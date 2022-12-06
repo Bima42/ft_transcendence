@@ -2,15 +2,22 @@
 Single Page Application Website. Last project of 42 School
 
 # Launch the project locally
-- Install npm
-- Clone the project
+- Get the Docker image
 
-```
-cd ft_transcendence
+```bash
+docker pull bima42/my-app
 ``` 
 
-```
-npm run dev
+- Go to the projet ft_transcendence, inside app folder
+
+```bash
+cd ft_transcendence/app
 ```
 
-- Go to localhost
+- Run the container
+
+```bash
+docker run -v ${PWD}:/app -v /app/node_modules -p 8080:8080 --rm bima42/my-app
+```
+
+- Go to `localhost:8080`
