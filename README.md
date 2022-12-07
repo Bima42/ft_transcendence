@@ -2,22 +2,29 @@
 Single Page Application Website. Last project of 42 School
 
 # Launch the project locally
-- Get the Docker image
 
-```bash
-docker pull bima42/my-app
-``` 
-
-- Go to the projet ft_transcendence, inside app folder
+- Go to the projedt ft_transcendence, inside app folder
 
 ```bash
 cd ft_transcendence/app
 ```
 
-- Run the container
+- Run containers
 
 ```bash
-docker run -v ${PWD}:/app -v /app/node_modules -p 8080:8080 --rm bima42/my-app
+docker compose up -d
 ```
 
 - Go to `localhost:8080`
+
+- If you want to clean up your Docker environment
+
+```
+docker compose down --rmi local
+```
+
+- If you want to explore the app container
+
+```
+docker exec -ti my-app sh
+```

@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+
+  my-app:
+    image: custom-node
+    container_name: my-app
+    build: ./app
+    volumes:
+      - './app:/app'
+      - '/app/node_modules'
+    ports:
+      - '8080:8080'
