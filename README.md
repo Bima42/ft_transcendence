@@ -6,7 +6,7 @@ Single Page Application Website. Last project of 42 School
 - Go to the projedt ft_transcendence, inside app folder
 
 ```bash
-cd ft_transcendence/app
+cd ft_transcendence
 ```
 
 - Run containers
