@@ -3,7 +3,7 @@ Single Page Application Website. Last project of 42 School
 
 # Launch the project locally
 
-- Go to the projedt ft_transcendence, inside app folder
+- Go to the project ft_transcendence, inside app folder
 
 ```bash
 cd ft_transcendence
