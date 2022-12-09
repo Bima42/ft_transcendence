@@ -8,13 +8,9 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
-COPY package.json /app/package.json
+COPY package.json ./
 
-# Sass
-RUN npm install -D sass-loader sass
-
-# Less
-RUN npm install -D less-loader less
+RUN npm install
 
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 RUN npm install -g @vue/cli

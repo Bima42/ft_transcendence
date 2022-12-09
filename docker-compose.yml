@@ -1,9 +1,8 @@
 version: '3.7'
 
 services:
-
   my-app:
-    image: custom-node
+    image: node-front
     container_name: my-app
     build: ./app
     volumes:
@@ -11,3 +10,13 @@ services:
       - '/app/node_modules'
     ports:
       - '8080:8080'
+
+  backend:
+    image: node-back
+    container_name: my-server
+    build: ./backend
+    volumes:
+      - './backend:/server'
+      - '/server/node_modules'
+    ports:
+      - '3080:3080'
