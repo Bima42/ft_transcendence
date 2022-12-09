@@ -1,11 +1,8 @@
 <template>
-<h1>Salut</h1>
+  <h1>INDEX</h1>
 </template>
 
-<script>
-export default {
-
-}
+<script setup lang="ts">
 </script>
 
 <style scoped>
