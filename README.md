@@ -9,7 +9,8 @@ Single Page Application Website. Last project of 42 School
 cd ft_transcendence
 ```
 
-- Run containers
+***
+### Run containers
 - Use `--build` to rebuild images
 - Use `--force-recreate` to force recreate image and containers
 
@@ -17,8 +18,12 @@ cd ft_transcendence
 docker compose up -d
 ```
 
+***
+### Reach application
 - Go to `localhost:8080`
 
+***
+### Build image with compose
 - If you want to rebuild images using compose
 - You can use `--no-cache` with it to build without using cache
 
@@ -26,19 +31,22 @@ docker compose up -d
 docker compose build
 ```
 
-- If you want to clean up images and volumes related to services
+***
+### Clean up images and volumes related to services
 
 ```
 docker compose down --rmi local
 ```
 
-- If you want to clean up environment
+***
+### Clean up environment
 
 ```
 docker system prune
 ```
 
-- If you want to explore container
+***
+### Explore container
 
 ```
 docker exec -ti my-app sh
