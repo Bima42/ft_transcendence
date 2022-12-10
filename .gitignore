@@ -1,5 +1,6 @@
+# Node related
 .DS_Store
-node_modules/
+*/.vscode
 */node_modules/
 backend/dist/
 npm-debug.log*

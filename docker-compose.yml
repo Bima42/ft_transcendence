@@ -2,17 +2,17 @@ version: '3.7'
 
 services:
   my-app:
-    image: node-front
+    image: frontend
     container_name: my-app
-    build: ./app
+    build: ./frontend
     volumes:
-      - './app:/app'
+      - './frontend:/app'
       - '/app/node_modules'
     ports:
       - '8080:8080'
 
   backend:
-    image: node-back
+    image: backend
     container_name: my-server
     build: ./backend
     volumes:
