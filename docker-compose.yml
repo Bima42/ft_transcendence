@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  my-app:
+  frontend:
     image: frontend
     container_name: my-app
     build: ./frontend
