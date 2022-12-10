@@ -1,7 +1,5 @@
 <template>
-  <router-link to="/index">
-    <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-  </router-link>
+
   <router-view></router-view>
 </template>
 
