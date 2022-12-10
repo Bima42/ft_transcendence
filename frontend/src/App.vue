@@ -9,7 +9,7 @@
 
 </script>
 
-<style>
+<style lang="scss">
 #app {
   display: flex;
   width: 100vw;
