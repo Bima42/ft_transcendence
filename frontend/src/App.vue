@@ -23,12 +23,14 @@
     height: 100%;
     grid-template-columns: 20% 30% 30% 20%;
     grid-template-rows: 10% 30% 30% 20% 10%;
+    justify-items: center;
+    align-items: center;
 
     grid-template-areas:
       "header1 header1 header2 header3"
-      "left main1 main1 right"
-      "left main2 main2 right"
-      "left main3 main3 right"
+      "left1 main1 main1 right1"
+      "left1 main2 main2 right1"
+      "left1 main3 main3 right1"
       "footer1 footer1 footer1 footer2";
   }
 }
