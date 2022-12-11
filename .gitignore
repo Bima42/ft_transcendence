@@ -2,9 +2,7 @@
 .DS_Store
 */.vscode
 */node_modules/
-backend/dist/
 backend/dist/*
-backend/dist/app.module.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
