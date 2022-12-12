@@ -35,7 +35,6 @@
 - Go to the [docs to download Docker Desktop](https://docs.docker.com/desktop/windows/wsl/#download)
 
 ### WSL Steps
-***
 - Accept this box
   - [ ] Use WSL2 instead of HyperV
 - Agree CGV
@@ -45,7 +44,6 @@
 
 
 ### Docker Desktop Tweaks
-***
 - Can login to [DockerHub](http://hub.docker.com) for pulls images
 - Go Task Bar -> Right Click on Docker -> Settings
   - Go to Resources
@@ -70,13 +68,11 @@
 - Go to [docs to install Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
 
 ### Mac Steps
-***
 - Choose the right .dmg file according to your MacOS Version
 - Launch the APP
 - Accept CGU
 
 ### Preferences
-***
 - All Preferences and Settings are in top right of the screen : Click on the Whale Icon to go in
 - You can log on [DockerHub](https://hub.docker.com) to pulls images from the hub
 - Go to `Preferences` -> `Resources` -> We can adjust the CPU usage, RAM or Disk usage for advanced using
@@ -102,7 +98,6 @@ sudo apt-get install ca-certificates curl gnupg lsb-release
 
 
 ### Linux Docker Desktop Tweaks
-***
 - You may want to login on [DockerHub](https://hub.docker.com) to pulls images
 
 - Go to `Preferences` -> `Resources` -> `Advanced`
@@ -113,7 +108,6 @@ sudo apt-get install ca-certificates curl gnupg lsb-release
     
 
 ### Problem Credential store not initialised
-***
 - This error can occur after launching Docker Desktop
 - Have to generate GPG Keys, always tuto on dockers docs ...
 

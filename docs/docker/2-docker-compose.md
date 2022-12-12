@@ -199,8 +199,10 @@ volumes:
   - `target`: the path in the container where the volume is mounted
   - `read_only`: flag to set the volume as read-only
 
-### EVERYTHING IS [HERE](https://docs.docker.com/compose/compose-file/)
 ***
+
+### EVERYTHING IS [HERE](https://docs.docker.com/compose/compose-file/)
+
 # Sources
 ***
 
