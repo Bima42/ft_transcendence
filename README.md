@@ -1,12 +1,13 @@
 # ft_transcendence
 ***
-Single Page Application Website. Last project of 42 School
+Single Page Application Website. This is the last project of 42 School common core.
 
-# Launch the project locally
+## Launch the project locally
 ***
-- Go to the project ft_transcendence, inside app folder
-
+### Clone the repository
 ```bash
+git clone git@github.com:Bima42/ft_transcendence.git
+
 cd ft_transcendence
 ```
 
@@ -18,7 +19,7 @@ cd ft_transcendence
 docker compose up -d
 ```
 
-# Documentation
+## Documentation
 ***
 - ### [Summary](docs/Summary.md)
 - ### [Docker](docs/docker/0-what-is-docker.md)
