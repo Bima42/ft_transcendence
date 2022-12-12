@@ -20,6 +20,7 @@
     - [1.3.3 Problem Credential store not initialised](#problem-credential-store-not-initialised)
 - ### [2. Sources](#sources)
 - ### [3. Docker Compose](2-docker-compose.md)
+### [Back to summary](../Summary.md)
 
 # Install Docker
 ***
