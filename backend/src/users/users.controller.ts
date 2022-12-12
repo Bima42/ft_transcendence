@@ -1,4 +1,4 @@
-import { Controller, Get} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
