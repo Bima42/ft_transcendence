@@ -6,14 +6,24 @@
       <input type="text" placeholder="Enter Username" name="uname" required>
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" required>
+	  <span>
       <router-link to="/index">
-        <button type="submit">Login</button>
+        <ButtonVue type="submit" label="Login"/>
       </router-link>
+      <router-link to="/signup">
+        <ButtonVue type="submit" label="Register"/>
+      </router-link>
+		</span>
+		<router-link to="/signup42">
+		<ButtonVue type="submit" label="Login with 42"/>
+		</router-link>
+		<!-- TODO: TYR justify center for last button -->
     </form>
   </section>
 </template>
 
 <script setup lang="ts">
+	import ButtonVue from '@/components/ButtonVue.vue';
 </script>
 
 <style scoped lang="scss">
