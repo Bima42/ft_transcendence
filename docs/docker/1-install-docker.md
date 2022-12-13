@@ -5,7 +5,6 @@
 ***
 
 # Index
-***
 - ### [1. Install Docker](#install-docker)
   - ##### [1.1 WSL](#wsl)
     - [1.1.1 WSL Steps](#wsl-steps)
@@ -19,18 +18,18 @@
     - [1.3.2 Linux Docker Desktop Tweaks](#linux-docker-desktop-tweaks)
     - [1.3.3 Problem Credential store not initialised](#problem-credential-store-not-initialised)
 - ### [2. Sources](#sources)
-- ### [3. Docker Compose](2-docker-compose.md)
+- ### [Previous Docs : Docker Compose](0-what-is-docker.md)
+- ### [Next Docs : Docker Compose](2-docker-compose.md)
 ### [Back to summary](../Summary.md)
 
-# Install Docker
 ***
+# Install Docker
 
 - We recommand you to use Docker Desktop, which is a really good tools to manage your docker containers
 - It provides a lot of great features to make docker easier
 - For Windows/WSL and Mac, Docker will run a tiny VM inside your host machine to run Docker inside
 
 ## WSL
-***
 
 - Go to the [docs to download Docker Desktop](https://docs.docker.com/desktop/windows/wsl/#download)
 
@@ -56,7 +55,6 @@
 </p>
 
 ### Problems when installing
-***
 ##### An unexpected error occured
 - Failed to deploy distro docker-desktop
 - This happen when you never run virtualisation inside your Windows
@@ -64,7 +62,6 @@
 - Had to enable virtualisation
 
 ## Mac
-***
 - Go to [docs to install Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
 
 ### Mac Steps
@@ -81,12 +78,10 @@
   - [ ] Enable VirtioFS : grants speed of file transfer between the machine and containers
 
 ## Linux
-***
 
 - #### This tuto may not work on all Linux Distribution
 
 ### Requirements
-***
 - There is some requirements for installing on Linux
 
 ~~~bash
@@ -112,7 +107,6 @@ sudo apt-get install ca-certificates curl gnupg lsb-release
 - Have to generate GPG Keys, always tuto on dockers docs ...
 
 # Sources
-***
 - <a href="https://docs.docker.com/desktop/windows/wsl/" target="_blank">Install WSL Docs</a>
 - <a href="https://docs.docker.com/desktop/install/mac-install/" target="_blank">Install Mac Docs</a>
 - <a href="https://docs.docker.com/desktop/install/linux-install/" target="_blank">Install Linux Docs</a>

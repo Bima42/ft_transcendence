@@ -22,7 +22,6 @@
 
 ***
 # Index
-***
 - ### [1. Disclaimer](#disclaimer)
 - ### [2. Getting Started](#getting-started)
 - ### [3. Prerequisites](#prerequisites)
@@ -33,9 +32,11 @@
   - ##### [5.3 Service for Users](#service-for-users)
   - ##### [5.4 Controller for Users](#controller-for-users)
 - ### [6. Adding data to our table user](#adding-data-to-our-table-user)
+- ### [Previous Docs : Dockerize Nest with Database](2-dockerize-nest-postgres-and-pgadmin.md)
+### [Back to summary](../Summary.md)
 
-# Disclaimer
 ***
+# Disclaimer
 - Keep in mind that sometimes, changes may not appear
 - Before panicking, try to stop your containers and run the project
 ~~~bash
@@ -55,12 +56,10 @@ docker compose up --build
 ~~~
 
 # Getting Started
-***
 - You must have a nest project set correctly
 - You can go to our [Tutorial for dockerize nest and postgres](2-dockerize-nest-postgres-and-pgadmin)
 
 # Prerequisites
-***
 - Go to your `backend` folder
 - Install TypeORM and Postgres module
 ~~~bash
@@ -90,7 +89,6 @@ docker compose up --build
 </p>
 
 # Configure database connection
-***
 - Go to your `src/app.module.ts` file
 - We will use Config Module to configure dynamically the database connection
 ~~~typescript
@@ -131,7 +129,6 @@ export class AppModule {}
 ~~~
 
 # Create Users table
-***
 ## Entity for Users
 - In TypeORM, an entity is a class that maps to a database table (or collection when using MongoDB)
 - Create a file `src/users/user.entity.ts` and add this code :
@@ -213,7 +210,6 @@ export class UsersController {
 ```
 
 # Adding data to our table user
-***
 - Launch the project if it's not running
 - Go to `localhost:5050` and log you in pgadmin
 - Go to your tables : `Servers` -> `Database name` -> `postgres` -> `Schemas` -> `public` -> `Tables`

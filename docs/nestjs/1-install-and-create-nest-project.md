@@ -21,7 +21,6 @@
 </p>
 
 # Index
-***
 - ### [1. Install npm and NodeJS](#install-npm-and-nodejs)
   - ##### [1.1 Linux](#linux)
   - ##### [1.1 Arch](#arch)
@@ -32,11 +31,12 @@
   - ##### [2.4 Nest new command](#nest-new-command)
 - ### [3. Launch project](#launch-project)
 - ### [4. Reach my project](#reach-my-project)
-- ### [5. Dockerize NestJS Postgres and PGAdmin](2-dockerize-nest-postgres-and-pgadmin.md)
+- ### [Previous Docs : What is NestJS](0-what-is-nestjs.md)
+- ### [Next Docs : Dockerize NestJS Postgres and PGAdmin](2-dockerize-nest-postgres-and-pgadmin.md)
 ### [Back to summary](../Summary.md)
 
-# Install npm and nodejs
 ***
+# Install npm and nodejs
 ## Linux
 ~~~bash
 sudo apt-get install -y npm nodejs
@@ -48,7 +48,6 @@ sudo pacman -Syu nodejs npm
 ~~~
 
 # Install and setup Nest
-***
 ## Install Nest
 ~~~bash
 npm i -g @nestjs/cli
@@ -77,7 +76,6 @@ nest new [nest-project-name]
     - `main.ts` : The entry file of the application which uses the core function NestFactory to create a Nest application instance.
 
 # Launch project
-***
 - Go to your nest project folder
 
 ~~~bash
