@@ -13,7 +13,6 @@
 ***
 
 # Index
-***
 - ### [1. Getting Started](#getting-started)
 - ### [2. Docker Compose Reference](#docker-compose-reference)
   - ##### [2.1 build](#build)
@@ -25,11 +24,12 @@
   - ##### [2.7 restart](#restart)
   - ##### [2.8 volume](#volume)
 - ### [3. Sources](#sources)
-- ### [4. Docker Usefull Commands](3-docker-usefull-commands.md)
+- ### [Previous Docs : Install Docker](1-install-docker.md)
+- ### [Next Docs : Docker Usefull Commands](3-docker-usefull-commands.md)
 ### [Back to summary](../Summary.md)
 
-# Getting Started
 ***
+# Getting Started
 - Allows you to start multiple containers at the same time
 - **docker-compose.yml**: required file that will serve as a guide to run the containers correctly
 - used to describe different containers
@@ -204,7 +204,6 @@ volumes:
 ### EVERYTHING IS [HERE](https://docs.docker.com/compose/compose-file/)
 
 # Sources
-***
 
 - <a href="https://docs.docker.com/compose/" target="_blank">Docker Compose Homepage</a>
 - <a href="https://docs.docker.com/compose/compose-file/compose-file-v3/" target="_blank">Docker Compose References and Docs</a>
