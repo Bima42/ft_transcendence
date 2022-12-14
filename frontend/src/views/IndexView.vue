@@ -1,6 +1,6 @@
 <template>
   <section class="header1">Je serai un header une jour :D</section>
-  <section class="header2">menu</section>
+  <BurgerMenu></BurgerMenu>
   <section class="left">left !</section>
   <section class="main"><img src="src/assets/logo.png"/></section>
   <section class="right">right !</section>
@@ -9,15 +9,14 @@
 </template>
 
 <script setup lang="ts">
+import BurgerMenu from "@/components/BurgerMenu.vue";
 </script>
 
 <style scoped lang="scss">
 .header1 {
   grid-area: $header1-2;
 }
-.header2 {
-  grid-area: header3;
-}
+
 .left {
   grid-area: left1;
 }
