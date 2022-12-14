@@ -1,47 +1,1 @@
-<template>
-  <section class="login-wrapper">
-    <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-    <form>
-      <label for="uname"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="uname" required>
-      <label for="psw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
-	  <span>
-      <router-link to="/index">
-        <ButtonVue type="submit" label="Login"/>
-      </router-link>
-      <router-link to="/signup">
-        <ButtonVue type="submit" label="Register"/>
-      </router-link>
-		</span>
-		<router-link to="/signup42">
-		<ButtonVue type="submit" label="Login with 42"/>
-		</router-link>
-		<!-- TODO: TYR justify center for last button -->
-    </form>
-  </section>
-</template>
-
-<script setup lang="ts">
-	import ButtonVue from '@/components/ButtonVue.vue';
-</script>
-
-<style scoped lang="scss">
-.login-wrapper {
-  grid-area: $main;
-
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  form {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-  }
-}
-
-</style>
+<template>  <section class="login-wrapper">    <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">    <form>      <label for="uname"><b>Username</b></label>      <input type="text" placeholder="Enter Username" name="uname" v-model="username" required>      <label for="psw"><b>Password</b></label>      <input type="password" placeholder="Enter Password"             name="psw"             v-model="password"             required>      <div class="buttons-container">        <CustomButton styles="fat" @click="loginClick">Login</CustomButton>        <CustomButton>Register</CustomButton>        <CustomButton>Login with 42</CustomButton>      </div>    </form>  </section></template><script setup lang="ts">  import CustomButton from "@/components/CustomButton.vue";  import { ref } from "vue";  const username = ref("")  const password = ref("")  function loginClick(e: Event) {    console.log(username.value, password.value)    username.value = "salut"    //TODO: fetch POST to login manager in backend and if OK change route  }</script><style scoped lang="scss">$button-gap: 10px;.login-wrapper {  grid-area: $main;  width: 100%;  height: 100%;  display: flex;  justify-content: center;  align-items: center;  flex-direction: column;  form {    display: flex;    justify-content: center;    flex-direction: column;  }}.buttons-container {  margin-top: $button-gap;  display: flex;  flex-direction: row;  flex-wrap: wrap;  justify-content: space-around;  align-items: center;  gap: 10px;  button {    width: calc(50% - $button-gap/2);  }}</style>
