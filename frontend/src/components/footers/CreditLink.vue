@@ -18,7 +18,13 @@ const props = defineProps<{}>()
   height: 100%;
 
   a {
-    color: yellow;
+    font-family: "Meta", sans-serif;
+    font-variation-settings: "wght" 1900, "ital" 0;
+    text-shadow: none;
+    -webkit-text-stroke: 2px $yellow;
+    letter-spacing: 2px;
+    font-size: 18px;
+    color: black;
   }
 }
 </style>
