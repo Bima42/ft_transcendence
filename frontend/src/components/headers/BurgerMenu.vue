@@ -32,7 +32,8 @@ const props = defineProps<{}>()
   width: 100%;
   overflow: hidden;
   img {
-    min-width: 25%;
+    max-width: 50px;
+    min-width: 20px;
   }
 }
 

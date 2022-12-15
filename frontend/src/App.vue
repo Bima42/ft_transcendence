@@ -10,6 +10,7 @@
 
 <style lang="scss">
 #app {
+  font-family: "Meta", sans-serif;
   display: flex;
   width: 100vw;
   height: 100vh;
