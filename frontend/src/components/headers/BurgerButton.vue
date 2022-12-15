@@ -20,7 +20,6 @@ function toggleMenu(e: Event) {
     menuOpen = false;
   }
 }
-
 </script>
 
 <style scoped lang="scss">
