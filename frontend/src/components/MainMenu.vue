@@ -90,4 +90,51 @@ const props = defineProps<{
     }
   }
 }
+
+.left {
+  grid-area: left1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+
+  .selections {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+
+    @font-face {
+      src: url("https://www.axis-praxis.org/fonts/webfonts/MetaVariableDemo-Set.woff2") format("woff2");
+      font-family: "Meta";
+      font-style: normal;
+      font-weight: normal;
+    }
+
+    h2:hover {
+      transform: translateX(10px);
+    }
+
+    a {
+      text-decoration: none;
+
+      h2 {
+        font-family: "Meta", sans-serif;
+        transition: all 0.5s;
+        font-variation-settings: "wght" 1900, "ital" 0;
+        text-shadow: none;
+        -webkit-text-stroke: 2px $yellow;
+        font-size: 24px;
+        color: black;
+      }
+    }
+  }
+}
 </style>
