@@ -16,10 +16,12 @@ button {
   background: $yellow;
   padding: 5px 12px;
   border: none;
+
   &:hover {
     cursor: pointer;
     filter: hue-rotate(180deg);
   }
+
   &.fat {
     font-weight: 900;
   }

@@ -1,5 +1,5 @@
 <template>
-  <section class="header1">Je serai un header une jour :D</section>
+  <HeaderTitle></HeaderTitle>
   <BurgerMenu></BurgerMenu>
   <section class="left">left !</section>
   <section class="main"><img src="src/assets/logo.png"/></section>
@@ -10,13 +10,10 @@
 
 <script setup lang="ts">
 import BurgerMenu from "@/components/BurgerMenu.vue";
+import HeaderTitle from "@/components/HeaderTitle.vue";
 </script>
 
 <style scoped lang="scss">
-.header1 {
-  grid-area: $header1-2;
-}
-
 .left {
   grid-area: left1;
 }
