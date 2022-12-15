@@ -1,25 +1,49 @@
 <template>
   <div class="header-wrapper">
     <img src="@/assets/img/logo.svg"/>
-<!--    TODO: Use user avatar here-->
+    <!--    TODO: Use user avatar here-->
     <input id="menu-toggle" type="checkbox"/>
     <label for="menu-toggle">
       <BurgerButton></BurgerButton>
     </label>
     <ul class="menu">
-      <li>One</li>
-      <li>Two</li>
-      <li>Three</li>
-      <li>Four</li>
-      <li>Five</li>
+      <a v-for="menuitem in menuitems"
+          :id="menuitem.id"
+          @click="eventClick">
+        {{ menuitem.name }}
+      </a>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import BurgerButton from "@/components/headers/BurgerButton.vue";
 
+const router = useRouter()
+
 const props = defineProps<{}>()
+
+function eventClick(e: Event) {
+  if (e.target.id === 'logout') {
+    router.push('/')
+    //TODO: Logout
+  }
+}
+
+const menuitems = ref(
+    [
+      {
+        name: 'Settings',
+        id: 'common',
+      },
+      {
+        name: 'Logout',
+        id: 'logout',
+      },
+    ]
+)
 </script>
 
 <style scoped lang="scss">
@@ -31,6 +55,7 @@ const props = defineProps<{}>()
   align-items: center;
   width: 100%;
   overflow: hidden;
+
   img {
     max-width: 50px;
     min-width: 20px;
@@ -51,9 +76,17 @@ const props = defineProps<{}>()
   right: 20px;
   margin-top: 50px;
   width: 100%;
+
+  a {
+    cursor: pointer;
+  }
 }
 
-.menu > li {
+#logout {
+  color: red;
+}
+
+.menu > a {
   margin: 0 1rem;
   overflow: hidden;
   display: flex;
@@ -68,7 +101,7 @@ const props = defineProps<{}>()
   display: none;
 }
 
-#menu-toggle ~ .menu li {
+#menu-toggle ~ .menu a {
   height: 0;
   margin: 0;
   padding: 0;
@@ -76,7 +109,7 @@ const props = defineProps<{}>()
   transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-#menu-toggle:checked ~ .menu li {
+#menu-toggle:checked ~ .menu a {
   border: 1px solid $yellow;
   height: 2.5em;
   padding: 0.5em;
