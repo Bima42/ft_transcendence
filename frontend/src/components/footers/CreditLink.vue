@@ -16,7 +16,6 @@ const props = defineProps<{}>()
   justify-content: center;
   width: 100%;
   height: 100%;
-
   a {
     color: yellow;
   }
