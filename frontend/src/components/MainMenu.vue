@@ -73,7 +73,7 @@ onMounted(() => {
     20px 20px 10px #e9019a;
     -webkit-text-stroke: 2px $yellow;
     color: black;
-
+    text-align: center;
   }
 
   .selections {
