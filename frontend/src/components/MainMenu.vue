@@ -2,27 +2,55 @@
   <section :class="props.position">
     <h1 v-if="props.position === 'main'">Main Menu</h1>
     <section class="selections">
-      <router-link to="/live">
-        <h2>Watch a live game</h2>
+      <router-link v-for="item in items" :to="item.link">
+        <h2 :id="item.id">{{ item.name }}</h2>
       </router-link>
-      <router-link to="/play">
-        <h2>Play a game</h2>
-      </router-link>
-      <router-link to="/score">
-        <h2>Score board</h2>
-      </router-link>
-      <router-link to="/community">
-        <h2>Community</h2>
-      </router-link>
-
     </section>
   </section>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const props = defineProps<{
   position: String,
 }>()
+
+const items = ref(
+    [
+      {
+        name: 'Watch a live game',
+        link: '/live',
+        id: 'live',
+      },
+      {
+        name: 'Play a game',
+        link: '/play',
+        id: 'play',
+      },
+      {
+        name: 'Score board',
+        link: '/score',
+        id: 'score',
+      },
+      {
+        name: 'Community',
+        link: '/community',
+        id: 'community',
+      },
+    ]
+)
+
+onMounted(() => {
+  if (router.currentRoute.value.name !== 'index') {
+    let current_selection = document.getElementById(router.currentRoute.value.name)
+    current_selection.classList.add('selected')
+  }
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -110,6 +138,21 @@ const props = defineProps<{
     width: 100%;
     height: 100%;
     padding: 40px;
+
+    .selected {
+      transform: translateX(10px);
+
+      &:before {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 3px;
+        background: $yellow;
+        border-radius: 25px;
+        transition: all .5s ease-in-out;
+        left: -20px;
+      }
+    }
 
     @font-face {
       src: url("https://www.axis-praxis.org/fonts/webfonts/MetaVariableDemo-Set.woff2") format("woff2");
