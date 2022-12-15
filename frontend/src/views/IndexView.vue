@@ -1,16 +1,14 @@
 <template>
-  <HeaderTitle></HeaderTitle>
-  <BurgerMenu></BurgerMenu>
+  <HeaderPack></HeaderPack>
   <section class="left">left !</section>
   <section class="main"><img src="src/assets/logo.png"/></section>
   <section class="right">right !</section>
   <section class="footer1">Information dans le footer !</section>
-  <section class="footer2">credits ?</section>
+  <router-link to="/credits">Credits</router-link>
 </template>
 
 <script setup lang="ts">
-import BurgerMenu from "@/components/BurgerMenu.vue";
-import HeaderTitle from "@/components/HeaderTitle.vue";
+import HeaderPack from "@/components/headers/HeaderPack.vue";
 </script>
 
 <style scoped lang="scss">
