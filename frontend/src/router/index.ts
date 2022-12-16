@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import IndexView from '@/views/IndexView.vue'
 import LoginView from '@/views/LoginView.vue'
 import CreditsView from '@/views/CreditsView.vue'
@@ -8,51 +8,56 @@ import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: LoginView,
-    },
-    {
-      path: '/index',
-      name: 'index',
-      component: IndexView,
-    },
-    {
-      path: '/credits',
-      name: 'credits',
-      component: CreditsView,
-    },
-    {
-      path: '/main',
-      name: 'main',
-      children: [
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: [
         {
-          path: '/live',
-          name: 'live',
-          component: LiveGameView,
+            path: '/',
+            name: 'home',
+            component: LoginView,
         },
         {
-          path: '/play',
-          name: 'play',
-          component: PlayAGameView,
+            path: '/index',
+            name: 'index',
+            component: IndexView,
         },
         {
-          path: '/score',
-          name: 'score',
-          component: ScoreBoardView,
+            path: '/credits',
+            name: 'credits',
+            component: CreditsView,
         },
         {
-          path: '/community',
-          name: 'community',
-          component: CommunityView,
+            path: '/main',
+            name: 'main',
+            children: [
+                {
+                    path: 'live',
+                    name: 'live',
+                    component: LiveGameView,
+                    longName: 'Watch a live game',
+
+                },
+                {
+                    path: 'play',
+                    name: 'play',
+                    component: PlayAGameView,
+                    longName: 'Play a game',
+
+                },
+                {
+                    path: 'score',
+                    name: 'score',
+                    component: ScoreBoardView,
+                    longName: 'Scoreboard',
+                },
+                {
+                    path: 'community',
+                    name: 'community',
+                    component: CommunityView,
+                    longName: 'Community',
+                },
+            ]
         },
-      ]
-    },
-  ]
+    ]
 })
-// TODO: erase the big objects and use routes instead
 
 export default router

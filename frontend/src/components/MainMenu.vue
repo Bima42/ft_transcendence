@@ -1,9 +1,9 @@
 <template>
   <section :class="menuPosition">
     <h1 v-if="menuPosition === 'main'">Main Menu</h1>
-    <section class="selections">
-      <router-link v-for="item in items" :to="item.link">
-        <h2 :id="item.id">{{ item.name }}</h2>
+    <section v-if="routes" class="selections">
+      <router-link v-for="item in routes" :to="{ name: item.name }">
+        <h2 :id="item.name">{{ item.longName }}</h2>
       </router-link>
     </section>
   </section>
@@ -22,30 +22,17 @@ const menuPosition = computed(() => {
   return route.name === 'index' ? 'main':'left'
 })
 
-const items = ref(
-    [
-      {
-        name: 'Watch a live game',
-        link: '/live',
-        id: 'live',
-      },
-      {
-        name: 'Play a game',
-        link: '/play',
-        id: 'play',
-      },
-      {
-        name: 'Scoreboard',
-        link: '/score',
-        id: 'score',
-      },
-      {
-        name: 'Community',
-        link: '/community',
-        id: 'community',
-      },
-    ]
-)
+const routes = computed(() => menuItems())
+
+function menuItems() {
+  let allRoutes = router.options.routes;
+  let mainChildren = allRoutes.filter(route => route.name === 'main');
+  if (!mainChildren.length) {
+    console.error('allRoutes filter has failed to find his main children')
+    return []
+  }
+  return mainChildren[0].children
+}
 </script>
 
 <style scoped lang="scss">
