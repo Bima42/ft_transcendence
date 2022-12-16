@@ -65,26 +65,12 @@ function menuItems() {
     flex-direction: column;
     gap: 20px;
 
-
     @font-face {
       src: url("https://www.axis-praxis.org/fonts/webfonts/MetaVariableDemo-Set.woff2") format("woff2");
       font-family: "Meta";
       font-style: normal;
       font-weight: normal;
     }
-
-    h2:hover {
-      transition: all 0.5s;
-      font-variation-settings: "wght" 900, "ital" 1;
-      text-align: center;
-      text-shadow: 5px 5px 0px black,
-      10px 10px 0px orange,
-      15px 15px 0px #e601c0,
-      20px 20px 10px #e9019a;
-      cursor: pointer;
-      color: $yellow;
-    }
-
     a {
       text-decoration: none;
 
@@ -96,6 +82,18 @@ function menuItems() {
         -webkit-text-stroke: 2px $yellow;
         font-size: 42px;
         color: black;
+
+        &:hover {
+          transition: all 0.5s;
+          font-variation-settings: "wght" 900, "ital" 1;
+          text-align: center;
+          text-shadow: 5px 5px 0px black,
+          10px 10px 0px orange,
+          15px 15px 0px #e601c0,
+          20px 20px 10px #e9019a;
+          cursor: pointer;
+          color: $yellow;
+        }
       }
     }
   }
