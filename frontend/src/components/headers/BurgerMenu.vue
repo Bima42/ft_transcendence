@@ -9,7 +9,7 @@
     <ul class="menu">
       <a v-for="menuitem in menuitems"
           :id="menuitem.id"
-          @click="eventClick">
+          @click="clickHandler">
         {{ menuitem.name }}
       </a>
     </ul>
@@ -17,23 +17,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import BurgerButton from "@/components/headers/BurgerButton.vue"
-import {useModalStore} from "@/stores/modal.ts"
-import Modal from "@/components/modal/TheModal.vue"
+import { useModalStore } from "@/stores/modal"
 
-const router = useRouter()
+import BurgerButton from "@/components/headers/BurgerButton.vue"
+import Modal from "@/components/modal/TheModal.vue"
+import UserModal from "@/components/UserEditModal.vue"
+
 const modalStore = useModalStore()
+const router = useRouter()
 const props = defineProps<{}>()
 
-function eventClick(e: Event) {
-  if (e.target.id === 'logout') {
+function clickHandler(e: Event) {
+  if (!e.target)
+    return
+  const target = e.target as HTMLElement
+
+  if (target.id === 'logout') {
     router.push('/')
     //TODO: Logout
   }
-  else if (e.target.id === 'modalUser') {
-    modalStore.loadAndDisplay(Modal, "","");
+  else if (target.id === 'modalUser') {
+    modalStore.loadAndDisplay(Modal, UserModal, {})
   }
 }
 

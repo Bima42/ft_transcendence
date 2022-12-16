@@ -26,26 +26,33 @@ const router = createRouter({
       component: CreditsView,
     },
     {
-      path: '/live',
-      name: 'live',
-      component: LiveGameView,
-    },
-    {
-      path: '/play',
-      name: 'play',
-      component: PlayAGameView,
-    },
-    {
-      path: '/score',
-      name: 'score',
-      component: ScoreBoardView,
-    },
-    {
-      path: '/community',
-      name: 'community',
-      component: CommunityView,
+      path: '/main',
+      name: 'main',
+      children: [
+        {
+          path: '/live',
+          name: 'live',
+          component: LiveGameView,
+        },
+        {
+          path: '/play',
+          name: 'play',
+          component: PlayAGameView,
+        },
+        {
+          path: '/score',
+          name: 'score',
+          component: ScoreBoardView,
+        },
+        {
+          path: '/community',
+          name: 'community',
+          component: CommunityView,
+        },
+      ]
     },
   ]
 })
+// TODO: erase the big objects and use routes instead
 
 export default router
