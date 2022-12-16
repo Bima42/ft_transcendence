@@ -22,7 +22,7 @@ button {
     transform: scale(0.9);
     transition: all 200ms ease-in-out;
   }
-  
+
   .menu-btn_burger::before,
   .menu-btn_burger::after {
     content: '';
