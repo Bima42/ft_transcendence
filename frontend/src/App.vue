@@ -1,11 +1,21 @@
 <template>
   <section class="UI-grid">
+    <HeaderPack></HeaderPack>
+    <MainMenu></MainMenu>
+    <CreditLink></CreditLink>
+    <TheModal v-if="modalStore.show"></TheModal>
     <router-view></router-view>
   </section>
 </template>
 
 <script setup lang="ts">
+import HeaderPack from "@/components/headers/HeaderPack.vue";
+import CreditLink from "@/components/footers/CreditLink.vue";
+import MainMenu from "@/components/MainMenu.vue";
+import TheModal from "@/components/modal/TheModal.vue";
+import {useModalStore} from "@/stores/modal";
 
+const modalStore = useModalStore()
 </script>
 
 <style lang="scss">

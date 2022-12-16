@@ -1,6 +1,6 @@
 <template>
-  <section :class="props.position">
-    <h1 v-if="props.position === 'main'">Main Menu</h1>
+  <section :class="menuPosition">
+    <h1 v-if="menuPosition === 'main'">Main Menu</h1>
     <section class="selections">
       <router-link v-for="item in items" :to="item.link">
         <h2 :id="item.id">{{ item.name }}</h2>
@@ -10,14 +10,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, defineProps, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const props = defineProps<{}>()
 
 const router = useRouter()
+const route = useRoute()
 
-const props = defineProps<{
-  position: String,
-}>()
+const menuPosition = computed(() => {
+  return route.name === 'index' ? 'main':'left'
+})
 
 const items = ref(
     [
@@ -32,7 +35,7 @@ const items = ref(
         id: 'play',
       },
       {
-        name: 'Score board',
+        name: 'Scoreboard',
         link: '/score',
         id: 'score',
       },
@@ -43,14 +46,6 @@ const items = ref(
       },
     ]
 )
-
-onMounted(() => {
-  if (router.currentRoute.value.name !== 'index') {
-    let current_selection = document.getElementById(router.currentRoute.value.name)
-    current_selection.classList.add('selected')
-  }
-})
-
 </script>
 
 <style scoped lang="scss">
@@ -170,7 +165,7 @@ onMounted(() => {
 
       h2 {
         font-family: "Meta", sans-serif;
-        transition: all 0.5s;
+        transition: all 0.2s;
         font-variation-settings: "wght" 1900, "ital" 0;
         text-shadow: none;
         -webkit-text-stroke: 2px $yellow;

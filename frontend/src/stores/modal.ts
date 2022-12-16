@@ -1,7 +1,7 @@
-import {defineStore} from 'pinia'
-import {ref, shallowRef} from "vue"
-import type {Component} from "vue";
-import type {Ref} from "vue"
+import { defineStore } from 'pinia'
+import { ref, shallowRef } from "vue"
+import type { Component } from "vue"
+import type { Ref } from "vue"
 
 
 export const useModalStore = defineStore('modal', () => {

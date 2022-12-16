@@ -1,5 +1,4 @@
 <template>
-  <HeaderPack></HeaderPack>
   <section class="credit-wrapper">
   <GitHubCard :link="creator.githubLink" v-for="creator in creators">
     <h2>{{ creator.name }}</h2>
@@ -11,7 +10,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import GitHubCard from "@/components/GitHubCard.vue";
-import HeaderPack from "@/components/headers/HeaderPack.vue";
 
 const creators = ref(
     [
