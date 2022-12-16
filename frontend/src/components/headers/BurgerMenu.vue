@@ -19,10 +19,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import BurgerButton from "@/components/headers/BurgerButton.vue";
+import BurgerButton from "@/components/headers/BurgerButton.vue"
+import {useModalStore} from "@/stores/modal.ts"
+import Modal from "@/components/modal/TheModal.vue"
 
 const router = useRouter()
-
+const modalStore = useModalStore()
 const props = defineProps<{}>()
 
 function eventClick(e: Event) {
@@ -30,13 +32,16 @@ function eventClick(e: Event) {
     router.push('/')
     //TODO: Logout
   }
+  else if (e.target.id === 'modalUser') {
+    modalStore.loadAndDisplay(Modal, "","");
+  }
 }
 
 const menuitems = ref(
     [
       {
         name: 'Settings',
-        id: 'common',
+        id: 'modalUser',
       },
       {
         name: 'Logout',
