@@ -1,56 +1,40 @@
 <template>
-  <section :class="props.position">
-    <h1 v-if="props.position === 'main'">Main Menu</h1>
-    <section class="selections">
-      <router-link v-for="item in items" :to="item.link">
-        <h2 :id="item.id">{{ item.name }}</h2>
+  <section :class="menuPosition">
+    <h1 v-if="menuPosition === 'main'">Main Menu</h1>
+    <section v-if="routes" class="selections">
+      <router-link v-for="item in routes"
+                   :to="{ name: item.name }"
+                   :id="item.name">
+        {{ item.longName }}
       </router-link>
     </section>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import {defineProps, computed} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
+
+const props = defineProps<{}>()
 
 const router = useRouter()
+const route = useRoute()
 
-const props = defineProps<{
-  position: String,
-}>()
-
-const items = ref(
-    [
-      {
-        name: 'Watch a live game',
-        link: '/live',
-        id: 'live',
-      },
-      {
-        name: 'Play a game',
-        link: '/play',
-        id: 'play',
-      },
-      {
-        name: 'Score board',
-        link: '/score',
-        id: 'score',
-      },
-      {
-        name: 'Community',
-        link: '/community',
-        id: 'community',
-      },
-    ]
-)
-
-onMounted(() => {
-  if (router.currentRoute.value.name !== 'index') {
-    let current_selection = document.getElementById(router.currentRoute.value.name)
-    current_selection.classList.add('selected')
-  }
+const menuPosition = computed(() => {
+  return route.name === 'index' ? 'main' : 'left'
 })
 
+const routes = computed(() => menuItems())
+
+function menuItems() {
+  let allRoutes = router.options.routes;
+  let mainChildren = allRoutes.filter(route => route.name === 'main');
+  if (!mainChildren.length) {
+    console.error('MainMenu.vue: allRoutes filter has failed to find his main children')
+    return []
+  }
+  return mainChildren[0].children
+}
 </script>
 
 <style scoped lang="scss">
@@ -83,37 +67,32 @@ onMounted(() => {
     flex-direction: column;
     gap: 20px;
 
-
     @font-face {
       src: url("https://www.axis-praxis.org/fonts/webfonts/MetaVariableDemo-Set.woff2") format("woff2");
       font-family: "Meta";
       font-style: normal;
       font-weight: normal;
     }
-
-    h2:hover {
-      transition: all 0.5s;
-      font-variation-settings: "wght" 900, "ital" 1;
-      text-align: center;
-      text-shadow: 5px 5px 0px black,
-      10px 10px 0px orange,
-      15px 15px 0px #e601c0,
-      20px 20px 10px #e9019a;
-      cursor: pointer;
-      color: $yellow;
-    }
-
     a {
       text-decoration: none;
+      font-family: "Meta", sans-serif;
+      transition: all 0.5s;
+      font-variation-settings: "wght" 1900, "ital" 0;
+      text-shadow: none;
+      -webkit-text-stroke: 2px $yellow;
+      font-size: 42px;
+      color: black;
 
-      h2 {
-        font-family: "Meta", sans-serif;
+      &:hover {
         transition: all 0.5s;
-        font-variation-settings: "wght" 1900, "ital" 0;
-        text-shadow: none;
-        -webkit-text-stroke: 2px $yellow;
-        font-size: 42px;
-        color: black;
+        font-variation-settings: "wght" 900, "ital" 1;
+        text-align: center;
+        text-shadow: 5px 5px 0px black,
+        10px 10px 0px orange,
+        15px 15px 0px #e601c0,
+        20px 20px 10px #e9019a;
+        cursor: pointer;
+        color: $yellow;
       }
     }
   }
@@ -139,7 +118,7 @@ onMounted(() => {
     height: 100%;
     padding: 40px;
 
-    .selected {
+    .router-link-active {
       transform: translateX(10px);
 
       &:before {
@@ -161,21 +140,18 @@ onMounted(() => {
       font-weight: normal;
     }
 
-    h2:hover {
-      transform: translateX(10px);
-    }
-
     a {
       text-decoration: none;
+      font-family: "Meta", sans-serif;
+      transition: all 0.2s;
+      font-variation-settings: "wght" 1900, "ital" 0;
+      text-shadow: none;
+      -webkit-text-stroke: 2px $yellow;
+      font-size: 24px;
+      color: black;
 
-      h2 {
-        font-family: "Meta", sans-serif;
-        transition: all 0.5s;
-        font-variation-settings: "wght" 1900, "ital" 0;
-        text-shadow: none;
-        -webkit-text-stroke: 2px $yellow;
-        font-size: 24px;
-        color: black;
+      &:hover {
+        transform: translateX(10px);
       }
     }
   }

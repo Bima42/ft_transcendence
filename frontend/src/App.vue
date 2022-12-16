@@ -1,11 +1,31 @@
 <template>
   <section class="UI-grid">
+    <template v-if="route.name !== 'home'">
+      <HeaderPack></HeaderPack>
+      <MainMenu></MainMenu>
+    </template>
+    <CreditLink></CreditLink>
+    <TheModal v-if="modalStore.show">
+      <UserEditModal></UserEditModal>
+    </TheModal>
     <router-view></router-view>
   </section>
 </template>
 
 <script setup lang="ts">
+import {useRoute} from 'vue-router'
 
+import HeaderPack from "@/components/headers/HeaderPack.vue";
+import CreditLink from "@/components/footers/CreditLink.vue";
+import MainMenu from "@/components/MainMenu.vue";
+import TheModal from "@/components/modal/TheModal.vue";
+import {useModalStore} from "@/stores/modal";
+import UserEditModal from "@/components/UserEditModal.vue";
+
+const route = useRoute()
+const modalStore = useModalStore()
+
+console.log(route.name)
 </script>
 
 <style lang="scss">

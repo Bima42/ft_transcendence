@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrapper">
-    <img src="@/assets/img/logo.svg"/>
+    <UserAvatar type="small"></UserAvatar>
     <!--    TODO: Use user avatar here-->
     <input id="menu-toggle" type="checkbox"/>
     <label for="menu-toggle">
@@ -9,7 +9,7 @@
     <ul class="menu">
       <a v-for="menuitem in menuitems"
           :id="menuitem.id"
-          @click="eventClick">
+          @click="clickHandler">
         {{ menuitem.name }}
       </a>
     </ul>
@@ -17,18 +17,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import BurgerButton from "@/components/headers/BurgerButton.vue";
+import { useModalStore } from "@/stores/modal"
 
+import BurgerButton from "@/components/headers/BurgerButton.vue"
+import Modal from "@/components/modal/TheModal.vue"
+import UserModal from "@/components/UserEditModal.vue"
+import UserAvatar from "@/components/UserAvatar.vue";
+
+const modalStore = useModalStore()
 const router = useRouter()
-
 const props = defineProps<{}>()
 
-function eventClick(e: Event) {
-  if (e.target.id === 'logout') {
+function clickHandler(e: Event) {
+  if (!e.target)
+    return
+  const target = e.target as HTMLElement
+
+  if (target.id === 'logout') {
     router.push('/')
     //TODO: Logout
+  }
+  else if (target.id === 'modalUser') {
+    modalStore.loadAndDisplay(Modal, UserModal, {})
   }
 }
 
@@ -36,7 +48,7 @@ const menuitems = ref(
     [
       {
         name: 'Settings',
-        id: 'common',
+        id: 'modalUser',
       },
       {
         name: 'Logout',
@@ -55,11 +67,6 @@ const menuitems = ref(
   align-items: center;
   width: 100%;
   overflow: hidden;
-
-  img {
-    max-width: 50px;
-    min-width: 20px;
-  }
 }
 
 .menu {
@@ -75,7 +82,6 @@ const menuitems = ref(
   top: 30px;
   right: 20px;
   margin-top: 50px;
-  width: 100%;
 
   a {
     cursor: pointer;
