@@ -86,7 +86,6 @@ const menuitems = ref(
   top: 30px;
   right: 20px;
   margin-top: 50px;
-  width: 100%;
 
   a {
     cursor: pointer;
