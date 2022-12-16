@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrapper">
-    <img src="@/assets/img/logo.svg"/>
+    <UserAvatar type="small"></UserAvatar>
     <!--    TODO: Use user avatar here-->
     <input id="menu-toggle" type="checkbox"/>
     <label for="menu-toggle">
@@ -24,6 +24,7 @@ import { useModalStore } from "@/stores/modal"
 import BurgerButton from "@/components/headers/BurgerButton.vue"
 import Modal from "@/components/modal/TheModal.vue"
 import UserModal from "@/components/UserEditModal.vue"
+import UserAvatar from "@/components/UserAvatar.vue";
 
 const modalStore = useModalStore()
 const router = useRouter()
@@ -66,11 +67,6 @@ const menuitems = ref(
   align-items: center;
   width: 100%;
   overflow: hidden;
-
-  img {
-    max-width: 50px;
-    min-width: 20px;
-  }
 }
 
 .menu {

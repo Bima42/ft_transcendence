@@ -3,7 +3,9 @@
     <HeaderPack></HeaderPack>
     <MainMenu></MainMenu>
     <CreditLink></CreditLink>
-    <TheModal v-if="modalStore.show"></TheModal>
+    <TheModal v-if="modalStore.show">
+      <UserEditModal></UserEditModal>
+    </TheModal>
     <router-view></router-view>
   </section>
 </template>
@@ -14,6 +16,7 @@ import CreditLink from "@/components/footers/CreditLink.vue";
 import MainMenu from "@/components/MainMenu.vue";
 import TheModal from "@/components/modal/TheModal.vue";
 import {useModalStore} from "@/stores/modal";
+import UserEditModal from "@/components/UserEditModal.vue";
 
 const modalStore = useModalStore()
 </script>
