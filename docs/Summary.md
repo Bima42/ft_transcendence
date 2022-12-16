@@ -8,8 +8,9 @@
 
 # NestJS
 - ### [What is NestJS ?](nestjs/0-what-is-nestjs.md)
-- ### [Install Docker](nestjs/1-install-and-create-nest-project.md)
-- ### [Docker Compose](nestjs/2-dockerize-nest-postgres-and-pgadmin.md)
+- ### [Install and Create Nest Project](nestjs/1-install-and-create-nest-project.md)
+- ### [Dockerize Nest, Postgres and PGadmin](nestjs/2-dockerize-nest-postgres-and-pgadmin.md)
+- ### [Create table in database](nestjs/3-create-table-in-database.md)
 
 # Vue
 
