@@ -30,19 +30,20 @@ const router = createRouter({
             name: 'main',
             children: [
                 {
-                    path: 'live',
-                    name: 'live',
-                    component: LiveGameView,
-                    longName: 'Watch a live game',
-
-                },
-                {
                     path: 'play',
                     name: 'play',
                     component: PlayAGameView,
                     longName: 'Play a game',
 
                 },
+                {
+                    path: 'live',
+                    name: 'live',
+                    component: LiveGameView,
+                    longName: 'Live games',
+
+                },
+
                 {
                     path: 'score',
                     name: 'score',
