@@ -30,6 +30,7 @@ function exitClick(e: Event) {
   justify-content: center;
   align-items: center;
   padding: 100px;
+  overflow: auto;
 
   .main-box {
     position: relative;
@@ -37,12 +38,10 @@ function exitClick(e: Event) {
     box-shadow: 8px 16px 32px 0 rgba(31, 31, 31, 0.08);
     background-color: $light-gray;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
-    padding-top: 75px;
     width: 100%;
     height: 100%;
-
   }
 
   .exit-button {
