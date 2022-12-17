@@ -1,2 +1,19 @@
 $yellow: #ffdd42;
 $light-gray: #121212;
+
+$border-radius: 20px;
+
+input {
+  background: $light-gray;
+  color: #f0f0f0;
+  border-radius: $border-radius;
+  border-color: $yellow;
+  padding: 5px 10px 5px 10px;
+  margin: 5px;
+
+  &:focus{
+    outline-color: $yellow;
+	outline-style: outset;
+	outline-width: 4px;
+  }
+}

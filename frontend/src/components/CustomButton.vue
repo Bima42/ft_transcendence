@@ -12,7 +12,7 @@ const props = defineProps<{
 
 <style scoped lang="scss">
 button {
-  border-radius: 16px;
+  border-radius: $border-radius;
   background: $yellow;
   padding: 5px 12px;
   border: none;
@@ -24,6 +24,12 @@ button {
 
   &.fat {
     font-weight: 900;
+  }
+
+  &:focus{
+    outline-color: $yellow;
+	outline-style: outset;
+	outline-width: 4px;
   }
 }
 </style>
