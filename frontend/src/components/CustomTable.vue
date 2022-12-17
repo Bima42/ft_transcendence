@@ -13,12 +13,13 @@
 		<tr>
 			<td>aaa</td>
 			<td>bbb</td>
-			<td>ccc</td>
+			<td><button>Button</button></td>
 		</tr>
 	</table>
 </template>
 
 <script lang="ts">
+  import CustomButton from '@/components/CustomButton.vue';
 </script>
 
 <style scoped lang="scss">
