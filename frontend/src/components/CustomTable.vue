@@ -1,28 +1,33 @@
 <template>
+		<div class="table-header">
+			<h1>LIVE GAME</h1>
+		</div>
+
 		<div class="table-container">
 
 			<div class="table-line">
-				<div class="binouze"><h1>OPPONENTS</h1></div>
-				<div class="binouze"><h1>SCORE</h1></div>
-				<div class="binouze"><h1>POPULATION</h1></div>
-				<div class="binouze"><h1>LIVE GAME</h1></div>
+				<div class="text"><h1>OPPONENTS</h1></div>
+				<div class="text"><h1>SCORE</h1></div>
+				<div class="text"><h1>POPULATION</h1></div>
+				<div class="text"><h1>LIVE GAME</h1></div>
 			</div>
 
 			<div class="table-line">
-				<div class="binouze">User 33</div>
-				<div class="binouze">2 - 1</div>
-				<div class="binouze">4000 </div>
-				<div class="binouze"><CustomButton> Watch now!</CustomButton></div>
+				<div class="text">User 33</div>
+				<div class="text">2 - 1</div>
+				<div class="text">4000 </div>
+				<div class="text"><CustomButton> Watch now!</CustomButton></div>
 			</div>
 
 			<div class="table-line">
-				<div class="binouze">User 209</div>
-				<div class="binouze">33 - 40</div>
-				<div class="binouze">3300 </div>
-				<div class="binouze"><CustomButton> Watch now!</CustomButton></div>
+				<div class="text">User 209</div>
+				<div class="text">33 - 40</div>
+				<div class="text">3300 </div>
+				<div class="text"><CustomButton> Watch now!</CustomButton></div>
 			</div>
 
 		</div>
+
 </template>
 
 <script lang="ts">
@@ -37,7 +42,11 @@
 </script>
 
 <style scoped lang="scss">
-	.table-line .binouze h1{
+	.table-header h1{
+	padding: 10px;
+	text-align: center;
+	}
+	.table-line .text h1{
 		font-weight: bolder;
 		color: rgb(255, 217, 0);
 	}
@@ -56,7 +65,7 @@
 		text-align: center;
 		transition: background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 	}
-	.table-line .binouze {
+	.table-line .text {
 		width: 138px;
 		padding: 10px;
 		margin: 10px;
