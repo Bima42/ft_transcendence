@@ -1,45 +1,70 @@
 <template>
-	<table>
-		<tr>
-			<th>Title 1</th>
-			<th>Title 2</th>
-			<th>Title 3</th>
-		</tr>
-		<tr>
-			<td>Subtitle 1</td>
-			<td>Subtitle 2</td>
-			<td>Subtitle 3</td>
-		</tr>
-		<tr>
-			<td>aaa</td>
-			<td>bbb</td>
-			<td><button>Button</button></td>
-		</tr>
-	</table>
+		<div class="table-container">
+
+			<div class="table-line">
+				<div class="binouze"><h1>OPPONENTS</h1></div>
+				<div class="binouze"><h1>SCORE</h1></div>
+				<div class="binouze"><h1>POPULATION</h1></div>
+				<div class="binouze"><h1>LIVE GAME</h1></div>
+			</div>
+
+			<div class="table-line">
+				<div class="binouze">User 33</div>
+				<div class="binouze">2 - 1</div>
+				<div class="binouze">4000 </div>
+				<div class="binouze"><CustomButton> Watch now!</CustomButton></div>
+			</div>
+
+			<div class="table-line">
+				<div class="binouze">User 209</div>
+				<div class="binouze">33 - 40</div>
+				<div class="binouze">3300 </div>
+				<div class="binouze"><CustomButton> Watch now!</CustomButton></div>
+			</div>
+
+		</div>
 </template>
 
 <script lang="ts">
-  import CustomButton from '@/components/CustomButton.vue';
+	import CustomButton from '@/components/CustomButton.vue';
+	export default
+		{
+		components:
+			{
+				CustomButton,
+			},
+		};
 </script>
 
 <style scoped lang="scss">
-table
-{
-	border-collapse: collapse;
-	width: 100%;
-
-	th, td {
-		border: 1px solid rgb(255, 187, 0);
-		padding: 8px;
+	.table-line .binouze h1{
+		font-weight: bolder;
+		color: rgb(255, 217, 0);
 	}
-
-	tr:nth-child(even) {
-		background-color: #6e6b65;
+	.table-line {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		width: 100%;
 	}
-
-	th {
-		background-color: #f0c400;
-		color: white;
+	.table-line {
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		border-top: 1px solid rgb(239, 173, 5);
+		border-bottom: 1px solid rgb(245, 221, 4);
+		margin: 10px;
+		text-align: center;
+		transition: background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 	}
-}
+	.table-line .binouze {
+		width: 138px;
+		padding: 10px;
+		margin: 10px;
+		text-align: center;
+		transition: background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+	.table-line:hover {
+		background: rgba(214, 177, 8, 0.522);
+		box-shadow: 0 0 10px 5px rgba(200, 0, 200, 0.5);
+	}
 </style>
