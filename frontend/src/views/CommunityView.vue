@@ -15,11 +15,39 @@
 				<ul class="chat-users">
 				<!-- Connected users will be added here dynamically using JavaScript -->
 				user1...
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+
 				</ul>
 				<h2>Connected Friends</h2>
 				<ul class="chat-users">
 				<!-- Connected users will be added here dynamically using JavaScript -->
-				Toto
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
 				</ul>
 			</div>
 
@@ -43,7 +71,7 @@
 				<h5>test</h5>
 				<h5>test</h5>
 				<h5>test</h5>
-				<h5>test</h5>
+				<h5>testeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</h5>
 				<h5>test</h5>
 				<h5>test</h5>
 				<h5>test</h5>
@@ -144,17 +172,19 @@
 	display: flex;
 	height: 407px;
 }
-
 #chat .chat-messages{
 	overflow-y: auto;
+	overflow-x: auto;
+
 	height: 407px;
 	width: 100%;
 }
 #chat .chat-sidebar {
-	width: 200px;
+	width: 300px;
 	height: 407px;
 	border-right: 1px solid rgb(255, 204, 0);
 	padding: 10px;
+	overflow-y: auto;
 }
 
 #chat .chat-sidebar h2 {
