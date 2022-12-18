@@ -9,21 +9,59 @@
 			</div>
 		</div>
 
-		<div class="chat-sidebar">
-			<h2>Connected Users</h2>
-			<ul class="chat-users">
-			<!-- Connected users will be added here dynamically using JavaScript -->
-			user1...
-			</ul>
-			<h2>Connected Friends</h2>
-			<ul class="chat-users">
-			<!-- Connected users will be added here dynamically using JavaScript -->
-			Toto
-			</ul>
-		</div>
+		<div class="chat-container">
+			<div class="chat-sidebar">
+				<h2>Connected Users</h2>
+				<ul class="chat-users">
+				<!-- Connected users will be added here dynamically using JavaScript -->
+				user1...
+				</ul>
+				<h2>Connected Friends</h2>
+				<ul class="chat-users">
+				<!-- Connected users will be added here dynamically using JavaScript -->
+				Toto
+				</ul>
+			</div>
 
-		<div class="chat-messages">
-			<!--Chat messages will be added here dynamically using JavaScript; example-->
+			<div class="chat-messages">
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<h5>test</h5>
+				<!--Chat messages will be added here dynamically using JavaScript; example-->
+			</div>
 		</div>
 
 		<div class="chat-input-container">
@@ -58,7 +96,7 @@
 	border: 1px solid rgb(255, 225, 0);
 	border-radius: 5px;
 	box-shadow: 5px 5px 30px rgba(255, 0, 128, 0.5); /* Pink shadow */
-	overflow-y: scroll;
+	// overflow-y: scroll;
 }
 
 #chat .chat-header {
@@ -100,6 +138,17 @@
 #chat .chat-tab.active {
 	background-color: #ea00ffc9;
 	color: rgb(252, 215, 5);
+}
+
+#chat .chat-container{
+	display: flex;
+	height: 407px;
+}
+
+#chat .chat-messages{
+	overflow-y: auto;
+	height: 407px;
+	width: 100%;
 }
 #chat .chat-sidebar {
 	width: 200px;
