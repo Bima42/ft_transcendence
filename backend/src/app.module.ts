@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import * as Joi from 'joi';
+import { DatabaseModule } from './modules/database.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import * as Joi from 'joi';
       }),
       ignoreEnvFile: true,
     }),
+    DatabaseModule,
     UsersModule,
     AuthModule,
   ],
