@@ -19,7 +19,9 @@ button {
 
   &:hover {
     cursor: pointer;
-    filter: hue-rotate(180deg);
+    outline-color: $yellow;
+	outline-style: outset;
+	outline-width: 2px;
   }
 
   &.fat {
