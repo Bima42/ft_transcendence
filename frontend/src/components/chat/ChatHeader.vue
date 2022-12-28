@@ -5,12 +5,13 @@
 				<!-- <button class="chat-tab" id="tab1">General Chat Room</button>
 				<button class="chat-tab" id="tab2">Private Chat Room</button> -->
 
-				<Tabs>
+
+				<!-- <Tabs>
 					<Tab title="Tab 1">Hello From Tab 1</Tab>
 					<Tab title="Tab 2">Hello From Tab 2</Tab>
 					<Tab title="Tab 3">Hello From Tab 3</Tab>
 					<Tab title="Tab 4">Hello From Tab 4</Tab>
-				</Tabs>
+				</Tabs> -->
 
 			</div>
 		</div>
@@ -19,6 +20,7 @@
 <script setup lang="ts">
 	import Tab from '@/components/chat/Tab.vue'
 	import Tabs from '@/components/chat/Tabs.vue'
+
 </script>
 
 <script lang="ts">
