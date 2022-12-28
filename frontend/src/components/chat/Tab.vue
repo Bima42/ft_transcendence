@@ -7,17 +7,17 @@
 
 <script lang="ts">
 	export default {
-	  props: {
+	props: {
 		title: {
 		  type: String,
 		  default: 'Tab'
 		}
-	  },
-	  data () {
+	},
+	data () {
 		return {
-		  isActive: true
+			isActive: true
 		}
-	  }
+	}
 	}
   </script>
 
