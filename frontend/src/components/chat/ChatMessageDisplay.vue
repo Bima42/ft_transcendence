@@ -1,46 +1,51 @@
 <template>
+	<div>
+		<ButtonDisplay></ButtonDisplay>
+	</div>
+
 	<div class="chat-messages">
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
 		<h5>testeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
-		<h5>test</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
+		<h5>user : message</h5>
 		<!--Chat messages will be added here dynamically using JavaScript; example-->
 	</div>
 </template>
 
 <script setup lang="ts">
+	import ButtonDisplay from '@/components/chat/ButtonDisplay.vue';
 </script>
 
 <style scoped lang="scss">
