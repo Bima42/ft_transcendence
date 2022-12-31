@@ -21,6 +21,7 @@ import { User } from '../users/user.entity';
         };
       },
     }),
+    TypeOrmModule.forFeature([User]),
   ],
 })
 export class DatabaseModule {}

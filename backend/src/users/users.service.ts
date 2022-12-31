@@ -16,7 +16,13 @@ export class UsersService {
       },
     });
   }
-  getAllUsers(): Promise<Array<User>> {
+
+  async getAllUsers(): Promise<Array<User>> {
     return this.usersRepository.find({});
+  }
+
+  // TODO : Add some protection if a user or mail already exist
+  async create(data: any): Promise<User> {
+    return this.usersRepository.save(data);
   }
 }
