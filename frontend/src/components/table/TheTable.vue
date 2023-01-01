@@ -11,33 +11,85 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td class="text">User 33</td>
+      <tr v-if="currentPage === 1">
+        <td class="text">User page 1</td>
         <td class="text">2 - 1</td>
         <td class="text">4000</td>
         <td class="text">
           <CustomButton> Watch now!</CustomButton>
         </td>
       </tr>
-      <tr>
+      <tr v-if="currentPage === 2">
 <!--      <tr v-for="n in 20">-->
-      <td class="text">User 209</td>
+      <td class="text">User page 2</td>
         <td class="text">33 - 40</td>
         <td class="text">3300</td>
         <td class="text">
           <CustomButton> Watch now!</CustomButton>
         </td>
       </tr>
+      <tr v-if="currentPage === 3">
+        <td class="text">User page 3</td>
+        <td class="text">2 - 1</td>
+        <td class="text">4000</td>
+        <td class="text">
+          <CustomButton> Watch now!</CustomButton>
+        </td>
+      </tr>
       </tbody>
     </table>
+    <div><button @click1="show1">page 1</button> <button @click="show2">page 2</button> <button @click="show3">page 3</button></div> 
   </section>
 </template>
 
-<script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue'
+<script lang="ts">
+// import CustomButton from '@/components/CustomButton.vue'
+
+export default {
+  data() {
+    return {
+      currentPage: 1
+    }
+  },
+  computed: {
+    show1: function() {
+      this.currentPage = 1,
+      this.currentPage != 2,
+      this.currentPage != 3
+    },
+    show2: function() {
+      this.currentPage != 1,
+      this.currentPage = 2,
+      this.currentPage != 2
+    },
+    show3: function() {
+      this.currentPage != 1,
+      this.currentPage != 2,
+      this.currentPage = 3
+    }
+  }
+}
+
 </script>
 
 <style scoped lang="scss">
+
+button {
+  border-radius: 16px;
+  background: $yellow;
+  padding: 5px 12px;
+  border: none;
+
+  &:hover {
+    cursor: pointer;
+    filter: hue-rotate(180deg);
+  }
+
+  &.fat {
+    font-weight: 900;
+  }
+}
+
 .table-wrapper {
   grid-area: $main;
   display: flex;
