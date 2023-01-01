@@ -21,7 +21,7 @@
       </tr>
       <tr v-if="currentPage === 2">
 <!--      <tr v-for="n in 20">-->
-      <td class="text">User page 2</td>
+        <td class="text">User page 2</td>
         <td class="text">33 - 40</td>
         <td class="text">3300</td>
         <td class="text">
@@ -38,7 +38,7 @@
       </tr>
       </tbody>
     </table>
-    <div><button @click1="show1">page 1</button> <button @click="show2">page 2</button> <button @click="show3">page 3</button></div> 
+    <div><button @click="show1">page 1</button> <button @click="show2">page 2</button> <button @click="show3">page 3</button></div> 
   </section>
 </template>
 
@@ -60,7 +60,7 @@ export default {
     show2: function() {
       this.currentPage != 1,
       this.currentPage = 2,
-      this.currentPage != 2
+      this.currentPage != 3
     },
     show3: function() {
       this.currentPage != 1,
