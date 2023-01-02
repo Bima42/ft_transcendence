@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import ChatTypeBox from './LeftChatList.vue';
+import ChatTypeBox from './TypeBox.vue';
 import ChatMessageDisplay from './ChatMessageDisplay.vue';
-import ChatUserList from './ChatUserList.vue';
+import ChatUserList from './LeftChatList.vue';
 import ChatHeader from './ChatHeader.vue';
 import ButtonDisplay from './ButtonDisplay.vue';
 </script>
