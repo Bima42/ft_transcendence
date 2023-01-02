@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 	import ButtonDisplay from '@/components/chat/ButtonDisplay.vue';
-	import ChatTypeBox from '@/components/chat/ChatTypeBox.vue';
+	import ChatTypeBox from '@/components/chat/LeftChatList.vue';
 
 </script>
 
