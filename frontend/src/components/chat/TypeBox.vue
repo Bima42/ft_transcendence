@@ -1,6 +1,6 @@
 <template>
   <div class="chat-input-container">
-    <input type="text" placeholder="Type a message..." class="chat-input">
+    <input type="text" placeholder="Type a message...">
     <CustomButton @click="sendMessage">Send</CustomButton>
   </div>
 </template>
@@ -14,14 +14,13 @@ function sendMessage() {
 </script>
 
 <style scoped lang="scss">
-#chat {
-  .chat-input-container {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid rgb(255, 221, 1);
-    padding: 10px;
-  }
-  .chat-input {
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+
+  input {
     flex: 1;
     height: 30px;
     border: 1px solid yellow;
