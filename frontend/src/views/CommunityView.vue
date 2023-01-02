@@ -1,6 +1,6 @@
 <template>
   <ChatMain></ChatMain>
-  <Modal></Modal>
+<!--  <Modal></Modal>-->
 </template>
 
 <script setup lang="ts">
