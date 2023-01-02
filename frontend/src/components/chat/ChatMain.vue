@@ -3,7 +3,7 @@
     <ChatUserList></ChatUserList>
     <div class="main-box">
       <ChatTopSection></ChatTopSection>
-      <div class="chat-display"></div>
+      <ChatWindow></ChatWindow>
       <TypeBox></TypeBox>
     </div>
   </section>
@@ -13,6 +13,7 @@
 import ChatUserList from './LeftChatList.vue';
 import ChatTopSection from "@/components/chat/ChatTopSection.vue";
 import TypeBox from "@/components/chat/TypeBox.vue";
+import ChatWindow from "@/components/chat/ChatWindow.vue";
 </script>
 
 <style scoped lang="scss">
@@ -27,14 +28,6 @@ import TypeBox from "@/components/chat/TypeBox.vue";
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-
-
-    .chat-display {
-      flex-grow: 1;
-      width: 100%;
-      background: $yellow;
-      min-height: 80%;
-    }
   }
 }
 </style>
