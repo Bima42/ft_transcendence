@@ -7,6 +7,7 @@
 		<div class="chat-container">
 			<ChatUserList></ChatUserList>
 			<ChatMessageDisplay></ChatMessageDisplay>
+			<!-- <ButtonDisplay></ButtonDisplay> -->
 		</div>
 			<ChatTypeBox></ChatTypeBox>
 	</div>
@@ -18,6 +19,7 @@
 	import ChatMessageDisplay from './ChatMessageDisplay.vue';
 	import ChatUserList from './ChatUserList.vue';
 	import ChatHeader from './ChatHeader.vue';
+	import ButtonDisplay from './ButtonDisplay.vue';
   </script>
 
   <style scoped lang="scss">

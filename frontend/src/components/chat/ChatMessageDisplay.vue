@@ -1,54 +1,20 @@
 <template>
-	<div>
-		<ButtonDisplay></ButtonDisplay>
-	</div>
-
 	<div class="chat-messages">
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>testeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
-		<h5>user : message</h5>
+		<div>
+			<ButtonDisplay></ButtonDisplay>
+		</div>
 		<!--Chat messages will be added here dynamically using JavaScript; example-->
 	</div>
 </template>
 
 <script setup lang="ts">
 	import ButtonDisplay from '@/components/chat/ButtonDisplay.vue';
+	import ChatTypeBox from '@/components/chat/ChatTypeBox.vue';
+
 </script>
 
 <style scoped lang="scss">
+
 	#chat .chat-messages {
 		overflow-y: auto;
 		overflow-x: auto;
