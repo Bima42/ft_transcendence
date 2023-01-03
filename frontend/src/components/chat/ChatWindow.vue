@@ -13,7 +13,7 @@ const props = defineProps<{}>()
 const messages = ref(
     [
       {
-        content: 'Bima',
+        content: 'TeasdasdadasdasdTeasdasdadasdasdTeasdasdadasdasdTeasdasdadasdasd Teasdasd adasdasd Teasdasdadasd asdTeasdasdadasdasdTeasdasdadasdasd Teasdasdadasdasd',
         sender: 'Yvan',
       },
       {
@@ -21,7 +21,7 @@ const messages = ref(
         sender: 'Bima',
       },
       {
-        content: 'Te',
+        content: 'Teasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd Teasdasdadasdasd',
         sender: 'Sandrine',
       },
       {
@@ -45,9 +45,11 @@ const messages = ref(
   flex-grow: 1;
   width: 100%;
   height: 80%;
+  position: relative;
 
   display: flex;
   flex-direction: column-reverse;
-  overflow-y: scroll;
+  overflow: auto;
+  gap: 15px;
 }
 </style>
