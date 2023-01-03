@@ -1,35 +1,52 @@
 <template>
-  <section class="menu-wrapper">
-    <p>{{ props.name + " V"}}</p>
-  </section>
+  <dropdown class="my-dropdown-toggle"
+            :options="chatList"
+            :selected="name"
+            v-on:updateOption="methodToRunOnSelect"
+            :placeholder="name"
+            :closeOnOutsideClick="true">
+  </dropdown>
 </template>
-
-<script setup lang="ts">
-import {defineProps} from 'vue'
-
-const props = defineProps<{
-  name: String,
-  chatList: object,
-}>()
+<script>
+export default {
+  components: {
+    'dropdown': dropdown,
+  },
+  methods: {
+    methodToRunOnSelect(payload) {
+      this.object = payload;
+    }
+  },
+  props: {
+    chatList: Object,
+    name: String,
+  },
+  data() {
+    return {
+      object: {
+        name: 'Object Name',
+      }
+    }
+  },
+}
 </script>
 
-<style scoped lang="scss">
-.menu-wrapper {
-  width: 15%;
-  justify-self: center;
-  align-self: center;
-  border: 2px solid $yellow;
-  border-radius: 20px;
-  padding: 5px;
+<script setup>
+import dropdown from 'vue-dropdowns'
+</script>
 
-  &:hover {
-    background: pink;
-  }
+<style scoped>
+.my-dropdown-toggle {
+  border-radius: 5px;
 
-  p {
-    text-align: center;
-    cursor: pointer;
-  }
+::v-deep .dropdown-toggle {
+  color: tomato;
+  font-size: 25px;
+  font-weight: 800;
 }
 
+::v-deep .dropdown-toggle-placeholder {
+  color: #c4c4c4;
+}
+}
 </style>
