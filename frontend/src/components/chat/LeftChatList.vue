@@ -57,6 +57,7 @@ const dummy = ref(
 <style scoped lang="scss">
 .chat-sidebar {
   width: 25%;
+  min-width: 25%;
   height: 100%;
 
   display: flex;
