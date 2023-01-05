@@ -5,6 +5,7 @@
       <ChatTopSection></ChatTopSection>
       <ChatWindow></ChatWindow>
       <TypeBox></TypeBox>
+      <modal></modal>
     </div>
   </section>
 </template>
@@ -14,6 +15,8 @@ import ChatUserList from './LeftChatList.vue';
 import ChatTopSection from "@/components/chat/ChatTopSection.vue";
 import TypeBox from "@/components/chat/TypeBox.vue";
 import ChatWindow from "@/components/chat/ChatWindow.vue";
+import Modal from '@/components/modal/Modal.vue';
+
 </script>
 
 <style scoped lang="scss">
