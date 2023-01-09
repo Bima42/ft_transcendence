@@ -32,7 +32,11 @@
 </template>
 
 <script setup lang="ts">
-	import CustomButton from '@/components/CustomButton.vue'
+import {useModalStore} from "@/stores/modal";
+import CustomButton from '@/components/CustomButton.vue'
+
+const modalStore = useModalStore()
+const data = modalStore.data.data
 </script>
 
 <script lang = "ts">

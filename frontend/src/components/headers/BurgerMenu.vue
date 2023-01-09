@@ -23,7 +23,7 @@ import { useModalStore } from "@/stores/modal"
 
 import BurgerButton from "@/components/headers/BurgerButton.vue"
 import Modal from "@/components/modal/TheModal.vue"
-import UserModal from "@/components/UserEditModal.vue"
+import UserModal from "@/components/modal/UserEditModal.vue"
 import UserAvatar from "@/components/UserAvatar.vue";
 
 const modalStore = useModalStore()

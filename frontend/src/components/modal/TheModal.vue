@@ -31,6 +31,7 @@ function exitClick(e: Event) {
   align-items: center;
   padding: 100px;
   overflow: auto;
+  z-index: 9;
 
   .main-box {
     position: relative;
@@ -46,7 +47,7 @@ function exitClick(e: Event) {
 
   .exit-button {
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     top: 20px;
     right: 20px;
   }

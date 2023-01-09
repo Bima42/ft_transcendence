@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
   import ChatMain from '@/components/chat/ChatMain.vue';
-  // import Modal from '@/components/modal/Modal.vue';
+  // import Modal from '@/components/modal/NewChannelModal.vue';
 </script>
 
 <style scoped lang="scss">

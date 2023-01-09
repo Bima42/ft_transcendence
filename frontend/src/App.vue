@@ -6,7 +6,7 @@
     </template>
     <CreditLink></CreditLink>
     <TheModal v-if="modalStore.show">
-      <UserEditModal></UserEditModal>
+      <Component :is="modalStore.component"/>
     </TheModal>
     <router-view></router-view>
   </section>
@@ -20,7 +20,7 @@ import CreditLink from "@/components/footers/CreditLink.vue";
 import MainMenu from "@/components/MainMenu.vue";
 import TheModal from "@/components/modal/TheModal.vue";
 import {useModalStore} from "@/stores/modal";
-import UserEditModal from "@/components/UserEditModal.vue";
+import UserEditModal from "@/components/modal/UserEditModal.vue";
 
 const route = useRoute()
 const modalStore = useModalStore()

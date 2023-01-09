@@ -5,18 +5,34 @@
       <ChatTopSection></ChatTopSection>
       <ChatWindow></ChatWindow>
       <TypeBox></TypeBox>
-      <modal></modal>
+      <CustomButton id="new-channel" @click="clickHandler">Create new channel</CustomButton>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import {useModalStore} from "@/stores/modal"
+
+const modalStore = useModalStore()
+
 import ChatUserList from './LeftChatList.vue';
 import ChatTopSection from "@/components/chat/ChatTopSection.vue";
 import TypeBox from "@/components/chat/TypeBox.vue";
 import ChatWindow from "@/components/chat/ChatWindow.vue";
-import Modal from '@/components/modal/Modal.vue';
+import NewChannelModal from '@/components/modal/NewChannelModal.vue';
+import CustomButton from "@/components/CustomButton.vue";
+import Modal from "@/components/modal/TheModal.vue";
 
+const data = modalStore.data.data
+
+function clickHandler(e: Event) {
+  if (!e.target)
+    return
+  const target = e.target as HTMLElement
+  if (target.id === 'new-channel') {
+    modalStore.loadAndDisplay(Modal, NewChannelModal, {})
+  }
+}
 </script>
 
 <style scoped lang="scss">
