@@ -16,7 +16,7 @@
         <td class="text">2 - 1</td>
         <td class="text">4000</td>
         <td class="text">
-          <CustomButton> Watch now!</CustomButton>
+          <button> Watch now!</button>
         </td>
       </tr>
       <tr v-if="currentPage === 2">
@@ -25,7 +25,7 @@
         <td class="text">33 - 40</td>
         <td class="text">3300</td>
         <td class="text">
-          <CustomButton> Watch now!</CustomButton>
+          <button> Watch now!</button>
         </td>
       </tr>
       <tr v-if="currentPage === 3">
@@ -33,42 +33,42 @@
         <td class="text">2 - 1</td>
         <td class="text">4000</td>
         <td class="text">
-          <CustomButton> Watch now!</CustomButton>
+          <button> Watch now!</button>
         </td>
       </tr>
       </tbody>
     </table>
-    <div><button @click="show1">page 1</button> <button @click="show2">page 2</button> <button @click="show3">page 3</button></div> 
+    <div><button v-on:click="currentPage > 1 ? currentPage-- : ''">Prev</button> <button @click="currentPage=1">page 1</button> <button @click="currentPage=2">page 2</button> <button id="colorChange" @click="currentPage=3">page 3</button> <button v-on:click="currentPage < 3 ? currentPage++ : ''">Next</button></div> 
   </section>
 </template>
 
 <script lang="ts">
-// import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/CustomButton.vue'
 
-export default {
-  data() {
-    return {
-      currentPage: 1
+  export default {
+    data() {
+      return {
+        currentPage: 1
+      }
     }
-  },
-  computed: {
-    show1: function() {
-      this.currentPage = 1,
-      this.currentPage != 2,
-      this.currentPage != 3
-    },
-    show2: function() {
-      this.currentPage != 1,
-      this.currentPage = 2,
-      this.currentPage != 3
-    },
-    show3: function() {
-      this.currentPage != 1,
-      this.currentPage != 2,
-      this.currentPage = 3
-    }
+  // computed: {
+  //   show1: function() {
+  //     this.currentPage = 1,
+  //     this.currentPage != 2,
+  //     this.currentPage != 3
+  //   },
+  //   show2: function() {
+  //     this.currentPage != 1,
+  //     this.currentPage = 2,
+  //     this.currentPage != 3
+  //   },
+  //   show3: function() {
+  //     this.currentPage != 1,
+  //     this.currentPage != 2,
+  //     this.currentPage = 3
+  //   }
+  // }
   }
-}
 
 </script>
 
@@ -79,7 +79,7 @@ button {
   background: $yellow;
   padding: 5px 12px;
   border: none;
-
+  
   &:hover {
     cursor: pointer;
     filter: hue-rotate(180deg);
