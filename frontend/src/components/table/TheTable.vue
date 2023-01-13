@@ -16,16 +16,15 @@
         <td class="text">2 - 1</td>
         <td class="text">4000</td>
         <td class="text">
-          <button> Watch now!</button>
+        <button> Watch now!</button>
         </td>
       </tr>
       <tr v-if="currentPage === 2">
-<!--      <tr v-for="n in 20">-->
         <td class="text">User page 2</td>
         <td class="text">33 - 40</td>
         <td class="text">3300</td>
         <td class="text">
-          <button> Watch now!</button>
+        <button> Watch now!</button>
         </td>
       </tr>
       <tr v-if="currentPage === 3">
@@ -33,12 +32,18 @@
         <td class="text">2 - 1</td>
         <td class="text">4000</td>
         <td class="text">
-          <button> Watch now!</button>
+        <button> Watch now!</button>
         </td>
       </tr>
       </tbody>
     </table>
-    <div><button v-on:click="currentPage > 1 ? currentPage-- : ''">Prev</button> <button @click="currentPage=1">page 1</button> <button @click="currentPage=2">page 2</button> <button id="colorChange" @click="currentPage=3">page 3</button> <button v-on:click="currentPage < 3 ? currentPage++ : ''">Next</button></div> 
+    <div>
+      <button v-on:click="currentPage > 1 ? currentPage-- : ''">Prev</button> 
+      <button v-bind:class="{ 'selected': currentPage === 1 }" @click="currentPage=1">page 1</button> 
+      <button v-bind:class="{ 'selected': currentPage === 2 }" @click="currentPage=2">page 2</button> 
+      <button v-bind:class="{ 'selected': currentPage === 3 }" @click="currentPage=3">page 3</button> 
+      <button v-on:click="currentPage < 3 ? currentPage++ : ''">Next</button>
+    </div> 
   </section>
 </template>
 
@@ -51,34 +56,23 @@ import CustomButton from '@/components/CustomButton.vue'
         currentPage: 1
       }
     }
-  // computed: {
-  //   show1: function() {
-  //     this.currentPage = 1,
-  //     this.currentPage != 2,
-  //     this.currentPage != 3
-  //   },
-  //   show2: function() {
-  //     this.currentPage != 1,
-  //     this.currentPage = 2,
-  //     this.currentPage != 3
-  //   },
-  //   show3: function() {
-  //     this.currentPage != 1,
-  //     this.currentPage != 2,
-  //     this.currentPage = 3
-  //   }
-  // }
   }
 
 </script>
 
 <style scoped lang="scss">
 
+div {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 5px;
+}
+
 button {
   border-radius: 16px;
   background: $yellow;
   padding: 5px 12px;
-  border: none;
+  border: 20px;
   
   &:hover {
     cursor: pointer;
@@ -87,6 +81,9 @@ button {
 
   &.fat {
     font-weight: 900;
+  }
+  &.selected {
+  background-color: rgba(200, 0, 200, 0.5);
   }
 }
 
