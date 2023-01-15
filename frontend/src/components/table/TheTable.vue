@@ -29,21 +29,37 @@
       </tr>
       <tr v-if="currentPage === 3">
         <td class="text">User page 3</td>
-        <td class="text">2 - 1</td>
-        <td class="text">4000</td>
+        <td class="text">12 - 71</td>
+        <td class="text">345</td>
+        <td class="text">
+        <button> Watch now!</button>
+        </td>
+      </tr>
+      <tr v-if="currentPage === 4">
+        <td class="text">User page 4</td>
+        <td class="text">5 - 21</td>
+        <td class="text">7668</td>
+        <td class="text">
+        <button> Watch now!</button>
+        </td>
+      </tr>
+      <tr v-if="currentPage === 5">
+        <td class="text">User page 5</td>
+        <td class="text">7 - 14</td>
+        <td class="text">8500</td>
         <td class="text">
         <button> Watch now!</button>
         </td>
       </tr>
       </tbody>
     </table>
-    <div>
+    <div v-bind:style="{ 'grid-template-columns': 'repeat(' + nbrGlobal + ', 1fr)' }">
       <button v-on:click="currentPage > 1 ? currentPage-- : ''">Prev</button> 
-      <button v-bind:class="{ 'selected': currentPage === 1 }" @click="currentPage=1">page 1</button> 
-      <button v-bind:class="{ 'selected': currentPage === 2 }" @click="currentPage=2">page 2</button> 
-      <button v-bind:class="{ 'selected': currentPage === 3 }" @click="currentPage=3">page 3</button> 
-      <button v-on:click="currentPage < 3 ? currentPage++ : ''">Next</button>
-    </div> 
+      <button v-for="nbr in nbrTotal" v-bind:class="{ 'selected': currentPage === nbr }" @click="currentPage=nbr">page {{nbr}}</button> 
+      <!-- <button v-bind:class="{ 'selected': currentPage === 2 }" @click="currentPage=2">page 2</button> 
+      <button v-bind:class="{ 'selected': currentPage === 3 }" @click="currentPage=3">page 3</button>  -->
+      <button v-on:click="currentPage < nbrTotal ? currentPage++ : ''">Next</button>
+    </div>
   </section>
 </template>
 
@@ -53,10 +69,22 @@ import CustomButton from '@/components/CustomButton.vue'
   export default {
     data() {
       return {
-        currentPage: 1
+        currentPage: 1,
+        nbr: 1,
+        nbrTotal: 4,
       }
+    },
+    computed:{
+    nbrGlobal(){
+      return this.nbrTotal + 2
     }
   }
+  
+  }
+
+  // let nbr = 1
+  // let nbrTotal = 3
+  // let nbrGlobal = 5
 
 </script>
 
