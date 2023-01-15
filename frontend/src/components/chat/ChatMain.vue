@@ -47,6 +47,7 @@ function clickHandler(e: Event) {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    width: 75%;
   }
 }
 </style>

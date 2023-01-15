@@ -117,6 +117,7 @@ function menuItems() {
     width: 100%;
     height: 100%;
     padding: 40px;
+    overflow: auto;
 
     .router-link-active {
       transform: translateX(10px);
