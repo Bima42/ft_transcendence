@@ -1,18 +1,34 @@
 <template>
   <h2>{{ props.header }}</h2>
   <section class="list-wrapper">
-    <p v-for="user in props.userList">{{ user.name }}</p>
-<!--    Make the <p> clickable to pop the small card-->
+    <ChatUserDetails v-for="user in userList"
+                     :user="user"
+                     :is-active="user.isActive"
+                     @setActive='setActiveUser(user)'
+                     @setInactive='setInactiveUser(user)'
+    />
   </section>
 </template>
 
 <script setup lang="ts">
+import ChatUserDetails from '@/components/chat/ChatUserDetails.vue'
 import { defineProps } from 'vue'
 
 const props = defineProps<{
   userList: object,
   header: string,
 }>()
+
+function setActiveUser(user: object) {
+  props.userList.forEach(user => {
+    user.isActive = false
+  })
+  user.isActive = true
+}
+
+function setInactiveUser(user: object) {
+  user.isActive = false
+}
 </script>
 
 <style scoped lang="scss">
@@ -25,11 +41,6 @@ const props = defineProps<{
   flex-direction: column;
   align-items: center;
   overflow: auto;
-
-  p {
-    cursor: pointer;
-    text-align: left;
-  }
 }
 
 h2 {

@@ -2,7 +2,7 @@
   <div class="chat-sidebar">
     <ChatUserList header="Friends online" :userList="dummy">
     </ChatUserList>
-    <ChatUserList header="People in the room" :userList="dummy">
+    <ChatUserList header="People in the room" :userList="dummy2">
     </ChatUserList>
   </div>
 </template>
@@ -51,6 +51,48 @@ const dummy = ref(
 
     ]
 )
+
+const dummy2 = ref(
+    [
+      {
+        name: 'Bima',
+      },
+      {
+        name: 'Mabi',
+      },
+      {
+        name: 'Te',
+      },
+      {
+        name: 'Bimsadasdaa',
+      },
+      {
+        name: 'Maasdadabi',
+      },
+      {
+        name: 'Tasdasde',
+      },{
+      name: 'Biasdasdma',
+    },
+      {
+        name: 'Masdasdabi',
+      },
+      {
+        name: 'Tasdadsasde',
+      },{
+      name: 'Biasdasdama',
+    },
+      {
+        name: 'Maasdasdabi',
+      },
+      {
+        name: 'Tasdasde',
+      },
+
+
+    ]
+)
+
 
 </script>
 
