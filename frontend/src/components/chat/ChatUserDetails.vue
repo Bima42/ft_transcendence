@@ -23,7 +23,6 @@ const props = defineProps<{
 p {
   cursor: pointer;
   text-align: left;
-  position: relative;
 
   .user-details-panel {
     width: 120px;
@@ -33,8 +32,7 @@ p {
     background: white;
     color: black;
     position: absolute;
-    left: 100%;
-    top: 0;
+    z-index: 10;
   }
 }
 </style>

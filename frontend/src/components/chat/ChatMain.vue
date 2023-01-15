@@ -38,6 +38,7 @@ function clickHandler(e: Event) {
 <style scoped lang="scss">
 .chat-wrapper {
   grid-area: $main;
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;

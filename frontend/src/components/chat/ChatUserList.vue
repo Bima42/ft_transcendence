@@ -40,7 +40,8 @@ function setInactiveUser(user: object) {
   justify-content: flex-start;
   flex-direction: column;
   align-items: center;
-  overflow: auto;
+  overflow-y: scroll;
+  overflow-x: visible;
 }
 
 h2 {
