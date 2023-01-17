@@ -5,7 +5,6 @@
 ***
 
 # Index
-***
 - ### [1. Install Docker](#install-docker)
   - ##### [1.1 WSL](#wsl)
     - [1.1.1 WSL Steps](#wsl-steps)
@@ -19,23 +18,22 @@
     - [1.3.2 Linux Docker Desktop Tweaks](#linux-docker-desktop-tweaks)
     - [1.3.3 Problem Credential store not initialised](#problem-credential-store-not-initialised)
 - ### [2. Sources](#sources)
-- ### [3. Docker Compose](2-docker-compose.md)
+- ### [Previous Docs : Docker Compose](0-what-is-docker.md)
+- ### [Next Docs : Docker Compose](2-docker-compose.md)
 ### [Back to summary](../Summary.md)
 
-# Install Docker
 ***
+# Install Docker
 
 - We recommand you to use Docker Desktop, which is a really good tools to manage your docker containers
 - It provides a lot of great features to make docker easier
 - For Windows/WSL and Mac, Docker will run a tiny VM inside your host machine to run Docker inside
 
 ## WSL
-***
 
 - Go to the [docs to download Docker Desktop](https://docs.docker.com/desktop/windows/wsl/#download)
 
 ### WSL Steps
-***
 - Accept this box
   - [ ] Use WSL2 instead of HyperV
 - Agree CGV
@@ -45,7 +43,6 @@
 
 
 ### Docker Desktop Tweaks
-***
 - Can login to [DockerHub](http://hub.docker.com) for pulls images
 - Go Task Bar -> Right Click on Docker -> Settings
   - Go to Resources
@@ -58,7 +55,6 @@
 </p>
 
 ### Problems when installing
-***
 ##### An unexpected error occured
 - Failed to deploy distro docker-desktop
 - This happen when you never run virtualisation inside your Windows
@@ -66,17 +62,14 @@
 - Had to enable virtualisation
 
 ## Mac
-***
 - Go to [docs to install Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
 
 ### Mac Steps
-***
 - Choose the right .dmg file according to your MacOS Version
 - Launch the APP
 - Accept CGU
 
 ### Preferences
-***
 - All Preferences and Settings are in top right of the screen : Click on the Whale Icon to go in
 - You can log on [DockerHub](https://hub.docker.com) to pulls images from the hub
 - Go to `Preferences` -> `Resources` -> We can adjust the CPU usage, RAM or Disk usage for advanced using
@@ -85,12 +78,10 @@
   - [ ] Enable VirtioFS : grants speed of file transfer between the machine and containers
 
 ## Linux
-***
 
 - #### This tuto may not work on all Linux Distribution
 
 ### Requirements
-***
 - There is some requirements for installing on Linux
 
 ~~~bash
@@ -102,7 +93,6 @@ sudo apt-get install ca-certificates curl gnupg lsb-release
 
 
 ### Linux Docker Desktop Tweaks
-***
 - You may want to login on [DockerHub](https://hub.docker.com) to pulls images
 
 - Go to `Preferences` -> `Resources` -> `Advanced`
@@ -113,12 +103,10 @@ sudo apt-get install ca-certificates curl gnupg lsb-release
     
 
 ### Problem Credential store not initialised
-***
 - This error can occur after launching Docker Desktop
 - Have to generate GPG Keys, always tuto on dockers docs ...
 
 # Sources
-***
 - <a href="https://docs.docker.com/desktop/windows/wsl/" target="_blank">Install WSL Docs</a>
 - <a href="https://docs.docker.com/desktop/install/mac-install/" target="_blank">Install Mac Docs</a>
 - <a href="https://docs.docker.com/desktop/install/linux-install/" target="_blank">Install Linux Docs</a>

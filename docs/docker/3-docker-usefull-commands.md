@@ -11,7 +11,8 @@
 - ### [3. Build image with compose](#build-image-with-compose)
 - ### [4. Stop containers related to compose](#stop-containers-related-to-compose)
 - ### [5. Explore container](#explore-container)
-- ### [6. NestJS Docs](../nestjs/0-what-is-nestjs.md)
+- ### [Previous Docs : Docker Compose](2-docker-compose.md)
+- ### [Next Docs : NestJS Docs](../nestjs/0-what-is-nestjs.md)
 ### [Back to summary](../Summary.md)
 
 ***
@@ -31,15 +32,15 @@ docker compose up --force-recreate
 docker compose up -d
 ```
 
-***
 ## Reach application
+
 - `localhost:8080` to reach frontend container
 - `localhost:5050` to reach pgadmin
 - `localhost:3080` to reach backend container
 - `localhost:3080/users` to reach users table inside our database
 
-***
 ## Build image with compose
+
 - If you want to rebuild images using compose
 - You can use `--no-cache` with it to build without using cache
 
@@ -47,14 +48,12 @@ docker compose up -d
 docker compose build
 ```
 
-***
 ## Stop containers related to compose
 
 ```bash
 docker compose down
 ```
 
-***bash
 ## Clean up environment
 - Clean containers and images not in use
 ```bash
@@ -65,7 +64,6 @@ docker system prune
 ```bash
 docker volume rm $(docker volume ls -q)
 ```
-***
 
 ## Explore container
 

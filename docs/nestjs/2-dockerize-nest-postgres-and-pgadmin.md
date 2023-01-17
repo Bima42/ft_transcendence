@@ -22,7 +22,6 @@
 
 ***
 # Index
-***
 - ### [1. Getting Started](#getting-started)
 - ### [2. NestJS part](#nestjs-part)
   - ##### [2.1 NestJS dockerfile](#nestjs-dockerfile)
@@ -36,9 +35,11 @@
 - ### [5. Docker Compose File](#docker-compose-file)
 - ### [6. Launch Project](#launch-project)
 - ### [7. Create Database](#create-database)
-- ### [8. Create Database with pgadmin](3-create-table-in-database.md)
+- ### [Previous Docs : Install and Create Nest project](1-install-and-create-nest-project.md)
+- ### [Next Docs : Create Database with pgadmin](3-create-table-in-database.md)
 ### [Back to summary](../Summary.md)
 
+***
 # Getting Started
 - From here, you already have a nest project created
 - Here is an example of the file tree
@@ -55,7 +56,6 @@
 ```
 
 # NestJS part
-***
 ## NestJS dockerfile
 - Create a Dockerfile at the root of your nest project
 - This is a simple Dockerfile based on node for alpine ([image](https://hub.docker.com/_/node))
@@ -100,7 +100,6 @@ services:
 - We create a `network` for `backend`, `db` and `pgadmin`. Used to protect datas from other containers if we want to add a frontend container for example
 
 # PGAdmin part
-***
 - Web-based GUI tool used to interact with the Postgres database sessions, both locally and remote servers as well
 - You can use it to perform any sort of database administration required for a Postgres database
 
@@ -129,7 +128,6 @@ PGADMIN_DEFAULT_PASSWORD=password
 - `Port 5050` is open to connect to pgadmin and manage your databases 
 
 # Postgres part
-***
 - We gonna pass directly by docker compose file
 - We use official image for postgres ([Image](https://hub.docker.com/_/postgres))
 - You can find a lot of information according to this image on Docker Hub
@@ -167,7 +165,6 @@ volumes:
 - We create a volume to keep data store locally on the host
 
 # Docker Compose File
-***
 ```yml
 version: '3.7'
 
@@ -250,8 +247,6 @@ docker compose up --build
 
 
 # Sources
-***
 - <a href="https://docs.nestjs.com/techniques/database" target="_blank">NestJS Database Docs</a>
-
 
 ### [Back to summary](../Summary.md)
