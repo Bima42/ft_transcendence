@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {ConflictException, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -21,8 +21,17 @@ export class UsersService {
     return this.usersRepository.find({});
   }
 
-  // TODO : Add some protection if a user or mail already exist
   async create(data: any): Promise<User> {
+    // check if a user with the same username or email already exists
+    const existingUser = await this.usersRepository.findOne({
+      where: [{ username: data.username }, { email: data.email }],
+    });
+    if (existingUser) {
+      throw new ConflictException(
+        'A user with the same username or email already exists',
+      );
+    }
+    // create a new user
     return this.usersRepository.save(data);
   }
 }

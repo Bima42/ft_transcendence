@@ -4,13 +4,14 @@ import {
   Get,
   Post,
   UseGuards,
-  Body,
+  Body, Req,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from './users/users.service';
+import { SchoolAuthGuard } from './auth/guards/42-auth.guard';
 
 @Controller()
 export class AppController {
