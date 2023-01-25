@@ -8,7 +8,7 @@
     <!-- <button v-on:click="addFriend">{{ buttonName }} </button> <button>Send private msg</button> <button @click="$emit('setActive')">...</button> -->
 
     <div class="box">
-	    <a class="button" href="#popup1">Add friend</a> <a class="button" href="#popup2">Send private msg</a> <a class="button" href="#popup3">...</a>
+	    <a class="button" :href="addRemove" v-on:click="buttonName == 'add friend' ? buttonName='remove' : buttonName='add friend'">{{buttonName}}</a> <a class="button" href="#popup2">Send private msg</a> <a class="button" href="#popup3">...</a>
     </div>
 
   </div>
@@ -16,7 +16,17 @@
 
   <div id="popup1" class="overlay">
     <div class="popup">
-      <h2>"Username" Correctly added! :) </h2>
+      <h2>{{ user.name }} Correctly added! :) </h2>
+      <a class="close" href="#">&times;</a>
+      <div class="content">
+        ...
+      </div>
+    </div>
+  </div>
+
+  <div id="popup1bis" class="overlay">
+    <div class="popup">
+      <h2>{{ user.name }} Correctly removed! :) </h2>
       <a class="close" href="#">&times;</a>
       <div class="content">
         ...
@@ -26,7 +36,7 @@
 
   <div id="popup2" class="overlay">
     <div class="popup">
-      <h2>Send private messge to "Username"</h2>
+      <h2>Send private messge to {{ user.name }}</h2>
       <a class="close" href="#">&times;</a>
       <div class="content">
         <div class="chat-input-container">
@@ -50,16 +60,15 @@
 
 <script setup lang="ts">
 
+  
   // var buttonName = "Add friend"
 
   import {defineProps} from 'vue';
   import UserAvatar from "@/components/UserAvatar.vue";
+  import {ref} from 'vue';
 
-    // function addFriend () {
-    //   return {
-    //     buttonName: "remove"
-    //   }
-    // }
+  var buttonName = ref('add friend');
+  var addRemove = ref(buttonName == 'add friend' ? '#popup1' : '#popup1bis');
 
   defineEmits(['setActive', 'setInactive'])
 
