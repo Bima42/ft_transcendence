@@ -4,7 +4,6 @@ import {
   HttpException,
   HttpStatus,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { SchoolAuthGuard } from './guards/42-auth.guard';

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from '../users/user.entity';
+import { UserEntity } from '../users/user.entity';
 
 @Module({
   imports: [
@@ -17,11 +17,11 @@ import { User } from '../users/user.entity';
           database: configService.get('POSTGRES_DB'),
           autoLoadEntities: true,
           synchronize: true, //false for production -> lose data
-          entities: [User],
+          entities: [UserEntity],
         };
       },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UserEntity]),
   ],
 })
 export class DatabaseModule {}
