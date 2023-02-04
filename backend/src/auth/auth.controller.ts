@@ -1,35 +1,45 @@
 import {
+  Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
-  Req,
-  UseGuards,
+  Post,
 } from '@nestjs/common';
-import { SchoolAuthGuard } from './guards/42-auth.guard';
+import { AuthService } from './auth.service';
+import { CreateUserDto } from '../users/dto/user.create.dto';
+import { RegistrationStatus } from './interfaces/registration-status.interface';
+import { LoginStatus } from './interfaces/login-status.interface';
+import { LoginUserDto } from '../users/dto/user-login.dto';
 
 @Controller('auth')
 export class AuthController {
-  @UseGuards(SchoolAuthGuard)
-  @Get('42')
-  async auth42(@Req() req) {
-    // redirect the user to the OAuth provider's authorization page
-    console.log('here');
-    return req.redirect('https://api.intra.42.fr/oauth/authorize');
+  constructor(private readonly authService: AuthService) {}
+
+  /**
+   * register route handler that receives an instance of CreateUserDto object and delegates creating a new user to the AuthService
+   * @param createUserDto
+   */
+  @Post('register')
+  public async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<RegistrationStatus> {
+    const result: RegistrationStatus = await this.authService.register(
+      createUserDto,
+    );
+
+    if (!result.success) {
+      throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return result;
   }
 
-  @UseGuards(SchoolAuthGuard)
-  @Get('42/callback')
-  async auth42Callback(@Req() req) {
-    // handle the callback from the OAuth provider
-    // check if the user was successfully authenticated
-    if (!req.user) {
-      throw new HttpException(
-        'Failed to authenticate user',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    // if the user is authenticated, redirect them to the index
-    return req.redirect('/index');
+  /**
+   * login route handler : returns the response of the call to AuthService.login() function
+   * @param loginUserDto
+   */
+  @Post('login')
+  public async login(@Body() loginUserDto: LoginUserDto): Promise<LoginStatus> {
+    return await this.authService.login(loginUserDto);
   }
 }

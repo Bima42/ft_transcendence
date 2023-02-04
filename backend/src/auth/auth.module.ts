@@ -3,20 +3,29 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
-import { SchoolStrategy } from './strategies/42.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
 
+/**
+ * Imports the UsersModule to enable the use of UsersService
+ * PassportModule : explicitly specifying the default strategy to use to authenticate users
+ * Exports the PassportModule and JwtModule so that other modules in the application can import the AuthModule and make use of the AuthGuard() decorator
+ */
 @Module({
   imports: [
     UsersModule,
-    PassportModule,
+    PassportModule.register({
+      defaultStrategy: 'jwt',
+      property: 'user',
+      session: false,
+    }),
     JwtModule.register({
       secret: process.env.JWT_KEY,
       signOptions: { expiresIn: '60s' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, SchoolStrategy],
+  providers: [AuthService, JwtStrategy],
+  exports: [PassportModule, JwtModule],
 })
 export class AuthModule {}
