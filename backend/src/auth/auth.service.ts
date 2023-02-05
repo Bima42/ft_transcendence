@@ -5,7 +5,7 @@ import { CreateUserDto } from '../users/dto/user.create.dto';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
 import { JwtPayload } from './interfaces/payload.interface';
 import { UserDto } from '../users/dto/user.dto';
-import { LoginUserDto } from "../users/dto/user-login.dto";
+import { LoginUserDto } from '../users/dto/user-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +38,8 @@ export class AuthService {
 
   /**
    * Login function
+   * Here we can decide what data we want to return to the client-side app upon a successful login
+   *
    * @param loginUserDto
    */
   async login(loginUserDto: LoginUserDto) {
