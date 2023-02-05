@@ -24,8 +24,6 @@ import UserEditModal from "@/components/UserEditModal.vue";
 
 const route = useRoute()
 const modalStore = useModalStore()
-
-console.log(route.name)
 </script>
 
 <style lang="scss">
