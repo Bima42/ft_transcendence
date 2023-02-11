@@ -10,7 +10,6 @@ services:
     build: ./frontend
     volumes:
       - './frontend:/app'
-      - '/app/node_modules'
     ports:
       - '8080:8080'
     depends_on:
@@ -28,7 +27,6 @@ services:
       - .env
     volumes:
       - './backend:/server'
-      - '/server/node_modules'
     ports:
       - '3080:3080'
     depends_on:

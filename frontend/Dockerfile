@@ -4,15 +4,17 @@ FROM node:19-alpine3.15
 # set working directory
 WORKDIR /app
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
 # install and cache app dependencies
 COPY package*.json ./
 
-RUN npm install
+# install yarn
+RUN apk add --no-cache yarn
 
-RUN chmod 777 node_modules
+# run yarn install
+RUN yarn install
+
+# change ownership of the node_modules directory to the node user
+RUN chown -R node:node /app/node_modules
 
 # start app
-CMD ["npm", "run", "dev"]
+CMD ["yarn", "run", "dev"]
