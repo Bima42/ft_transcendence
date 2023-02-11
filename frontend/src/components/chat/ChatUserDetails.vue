@@ -2,7 +2,7 @@
   <p @click="$emit('setActive')">
       {{ user.name }}
   <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
-    <div class="user-details-panel" v-show="isActive" @click="clickOutside">
+    <div class="user-details-panel" v-show="isActive">
       <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
       <UserDetailsCardContent></UserDetailsCardContent>
     </div>
@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 import XButton from '@/components/XButton.vue'
 import UserDetailsCardContent from '@/components/chat/UserDetailsCardContent.vue'
 

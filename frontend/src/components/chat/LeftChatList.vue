@@ -15,40 +15,52 @@ const dummy = ref(
     [
       {
         name: 'Bima',
+        isActive: false,
       },
       {
         name: 'Mabi',
+        isActive: false,
       },
       {
         name: 'Te',
+        isActive: false,
       },
       {
         name: 'Bimsadasdaa',
+        isActive: false,
       },
       {
         name: 'Maasdadabi',
+        isActive: false,
       },
       {
         name: 'Tasdasde',
-      },{
-      name: 'Biasdasdma',
-    },
+        isActive: false,
+      },
+      {
+        name: 'Biasdasdma',
+        isActive: false,
+      },
       {
         name: 'Masdasdabi',
+        isActive: false,
       },
       {
         name: 'Tasdadsasde',
-      },{
-      name: 'Biasdasdama',
-    },
+        isActive: false,
+      },
+      {
+        name: 'Biasdasdama',
+        isActive: false,
+      },
       {
         name: 'Maasdasdabi',
+        isActive: false,
       },
       {
         name: 'Tasdasde',
+        isActive: false,
       },
-
-
     ]
 )
 
@@ -56,45 +68,54 @@ const dummy2 = ref(
     [
       {
         name: 'Bima',
+        isActive: false,
       },
       {
         name: 'Mabi',
+        isActive: false,
       },
       {
         name: 'Te',
+        isActive: false,
       },
       {
         name: 'Bimsadasdaa',
+        isActive: false,
       },
       {
         name: 'Maasdadabi',
+        isActive: false,
       },
       {
         name: 'Tasdasde',
+        isActive: false,
       },
       {
-      name: 'Biasdasdma',
+        name: 'Biasdasdma',
+        isActive: false,
       },
       {
         name: 'Masdasdabi',
+        isActive: false,
       },
       {
         name: 'Tasdadsasde',
-      },{
-      name: 'Biasdasdama',
-    },
+        isActive: false,
+      },
+      {
+        name: 'Biasdasdama',
+        isActive: false,
+      },
       {
         name: 'Maasdasdabi',
+        isActive: false,
       },
       {
         name: 'Tasdasde',
+        isActive: false,
       },
-
-
     ]
 )
-
-
 </script>
 
 <style scoped lang="scss">
