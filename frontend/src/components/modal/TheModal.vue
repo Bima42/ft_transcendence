@@ -1,7 +1,7 @@
 <template>
   <div class="modal-container" @click="exitClick">
     <section class="main-box" @click.stop>
-      <XButton class="exit-button" @click="exitClick"/>
+      <XButton :size="'big'" class="exit-button" @click="exitClick"/>
         <slot></slot>
     </section>
   </div>
