@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './auth.controller';
+import { FortyTwoStrategy } from './strategies/42.strategy';
 
 /**
  * Imports the UsersModule to enable the use of UsersService
@@ -25,7 +26,7 @@ import { AuthController } from './auth.controller';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [PassportModule, JwtModule],
+  providers: [AuthService, JwtStrategy, FortyTwoStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

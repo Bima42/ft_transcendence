@@ -1,15 +1,20 @@
 import {
   Body,
+  Req,
   Controller,
   HttpException,
   HttpStatus,
+  Get,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/user.create.dto';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
 import { LoginStatus } from './interfaces/login-status.interface';
 import { LoginUserDto } from '../users/dto/user-login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { FortyTwoAuthGuard } from './guards/42.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +46,11 @@ export class AuthController {
   @Post('login')
   public async login(@Body() loginUserDto: LoginUserDto): Promise<LoginStatus> {
     return await this.authService.login(loginUserDto);
+  }
+
+  @UseGuards(FortyTwoAuthGuard)
+  @Get('42/callback')
+  async login42(@Req() req): Promise<any> {
+    return req.user;
   }
 }
