@@ -35,7 +35,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: my-pgadmin
-    restart: always
+    restart: on-failure
     networks:
       - backend
     env_file:
@@ -48,7 +48,7 @@ services:
   db:
     image: postgres:15.1-alpine
     container_name: my-db
-    restart: always
+    restart: on-failure
     networks:
       - backend
     env_file:

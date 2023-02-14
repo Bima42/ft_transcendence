@@ -11,7 +11,7 @@
     <div class="buttons-container">
       <CustomButton styles="fat" @click="loginClick">Login</CustomButton>
       <CustomButton styles="fat">Register</CustomButton>
-      <form action="https://api.intra.42.fr/oauth/authorize" method="GET">
+      <form action="http://localhost:3080/auth/42/callback" method="GET">
         <CustomButton styles="fat">Login with 42</CustomButton>
       </form>
     </div>

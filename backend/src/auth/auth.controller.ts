@@ -50,7 +50,6 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/callback')
   async login42(@Req() req): Promise<any> {
-    console.log(req.user);
     return req.user;
   }
 }
