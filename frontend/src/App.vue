@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
-import {getCookie} from "typescript-cookie";
 
 import HeaderPack from "@/components/headers/HeaderPack.vue";
 import CreditLink from "@/components/footers/CreditLink.vue";
