@@ -10,8 +10,16 @@
       <input type="email" id="email" placeholder="Your email..." v-model="email">
     </li>
     <li>
+      <label for="phone">Phone number</label>
+      <input type="text" id="phone" placeholder="Your phone number...">
+    </li>
+    <li>
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="Your password..." v-model="password">
+    </li>
+    <li>
+      <label for="password2">Confirm password</label>
+      <input type="password" id="password2" placeholder="Confirm your password..." v-model="password2">
     </li>
   </form>
 </template>
