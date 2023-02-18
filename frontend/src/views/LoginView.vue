@@ -10,7 +10,7 @@
            required>
     <div class="buttons-container">
       <CustomButton styles="fat" @click="loginClick">Login</CustomButton>
-      <CustomButton styles="fat">Register</CustomButton>
+      <CustomButton styles="fat" @click="modalStore.loadAndDisplay(Modal, RegisterModal, {})">Register</CustomButton>
       <form action="http://localhost:3080/auth/42/callback" method="GET">
         <CustomButton styles="fat">Login with 42</CustomButton>
       </form>
@@ -22,8 +22,12 @@
   import CustomButton from '@/components/CustomButton.vue'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useModalStore } from '@/stores/modal'
+  import Modal from '@/components/modal/TheModal.vue'
+  import RegisterModal from '@/components/modal/RegisterModal.vue'
 
   const router = useRouter()
+  const modalStore = useModalStore()
 
   const username = ref("")
   const password = ref("")

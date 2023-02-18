@@ -19,12 +19,12 @@
 <script setup lang="ts">
 import { ref, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import { useModalStore } from "@/stores/modal"
+import { useModalStore } from '@/stores/modal'
 
-import BurgerButton from "@/components/headers/BurgerButton.vue"
-import Modal from "@/components/modal/TheModal.vue"
-import UserModal from "@/components/modal/UserEditModal.vue"
-import UserAvatar from "@/components/UserAvatar.vue";
+import BurgerButton from '@/components/headers/BurgerButton.vue'
+import Modal from '@/components/modal/TheModal.vue'
+import UserModal from '@/components/modal/UserEditModal.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const modalStore = useModalStore()
 const router = useRouter()
