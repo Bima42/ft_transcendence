@@ -50,6 +50,7 @@ export class AuthController {
     const loginStatus: LoginStatus = await this.authService.login(loginUserDto);
 
     if (loginStatus.status === 'success') {
+      res.cookie('access_token', loginStatus.accessToken);
       res.redirect('http://localhost:8080/index');
     } else {
       throw new HttpException('Connection failed', HttpStatus.UNAUTHORIZED);
