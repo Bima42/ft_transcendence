@@ -14,9 +14,7 @@ import UserAvatar from "@/components/UserAvatar.vue";
 import UserHighestScore from "@/components/UserHighestScore.vue";
 
 const modalStore = useModalStore()
-
 const data = modalStore.data.data
-const model = modalStore.data.model
 </script>
 
 <style scoped lang="scss">

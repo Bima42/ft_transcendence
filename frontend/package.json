@@ -13,6 +13,7 @@
   "dependencies": {
     "pinia": "^2.0.28",
     "vue": "^3.2.45",
+    "vue-dropdowns": "^1.1.2",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
