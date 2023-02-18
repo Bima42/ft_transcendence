@@ -1,7 +1,7 @@
 <template>
   <section class="login-wrapper">
     <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-    <form v-on:keyup.enter="login">
+    <form action="http://localhost:3080/auth/login" method="post" v-on:keyup.enter="login">
       <label for="uname"><b>Username</b></label>
       <input type="text" placeholder="Enter Username" name="username" v-model="username" required>
       <label for="psw"><b>Password</b></label>
@@ -9,7 +9,7 @@
              name="password"
              v-model="password"
              required>
-      <CustomButton styles="fat" @click="loginClick">Login</CustomButton>
+      <CustomButton styles="fat">Login</CustomButton>
     </form>
     <div class="buttons-container">
       <CustomButton styles="fat" @click="modalStore.loadAndDisplay(Modal, RegisterModal, {})">Register</CustomButton>
@@ -33,29 +33,6 @@ const modalStore = useModalStore()
 
 const username = ref("")
 const password = ref("")
-
-function loginClick(e: MouseEvent) {
-  if (e.target instanceof HTMLButtonElement && e.target.innerText === 'Login') {
-    fetch('http://localhost:3080/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value
-      })
-    })
-        .then((response) => {
-          if (response.ok) {
-            router.push('/index');
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-  }
-}
 </script>
 
 <style scoped lang="scss">

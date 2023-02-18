@@ -3,31 +3,60 @@
     <h1>Create a new account</h1>
     <li>
       <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Your username..." v-model="username">
+      <input type="text" id="username" name="username" placeholder="Your username..." v-model="username" required>
     </li>
     <li>
       <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Your email..." v-model="email">
+      <input type="email" id="email" name="email" placeholder="Your email..." v-model="email" required>
     </li>
     <li>
       <label for="phone">Phone number</label>
-      <input type="text" id="phone" placeholder="Your phone number...">
+      <input type="text" id="phone" name="phone" placeholder="Your phone number..." v-model="phone" required>
     </li>
     <li>
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Your password..." v-model="password">
+      <input type="password" id="password" name="password" placeholder="Your password..." v-model="password" required>
     </li>
     <li>
       <label for="password2">Confirm password</label>
-      <input type="password" id="password2" placeholder="Confirm your password..." v-model="password2">
+      <input type="password" id="password2" placeholder="Confirm your password...">
     </li>
+    <CustomButton styles="fat" @click="registerClick">Register</CustomButton>
   </form>
 </template>
 
 <script setup lang="ts">
-import {defineProps} from 'vue'
+import {defineProps, ref} from 'vue'
+import CustomButton from '@/components/CustomButton.vue'
+import {useRouter} from "vue-router";
+const router = useRouter()
 
 const props = defineProps<{}>()
+
+const username = ref("")
+const password = ref("")
+const email = ref("")
+const phone = ref("")
+
+function registerClick (e: MouseEvent) {
+  if (e.target instanceof HTMLButtonElement && e.target.innerText === 'Register') {
+    fetch('http://localhost:3080/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+        phoneNumber: phone.value
+      })
+    })
+        .catch((error) => {
+          console.error(error);
+        });
+  }
+}
 </script>
 
 <style scoped lang="scss">

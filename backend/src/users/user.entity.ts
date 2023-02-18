@@ -14,6 +14,7 @@ export class UserEntity {
 
   @Column({
     nullable: false,
+    unique: true,
   })
   username: string;
 
@@ -21,6 +22,12 @@ export class UserEntity {
     nullable: false,
   })
   password: string;
+
+  @Column({
+    nullable: false,
+    unique: true,
+  })
+  phoneNumber: string;
 
   //This hook runs and gives the opportunity to run any code before saving the Entity in the database
   //the code hashes the original password entered by the user
