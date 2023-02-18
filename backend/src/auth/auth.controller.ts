@@ -7,7 +7,9 @@ import {
   Get,
   Post,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/user.create.dto';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
@@ -41,10 +43,17 @@ export class AuthController {
   /**
    * login route handler : returns the response of the call to AuthService.login() function
    * @param loginUserDto
+   * @param res
    */
   @Post('login')
-  public async login(@Body() loginUserDto: LoginUserDto): Promise<LoginStatus> {
-    return await this.authService.login(loginUserDto);
+  public async login(@Body() loginUserDto: LoginUserDto, @Res() res: Response): Promise<void> {
+    const loginStatus: LoginStatus = await this.authService.login(loginUserDto);
+
+    if (loginStatus.status === 'success') {
+      res.redirect('http://localhost:8080/index');
+    } else {
+      throw new HttpException('Connection failed', HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @UseGuards(FortyTwoAuthGuard)
