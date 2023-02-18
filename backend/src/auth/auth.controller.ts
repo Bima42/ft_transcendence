@@ -46,7 +46,7 @@ export class AuthController {
    * @param res
    */
   @Post('login')
-  public async login(@Body() loginUserDto: LoginUserDto, @Res() res: Response): Promise<void> {
+  public async login(@Body() loginUserDto: LoginUserDto, @Res() res: Response) {
     const loginStatus: LoginStatus = await this.authService.login(loginUserDto);
 
     if (loginStatus.status === 'success') {
@@ -59,7 +59,8 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('42/callback')
-  async login42(@Req() req): Promise<any> {
-    return req.user;
+  async login42(@Req() req, @Res() res: Response) {
+    res.cookie('access_token', req.user.accessToken);
+    res.redirect('http://localhost:8080/index');
   }
 }
