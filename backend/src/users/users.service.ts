@@ -67,9 +67,9 @@ export class UsersService {
    * @param userData: CreateUserDto
    */
   async create(userData: CreateUserDto): Promise<UserDto> {
-    const { username, password, email } = userData;
+    const { username, password, email, phoneNumber } = userData;
     const userInDb = await this.usersRepo.findOne({
-      where: { username },
+      where: { username, email },
     });
     if (userInDb) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
@@ -80,6 +80,7 @@ export class UsersService {
       username,
       password,
       email,
+      phoneNumber,
     });
     await this.usersRepo.save(newUser);
 

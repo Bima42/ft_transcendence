@@ -12,4 +12,7 @@ export class UserDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @IsNotEmpty()
+  phoneNumber: string;
 }

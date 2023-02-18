@@ -44,12 +44,16 @@ export class AuthService {
    */
   async login(loginUserDto: LoginUserDto) {
     const user = await this.usersService.findByLogin(loginUserDto);
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
 
     const token = this._createToken(user);
 
     return {
       username: user.username,
       ...token,
+      status: 'success',
     };
   }
 
