@@ -1,9 +1,9 @@
 <template>
-  Ici logique de live game
+  <TheTable></TheTable>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{}>()
+import TheTable from "@/components/table/TheTable.vue";
 </script>
 
 <style scoped lang="scss">

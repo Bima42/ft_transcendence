@@ -6,6 +6,7 @@ import LiveGameView from '@/views/LiveGameView.vue'
 import PlayAGameView from '@/views/PlayAGameView.vue'
 import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
+import TableView from '@/components/table/TheTable.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,11 @@ const router = createRouter({
             path: '/credits',
             name: 'credits',
             component: CreditsView,
+        },
+        {
+            path: '/table',
+            name: 'table',
+            component: TableView
         },
         {
             path: '/main',
