@@ -33,6 +33,7 @@
   - ##### [5.4 Controller for Users](#controller-for-users)
 - ### [6. Adding data to our table user](#adding-data-to-our-table-user)
 - ### [Previous Docs : Dockerize Nest with Database](2-dockerize-nest-postgres-and-pgadmin.md)
+- ### [Next Docs : Database Structure](4-database-structure.md)
 ### [Back to summary](../Summary.md)
 
 ***
