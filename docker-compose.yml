@@ -1,7 +1,7 @@
 version: '3.7'
 
 networks:
-  backend: {}
+  transcendence: {}
 
 services:
   frontend:
@@ -10,6 +10,7 @@ services:
     build: ./frontend
     volumes:
       - './frontend:/app'
+      - '/app/node_modules'
     ports:
       - '8080:8080'
     depends_on:
@@ -22,11 +23,12 @@ services:
       context: ./backend
       target: dev
     networks:
-      - backend
+      - transcendence
     env_file:
-      - .env
+      - ./env/.backend_env
     volumes:
       - './backend:/server'
+      - '/server/node_modules'
     ports:
       - '3080:3080'
     depends_on:
@@ -37,9 +39,9 @@ services:
     container_name: my-pgadmin
     restart: on-failure
     networks:
-      - backend
+      - transcendence
     env_file:
-      - .env
+      - ./env/.pg_env
     ports:
       - '5050:80'
     depends_on:
@@ -50,9 +52,9 @@ services:
     container_name: my-db
     restart: on-failure
     networks:
-      - backend
+      - transcendence
     env_file:
-      - .env
+      - ./env/.postgres_env
     volumes:
       - 'data:/var/lib/postgresql/data'
     ports:
