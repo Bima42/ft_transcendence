@@ -12,7 +12,7 @@ services:
       - './frontend:/app'
       - '/app/node_modules'
     ports:
-      - '8080:8080'
+      - '8000:8000'
     depends_on:
       - backend
 
@@ -34,18 +34,14 @@ services:
     depends_on:
       - db
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: my-pgadmin
+  adminer:
+    image: adminer
+    container_name: my-adminer
     restart: on-failure
+    ports:
+      - "8080:8080"
     networks:
       - transcendence
-    env_file:
-      - ./env/.pg_env
-    ports:
-      - '5050:80'
-    depends_on:
-      - db
 
   db:
     image: postgres:15.1-alpine
