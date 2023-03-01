@@ -1,6 +1,6 @@
 <template>
 <!--  <TheTable></TheTable>-->
-  <TheTablev3 :data="tableData"></TheTablev3>
+  <TheTablev3 :data="tableData" :headers="tableHeader"></TheTablev3>
 </template>
 
 <script setup lang="ts">
@@ -14,6 +14,14 @@ const tableData = ref([
   { opponent: 'Team B', score: 5, population: 50000, live: false, game: 'Game 2' },
   { opponent: 'Team C', score: 8, population: 80000, live: true, game: 'Game 3' },
   { opponent: 'Team D', score: 3, population: 30000, live: false, game: 'Game 4' }
+])
+
+const tableHeader = ref([
+  { name: 'Opponent' },
+  { name: 'Score' },
+  { name: 'Population' },
+  { name: 'Live' },
+  { name: 'Game' }
 ])
 </script>
 
