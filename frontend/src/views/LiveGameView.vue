@@ -14,7 +14,13 @@ const tableData = ref([
   { opponent: 'Team B', score: '5 - 43', population: 50000, live: false, game: 'Game 2' },
   { opponent: 'Team C', score: '8 - 1', population: 80000, live: true, game: 'Game 3' },
   { opponent: 'Team D', score: '3 - 2', population: 30000, live: false, game: 'Game 4' },
-  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'}
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
+  { opponent: 'Team E', score: '4 - 3', population: 20, live: true, game: 'Game 23'},
 ])
 
 const tableHeader = ref([

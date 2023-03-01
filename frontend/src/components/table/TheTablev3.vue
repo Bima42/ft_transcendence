@@ -7,28 +7,61 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in tableData" :key="index">
+        <tr v-for="(row, index) in tableDataPaginated" :key="index">
           <td v-for="data in row">{{ data }}</td>
         </tr>
       </tbody>
     </table>
+    <div>
+      <button @click="prevPage" :disabled="currentPage === 1">Prev</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 const props = defineProps<{
-  data: object,
+  data: object[],
   headers: object,
 }>()
 
 const tableData = props.data;
-const tableHeaders= props.headers;
+const tableHeaders = props.headers;
+let currentPage = ref();
+currentPage = 1;
 
+const totalPages = computed(() => {
+  return Math.ceil(tableData.length / 5);
+});
+
+const nextPage = () => {
+  if (currentPage < totalPages.value) {
+    currentPage++;
+  }
+  console.log(currentPage);
+};
+
+const prevPage = () => {
+  if (currentPage > 1) {
+    currentPage--;
+  }
+};
+
+const tableDataPaginated = computed(() => {
+  const pageSize = 5
+  const start = (currentPage - 1) * pageSize;
+  const end = start + pageSize;
+  return tableData.slice(start, end);
+});
 </script>
 
 <style scoped lang="scss">
 .table_wrapper {
   display: flex;
+  flex-direction: column;
   width: 100%;
   justify-content: center;
   grid-area: $main;
