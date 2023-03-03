@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { UsersModule } from './users/users.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -18,6 +19,7 @@ import * as Joi from 'joi';
       ignoreEnvFile: true,
     }),
     PrismaModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
