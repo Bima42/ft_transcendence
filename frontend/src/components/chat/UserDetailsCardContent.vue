@@ -1,8 +1,7 @@
 <template>
   <div class="user-details-card-wrapper">
     <UserAvatar type="small"></UserAvatar>
-    <div class="user-details-card-header">
-    </div>
+    <div class="user-details-card-header"></div>
     <div class="user-details-card-content">
       <CustomButton styles="fat">Add friend</CustomButton>
       <CustomButton styles="fat">Send a private message</CustomButton>
@@ -12,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps} from 'vue'
+import { defineProps } from 'vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import CustomButton from "@/components/CustomButton.vue";
 
