@@ -1,7 +1,7 @@
 <template>
   <section class="login-wrapper">
     <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-    <form action="http://localhost:3080/auth/login" method="post" v-on:keyup.enter="login">
+    <form action="http://localhost:8000/index" method="get" v-on:keyup.enter="login">
       <label for="uname"><b>Username</b></label>
       <input type="text" placeholder="Enter Username" name="username" v-model="username" required>
       <label for="psw"><b>Password</b></label>
@@ -12,8 +12,7 @@
       <CustomButton styles="fat">Login</CustomButton>
     </form>
     <div class="buttons-container">
-      <CustomButton styles="fat" @click="modalStore.loadAndDisplay(Modal, RegisterModal, {})">Register</CustomButton>
-      <form action="http://localhost:3080/auth/42/callback" method="GET">
+      <form action="http://localhost:8000/index" method="get">
         <CustomButton styles="fat">Login with 42</CustomButton>
       </form>
     </div>
