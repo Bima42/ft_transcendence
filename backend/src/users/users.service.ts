@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { User, UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -45,33 +45,31 @@ export class UsersService {
     return users;
   }
 
+  async updateStatus(userId: number, status: UserStatus): Promise<User> {
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        status: status
+      }
+    });
+  }
+
   async update(userId: number, data: User): Promise<User> {
-    const updatedUser = await this.prismaService.user.update({
+    return  this.prismaService.user.update({
       where: {
         id: +userId
       },
       data: data
     });
-
-    if (!updatedUser) {
-      throw new BadRequestException('User not updated');
-    }
-
-    return updatedUser;
   }
 
   async delete(userId: number): Promise<User> {
-     const deletedUser = await this.prismaService.user.delete({
+     return this.prismaService.user.delete({
        where: {
         id: +userId
        }
      });
-
-     if (!deletedUser) {
-       throw new BadRequestException('User not deleted');
-     }
-
-     return deletedUser;
   }
-
 }
