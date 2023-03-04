@@ -2,7 +2,6 @@ import {createRouter, createWebHistory} from 'vue-router'
 import IndexView from '@/views/IndexView.vue'
 import LoginView from '@/views/LoginView.vue'
 import CreditsView from '@/views/CreditsView.vue'
-import LiveGameView from '@/views/LiveGameView.vue'
 import PlayAGameView from '@/views/PlayAGameView.vue'
 import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
@@ -42,14 +41,6 @@ const router = createRouter({
                     longName: 'Play a game',
 
                 },
-                {
-                    path: 'live',
-                    name: 'live',
-                    component: LiveGameView,
-                    longName: 'Live games',
-
-                },
-
                 {
                     path: 'score',
                     name: 'score',
