@@ -1,11 +1,13 @@
 # base image
-FROM node:19-alpine3.15
+FROM node:18-alpine
 
 # set working directory
 WORKDIR /app
 
 # install and cache app dependencies
 COPY package*.json ./
+
+COPY yarn.lock ./
 
 # install yarn
 RUN apk add --no-cache yarn
@@ -17,4 +19,4 @@ RUN yarn install
 RUN chown -R node:node /app/node_modules
 
 # start app
-CMD ["yarn", "run", "dev"]
+CMD ["yarn", "dev"]

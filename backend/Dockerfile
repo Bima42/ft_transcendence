@@ -1,15 +1,25 @@
 # Base
-FROM node:19-alpine3.15 AS base
+FROM node:18-alpine AS base
+
+RUN apk update && apk upgrade \
+    && apk add --no-cache --quiet --update vim curl bash postgresql-client dos2unix
 
 WORKDIR /server
 
 COPY package*.json ./
 
+RUN yarn install
+
 # Dev target
 FROM base AS dev
 
-RUN npm install
+RUN chmod 777 -R ./node_modules
 
-CMD ["npm", "run", "start:dev"]
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN dos2unix /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
 
 # Prod target

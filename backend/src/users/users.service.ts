@@ -1,89 +1,77 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from './user.entity';
-import { UserDto } from './dto/user.dto';
-import { toUserDto } from '../shared/mapper';
-import { LoginUserDto } from './dto/user-login.dto';
-import { comparePasswords } from '../shared/utils';
-import { CreateUserDto } from './dto/user.create.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity)
-    private usersRepo: Repository<UserEntity>,
+      private readonly prismaService: PrismaService
   ) {}
 
-  /**
-   * Function takes a UserEntity object and returns a UserDto object
-   *
-   * @param options: object
-   */
-  async findOne(options?: object): Promise<UserDto> {
-    const user = await this.usersRepo.findOne(options);
-    return toUserDto(user);
-  }
 
-  /**
-   * Function takes a username and password and returns a UserDto object
-   * used later when the user wants to log in to the application
-   *
-   * @param username: string
-   * @param password: string
-   */
-  async findByLogin({ username, password }: LoginUserDto): Promise<UserDto> {
-    const user = await this.usersRepo.findOne({ where: { username } });
+  async create(data: User): Promise<User> {
+    const user = await this.prismaService.user.create({
+      data: data
+    });
+
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new BadRequestException('User not created');
     }
 
-    // compare the password entered by the user with the hashed password stored in the database
-    const isMatch = await comparePasswords(user.password, password);
-    if (!isMatch) {
-      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
-    }
-
-    return toUserDto(user);
+    return user;
   }
 
-  async findByPayload({ username }: any): Promise<UserDto> {
-    return await this.findOne({
+  async findById(userId: number) {
+    const user = await this.prismaService.user.findUnique({
       where: {
-        username,
-      },
+        id: +userId
+      }
     });
-  }
 
-  /**
-   * Function takes a CreateUserDto object and returns a UserDto object
-   * used when the user wants to register to the application
-   *
-   * @param userData: CreateUserDto
-   */
-  async create(userData: CreateUserDto): Promise<UserDto> {
-    const { username, password, email, phoneNumber } = userData;
-    const userInDb = await this.usersRepo.findOne({
-      where: { username, email },
-    });
-    if (userInDb) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    if (!user) {
+        throw new BadRequestException('User not found');
     }
 
-    // create a new user using create() method from the repository
-    const newUser: UserEntity = await this.usersRepo.create({
-      username,
-      password,
-      email,
-      phoneNumber,
-    });
-    await this.usersRepo.save(newUser);
-
-    return toUserDto(newUser);
+    return user;
   }
+
+  async findAll(): Promise<User[]> {
+    const users = await this.prismaService.user.findMany();
+
+    if (!users) {
+      throw new BadRequestException('No users found');
+    }
+
+    return users;
+  }
+
+  async update(userId: number, data: User): Promise<User> {
+    const updatedUser = await this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: data
+    });
+
+    if (!updatedUser) {
+      throw new BadRequestException('User not updated');
+    }
+
+    return updatedUser;
+  }
+
+  async delete(userId: number): Promise<User> {
+     const deletedUser = await this.prismaService.user.delete({
+       where: {
+        id: +userId
+       }
+     });
+
+     if (!deletedUser) {
+       throw new BadRequestException('User not deleted');
+     }
+
+     return deletedUser;
+  }
+
 }
