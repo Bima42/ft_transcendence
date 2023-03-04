@@ -1,25 +1,61 @@
 <template>
   <div class="header-wrapper">
-    <img src="@/assets/img/logo.svg"/>
-<!--    TODO: Use user avatar here-->
+    <UserAvatar type="small"></UserAvatar>
+    <!--    TODO: Use user avatar here-->
     <input id="menu-toggle" type="checkbox"/>
     <label for="menu-toggle">
       <BurgerButton></BurgerButton>
     </label>
     <ul class="menu">
-      <li>One</li>
-      <li>Two</li>
-      <li>Three</li>
-      <li>Four</li>
-      <li>Five</li>
+      <a v-for="menuitem in menuitems"
+          :id="menuitem.id"
+          @click="clickHandler">
+        {{ menuitem.name }}
+      </a>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
-import BurgerButton from "@/components/headers/BurgerButton.vue";
+import { ref, defineProps } from 'vue'
+import { useRouter } from 'vue-router'
+import { useModalStore } from '@/stores/modal'
 
+import BurgerButton from '@/components/headers/BurgerButton.vue'
+import Modal from '@/components/modal/TheModal.vue'
+import UserModal from '@/components/modal/UserEditModal.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+
+const modalStore = useModalStore()
+const router = useRouter()
 const props = defineProps<{}>()
+
+function clickHandler(e: Event) {
+  if (!e.target)
+    return
+  const target = e.target as HTMLElement
+
+  if (target.id === 'logout') {
+    router.push('/')
+    //TODO: Logout
+  }
+  else if (target.id === 'modalUser') {
+    modalStore.loadAndDisplay(Modal, UserModal, {})
+  }
+}
+
+const menuitems = ref(
+    [
+      {
+        name: 'Settings',
+        id: 'modalUser',
+      },
+      {
+        name: 'Logout',
+        id: 'logout',
+      },
+    ]
+)
 </script>
 
 <style scoped lang="scss">
@@ -31,9 +67,6 @@ const props = defineProps<{}>()
   align-items: center;
   width: 100%;
   overflow: hidden;
-  img {
-    min-width: 25%;
-  }
 }
 
 .menu {
@@ -49,10 +82,17 @@ const props = defineProps<{}>()
   top: 30px;
   right: 20px;
   margin-top: 50px;
-  width: 100%;
+
+  a {
+    cursor: pointer;
+  }
 }
 
-.menu > li {
+#logout {
+  color: red;
+}
+
+.menu > a {
   margin: 0 1rem;
   overflow: hidden;
   display: flex;
@@ -67,7 +107,7 @@ const props = defineProps<{}>()
   display: none;
 }
 
-#menu-toggle ~ .menu li {
+#menu-toggle ~ .menu a {
   height: 0;
   margin: 0;
   padding: 0;
@@ -75,7 +115,7 @@ const props = defineProps<{}>()
   transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-#menu-toggle:checked ~ .menu li {
+#menu-toggle:checked ~ .menu a {
   border: 1px solid $yellow;
   height: 2.5em;
   padding: 0.5em;

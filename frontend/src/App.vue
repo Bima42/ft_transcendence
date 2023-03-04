@@ -1,15 +1,33 @@
 <template>
   <section class="UI-grid">
+    <template v-if="route.name !== 'home'">
+      <HeaderPack></HeaderPack>
+      <MainMenu></MainMenu>
+    </template>
+    <CreditLink></CreditLink>
+    <TheModal v-if="modalStore.show">
+      <Component :is="modalStore.component"/>
+    </TheModal>
     <router-view></router-view>
   </section>
 </template>
 
 <script setup lang="ts">
+import {useRoute} from 'vue-router'
 
+import HeaderPack from "@/components/headers/HeaderPack.vue";
+import CreditLink from "@/components/footers/CreditLink.vue";
+import MainMenu from "@/components/MainMenu.vue";
+import TheModal from "@/components/modal/TheModal.vue";
+import {useModalStore} from "@/stores/modal";
+
+const route = useRoute()
+const modalStore = useModalStore()
 </script>
 
 <style lang="scss">
 #app {
+  font-family: "Meta", sans-serif;
   display: flex;
   width: 100vw;
   height: 100vh;
