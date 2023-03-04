@@ -1,13 +1,11 @@
 <template>
-<!--  <TheTable></TheTable>-->
-  <TheTablev3 :data="tableData" :headers="tableHeader"></TheTablev3>
+  <TheTable :rowsPerPage="8" :data="tableData" :headers="tableHeader"></TheTable>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
 import TheTable from "@/components/table/TheTable.vue"
-import TheTablev3 from "@/components/table/TheTablev3.vue"
 
 const tableData = ref([
   { opponent: 'Team A', score: '10 - 1', population: 100000, live: true, game: 'Game 1' },
