@@ -7,6 +7,11 @@ export class UsersController {
   constructor(
       private readonly usersService: UsersService) {}
 
+  @Post('create')
+  async createUser(@Body() data: User): Promise<User> {
+    return this.usersService.create(data);
+  }
+
   @Get(':id')
   async getUserById(@Param('id') userId: number) {
     return this.usersService.findById(userId);
@@ -15,11 +20,6 @@ export class UsersController {
   @Get()
   async getAllUsers() {
     return this.usersService.findAll();
-  }
-
-  @Post()
-  async createUser(@Body() data: User): Promise<User> {
-        return this.usersService.create(data);
   }
 
   @Patch(':id')

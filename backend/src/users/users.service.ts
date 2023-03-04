@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 
@@ -7,6 +7,19 @@ export class UsersService {
   constructor(
       private readonly prismaService: PrismaService
   ) {}
+
+
+  async create(data: User): Promise<User> {
+    const user = await this.prismaService.user.create({
+      data: data
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not created');
+    }
+
+    return user;
+  }
 
   async findById(userId: number) {
     const user = await this.prismaService.user.findUnique({
@@ -30,18 +43,6 @@ export class UsersService {
     }
 
     return users;
-  }
-
-  async create(data: User): Promise<User> {
-    const user = await this.prismaService.user.create({
-      data: data
-    });
-
-    if (!user) {
-      throw new BadRequestException('User not created');
-    }
-
-    return user;
   }
 
   async update(userId: number, data: User): Promise<User> {
