@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
@@ -9,6 +10,17 @@ export class UsersController {
   constructor(
       private readonly usersService: UsersService) {}
 
+  @Get('login')
+  async login(@Req() req: Request, @Res() res: Response) {
+    res.status(200).send('coucou');
+
+    // const user = req.user;
+    // if (!user) {
+    //   res.status(401).send('Unauthorized');
+    // } else {
+    //   res.status(200).send(user);
+    // }
+  }
   @Post('create')
   async createUser(@Body() data: User): Promise<User> {
     return this.usersService.create(data);

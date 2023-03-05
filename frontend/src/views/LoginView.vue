@@ -1,37 +1,17 @@
 <template>
   <section class="login-wrapper">
     <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-    <form action="http://localhost:8000/index" method="get" v-on:keyup.enter="login">
-      <label for="uname"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="username" v-model="username" required>
-      <label for="psw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password"
-             name="password"
-             v-model="password"
-             required>
-      <CustomButton styles="fat">Login</CustomButton>
-    </form>
     <div class="buttons-container">
-      <form action="http://localhost:8000/index" method="get">
-        <CustomButton styles="fat">Login with 42</CustomButton>
-      </form>
+      <CustomButton styles="fat">Login with 42</CustomButton>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import CustomButton from '@/components/CustomButton.vue'
-import {ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {useModalStore} from '@/stores/modal'
-import Modal from '@/components/modal/TheModal.vue'
-import RegisterModal from '@/components/modal/RegisterModal.vue'
 
 const router = useRouter()
-const modalStore = useModalStore()
-
-const username = ref("")
-const password = ref("")
 </script>
 
 <style scoped lang="scss">

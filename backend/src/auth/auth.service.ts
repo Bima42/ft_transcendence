@@ -6,11 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
       private readonly prismaService: PrismaService,
-        private readonly jwtService: JwtService
+      private readonly jwtService: JwtService
   ) {}
 
-  async createOrValidateUser({ id, username, email, fortyTwoId, avatar }: {
-    id: number,
+  async createOrValidateUser({ username, email, fortyTwoId, avatar }: {
     username: string,
     email: string,
     fortyTwoId: number,

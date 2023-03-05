@@ -6,7 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import * as process from 'process';
 import { UsersService } from '../users/users.service';
-import { FortyTwoStrategy } from './fortytwo.strategy';
+import { FortyTwoStrategy } from './strategies/fortytwo.strategy';
 
 @Module({
   imports: [
