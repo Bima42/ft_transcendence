@@ -20,11 +20,3 @@
 | POST   | /chat/<user>                 | post a new direct message to some user |
 
 
-
-## Questions
-
-* Quand utiliser les fonctions `async` ?
-* Que met-on dans un controller / un service ?
-* Comment structurer les fichiers ? Un seul controller pour le chat ?
-* Comment s'authentifier pour les channels ? (private, msg author, admin rights...)
-* Database: where vs select
