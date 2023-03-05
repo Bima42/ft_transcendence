@@ -20,6 +20,7 @@ async function bootstrap() {
       .setTitle('Transcendence')
       .setDescription('Transcendence API')
       .setVersion('0.1')
+	  .addTag('Chat')
       .build();
 
   const document = SwaggerModule.createDocument(app, config);
