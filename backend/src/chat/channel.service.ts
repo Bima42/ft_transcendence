@@ -54,6 +54,12 @@ export class ChannelService {
 	});
   }
 
+  async deleteChannel(chatId: number) {
+      return this.prismaService.chat.delete({
+          where: { id: chatId }
+      });
+  }
+
   async getMessages(chatId: number): Promise<Array<ChatMessage>> {
 	  let chat = await this.findById(chatId);
 	  if ( ! chat)

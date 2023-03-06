@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put} from '@nestjs/common';
+import { Body, Controller, Get, Delete, Param, ParseIntPipe, Post, Put} from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { Chat, ChatMessage, UserChatRole } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
@@ -11,12 +11,12 @@ import { NewChannelDto } from './dto/channel.dto';
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
-  @Get()
+  @Get('rooms')
   getAllChannels(): Promise<Chat[]> {
     return this.channelService.getAllChannels();
   }
 
-  @Post('room')
+  @Post('rooms')
   async createNewChannel(@Body() data: NewChannelDto) : Promise<Chat> {
 	  return this.channelService.createChannel(data)
   }
@@ -29,6 +29,11 @@ export class ChannelController {
   @Put('rooms/:id')
   async updateChannel(@Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
 	return this.channelService.updateChannel(id, data);
+  }
+
+  @Delete('rooms/:id')
+  async DeleteChannel(@Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+	return this.channelService.deleteChannel(id);
   }
 
   @Get('rooms/:id/messages')
