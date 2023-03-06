@@ -62,7 +62,6 @@ const tableDataPaginated = computed(() => {
 .table_wrapper {
   display: flex;
   flex-direction: column;
-(??)
   width: 100%;
   justify-content: center;
   grid-area: $main;
