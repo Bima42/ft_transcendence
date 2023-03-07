@@ -125,15 +125,19 @@ export default {
     };
 
     class Paddle extends Rectangle {
-		speed: number;
+		curSpeed: number;
+		topSpeed: number;
+		static defaultSpeed: number = 10;
 
 		constructor(pos: vector, size: vector) {
 			super(pos, size);
-			this.speed = 0;
+			this.topSpeed = Paddle.defaultSpeed;
+			this.topSpeed = 10;
+			this.curSpeed = 0;
 		}
 
 		move() {
-			this.pos.y = clamp(this.pos.y + this.speed, - this.size.y / 2, canvas.height - this.size.y / 2)
+			this.pos.y = clamp(this.pos.y + this.curSpeed, - this.size.y / 2, canvas.height - this.size.y / 2)
 
 		}
 
@@ -193,17 +197,17 @@ export default {
 
 	function handleInputs(){
 
-		paddle1.speed = 0;
+		paddle1.curSpeed = 0;
 		if (keyboard["w"])
-			paddle1.speed -= 10;
+			paddle1.curSpeed -= paddle1.topSpeed;
 		if (keyboard["s"])
-			paddle1.speed += 10;
+			paddle1.curSpeed += paddle1.topSpeed;
 
-		paddle2.speed = 0;
+		paddle2.curSpeed = 0;
 		if (keyboard["ArrowUp"])
-			paddle2.speed -= 10;
+			paddle2.curSpeed -= paddle2.topSpeed;
 		if (keyboard["ArrowDown"])
-			paddle2.speed += 10;
+			paddle2.curSpeed += paddle2.topSpeed;
 
 		if (gameOver && keyboard["r"]) {
 			onReset()
@@ -216,7 +220,7 @@ export default {
 	function onReset() {
 		paddle1.pos.y = canvas.height / 2 - paddle1.size.y / 2;
 		paddle2.pos.y = canvas.height / 2 - paddle2.size.y / 2;
-		paddle1.speed = 20;
+		paddle1.topSpeed = paddle2.topSpeed = Paddle.defaultSpeed;
 		ball.pos.x = canvas.width / 2;
 		ball.pos.y = canvas.height / 2;
 		ball.dir.x = 1;
