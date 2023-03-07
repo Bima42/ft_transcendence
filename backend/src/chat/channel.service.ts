@@ -1,10 +1,10 @@
 
-import { BadRequestException, HttpStatus, Injectable, Logger} from '@nestjs/common';
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, Logger} from '@nestjs/common';
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
 import { Chat, ChatMessage} from '@prisma/client';
 import { NewMessageDto } from './dto/message.dto';
-import { NewChannelDto } from './dto/channel.dto';
+import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -12,14 +12,54 @@ export class ChannelService {
       private readonly prismaService: PrismaService
   ) {}
 
-  async getAllChannels(): Promise<Array<Chat>> {
-    const channels = await this.prismaService.chat.findMany();
+  async getAllChannels(): Promise<Array<NewChannelDto>> {
+    const channels = await this.prismaService.chat.findMany({
+		select: {
+			id: true,
+			name: true,
+			type: true
+		}
+	});
 
     if (!channels) {
       throw new BadRequestException('No channel found');
     }
 
     return channels;
+  }
+
+  // Return the detailed description of the chat, except for the messages
+  async getChannelDetails(chatId: number): Promise<DetailedChannelDto> {
+		let chat = await this.prismaService.chat.findUnique({
+			where: { id: +chatId },
+			select: {
+				id: true,
+				name: true,
+				createdAt: true,
+				updatedAt: true
+			}
+		});
+
+		// TODO TYR: When the chat is not found
+
+		let users = await this.prismaService.userChat.findMany({
+			where: {chatId: chatId},
+			select: {
+				userId: true,
+				chatId: true,
+				role: true,
+				mutedUntil: true
+			}
+		})
+		let chatDto: DetailedChannelDto =  {
+			id: chatId,
+			name: chat.name,
+			createdAt: chat.createdAt,
+			updatedAt: chat.updatedAt,
+			users: users,
+		}
+
+		return chatDto;
   }
 
   async findById(chatId: number): Promise<Chat> {
@@ -44,6 +84,8 @@ export class ChannelService {
       data: newChannel
     });
 
+	// TODO TYR: Add channel owner and not 1
+	this.UpsertUserChatRole(newChat.id, 1, UserChatRole.OWNER, 0);
     return newChat;
   }
 
@@ -55,18 +97,34 @@ export class ChannelService {
   }
 
   async deleteChannel(chatId: number) {
-      return this.prismaService.chat.delete({
-          where: { id: chatId }
+
+	  // Delete UserChatRole
+	  const roleOutput = await this.prismaService.userChat.deleteMany({
+		where: { chatId: chatId}
+	  })
+
+	  // Delete messages
+	  const MsgOutput = await this.prismaService.chatMessage.deleteMany({
+		where: { chatId: chatId}
+	  })
+
+	  // Delete Chat
+      const chatOutput = await this.prismaService.chat.delete({
+          where: { id: chatId },
       });
+
+	  Logger.log("Deleted chat " + chatId + ": "
+				 + roleOutput.count + " roles and " + MsgOutput.count + " messages erased");
+
   }
 
-  async getMessages(chatId: number): Promise<Array<ChatMessage>> {
+  async getLastMessages(chatId: number, nbrMsgs: number): Promise<Array<ChatMessage>> {
 	  let chat = await this.findById(chatId);
 	  if ( ! chat)
 		  return [];
 	return this.prismaService.chatMessage.findMany({
 		skip: 0,
-		take: 50,
+		take: nbrMsgs,
 		where: { chatId: chatId },
 		orderBy: { id: "desc" }
 	});
@@ -85,7 +143,7 @@ export class ChannelService {
 	return HttpStatus.OK;
   }
 
-  async UpsertUserChatRole(chatId: number, userId: number, role: UserChatRole, mutedUntil): Promise<HttpStatus> {
+  async deleteUserChatRole(chatId: number, userId: number) {
 	var userChat = await this.prismaService.userChat.findFirst({
 		where: {
 			AND: [
@@ -93,25 +151,48 @@ export class ChannelService {
 				{ userId: userId}
 			]}
 	});
-	if ( userChat ) {
-		userChat.role = role;
-		Logger.log("Update UserChat " + userChat.id + ": " + role);
-		// this.prismaService.userChat.update({
-		// 	where: {id: userChat.id},
-		// 	data: userChat
-		// });
-	} else {
-		Logger.log("New UserChat (" + userId + " on " + chatId + "): " + role);
+	if ( userChat && userChat.role != UserChatRole.BANNED ) {
+		Logger.log("chat: " + chatId + "kick user: " + userId);
+		await this.prismaService.userChat.delete({
+			where: {id: userChat.id},
+		});
+	}
+	return HttpStatus.OK;
+  }
+
+  async UpsertUserChatRole(chatId: number, userId: number, newRole: UserChatRole, mutedUntil): Promise<HttpStatus> {
+	var userChat = await this.prismaService.userChat.findFirst({
+		where: {
+			AND: [
+				{ chatId: chatId} ,
+				{ userId: userId}
+			]}
+	});
+	if ( ! userChat ) {
+		Logger.log("New role: chat: " + chatId + ", user: " + userId + ", role: " + newRole);
 		var uuuu = await this.prismaService.userChat.create({
 			data: {
 				chatId: chatId,
 				userId: userId,
-				role: role,
+				role: newRole,
 				mutedUntil: null
 			}
 		});
 		return uuuu ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
 	}
+
+	Logger.log("Oold role: " + userChat.role );
+	if (userChat.role == UserChatRole.OWNER) {
+		Logger.log("Cannot change role from owner");
+		return HttpStatus.FORBIDDEN;
+	}
+
+	userChat.role = newRole;
+	Logger.log("Update role: chat: " + chatId + ", user: " + userId + ", role: " + newRole);
+	await this.prismaService.userChat.update({
+		where: {id: userChat.id},
+		data: userChat
+	});
 	return HttpStatus.OK;
   }
 }
