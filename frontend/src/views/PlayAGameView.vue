@@ -31,7 +31,6 @@ export default {
 		}
 
 		intersectCircle(c: Circle) {
-		if (c === undefined)
 			var diff: vector = {
 				x: this.pos.x - c.pos.x,
 				y: this.pos.y - c.pos.y};
@@ -47,18 +46,40 @@ export default {
 
     class Ball extends Circle {
 
-		constructor(public speed: vector = new vector()) {
-			super();
-			this.speed = {x: 5, y: 0};
-			this.radius = 10;
+		constructor(public speed: number = 5, public dir: vector = new vector()) {
+			super({x:0, y:0}, 10);
+			this.dir = {x: 1, y: 0};
 		}
 
 		move() {
-			this.pos.x += this.speed.x;
-			this.pos.y += this.speed.y;
+
+			// Create a circle at the next position, in order to see if it
+			// WILL collide
+			var nextBall = new Circle(this.pos, this.radius);
+			nextBall.pos.x += this.dir.x;
+			nextBall.pos.y += this.dir.y;
+
+			if (nextBall.intersectRect(paddle1) && this.pos.x > paddle1.pos.x + paddle1.size.x) {
+				reflectionAngle(this, paddle1);
+			}
+			if (nextBall.intersectRect(paddle2) && this.pos.x < paddle2.pos.x) {
+				reflectionAngle(this, paddle2);
+			}
+
+			// Intersection with upper and lower walls
+			if (this.pos.y < this.radius || this.pos.y > canvas.height - this.radius) {
+				this.dir.y *= -1;
+			}
+
+			// Player 1 is cheating
+			// if (this.pos.x < this.radius)
+			// 	this.dir.x *= -1;
+
+			this.pos.x += this.speed * this.dir.x;
+			this.pos.y += this.speed * this.dir.y;
 		}
 
-        draw(ctx)
+        draw(ctx: CanvasRenderingContext2D)
         {
             ctx.beginPath();
             ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI*2);
@@ -88,6 +109,7 @@ export default {
             return true;
         }
 
+		// Only works with 'straight' rectangle, i.e. with vertical/horizontal sides
         intersectCircle(c: Circle) : boolean {
             var closestPoint: vector = {
                 x: clamp(c.pos.x, this.pos.x, this.pos.x + this.size.x),
@@ -111,7 +133,7 @@ export default {
 		}
 
 		move() {
-			this.pos.y = clamp(this.pos.y + this.speed, 0, canvas.height - this.size.y)
+			this.pos.y = clamp(this.pos.y + this.speed, - this.size.y / 2, canvas.height - this.size.y / 2)
 
 		}
 
@@ -123,7 +145,7 @@ export default {
 
     // declaration des variables
     var canvas = document.getElementById("game");
-    var ctx = canvas.getContext("2d");
+    var ctx : CanvasRenderingContext2D = canvas?.getContext("2d");
 	var keyboard: { [id: string] : boolean } = {};
 
     var paddle1 = new Paddle({x: 20, y: canvas.height / 2}, {x: 20, y: 100});
@@ -131,7 +153,7 @@ export default {
     var ball = new Ball();
 
     var reset = 1;
-	var onGameOver = 0;
+	var gameOver = 0;
     var scoreRight = 0;
     var scoreLeft = 0;
     var maxScore = 3;
@@ -143,27 +165,30 @@ export default {
     // scores
     function drawScores(){
         ctx.font = '70px serif';
-        ctx.fillText(scoreRight, 500, 80);
-        ctx.fillText(scoreLeft, 350, 80);
+        ctx.fillText(String(scoreRight), 500, 80);
+        ctx.fillText(String(scoreLeft), 350, 80);
     }
     // fin de partie
-    function gameOver(){
+    function onGameOver(){
         ctx.font = '100px serif';
-        ctx.fillText('GAME OVER', 150, 330)
-		onGameOver = 1;
+		ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, 230)
+        ctx.font = '50px serif';
+        ctx.fillText('Press r to replay', canvas.width / 2, 530)
+		winner();
     }
 
     function winner(){
-        if (scoreLeft == maxScore)
-        {
-            ctx.font = '70px serif';
-            ctx.fillText('Player left wins', 180, 500)
+		ctx.font = '70px serif';
+		ctx.textAlign = 'center';
+		var txt = "Player right wins";
+		if (scoreLeft > scoreRight) {
+			txt = "Player left wins";
         }
-        else if (scoreRight == maxScore)
-        {
-            ctx.font = '70px serif';
-            ctx.fillText('Player right wins', 180, 500)
-        }
+		else if (scoreRight == scoreLeft) {
+			txt = "It's a tie !";
+		}
+    	ctx.fillText(txt, canvas.width / 2, 430)
     }
 
 	function handleInputs(){
@@ -171,54 +196,53 @@ export default {
 		paddle1.speed = 0;
 		if (keyboard["w"])
 			paddle1.speed -= 10;
-		else if (keyboard["s"])
+		if (keyboard["s"])
 			paddle1.speed += 10;
 
 		paddle2.speed = 0;
 		if (keyboard["ArrowUp"])
 			paddle2.speed -= 10;
-		else if (keyboard["ArrowDown"])
+		if (keyboard["ArrowDown"])
 			paddle2.speed += 10;
 
-		if (onGameOver && keyboard["r"]) {
+		if (gameOver && keyboard["r"]) {
 			onReset()
 			scoreLeft = 0;
 			scoreRight = 0;
-			onGameOver = 0;
+			gameOver = 0;
 		}
-
 	}
 
 	function onReset() {
 		paddle1.pos.y = canvas.height / 2 - paddle1.size.y / 2;
 		paddle2.pos.y = canvas.height / 2 - paddle2.size.y / 2;
+		paddle1.speed = 20;
 		ball.pos.x = canvas.width / 2;
 		ball.pos.y = canvas.height / 2;
-		ball.speed.x = 5;
-		ball.speed.y = 0;
+		ball.dir.x = 1;
+		ball.dir.y = 0;
+		ball.speed = 10;
 
 		reset = 0;
 		console.log("Reset");
 	}
 
-	function reflectionAngle(ball: Ball, paddle: Paddle) : number {
-		var minAngle = 30;
+	function reflectionAngle(ball: Ball, paddle: Paddle) {
+		var minAngle = 20;
 		var percentage = clamp((ball.pos.y - paddle.pos.y) / paddle.size.y, 0, 1)
-		var newAngle = minAngle + (180 - 2 * minAngle) * percentage;
-		if (ball.speed.x > 0)
-			newAngle += 180;
-		ball.speed.x = Math.sin(newAngle * Math.PI / 180) * 5;
-		ball.speed.y = Math.cos(newAngle * Math.PI / 180) * 5;
+		var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+		if (ball.dir.x < 0)
+			newAngle *= -1;
+		ball.dir.x = Math.sin(newAngle * Math.PI / 180);
+		ball.dir.y = Math.cos(newAngle * Math.PI / 180);
 	}
 
 	function update() {
 
-		if (ball.intersectRect(paddle1)) {
-			reflectionAngle(ball, paddle1);
-		}
-		if (ball.intersectRect(paddle2)) {
-			reflectionAngle(ball, paddle2);
-		}
+		paddle1.move();
+		paddle2.move();
+		ball.move();
+
 		if (ball.pos.x < 0) {
 			scoreRight += 1;
 			reset = 1;
@@ -227,13 +251,10 @@ export default {
 			scoreLeft += 1;
 			reset = 1;
 		}
-		if (ball.pos.y < ball.radius || ball.pos.y > canvas.height - ball.radius) {
-			ball.speed.y *= -1;
-		}
 
-		paddle1.move();
-		paddle2.move();
-		ball.move();
+		if (scoreLeft >= maxScore || scoreRight >= maxScore) {
+			gameOver = 1;
+		}
 	}
 
 
@@ -258,20 +279,17 @@ export default {
 		update();
 
 		// Draw everything on screen
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if(reset == 0)
-        {
-			draw();
-        }
-        else if (reset == 1)
-        {
-            if (scoreLeft < maxScore && scoreRight < maxScore){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		if (gameOver) {
+			onGameOver();
+		}
+		else {
+			if(reset == 1) {
 				onReset();
-            }
-            else
-                gameOver();
-                winner();
-        }
+			}
+
+			draw();
+		}
     }
     // ecoute des evenements clavier
     document.addEventListener("keydown", function(event)
