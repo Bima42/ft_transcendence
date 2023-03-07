@@ -59,10 +59,10 @@ export default {
 			nextBall.pos.x += this.dir.x;
 			nextBall.pos.y += this.dir.y;
 
-			if (nextBall.intersectRect(paddle1) && this.pos.x > paddle1.pos.x + paddle1.size.x) {
+			if (nextBall.intersectRect(paddle1) && this.pos.x > paddle1.pos.x) {
 				reflectionAngle(this, paddle1);
 			}
-			if (nextBall.intersectRect(paddle2) && this.pos.x < paddle2.pos.x) {
+			if (nextBall.intersectRect(paddle2) && this.pos.x < paddle2.pos.x + paddle2.size.x) {
 				reflectionAngle(this, paddle2);
 			}
 
