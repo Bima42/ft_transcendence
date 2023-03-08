@@ -8,7 +8,7 @@
 | GET    | /chat/online                 | Get the list of all online users       |
 | GET    | /chat/rooms                  | Get the list of all chat rooms         |
 | GET    | /chat/rooms/<id>             | Get the info for a specific chat room  |
-| POST   | /chat                        | Create a new chat room                 |
+| POST   | /chat/rooms                  | Create a new chat room                 |
 | GET    | /chat/rooms/<id>/messages    | get messages for a chatroom            |
 | POST   | /chat/rooms/<id>/messages    | post new message for a chatroom        |
 | POST   | /chat/rooms/<id>/kick/<user> | Kick a user                            |
