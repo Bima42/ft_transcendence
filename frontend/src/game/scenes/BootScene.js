@@ -12,11 +12,10 @@ export default class BootScene extends Scene {
   preload () {
     this.load.audio('thud', [thudMp3, thudOgg])
 
-    // this.load.atlas('assets', 'assets/games/breakout/breakout.png', 'assets/games/breakout/breakout.json');
     this.load.atlas('assets', breakoutPng, breakoutJson);
   }
 
   create () {
-    this.scene.start('BreakoutScene')
+    this.scene.start('PongScene')
   }
 }

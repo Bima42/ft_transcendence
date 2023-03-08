@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import BootScene from '@/game/scenes/BootScene'
-import BreakoutScene from '@/game/scenes/BreakoutScene'
+import PongScene from '@/game/scenes/PongScene'
+import GameoverScene from '@/game/scenes/GameoverScene'
 
 function launch(containerId) {
   return new Phaser.Game({
@@ -11,10 +12,10 @@ function launch(containerId) {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
-    scene: [BootScene, BreakoutScene]
+    scene: [BootScene, PongScene, GameoverScene]
   })
 }
 
