@@ -4,20 +4,18 @@ import 'phaser'
 //
 class Ball extends Phaser.Physics.Arcade.Image {
 
-	maxSpeed: number = 700;
-
 	constructor(scene: Phaser.Scene, x: number, y: number) {
 		super(scene, x, y, 'assets', 'ball1')
 		scene.add.existing(this);
 		scene.physics.add.existing(this);
 		this.setCollideWorldBounds(true).setBounce(1);
+		this.body.maxSpeed = 700;
 	}
 
 }
 
 class Paddle extends Phaser.Physics.Arcade.Image {
 
-	maxSpeed: number = 700;
 
 	constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
 		super(scene, x, y, 'assets', 'paddle' + nPlayer)
@@ -26,6 +24,7 @@ class Paddle extends Phaser.Physics.Arcade.Image {
 		this.setImmovable();
         this.angle = 90;
 		this.setSize(this.height, this.width, true);
+		this.body.maxSpeed = 700;
 	}
 
 	update() {
@@ -109,11 +108,12 @@ export default class PongScene extends Phaser.Scene {
         const minAngle = 30;
         const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.width / 2) / paddle.width, 0, 1)
         var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+		// Mirror translation for the paddle on the left
         if (ball.x < 300)
             newAngle *= -1;
         // convert to radian
         newAngle *= Math.PI / 180;
-        ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
+        ball.setVelocity(ball.body.maxSpeed * Math.sin(newAngle), ball.body.maxSpeed * Math.cos(newAngle));
 
         this.sound.play('thud', { volume: 0.75 })
     }
@@ -130,12 +130,12 @@ export default class PongScene extends Phaser.Scene {
 		// 	console.log("S is down")
 		// }
 		this.paddle1.setVelocity(0);
-		if ( this.keys.s.isDown) { this.paddle1.setVelocityY(this.paddle1.maxSpeed); }
-		if ( this.keys.w.isDown) { this.paddle1.setVelocityY(-this.paddle1.maxSpeed); }
+		if ( this.keys.s.isDown) { this.paddle1.setVelocityY(this.paddle1.body.maxSpeed); }
+		if ( this.keys.w.isDown) { this.paddle1.setVelocityY(-this.paddle1.body.maxSpeed); }
 		this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, 0, 600);
 		this.paddle2.setVelocity(0);
-		if ( this.keys.i.isDown) { this.paddle2.setVelocityY(-this.paddle2.maxSpeed); }
-		if ( this.keys.k.isDown) { this.paddle2.setVelocityY(this.paddle2.maxSpeed); }
+		if ( this.keys.i.isDown) { this.paddle2.setVelocityY(-this.paddle2.body.maxSpeed); }
+		if ( this.keys.k.isDown) { this.paddle2.setVelocityY(this.paddle2.body.maxSpeed); }
 		this.paddle2.y = Phaser.Math.Clamp(this.paddle2.y, 0, 600);
     }
 
