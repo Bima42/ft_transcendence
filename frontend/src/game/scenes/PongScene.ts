@@ -50,7 +50,7 @@ export default class PongScene extends Phaser.Scene {
     private paddle1 : Paddle;
     private paddle2 : Paddle;
 	private keys;
-	private customPong : boolean;
+	private scores: Array<number> = [0, 0];
 
     constructor(mode: string = "custom") {
         super({ key: 'PongScene' })
@@ -61,10 +61,15 @@ export default class PongScene extends Phaser.Scene {
 
     }
 
+	private parseConfig(config) {
+		this.maxScore = config.maxScore ?? 3;
+		this.customPong = config.customPong ?? true;
+	}
+
     create(config) : void
     {
-		this.customPong = config.customPong;
-		if (config.customPong) {
+		this.parseConfig(config);
+		if (this.customPong) {
 			console.log("Custom game !");
 		} else {
 			console.log("Classic game.");
@@ -80,6 +85,9 @@ export default class PongScene extends Phaser.Scene {
         this.paddle2 = new Paddle(this, 780, 300, 2);
         this.physics.add.collider(this.ball, this.paddle1, this.hitPaddle, null, this);
         this.physics.add.collider(this.ball, this.paddle2, this.hitPaddle, null, this);
+
+		this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
+		this.scores = [0, 0];
 
 		if (this.customPong)
 		{
@@ -118,6 +126,15 @@ export default class PongScene extends Phaser.Scene {
 
     private resetLevel () : void
     {
+		if (this.ball.x < 0) {
+			this.scores[1] += 1;
+		} else {
+			this.scores[0] += 1;
+		}
+		if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore ) {
+			this.scene.start("GameoverScene");
+		}
+
         this.resetBall();
     }
 
@@ -147,9 +164,12 @@ export default class PongScene extends Phaser.Scene {
 
     update()
     {
+		this.scoreText.setText(this.scores[0] + " - " + this.scores[1]);
+		Phaser.Display.Align.In.Center(this.scoreText, this.add.zone(400, 30, 800, 400));
+
         if (this.ball.x < 0 || this.ball.x > 800)
         {
-            this.resetBall();
+            this.resetLevel();
         }
 
 		this.paddle1.setVelocity(0);

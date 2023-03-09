@@ -13,7 +13,6 @@ export default class GameoverScene extends Scene {
 
     create()
     {
-		console.log("gameoverscene");
 		this.add.text(100, 100, "Gameover", { fontFamily: 'Arial', fontSize: "50px", color: '#00FF00', align: 'left' });
 
 		this.add.text(100, 300, "Press space to restart custom", {});
