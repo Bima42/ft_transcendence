@@ -17,6 +17,8 @@ class Ball extends Phaser.Physics.Arcade.Image {
 
 class Paddle extends Phaser.Physics.Arcade.Image {
 
+	maxSpeed: number = 700;
+
 	constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
 		super(scene, x, y, 'assets', 'paddle' + nPlayer)
 		scene.add.existing(this);
@@ -24,6 +26,9 @@ class Paddle extends Phaser.Physics.Arcade.Image {
 		this.setImmovable();
         this.angle = 90;
 		this.setSize(this.height, this.width, true);
+	}
+
+	update() {
 
 	}
 
@@ -34,6 +39,7 @@ export default class PongScene extends Phaser.Scene {
     private ball: Ball;
     private paddle1 : Paddle;
     private paddle2 : Paddle;
+	private keys;
 
     constructor() {
         super({ key: 'PongScene' })
@@ -59,18 +65,20 @@ export default class PongScene extends Phaser.Scene {
         this.physics.add.collider(this.ball, this.paddle1, this.hitPaddle, null, this);
         this.physics.add.collider(this.ball, this.paddle2, this.hitPaddle, null, this);
 
+
         //  Input events
-        this.input.on('pointermove', function (pointer) {
-
-            //  Keep the paddle within the game
-            this.paddle1.y = Phaser.Math.Clamp(pointer.y, 0, 800);
-
-            if (this.ball.getData('onPaddle'))
-            {
-                this.ball.y = this.paddle1.y;
-            }
-
-        }, this);
+		this.keys = this.input.keyboard.addKeys('s,w,i,k');
+        // this.input.on('pointermove', function (pointer) {
+        //
+        //     //  Keep the paddle within the game
+        //     this.paddle1.y = Phaser.Math.Clamp(pointer.y, 0, 800);
+        //
+        //     if (this.ball.getData('onPaddle'))
+        //     {
+        //         this.ball.y = this.paddle1.y;
+        //     }
+        //
+        // }, this);
 
         this.input.on('pointerup', function (pointer) {
 
@@ -84,14 +92,14 @@ export default class PongScene extends Phaser.Scene {
 
     }
 
-    private resetBall()
+    private resetBall ()
     {
         this.ball.setVelocity(0);
         this.ball.setPosition(400, 300);
         this.ball.setData('onPaddle', true);
     }
 
-    resetLevel()
+    private resetLevel () : void
     {
         this.resetBall();
     }
@@ -116,6 +124,19 @@ export default class PongScene extends Phaser.Scene {
         {
             this.resetBall();
         }
+
+		// if ( this.keys.S.isDown)
+		// {
+		// 	console.log("S is down")
+		// }
+		this.paddle1.setVelocity(0);
+		if ( this.keys.s.isDown) { this.paddle1.setVelocityY(this.paddle1.maxSpeed); }
+		if ( this.keys.w.isDown) { this.paddle1.setVelocityY(-this.paddle1.maxSpeed); }
+		this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, 0, 600);
+		this.paddle2.setVelocity(0);
+		if ( this.keys.i.isDown) { this.paddle2.setVelocityY(-this.paddle2.maxSpeed); }
+		if ( this.keys.k.isDown) { this.paddle2.setVelocityY(this.paddle2.maxSpeed); }
+		this.paddle2.y = Phaser.Math.Clamp(this.paddle2.y, 0, 600);
     }
 
 };
