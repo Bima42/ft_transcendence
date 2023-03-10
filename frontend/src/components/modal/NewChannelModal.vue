@@ -11,7 +11,7 @@
       <label><input type="radio" name="type" value="public">Public</label>
     </div>
     <div class="button-container">
-      <CustomButton>Create</CustomButton>
+      <CustomButton @click="onCreateNewChannel">Create</CustomButton>
       <CustomButton @click="quitButton">Quit</CustomButton>
     </div>
   </div>
@@ -23,6 +23,22 @@ import CustomButton from '@/components/CustomButton.vue'
 
 const modalStore = useModalStore()
 const data = modalStore.data.data
+
+function onCreateNewChannel(e: Event) {
+
+	console.log("send request to server to create channel");
+	// TODO: catch error ?
+	fetch('http://localhost:3080/chat/rooms', {
+		method: 'POST',
+		mode: "cors",
+		body: JSON.stringify({name: "Neeeew chan UwU"}),
+		})
+		.then((res) => res.json())
+		.then((json) => (console.log("Sucess !")))
+		.catch((err) => (error.value = err)
+				console.log("Failure"));
+
+}
 
 function quitButton(e: Event) {
   modalStore.resetState()

@@ -1,8 +1,8 @@
 <template>
   <section class="head-wrap">
-    <ChatDropdownMenu :chatList="amazing" name="Rooms"></ChatDropdownMenu>
+    <ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
     <h1>CURRENT CHAT NAME</h1>
-    <ChatDropdownMenu :chatList="amazing" name="Whispers"></ChatDropdownMenu>
+    <ChatDropdownMenu :chatList="publicChatList" name="Whispers"></ChatDropdownMenu>
   </section>
 </template>
 
@@ -10,22 +10,17 @@
 import { ref } from 'vue'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
 
-const amazing = ref(
-    [
-      {
-        name: 'SampleChat1',
-      },
-      {
-        name: 'SampleChat2',
-      },
-      {
-        name: 'SampleChat3',
-      },
-      {
-        name: 'SampleChat4',
-      },
-    ],
-)
+const publicChatList = ref(null);
+const error = ref(null);
+
+// TODO: Put the real backend adress
+// TODO: Retrieve private chats
+fetch('http://localhost:3080/chat/rooms', { method: 'GET' })
+	.then((res) => res.json())
+	.then((json) => (publicChatList.value = json))
+	.catch((err) => (error.value = err));
+
+
 </script>
 
 <style scoped lang="scss">

@@ -86,6 +86,7 @@ export class ChannelService {
 
 	// TODO TYR: Add channel owner and not 1
 	this.UpsertUserChatRole(newChat.id, 1, UserChatRole.OWNER, 0);
+	Logger.log("Create new channel: " + newChat.name);
     return newChat;
   }
 
