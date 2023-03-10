@@ -3,7 +3,9 @@
 <div id="wrapper">
 
     <GameSettings></GameSettings>
-    <CustomButton id="join_btn" @click="joinQueue">Join queue</CustomButton>
+	<CustomButton id="join_btn" @click="joinQueue">
+	{{ abortQueue ? 'Abort' : 'Join queue' }}
+	</CustomButton>
 	<p v-if="joinText" class="join-text">{{ joinText }}</p>
 	<div class="box" v-if="showBox">
 		<ball></ball>
@@ -20,10 +22,18 @@ import GameSettings from '@/components/game/GameSettings.vue';
 
 const joinText = ref('');
 const showBox = ref(false);
+const abortQueue = ref(false);
 
 function joinQueue() {
-	joinText.value = 'You have successfully joined the queue. Please wait for a few seconds while we find you a match.';
-    showBox.value = true;
+	if (!abortQueue.value) {
+		joinText.value = 'You have successfully joined the queue. Please wait for a few seconds while we find you a match.';
+		showBox.value = true;
+		abortQueue.value = true;
+	} else {
+		joinText.value = '';
+		showBox.value = false;
+		abortQueue.value = false;
+	}
 }
 
 </script>
