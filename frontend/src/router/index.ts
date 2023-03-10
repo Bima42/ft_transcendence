@@ -6,6 +6,7 @@ import PlayAGameView from '@/views/PlayAGameView.vue'
 import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
 import TableView from '@/components/table/TheTable.vue'
+import JoinQueueView from '@/views/JoinQueue.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,10 +35,17 @@ const router = createRouter({
             path: '/main',
             name: 'main',
             children: [
+                //{
+                //    path: 'play',
+                //    name: 'play',
+                //    component: PlayAGameView,
+                //    longName: 'Play a game',
+
+                //},
                 {
                     path: 'play',
                     name: 'play',
-                    component: PlayAGameView,
+                    component: JoinQueueView,
                     longName: 'Play a game',
 
                 },
