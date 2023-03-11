@@ -1,17 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Use cookie parser middleware
+  app.use(cookieParser());
+
   app.enableCors({
-    origin: 'http://localhost:8000',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
+    allowedHeaders: 'Content-Type, Authorization, Cookie',
+    methods: 'GET,POST,DELETE',
   });
 
   const config = new DocumentBuilder()
-      .setTitle('Median')
-      .setDescription('The Median API description')
+      .setTitle('Transcendence')
+      .setDescription('Transcendence API')
       .setVersion('0.1')
       .build();
 

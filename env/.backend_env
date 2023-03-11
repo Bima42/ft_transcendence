@@ -3,8 +3,10 @@ JWT_KEY=mySecretKey
 EXPIRES_IN=60s
 PORT=3080
 FORTYTWO_API_UID=u-s4t2ud-92ce1a0afad1a634dcd2140cbf1a6fe599e99cb72bd310a13428b5d8187ad240
-FORTYTWO_API_SECRET=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
-AUTH_CALLBACK=http://localhost:3080/auth/42/callback
+FORTYTWO_API_SECRET=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
+FORTYTWO_API_CALLBACK=http://localhost:3080/auth/42/callback
+FRONTEND_URL=http://localhost:8000
+
 DATABASE_URL=postgresql://user:mypassword@db:5432/postgres?schema=public
 
 # Postgres

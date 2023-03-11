@@ -15,11 +15,11 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
 
-import HeaderPack from "@/components/headers/HeaderPack.vue";
-import CreditLink from "@/components/footers/CreditLink.vue";
-import MainMenu from "@/components/MainMenu.vue";
-import TheModal from "@/components/modal/TheModal.vue";
-import {useModalStore} from "@/stores/modal";
+import HeaderPack from '@/components/headers/HeaderPack.vue'
+import CreditLink from '@/components/footers/CreditLink.vue'
+import MainMenu from '@/components/MainMenu.vue'
+import TheModal from '@/components/modal/TheModal.vue'
+import {useModalStore} from '@/stores/modal'
 
 const route = useRoute()
 const modalStore = useModalStore()
