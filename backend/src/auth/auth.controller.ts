@@ -74,7 +74,7 @@ export class AuthController {
       }
 
       // Create token and set cookie
-      if (!req.cookies) {
+      if (!req.cookies['access_token']) {
         const token = this.authService._createToken(user);
 
         if (!token) {
