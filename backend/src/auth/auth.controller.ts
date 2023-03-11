@@ -1,4 +1,4 @@
-import {Controller, ForbiddenException, Get, Req, Res, UseGuards} from '@nestjs/common';
+import {Controller, ForbiddenException, Get, Param, Req, Res, UseGuards} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -54,7 +54,7 @@ export class AuthController {
 
       // Create or validate user with data from 42 API
       const { id, email, login, image } = userData.data;
-      const user = await this.authService.createOrValidateUser({
+      const user = await this.authService.findOrCreate({
         username: login,
         email,
         fortyTwoId: id,
@@ -73,18 +73,30 @@ export class AuthController {
           throw new ForbiddenException('Empty token');
         }
 
-        res.cookie('token', token.access_token, {
+        res.cookie('access_token', token.access_token, {
           httpOnly: true,
           maxAge: 1000 * 60 * 60 * 24, // 1 day
           secure: true,
           sameSite: 'none',
         });
       }
+      const redirectUrl = `${process.env.FRONTEND_URL}/index`
+      res.status(302).redirect(redirectUrl);
     }
 
     catch (e) {
       console.error(e);
       res.status(500).send('Authentication via 42 API failed');
     }
+  }
+
+  @Get('signout/:id')
+  async logout(
+      @Res({ passthrough: true }) res,
+      @Param() params: { id: number })
+  {
+    res.clearCookie('access_token');
+    await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
+    return this.authService.logout(res, params.id);
   }
 }

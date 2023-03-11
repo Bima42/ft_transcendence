@@ -1,6 +1,7 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +10,7 @@ export class AuthService {
       private readonly jwtService: JwtService
   ) {}
 
-  async createOrValidateUser({ username, email, fortyTwoId, avatar }: {
+  async findOrCreate({ username, email, fortyTwoId, avatar }: {
     username: string,
     email: string,
     fortyTwoId: number,
@@ -31,6 +32,7 @@ export class AuthService {
         }
       });
     }
+    // TODO : check this update, some things can be wrong
     else {
       return this.prismaService.user.update({
          where: {
@@ -66,5 +68,25 @@ export class AuthService {
         token, {
           secret: process.env.JWT_KEY
     });
+  }
+
+  async logout(res: Response, userId: number) {
+    const user = await this.prismaService.user.findUnique({
+        where: {
+            id: +userId
+        }
+    });
+
+    if (!user) {
+        throw new BadRequestException('User not found');
+    }
+
+    res.cookie('access_token', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 0,
+    });
+    return res.status(200).send('Sign out succes!');
   }
 }

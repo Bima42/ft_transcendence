@@ -10,13 +10,13 @@ const props = defineProps<{}>()
 
 let menuOpen = false;
 
-function toggleMenu(e: Event) {
+function toggleMenu() {
   let menuBtn = document.querySelector('.menu-btn');
   if (!menuOpen) {
-    menuBtn.classList.add("open")
+    menuBtn?.classList.add("open")
     menuOpen = true;
   } else {
-    menuBtn.classList.remove("open")
+    menuBtn?.classList.remove("open")
     menuOpen = false;
   }
 }
