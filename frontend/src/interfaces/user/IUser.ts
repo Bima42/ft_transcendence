@@ -1,6 +1,11 @@
+import type IUserChat from '@/interfaces/user/IUserChat';
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import type IFriendship from '@/interfaces/user/IFriendship';
+import type IUserGame from '@/interfaces/user/IUserGame';
+
+
 export default interface IUser {
-	[key: string]: any
-	id: string
+	id: number
 	username: string
 	twoFA: boolean
 	fortyTwoID: number
