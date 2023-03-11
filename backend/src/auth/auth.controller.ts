@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
-import axios from 'axios';
 import { UserStatus } from '@prisma/client';
 
 @Controller('auth')
@@ -36,24 +35,33 @@ export class AuthController {
 
     try {
       // POST request to /oauth/token to get access_token, must be on server side
-      const tokenResponse = await axios.post('https://api.intra.42.fr/oauth/token', {
-        grant_type: 'authorization_code',
-        client_id: process.env.FORTYTWO_API_UID,
-        client_secret: process.env.FORTYTWO_API_SECRET,
-        code: code,
-        redirect_uri: process.env.FORTYTWO_API_CALLBACK,
+      const tokenResponse = await fetch('https://api.intra.42.fr/oauth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          grant_type: 'authorization_code',
+          client_id: process.env.FORTYTWO_API_UID,
+          client_secret: process.env.FORTYTWO_API_SECRET,
+          code: code,
+          redirect_uri: process.env.FORTYTWO_API_CALLBACK,
+        }),
       });
+      const tokenData = await tokenResponse.json();
 
       // We can use the token to make requests to the API
       // GET request to /v2/me to get user data
-      const userData = await axios.get('https://api.intra.42.fr/v2/me', {
+      const userDataResponse = await fetch('https://api.intra.42.fr/v2/me', {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${tokenResponse.data.access_token}`
+          Authorization: `Bearer ${tokenData.access_token}`,
         },
       });
+      const userData = await userDataResponse.json();
 
       // Create or validate user with data from 42 API
-      const { id, email, login, image } = userData.data;
+      const { id, email, login, image } = userData;
       const user = await this.authService.findOrCreate({
         username: login,
         email,
