@@ -44,7 +44,6 @@ const textPosition = computed(() => {
     justify-content: flex-start;
 
     p {
-      background: #e601c0;
       border-radius: 20px 20px 0px 20px;
     }
   }
@@ -54,7 +53,6 @@ const textPosition = computed(() => {
     justify-content: flex-start;
 
     p {
-      background: blue;
       border-radius: 20px 20px 20px 0px;
     }
   }
