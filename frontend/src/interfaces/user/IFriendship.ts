@@ -1,4 +1,4 @@
-import IUser from './IUser'
+import type IUser from '@/interfaces/user/IUser';
 
 export default interface IFriendship {
 	id: number

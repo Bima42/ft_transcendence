@@ -32,7 +32,13 @@ export class UsersController {
   }
 
   @Get()
-  async getAllUsers() {
+  async getAllUsers(@Req() req: Request, @Res() res: Response) {
+    if (!req.user) {
+        res.status(401).send('Unauthorized');
+    } else {
+      const users = await this.usersService.getAllUsers();
+      res.send({ users });
+    }
     return this.usersService.findAll();
   }
 

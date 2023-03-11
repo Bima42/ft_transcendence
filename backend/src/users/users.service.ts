@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Req, Res} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
 
@@ -8,6 +8,16 @@ export class UsersService {
       private readonly prismaService: PrismaService
   ) {}
 
+
+  async getAllUsers() {
+    const users = await this.prismaService.user.findMany();
+
+    if (!users) {
+      throw new BadRequestException('No users found');
+    }
+
+    return users;
+  }
 
   async create(data: User): Promise<User> {
     const user = await this.prismaService.user.create({
