@@ -98,7 +98,7 @@ export class AuthController {
     }
   }
 
-  @Get('signout/:id')
+  @Get('logout/:id')
   async logout(
       @Res({ passthrough: true }) res,
       @Param() params: { id: number })

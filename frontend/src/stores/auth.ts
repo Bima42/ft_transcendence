@@ -2,49 +2,34 @@ import { get, post } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 
-const initial = await get('auth', 'Failed to get user data')
-	.then(response => response.json())
-	.then(json => json as IUser)
-	.catch(() => null)
-
 export default defineStore({
 	id: 'auth',
 	state: () => ({
-		user: initial as IUser | null,
+		user: localStorage.getItem("localUser") ? JSON.parse(localStorage.getItem("localUser") as string) : undefined,
 	}),
 	getters: {
 		logged: (state) => state.user !== null,
 		username: (state) => state.user?.username,
 	},
 	actions: {
-		register(username: string, password: string) {
-			post(
-				'auth/register',
-				'Failed to register',
-				{username: username, password: password}
-			)
-				.then(response => response.json())
-				.then(json => {
-					this.user = json as IUser
-				})
-		},
-		login(username: string, password: string) {
-			post(
-				'auth/login',
+		login() {
+			get(
+				'users/login',
 				'Failed to login',
-				{username: username, password: password}
 			)
 				.then(response => response.json())
 				.then(json => {
 					this.user = json as IUser
-					window.location.href = window.location.href
+					localStorage.setItem("localUser", JSON.stringify(this.user));
+					window.location.href = 'http://localhost:8000/index'
 				})
 		},
 		logout() {
 			if (!this.user)
 				return
-			post('auth/logout', 'Failed to logout').then(() => {
+			get(`auth/logout/${this.user.id}`, 'Failed to logout').then(() => {
 				this.user = null
+				localStorage.removeItem("localUser");
 				window.location.href = window.location.href
 			})
 		}

@@ -1,25 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Body, Next, Patch, Param, Delete, Req, Res } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { UsersMiddleware } from './middlewares/users.middleware';
 
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
   constructor(
+      private readonly authMiddleware: UsersMiddleware,
       private readonly usersService: UsersService) {}
 
   @Get('login')
-  async login(@Req() req: Request, @Res() res: Response) {
-    res.status(200).send('coucou');
-
-    // const user = req.user;
-    // if (!user) {
-    //   res.status(401).send('Unauthorized');
-    // } else {
-    //   res.status(200).send(user);
-    // }
+  async login(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+    await new Promise(resolve => this.authMiddleware.use(req, res, resolve));
+    const user = req.user;
+    console.log('user', user);
+    if (!user) {
+      res.status(401).send('Unauthorized');
+    } else {
+      res.status(200).send(user);
+    }
   }
   @Post('create')
   async createUser(@Body() data: User): Promise<User> {

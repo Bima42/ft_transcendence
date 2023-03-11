@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { UsersService } from '../users.service';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../../auth/auth.service';
 import { UserStatus } from '@prisma/client';
 
@@ -11,8 +11,8 @@ export class UsersMiddleware implements NestMiddleware {
 		private readonly authService: AuthService
 	) {}
 
-	async use(req: Request, res: Response, next: () => void) {
-		const token = req.cookies['token'];
+	async use(req: Request, res: Response, next: NextFunction) {
+		const token = req.cookies['access_token'];
 		if (!token) {
 			res.status(401).send('Unauthorized');
 		}
