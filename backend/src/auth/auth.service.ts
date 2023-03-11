@@ -87,6 +87,7 @@ export class AuthService {
         sameSite: 'none',
         maxAge: 0,
     });
-    return res.status(200).send('Sign out succes!');
+
+    return res.status(200).send('Sign out success');
   }
 }

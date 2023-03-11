@@ -16,13 +16,13 @@ export class UsersController {
   async login(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
     await new Promise(resolve => this.authMiddleware.use(req, res, resolve));
     const user = req.user;
-    console.log(user);
     if (!user) {
       res.status(401).send('Unauthorized');
     } else {
       res.status(200).send(user);
     }
   }
+
   @Post('create')
   async createUser(@Body() data: User): Promise<User> {
     return this.usersService.create(data);

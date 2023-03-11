@@ -88,7 +88,7 @@ export class AuthController {
           sameSite: 'none',
         });
       }
-      const redirectUrl = `${process.env.FRONTEND_URL}/index`
+      const redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
       res.status(302).redirect(redirectUrl);
     }
 
@@ -103,9 +103,8 @@ export class AuthController {
       @Res({ passthrough: true }) res,
       @Param() params: { id: number })
   {
-    console.log('logout');
     res.clearCookie('access_token');
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
-    return this.authService.logout(res, params.id);
+    await this.authService.logout(res, params.id);
   }
 }

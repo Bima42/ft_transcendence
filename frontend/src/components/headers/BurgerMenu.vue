@@ -20,26 +20,25 @@
 import {ref, defineProps} from 'vue'
 import {useRouter} from 'vue-router'
 import {useModalStore} from '@/stores/modal'
+import {useAuthStore} from '@/stores/auth'
 
 import BurgerButton from '@/components/headers/BurgerButton.vue'
 import Modal from '@/components/modal/TheModal.vue'
 import UserModal from '@/components/modal/UserEditModal.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
-import useAuthStore from '@/stores/auth'
 
 const userStore = useAuthStore()
 const modalStore = useModalStore()
 const router = useRouter()
 const props = defineProps<{}>()
 
-function clickHandler(e: Event) {
+async function clickHandler(e: Event) {
     if (!e.target)
         return
     const target = e.target as HTMLElement
 
     if (target.id === 'logout') {
         userStore.logout()
-        router.push('/')
     } else if (target.id === 'modalUser') {
         modalStore.loadAndDisplay(Modal, UserModal, {})
     }

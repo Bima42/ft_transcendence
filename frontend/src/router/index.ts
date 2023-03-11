@@ -7,6 +7,7 @@ import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
 import TableView from '@/components/table/TheTable.vue'
 import JoinQueueView from '@/views/JoinQueue.vue'
+import redirectHandler from '@/components/redirectHandler.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,6 +64,11 @@ const router = createRouter({
                 },
             ]
         },
+        {
+            path: '/redirectHandler',
+            name: 'redirectHandler',
+            component: redirectHandler,
+        }
     ]
 })
 

@@ -3,7 +3,7 @@ export async function post(
 	message: string,
 	json: Record<string, unknown> = {},
 ): Promise<Response> {
-	let request: RequestInit = {
+	const request: RequestInit = {
 		method: 'POST',
 		mode: 'cors',
 		credentials: 'include',
@@ -35,24 +35,6 @@ export async function del(route: string, message: string): Promise<Response> {
 		method: 'DELETE',
 		credentials: 'include',
 	})
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
-}
-
-export async function put(route: string, message: string, json: Record<string, unknown> = {}): Promise<Response> {
-	let request: RequestInit = {
-		method: 'PUT',
-		mode: 'cors',
-		credentials: 'include',
-		headers: new Headers({
-			'Content-Type': 'application/json',
-			'Accept': 'application/json',
-		}),
-	}
-	if (json)
-		request.body = JSON.stringify(json)
-	const response = await fetch(`http://localhost:3080/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	return response
