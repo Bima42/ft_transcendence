@@ -20,7 +20,7 @@ export default defineStore({
 				.then(response => response.json())
 				.then(json => {
 					this.user = json as IUser
-					localStorage.setItem("localUser", JSON.stringify(this.user));
+					localStorage.setItem('localUser', this.user);
 					window.location.href = 'http://localhost:8000/index'
 				})
 		},
@@ -29,9 +29,9 @@ export default defineStore({
 				return
 			get(`auth/logout/${this.user.id}`, 'Failed to logout').then(() => {
 				this.user = null
-				localStorage.removeItem("localUser");
+				localStorage.removeItem('localUser');
 				window.location.href = window.location.href
 			})
-		}
-	}
+		},
+	},
 })
