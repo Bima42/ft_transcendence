@@ -61,14 +61,18 @@ export class AuthController {
       const userData = await userDataResponse.json();
 
       // Create or validate user with data from 42 API
-      const { id, email, login, image } = userData;
+      const { id, email, first_name, last_name, phone, login, image } = userData;
       const user = await this.authService.findOrCreate({
         username: login,
         email,
+        firstName: first_name,
+        lastName: last_name,
+        phoneNumber: phone,
         fortyTwoId: id,
-        avatar: image.versions.little,
+        avatar: image.versions.medium,
       });
 
+      // Update user status
       if (user) {
         await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
       }
@@ -88,6 +92,8 @@ export class AuthController {
           sameSite: 'none',
         });
       }
+
+      // Redirect to frontend redirectHandler
       const redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
       res.status(302).redirect(redirectUrl);
     }
