@@ -1,6 +1,6 @@
 <template>
   <span class="avatar-container" :class="props.type">
-    <img :src="userStore.user.avatar"/>
+    <img :src="userStore.user?.avatar"/>
   </span>
 </template>
 

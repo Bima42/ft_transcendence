@@ -2,14 +2,14 @@
   <section class="login-wrapper">
     <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
     <div class="buttons-container">
-      <CustomButton styles="fat">Login with 42</CustomButton>
+      <LoginButton styles="fat">Login with 42</LoginButton>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue'
 import {useRouter} from 'vue-router'
+import LoginButton from "@/components/LoginButton.vue";
 
 const router = useRouter()
 </script>
@@ -18,7 +18,6 @@ const router = useRouter()
 $button-gap: 10px;
 .login-wrapper {
   grid-area: $main;
-
   width: 100%;
   height: 100%;
   display: flex;
@@ -41,9 +40,11 @@ $button-gap: 10px;
   justify-content: space-around;
   align-items: center;
   gap: 10px;
+  width: 20vw;
 
   button {
     width: calc(50% - $button-gap / 2);
+    height: 4vh;
   }
 }
 
