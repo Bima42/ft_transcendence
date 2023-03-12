@@ -1,10 +1,14 @@
 <template>
   <span class="avatar-container" :class="props.type">
-    <img src="@/assets/img/placeholder_avatar.jpg"/>
+    <img :src="userStore.user.avatar"/>
   </span>
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+
+const userStore = useAuthStore()
+
 const props = defineProps<{
   type: String,
 }>()
@@ -14,7 +18,7 @@ const props = defineProps<{
 .avatar-container {
   display: block;
   content: "";
-  border-radius: 500px;
+  border-radius: 50%;
   background-color: $yellow;
   overflow: hidden;
   border: 2px solid $yellow;
@@ -32,12 +36,14 @@ const props = defineProps<{
   }
 
   &.small {
-    width: 3vw;
-    height: 3vw;
+    width: 4vw;
+    height: 4vw;
   }
 
   img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 </style>

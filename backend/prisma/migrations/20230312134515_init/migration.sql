@@ -2,7 +2,7 @@
 CREATE TYPE "FriendshipStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'BLOCKED');
 
 -- CreateEnum
-CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE');
+CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE', 'AWAY', 'BUSY');
 
 -- CreateEnum
 CREATE TYPE "ChatType" AS ENUM ('PUBLIC', 'PRIVATE', 'GAMECHAT');
@@ -21,6 +21,9 @@ CREATE TABLE "User" (
     "username" VARCHAR(255) NOT NULL,
     "email" TEXT NOT NULL,
     "avatar" TEXT,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "phoneNumber" TEXT,
     "status" "UserStatus" NOT NULL DEFAULT 'OFFLINE',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
