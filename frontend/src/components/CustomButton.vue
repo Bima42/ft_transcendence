@@ -1,21 +1,14 @@
 <template>
-  <button :class="props.styles" @click="login">
+  <button :class="props.styles">
     <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
-
-const userStore = useAuthStore()
-
 const props = defineProps<{
   styles?: String,
 }>()
 
-async function login() {
-    userStore.redirect()
-}
 </script>
 
 <style scoped lang="scss">
