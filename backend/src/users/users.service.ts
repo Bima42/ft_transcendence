@@ -1,15 +1,85 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { User, UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>,
+      private readonly prismaService: PrismaService
   ) {}
 
-  getAllUsers(): Promise<Array<User>> {
-    return this.usersRepository.find({});
+
+  async getAllUsers() {
+    const users = await this.prismaService.user.findMany();
+
+    if (!users) {
+      throw new BadRequestException('No users found');
+    }
+
+    return users;
+  }
+
+  async create(data: User): Promise<User> {
+    const user = await this.prismaService.user.create({
+      data: data
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not created');
+    }
+
+    return user;
+  }
+
+  async findById(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: +userId
+      }
+    });
+
+    if (!user) {
+        throw new BadRequestException('User not found');
+    }
+
+    return user;
+  }
+
+  async findAll(): Promise<User[]> {
+    const users = await this.prismaService.user.findMany();
+
+    if (!users) {
+      throw new BadRequestException('No users found');
+    }
+
+    return users;
+  }
+
+  async updateStatus(userId: number, status: UserStatus): Promise<User> {
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        status: status
+      }
+    });
+  }
+
+  async update(userId: number, data: User): Promise<User> {
+    return  this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: data
+    });
+  }
+
+  async delete(userId: number): Promise<User> {
+     return this.prismaService.user.delete({
+       where: {
+        id: +userId
+       }
+     });
   }
 }

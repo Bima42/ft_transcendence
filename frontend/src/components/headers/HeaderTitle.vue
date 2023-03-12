@@ -29,9 +29,8 @@ function indexClick(e: Event) {
   width: 100%;
 
   h1 {
-    font-weight: 600;
-    font-family: fantasy;
     font-size: 24px;
+    font-family: "Meta", sans-serif;
   }
 
   img:hover {
