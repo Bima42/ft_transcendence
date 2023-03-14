@@ -27,6 +27,7 @@ const data = modalStore.data.data
 function onCreateNewChannel(e: Event) {
 
 	console.log("send request to server to create channel");
+
 	// TODO: catch error ?
 	fetch('http://localhost:3080/chat/rooms', {
 		method: 'POST',
@@ -35,7 +36,7 @@ function onCreateNewChannel(e: Event) {
 		})
 		.then((res) => res.json())
 		.then((json) => (console.log("Sucess !")))
-		.catch((err) => (error.value = err)
+		.catch((err) =>
 				console.log("Failure"));
 
 }

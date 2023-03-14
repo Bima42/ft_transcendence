@@ -11,7 +11,7 @@ dev:
 	@make up
 
 up:
-	@echo "${GREEN}Starting containers...${RESET}"
+	@echo -e "${GREEN}Starting containers...${RESET}"
 	@docker compose up
 
 detached:
