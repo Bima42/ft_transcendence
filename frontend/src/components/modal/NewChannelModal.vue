@@ -20,6 +20,8 @@
 <script setup lang="ts">
 import {useModalStore} from "@/stores/modal";
 import CustomButton from '@/components/CustomButton.vue'
+import {post} from '../../../utils'
+import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
 const data = modalStore.data.data
@@ -27,18 +29,18 @@ const data = modalStore.data.data
 function onCreateNewChannel(e: Event) {
 
 	console.log("send request to server to create channel");
+	const newChat : IChat = {
+		id: undefined,
+		type: 'PUBLIC',
+		name: 'New chan UwU',
+		createdAt: undefined,
+		updatedAt: undefined,
+		messages: undefined,
+		users: undefined
+	};
 
 	// TODO: catch error ?
-	fetch('http://localhost:3080/chat/rooms', {
-		method: 'POST',
-		mode: "cors",
-		body: JSON.stringify({name: "Neeeew chan UwU"}),
-		})
-		.then((res) => res.json())
-		.then((json) => (console.log("Sucess !")))
-		.catch((err) =>
-				console.log("Failure"));
-
+	post('chat/rooms', "Cannot create channel", newChat);
 }
 
 function quitButton(e: Event) {
