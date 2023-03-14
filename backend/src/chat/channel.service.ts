@@ -119,15 +119,28 @@ export class ChannelService {
 
   }
 
-  async getLastMessages(chatId: number, nbrMsgs: number): Promise<Array<ChatMessage>> {
+  async getLastMessages(chatId: number, nbrMsgs: number) {
 	  let chat = await this.findById(chatId);
 	  if ( ! chat)
 		  return [];
+	Logger.log("returning some message");
 	return this.prismaService.chatMessage.findMany({
 		skip: 0,
 		take: nbrMsgs,
 		where: { chatId: chatId },
-		orderBy: { id: "desc" }
+		orderBy: { id: "desc" },
+		include: {
+			user: {
+				select: {
+					username: true
+				}
+			}
+		},
+		// select: {
+		// 	content: true,
+		// 	userId: true,
+		// 	user: true
+		// }
 	});
   }
 
@@ -176,7 +189,6 @@ export class ChannelService {
 				chatId: chatId,
 				userId: userId,
 				role: newRole,
-				mutedUntil: null
 			}
 		});
 		return uuuu ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;

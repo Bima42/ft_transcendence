@@ -1,43 +1,23 @@
 <template>
-  <div class="chat-window-wrapper">
-    <MessageDisplay v-for="element in messages" :message="element"></MessageDisplay>
-  </div>
+	  <div class="chat-window-wrapper">
+		<MessageDisplay v-for="element in messages" :message="element"></MessageDisplay>
+	  </div>
 </template>
 
 <script setup lang="ts">
 import {defineProps, ref} from 'vue'
+import {get} from "../../../utils"
 import MessageDisplay from "@/components/chat/MessageDisplay.vue";
 
 const props = defineProps<{}>()
 
-const messages = ref(
-    [
-      {
-        content: 'TeasdasdadasdasdTeasdasdadasdasdTeasdasdadasdasdTeasdasdadasdasd Teasdasd adasdasd Teasdasdadasd asdTeasdasdadasdasdTeasdasdadasdasd Teasdasdadasdasd',
-        sender: 'Yvan',
-      },
-      {
-        content: 'Mabi',
-        sender: 'Bima',
-      },
-      {
-        content: 'Teasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd TeasdasdadasdasdTeasdasdadasdasd Teasdasdadasdasd',
-        sender: 'Sandrine',
-      },
-      {
-        content: 'Teasdadasdasdfafa gfwg wrg asdfg asdf gsdfg dfg dfg dfg dfg dfg dfg dfg',
-        sender: 'Sandrine',
-      },
-      {
-        content: 'Teeasdadasdasdfafa gfwg wrg asdfg asdf gsdfg dfg dfg dfgeasdadasdasdfafa gfwg wrg asdfg asdf gsdfg dfg dfg dfgeasdadasdasdfafa gfwg wrg asdfg asdf gsdfg dfg dfg dfg',
-        sender: 'Sandrine',
-      },
-      {
-        content: 'Te',
-        sender: 'Yvan',
-      },
-    ]
-)
+
+const messages = await get('chat/rooms/1/messages', 'Failed to get messages')
+	.then((res) => res.json())
+	.catch((err) => (console.log("Error: " + err)));
+
+console.log("Messages: "  + JSON.stringify(messages));
+
 </script>
 
 <style scoped lang="scss">

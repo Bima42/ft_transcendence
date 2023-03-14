@@ -3,7 +3,12 @@
     <ChatUserList></ChatUserList>
     <div class="main-box">
       <ChatTopSection></ChatTopSection>
+	  <Suspense>
       <ChatWindow></ChatWindow>
+	  <template #fallback>
+		Messages...
+	  </template>
+	  </Suspense>
       <TypeBox></TypeBox>
       <CustomButton id="new-channel" @click="clickHandler">Create new channel</CustomButton>
     </div>

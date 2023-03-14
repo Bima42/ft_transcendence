@@ -38,7 +38,7 @@ export class ChannelController {
   }
 
   @Get('rooms/:id/messages')
-  getOneChannelMessages(@Param('id', new ParseIntPipe()) id: number): Promise<ChatMessage[]> {
+  getOneChannelMessages(@Param('id', new ParseIntPipe()) id: number) {
 	  return this.channelService.getLastMessages(id, 50);
   }
 

@@ -2,22 +2,29 @@
   <section class="head-wrap">
     <ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
     <h1>CURRENT CHAT NAME</h1>
-    <ChatDropdownMenu :chatList="publicChatList" name="Whispers"></ChatDropdownMenu>
+    <ChatDropdownMenu :chatList="privateChatList" name="Whispers"></ChatDropdownMenu>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
 
 const publicChatList = ref(null);
+const privateChatList = ref(null);
 const error = ref(null);
 
-// TODO: Put the real backend adress
-// TODO: Retrieve private chats
-fetch('http://localhost:3080/chat/rooms', { method: 'GET' })
+
+get('chat/rooms', 'Failed to retrieve chat list')
 	.then((res) => res.json())
 	.then((json) => (publicChatList.value = json))
+	.catch((err) => (error.value = err));
+
+// TODO: Retrieve private chats
+get('chat/rooms', 'Failed to retrieve whispers list')
+	.then((res) => res.json())
+	.then((json) => (privateChatList.value = json))
 	.catch((err) => (error.value = err));
 
 

@@ -1,14 +1,24 @@
 <template>
   <div class="chat-input-container">
-    <input type="text" placeholder="Type a message...">
+    <input v-model="msgContent" type="text" placeholder="Type a message...">
     <CustomButton @click="sendMessage">Send</CustomButton>
   </div>
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/CustomButton.vue';
+import { post } from '../../../utils';
+import { ref } from 'vue'
+
+const msgContent = ref('');
 
 function sendMessage() {
+  post('chat/rooms/1/messages',
+       'Cannot send message',
+	   {
+		   content: msgContent.value
+	   }
+  )
   console.log('Message sent :)')
 }
 </script>
