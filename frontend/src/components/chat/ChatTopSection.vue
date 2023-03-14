@@ -1,7 +1,7 @@
 <template>
   <section class="head-wrap">
     <ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
-    <h1>CURRENT CHAT NAME</h1>
+    <h1>{{ currentChatName }}</h1>
     <ChatDropdownMenu :chatList="privateChatList" name="Whispers"></ChatDropdownMenu>
   </section>
 </template>
@@ -10,10 +10,14 @@
 import { ref } from 'vue'
 import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
+import { useChatStore } from '@/stores/chat'
 
 const publicChatList = ref(null);
 const privateChatList = ref(null);
 const error = ref(null);
+const chatStore = useChatStore()
+
+const currentChatName = chatStore.currentChatName;
 
 
 get('chat/rooms', 'Failed to retrieve chat list')

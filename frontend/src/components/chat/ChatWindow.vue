@@ -8,17 +8,24 @@
 import {defineProps, ref} from 'vue'
 import {get} from "../../../utils"
 import MessageDisplay from "@/components/chat/MessageDisplay.vue";
+import { useChatStore } from '@/stores/chat';
 
 const props = defineProps<{}>()
+const chatStore = useChatStore();
+let messages: any;
 
+chatStore.$subscribe((mutation, state) => {
+    messages = state
 
-const messages = await get('chat/rooms/1/messages', 'Failed to get messages')
+});
+
+messages = await get('chat/rooms/1/messages', 'Failed to get messages')
 	.then((res) => res.json())
 	.catch((err) => (console.log("Error: " + err)));
-
-console.log("Messages: "  + JSON.stringify(messages));
+//	messages = [{content: "hallo", user: {username:"trossel"}}]
 
 </script>
+
 
 <style scoped lang="scss">
 .chat-window-wrapper {

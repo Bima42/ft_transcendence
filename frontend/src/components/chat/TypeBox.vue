@@ -9,17 +9,27 @@
 import CustomButton from '@/components/CustomButton.vue';
 import { post } from '../../../utils';
 import { ref } from 'vue'
+import { useChatStore } from '@/stores/chat';
+import { useAuthStore } from '@/stores/auth';
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
 const msgContent = ref('');
+const chatStore = useChatStore();
+const userStore = useAuthStore();
 
 function sendMessage() {
-  post('chat/rooms/1/messages',
-       'Cannot send message',
-	   {
-		   content: msgContent.value
-	   }
-  )
-  console.log('Message sent :)')
+    const msg = {
+        id: 0,
+        content: msgContent.value,
+        sentAt: null,
+        updatedAt: null,
+        user: userStore.user.username,
+        chat: chatStore.currentChat,
+	};
+
+	post('chat/rooms/1/messages', 'Cannot send message', msg)
+	chatStore.addMessage(msg);
+	console.log('Message sent :)')
 }
 </script>
 
