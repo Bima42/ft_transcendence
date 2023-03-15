@@ -46,6 +46,7 @@ export class ChannelService {
 			where: {chatId: chatId},
 			select: {
 				userId: true,
+                user: true,
 				chatId: true,
 				role: true,
 				mutedUntil: true
