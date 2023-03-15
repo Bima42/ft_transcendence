@@ -2,7 +2,7 @@
   <h1>Create a new channel</h1>
   <p>Here you can create a new channel, please fill the following info :</p>
   <div class="chat-input-container">
-    <input type="text" placeholder="Chose the name of the channel" class="chat-input">
+    <input v-model="chatName" type="text" placeholder="Chose the name of the channel" class="chat-input">
     <input type="text" placeholder="Set Password" class="chat-input">
     <input type="text" placeholder="Confirm Password" class="chat-input">
     <input type="text" placeholder="Invite users to the channel" class="chat-input">
@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import {useModalStore} from "@/stores/modal";
 import CustomButton from '@/components/CustomButton.vue'
 import {post} from '../../../utils'
@@ -26,13 +27,15 @@ import type IChat from '@/interfaces/chat/IChat'
 const modalStore = useModalStore()
 const data = modalStore.data.data
 
+const chatName = ref('');
+
 function onCreateNewChannel(e: Event) {
 
 	console.log("send request to server to create channel");
 	const newChat : IChat = {
 		id: undefined,
 		type: 'PUBLIC',
-		name: 'New chan UwU',
+		name: chatName.value,
 		createdAt: undefined,
 		updatedAt: undefined,
 		messages: undefined,
