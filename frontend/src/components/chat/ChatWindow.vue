@@ -13,11 +13,7 @@ import { useChatStore } from '@/stores/chat';
 
 const props = defineProps<{}>()
 const chatStore = useChatStore();
-let messages = ref<IChatMessage[]>(
-   await get('chat/rooms/1/messages', 'Failed to get messages')
-        .then((res) => res.json())
-        .catch((err) => (console.log(err)))
-    );
+let messages = ref<IChatMessage[]>([]);
 
 onMounted(() => {
     chatStore.$subscribe(async (mutation, state) => {
