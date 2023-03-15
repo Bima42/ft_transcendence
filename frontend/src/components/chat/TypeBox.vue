@@ -17,19 +17,20 @@ const msgContent = ref('');
 const chatStore = useChatStore();
 const userStore = useAuthStore();
 
-function sendMessage() {
-    const msg = {
-        id: 0,
+async function sendMessage() {
+    const msg: IChatMessage = {
+        id: undefined,
         content: msgContent.value,
-        sentAt: null,
-        updatedAt: null,
+        sentAt: undefined,
+        updatedAt: undefined,
         user: userStore.user.username,
         chat: chatStore.currentChat,
 	};
 
-	post('chat/rooms/1/messages', 'Cannot send message', msg)
+    const url = "chat/rooms/" + chatStore.currentChat.id + "/messages";
+	const response = await post(url, 'Cannot send message', msg)
+    console.log("Response = " + JSON.stringify(response));
 	chatStore.addMessage(msg);
-	console.log('Message sent :)')
 }
 </script>
 

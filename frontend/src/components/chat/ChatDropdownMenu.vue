@@ -11,8 +11,9 @@
 <script setup lang="ts">
 
 import { ref } from 'vue'
-import dropdown from 'vue-dropdowns'
-import { useChatStore } from '@/stores/chat'
+import dropdown from 'vue-dropdowns';
+import { useChatStore } from '@/stores/chat';
+import type IChat from '@/interfaces/chat/IChat';
 
 let chatStore = useChatStore();
 const props = defineProps<{
@@ -22,11 +23,8 @@ const props = defineProps<{
 
 
 function methodToRunOnSelect(payload) {
-    //console.log("New selected: " + JSON.stringify(payload));
-    console.log("New selected: " + payload.name);
-    console.log("store value: " + chatStore.currentChatName);
 
-    chatStore.currentChatName = payload.name;
+    chatStore.currentChat = payload;
 }
 </script>
 

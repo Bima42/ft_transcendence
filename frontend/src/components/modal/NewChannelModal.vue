@@ -20,16 +20,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {useModalStore} from "@/stores/modal";
+import {useChatStore} from "@/stores/chat";
 import CustomButton from '@/components/CustomButton.vue'
 import {post} from '../../../utils'
 import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
+const chatStore = useChatStore();
 const data = modalStore.data.data
 
 const chatName = ref('');
 
-function onCreateNewChannel(e: Event) {
+async function onCreateNewChannel(e: Event) {
 
 	console.log("send request to server to create channel");
 	const newChat : IChat = {
@@ -43,8 +45,10 @@ function onCreateNewChannel(e: Event) {
 	};
 
 	// TODO: catch error ?
-	post('chat/rooms', "Cannot create channel", newChat);
+	const response = await post('chat/rooms', "Cannot create channel", newChat);
     modalStore.resetState();
+    chatStore.currentStore = response;
+    console.log("Server response: " + JSON.stringify(response));
 }
 
 function quitButton(e: Event) {

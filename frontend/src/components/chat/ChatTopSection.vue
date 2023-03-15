@@ -12,16 +12,15 @@ import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
 import { useChatStore } from '@/stores/chat'
 
-const publicChatList = ref(null);
-const privateChatList = ref(null);
+const publicChatList = ref([]);
+const privateChatList = ref([]);
 const error = ref(null);
 const chatStore = useChatStore();
 
 let currentChatName = ref(chatStore.currentChatName);
 
 chatStore.$subscribe((mutation, state) => {
-    currentChatName.value = chatStore.currentChatName;
-
+    currentChatName.value = chatStore.currentChat.name;
 })
 
 get('chat/rooms', 'Failed to retrieve chat list')

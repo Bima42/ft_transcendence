@@ -5,24 +5,31 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, ref} from 'vue'
+import {defineProps, ref, onMounted} from 'vue'
 import {get} from "../../../utils"
 import MessageDisplay from "@/components/chat/MessageDisplay.vue";
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import { useChatStore } from '@/stores/chat';
 
 const props = defineProps<{}>()
 const chatStore = useChatStore();
-let messages: any;
+let messages = ref<IChatMessage[]>(
+   await get('chat/rooms/1/messages', 'Failed to get messages')
+        .then((res) => res.json())
+        .catch((err) => (console.log(err)))
+    );
 
-chatStore.$subscribe((mutation, state) => {
-    messages = state
+onMounted(() => {
+    chatStore.$subscribe(async (mutation, state) => {
+        const url = 'chat/rooms/' + chatStore.currentChat.id + "/messages";
 
+        const tmp_messages = await get(url, 'Failed to get messages')
+            .then((res) => res.json())
+            .catch((err) => (console.log("Error: " + err)));
+
+        messages.value = tmp_messages;
+    });
 });
-
-messages = await get('chat/rooms/1/messages', 'Failed to get messages')
-	.then((res) => res.json())
-	.catch((err) => (console.log("Error: " + err)));
-//	messages = [{content: "hallo", user: {username:"trossel"}}]
 
 </script>
 
