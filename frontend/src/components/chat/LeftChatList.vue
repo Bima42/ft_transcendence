@@ -1,121 +1,29 @@
 <template>
   <div class="chat-sidebar">
-    <ChatUserList header="Friends online" :userList="dummy">
+    <ChatUserList header="Friends online" :userList="friendUsers">
     </ChatUserList>
-    <ChatUserList header="People in the room" :userList="dummy2">
+    <ChatUserList header="People in the room" :userList="currentRoomUsers">
     </ChatUserList>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import {ref, onMounted } from 'vue'
 import ChatUserList from '@/components/chat/ChatUserList.vue'
+import {useChatStore} from "@/stores/chat";
+import type IUserChat from '@/interfaces/user/IUserChat';
 
-const dummy = ref(
-    [
-      {
-        name: 'Bima',
-        isActive: false,
-      },
-      {
-        name: 'Mabi',
-        isActive: false,
-      },
-      {
-        name: 'Te',
-        isActive: false,
-      },
-      {
-        name: 'Bimsadasdaa',
-        isActive: false,
-      },
-      {
-        name: 'Maasdadabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdasde',
-        isActive: false,
-      },
-      {
-        name: 'Biasdasdma',
-        isActive: false,
-      },
-      {
-        name: 'Masdasdabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdadsasde',
-        isActive: false,
-      },
-      {
-        name: 'Biasdasdama',
-        isActive: false,
-      },
-      {
-        name: 'Maasdasdabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdasde',
-        isActive: false,
-      },
-    ]
-)
+const chatStore = useChatStore();
+const currentRoomUsers = ref<IUserChat[]>([]);
+const friendUsers = ref<IUserChat[]>([]);
 
-const dummy2 = ref(
-    [
-      {
-        name: 'Bima',
-        isActive: false,
-      },
-      {
-        name: 'Mabi',
-        isActive: false,
-      },
-      {
-        name: 'Te',
-        isActive: false,
-      },
-      {
-        name: 'Bimsadasdaa',
-        isActive: false,
-      },
-      {
-        name: 'Maasdadabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdasde',
-        isActive: false,
-      },
-      {
-        name: 'Biasdasdma',
-        isActive: false,
-      },
-      {
-        name: 'Masdasdabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdadsasde',
-        isActive: false,
-      },
-      {
-        name: 'Biasdasdama',
-        isActive: false,
-      },
-      {
-        name: 'Maasdasdabi',
-        isActive: false,
-      },
-      {
-        name: 'Tasdasde',
-        isActive: false,
-      },
-    ]
-)
+onMounted(() => {
+    chatStore.$subscribe(async (mutation, state) => {
+
+            currentRoomUsers.value = chatStore.currentChat.users;
+    });
+});
+
 </script>
 
 <style scoped lang="scss">
