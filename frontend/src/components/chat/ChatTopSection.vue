@@ -15,10 +15,14 @@ import { useChatStore } from '@/stores/chat'
 const publicChatList = ref(null);
 const privateChatList = ref(null);
 const error = ref(null);
-const chatStore = useChatStore()
+const chatStore = useChatStore();
 
-const currentChatName = chatStore.currentChatName;
+let currentChatName = ref(chatStore.currentChatName);
 
+chatStore.$subscribe((mutation, state) => {
+    currentChatName.value = chatStore.currentChatName;
+
+})
 
 get('chat/rooms', 'Failed to retrieve chat list')
 	.then((res) => res.json())

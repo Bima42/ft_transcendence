@@ -44,10 +44,11 @@ function onCreateNewChannel(e: Event) {
 
 	// TODO: catch error ?
 	post('chat/rooms', "Cannot create channel", newChat);
+    modalStore.resetState();
 }
 
 function quitButton(e: Event) {
-  modalStore.resetState()
+  modalStore.resetState();
 }
 </script>
 
