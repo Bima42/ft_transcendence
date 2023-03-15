@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 
+import { get } from '../../../utils'
 import { ref } from 'vue'
 import dropdown from 'vue-dropdowns';
 import { useChatStore } from '@/stores/chat';
@@ -22,9 +23,17 @@ const props = defineProps<{
 }>();
 
 
-function methodToRunOnSelect(payload) {
+async function methodToRunOnSelect(payload: IChat) {
 
-    chatStore.currentChat = payload;
+
+    const url = 'chat/rooms/' + payload.id
+    //chatStore.currentChat = payload;
+    const newChannel = await get(url, 'Cannot load channel')
+        .then((res) => res.json())
+        .catch((err) => console.log(err));
+    //console.log("New channel: " + JSON.stringify(newChannel));
+    chatStore.currentChat = newChannel;
+
 }
 </script>
 
