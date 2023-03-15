@@ -31,7 +31,6 @@ async function methodToRunOnSelect(payload: IChat) {
     const newChannel = await get(url, 'Cannot load channel')
         .then((res) => res.json())
         .catch((err) => console.log(err));
-    //console.log("New channel: " + JSON.stringify(newChannel));
     chatStore.currentChat = newChannel;
 
 }

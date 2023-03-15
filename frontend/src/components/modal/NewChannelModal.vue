@@ -33,7 +33,6 @@ const chatName = ref('');
 
 async function onCreateNewChannel(e: Event) {
 
-	console.log("send request to server to create channel");
 	const newChat : IChat = {
 		id: undefined,
 		type: 'PUBLIC',

@@ -29,7 +29,6 @@ async function sendMessage() {
 
     const url = "chat/rooms/" + chatStore.currentChat.id + "/messages";
 	const response = await post(url, 'Cannot send message', msg)
-    console.log("Response = " + JSON.stringify(response));
 	chatStore.addMessage(msg);
 }
 </script>
