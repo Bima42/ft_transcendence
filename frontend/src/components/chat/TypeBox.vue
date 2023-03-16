@@ -1,15 +1,35 @@
 <template>
   <div class="chat-input-container">
-    <input type="text" placeholder="Type a message...">
+    <input v-model="msgContent" type="text" placeholder="Type a message...">
     <CustomButton @click="sendMessage">Send</CustomButton>
   </div>
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/CustomButton.vue';
+import { post } from '../../../utils';
+import { ref } from 'vue'
+import { useChatStore } from '@/stores/chat';
+import { useAuthStore } from '@/stores/auth';
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
-function sendMessage() {
-  console.log('Message sent :)')
+const msgContent = ref('');
+const chatStore = useChatStore();
+const userStore = useAuthStore();
+
+async function sendMessage() {
+  if (msgContent.value.trim() == "") return;
+
+    const msg: IChatMessage = {
+        content: msgContent.value,
+        user: userStore.user.username,
+        chat: chatStore.currentChat,
+	};
+
+    const url = "chat/rooms/" + chatStore.currentChat.id + "/messages";
+	const response = await post(url, 'Cannot send message', msg)
+	chatStore.addMessage(msg);
+  msgContent.value = "";
 }
 </script>
 

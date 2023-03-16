@@ -1,6 +1,6 @@
 <template>
   <p @click="$emit('setActive')">
-      {{ user.name }}
+      {{ userChat.user.username }}
   <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
     <div class="user-details-panel" v-show="isActive">
       <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
@@ -10,15 +10,20 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, onUpdated } from 'vue'
 import XButton from '@/components/XButton.vue'
 import UserDetailsCardContent from '@/components/chat/UserDetailsCardContent.vue'
+import type IUserChat from '@/interfaces/user/IUserChat';
 
 defineEmits(['setActive', 'setInactive'])
 const props = defineProps<{
-  user: object,
+  userChat: IUserChat,
   isActive: boolean,
 }>()
+
+onUpdated(() => {
+    console.log("onUpdated user detail");
+});
 </script>
 
 <style scoped lang="scss">
