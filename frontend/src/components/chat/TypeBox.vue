@@ -21,10 +21,7 @@ async function sendMessage() {
   if (msgContent.value.trim() == "") return;
 
     const msg: IChatMessage = {
-        id: undefined,
         content: msgContent.value,
-        sentAt: undefined,
-        updatedAt: undefined,
         user: userStore.user.username,
         chat: chatStore.currentChat,
 	};
