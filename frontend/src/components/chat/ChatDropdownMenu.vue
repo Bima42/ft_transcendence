@@ -7,46 +7,47 @@
             :closeOnOutsideClick="true">
   </dropdown>
 </template>
-<script>
-export default {
-  components: {
-    'dropdown': dropdown,
-  },
-  methods: {
-    methodToRunOnSelect(payload) {
-      this.object = payload;
-    }
-  },
-  props: {
+
+<script setup lang="ts">
+
+import { get } from '../../../utils'
+import { ref } from 'vue'
+import dropdown from 'vue-dropdowns';
+import { useChatStore } from '@/stores/chat';
+import type IChat from '@/interfaces/chat/IChat';
+
+let chatStore = useChatStore();
+const props = defineProps<{
     chatList: Object,
     name: String,
-  },
-  data() {
-    return {
-      object: {
-        name: 'Object Name',
-      }
-    }
-  },
+}>();
+
+
+async function methodToRunOnSelect(payload: IChat) {
+
+
+    const url = 'chat/rooms/' + payload.id
+    //chatStore.currentChat = payload;
+    const newChannel = await get(url, 'Cannot load channel')
+        .then((res) => res.json())
+        .catch((err) => console.log(err));
+    chatStore.currentChat = newChannel;
+
 }
 </script>
 
-<script setup>
-import dropdown from 'vue-dropdowns'
-</script>
-
-<style scoped>
+<style lang="scss">
 .my-dropdown-toggle {
   border-radius: 5px;
 
-::v-deep .dropdown-toggle {
-  color: tomato;
-  font-size: 25px;
-  font-weight: 800;
-}
+    ::v-deep .dropdown-toggle {
+      color: tomato;
+      font-size: 25px;
+      font-weight: 800;
+    }
 
-::v-deep .dropdown-toggle-placeholder {
-  color: #c4c4c4;
-}
+    ::v-deep .dropdown-toggle-placeholder {
+      color: #c4c4c4;
+    }
 }
 </style>

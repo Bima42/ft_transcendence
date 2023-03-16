@@ -10,16 +10,17 @@
 <script setup lang="ts">
 import {defineProps, computed} from 'vue'
 import UserAvatar from "@/components/UserAvatar.vue";
+import { useAuthStore } from "@/stores/auth"
 
+const authStore = useAuthStore()
 const props = defineProps<{
   message: object,
 }>()
 
-let text_position = props.message.sender as String
+let text_position = props.message.user.username as String
 
 const textPosition = computed(() => {
-  return text_position === 'Sandrine' ? 'right' : 'left'
-  //replace 'Sandrine by currentUser
+  return text_position === authStore.user.username ? 'right' : 'left'
 })
 </script>
 

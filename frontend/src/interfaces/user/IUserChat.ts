@@ -9,4 +9,4 @@ export default interface IUserChat {
 	user: IUser
 }
 
-export type UserChatRole = 'BANNED' | 'ADMIN' | 'MEMBER'
+export type UserChatRole = 'BANNED' | 'ADMIN' | 'MEMBER' | 'OWNER'

@@ -1,34 +1,49 @@
 <template>
   <h2>{{ props.header }}</h2>
   <section class="list-wrapper">
-    <ChatUserDetails v-for="user in userList"
-                     :user="user"
-                     :is-active="user.isActive"
-                     @setActive='setActiveUser(user)'
-                     @setInactive='setInactiveUser(user)'
+    <ChatUserDetails v-for="userChat in userList"
+                     :userChat="userChat"
+                     :is-active="isActive[userChat.user.id] ??= false"
+                     @setActive='setActiveUser(userChat)'
+                     @setInactive='setInactiveUser(userChat)'
     />
   </section>
 </template>
 
 <script setup lang="ts">
 import ChatUserDetails from '@/components/chat/ChatUserDetails.vue'
-import { defineProps } from 'vue'
+import type IUserChat from '@/interfaces/user/IUserChat';
+import { defineProps, onUpdated, ref } from 'vue'
 
 const props = defineProps<{
-  userList: object,
+  userList: IUserChat[],
   header: string,
 }>()
 
-function setActiveUser(user: object) {
-  props.userList.forEach(user => {
-    user.isActive = false
-  })
-  user.isActive = true
+// Dictionary where key is the userId and the value is a boolean
+var isActive = ref({});
+
+onUpdated(() => {
+
+    console.log("onUpdated");
+      props.userList.forEach((userChat: IUserChat)=> {
+        isActive.value[userChat.user.id] = false;
+      })
+});
+
+function setActiveUser(userChat: IUserChat) {
+    console.log("setActive: " + userChat.user.username);
+    props.userList.forEach((userChat: IUserChat)=> {
+        isActive[userChat.user.id] = false;
+        })
+    if (userChat)
+        isActive[userChat.user.id] = true;
 }
 
-function setInactiveUser(user: object) {
-  user.isActive = false
+function setInactiveUser(userChat: IUserChat) {
+    isActive[userChat.user.id] = false;
 }
+
 </script>
 
 <style scoped lang="scss">

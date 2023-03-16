@@ -1,35 +1,71 @@
 <template>
+  <div id="leftColumn">
   <h1>Create a new channel</h1>
   <p>Here you can create a new channel, please fill the following info :</p>
   <div class="chat-input-container">
-    <input type="text" placeholder="Chose the name of the channel" class="chat-input">
-    <input type="text" placeholder="Set Password" class="chat-input">
-    <input type="text" placeholder="Confirm Password" class="chat-input">
+    <input v-model="chatName" type="text" placeholder="Chose the name of the channel" class="chat-input">
+    <input type="password" placeholder="Set Password" class="chat-input">
+    <input type="password" placeholder="Confirm Password" class="chat-input">
     <input type="text" placeholder="Invite users to the channel" class="chat-input">
     <div class="radio-buttons">
       <label><input type="radio" name="type" value="private">Private</label>
       <label><input type="radio" name="type" value="public">Public</label>
     </div>
     <div class="button-container">
-      <CustomButton>Create</CustomButton>
+      <CustomButton @click="onCreateNewChannel">Create</CustomButton>
       <CustomButton @click="quitButton">Quit</CustomButton>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import {useModalStore} from "@/stores/modal";
+import {useChatStore} from "@/stores/chat";
 import CustomButton from '@/components/CustomButton.vue'
+import {post} from '../../../utils'
+import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
+const chatStore = useChatStore();
 const data = modalStore.data.data
 
+const chatName = ref('');
+
+async function onCreateNewChannel(e: Event) {
+
+	const newChat : IChat = {
+		id: undefined,
+		type: 'PUBLIC',
+		name: chatName.value,
+		createdAt: undefined,
+		updatedAt: undefined,
+		messages: undefined,
+		users: undefined
+	};
+
+	// TODO: catch error ?
+	const response = await post('chat/rooms', "Cannot create channel", newChat);
+    modalStore.resetState();
+    chatStore.currentStore = response;
+    console.log("Server response: " + JSON.stringify(response));
+}
+
 function quitButton(e: Event) {
-  modalStore.resetState()
+  modalStore.resetState();
 }
 </script>
 
 <style lang="scss" scoped>
+
+#leftColumn {
+  display: flex;
+  flex-direction: column; /*aligns items vertically*/
+  align-items: left;
+  justify-items: left;
+}
+
 .radio-buttons {
   color: rgb(255, 179, 0);
   margin: 10px;
