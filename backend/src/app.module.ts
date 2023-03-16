@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -24,6 +25,7 @@ import * as Joi from 'joi';
     UsersModule,
     AuthModule,
     ChatModule,
+    GameModule,
   ],
 })
 export class AppModule {}
