@@ -1,10 +1,11 @@
 <template>
+  <div id="leftColumn">
   <h1>Create a new channel</h1>
   <p>Here you can create a new channel, please fill the following info :</p>
   <div class="chat-input-container">
     <input v-model="chatName" type="text" placeholder="Chose the name of the channel" class="chat-input">
-    <input type="text" placeholder="Set Password" class="chat-input">
-    <input type="text" placeholder="Confirm Password" class="chat-input">
+    <input type="password" placeholder="Set Password" class="chat-input">
+    <input type="password" placeholder="Confirm Password" class="chat-input">
     <input type="text" placeholder="Invite users to the channel" class="chat-input">
     <div class="radio-buttons">
       <label><input type="radio" name="type" value="private">Private</label>
@@ -14,6 +15,7 @@
       <CustomButton @click="onCreateNewChannel">Create</CustomButton>
       <CustomButton @click="quitButton">Quit</CustomButton>
     </div>
+  </div>
   </div>
 </template>
 
@@ -56,6 +58,14 @@ function quitButton(e: Event) {
 </script>
 
 <style lang="scss" scoped>
+
+#leftColumn {
+  display: flex;
+  flex-direction: column; /*aligns items vertically*/
+  align-items: left;
+  justify-items: left;
+}
+
 .radio-buttons {
   color: rgb(255, 179, 0);
   margin: 10px;
