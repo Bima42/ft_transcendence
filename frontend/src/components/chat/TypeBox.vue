@@ -18,6 +18,8 @@ const chatStore = useChatStore();
 const userStore = useAuthStore();
 
 async function sendMessage() {
+  if (msgContent.value.trim() == "") return;
+
     const msg: IChatMessage = {
         id: undefined,
         content: msgContent.value,
@@ -30,6 +32,7 @@ async function sendMessage() {
     const url = "chat/rooms/" + chatStore.currentChat.id + "/messages";
 	const response = await post(url, 'Cannot send message', msg)
 	chatStore.addMessage(msg);
+  msgContent.value = "";
 }
 </script>
 

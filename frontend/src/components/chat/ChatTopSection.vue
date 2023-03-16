@@ -1,6 +1,7 @@
 <template>
   <section class="head-wrap">
-    <ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
+    <div><ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
+    <CustomButton id="new-channel" @click="clickHandler">+</CustomButton></div>
     <h1>{{ currentChatName }}</h1>
     <ChatDropdownMenu :chatList="privateChatList" name="Whispers"></ChatDropdownMenu>
   </section>
@@ -10,7 +11,12 @@
 import { ref } from 'vue'
 import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
+import CustomButton from "@/components/CustomButton.vue";
 import { useChatStore } from '@/stores/chat'
+import {useModalStore} from "@/stores/modal"
+import NewChannelModal from '@/components/modal/NewChannelModal.vue';
+import Modal from "@/components/modal/TheModal.vue";
+
 
 const publicChatList = ref([]);
 const privateChatList = ref([]);
@@ -34,6 +40,16 @@ get('chat/rooms', 'Failed to retrieve whispers list')
 	.then((json) => (privateChatList.value = json))
 	.catch((err) => (error.value = err));
 
+const modalStore = useModalStore()
+
+function clickHandler(e: Event) {
+  if (!e.target)
+    return
+  const target = e.target as HTMLElement
+  if (target.id === 'new-channel') {
+    modalStore.loadAndDisplay(Modal, NewChannelModal, {})
+  }
+}
 
 </script>
 
