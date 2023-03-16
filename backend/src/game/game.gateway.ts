@@ -4,6 +4,7 @@ import { Socket, Server } from 'socket.io'
 
 @WebSocketGateway({
     cors: true,
+    namespace: "game"
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -33,11 +34,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleConnection(client: any, ...args: any[]): any {
-        Logger.log(`connected... id: ${client.id}`);
+        Logger.log(`Game: connected... id: ${client.id}`);
     }
 
     handleDisconnect(client: any): any {
-        Logger.log(`disconnect... id: ${client.id}`);
+        Logger.log(`Game: disconnect... id: ${client.id}`);
     }
 
 };
