@@ -1,16 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  Res,
+  UseGuards
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
-import { UsersMiddleware } from './middlewares/users.middleware';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
   constructor(
-      private readonly authMiddleware: UsersMiddleware,
-      private readonly usersService: UsersService) {}
+      private readonly usersService: UsersService
+  ) {}
 
   @Get('login')
   async login(@Req() req: Request, @Res() res: Response) {
@@ -28,19 +39,19 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async getUserById(@Param('id') userId: number) {
     return this.usersService.findById(userId);
   }
 
-  @Get()
+  @Get('all')
   async getAllUsers(@Req() req: Request, @Res() res: Response) {
     if (!req.user) {
         res.status(401).send('Unauthorized');
     } else {
-      const users = await this.usersService.getAllUsers();
-      res.send({ users });
+      const users = await this.usersService.findAll();
+      res.status(200).send({ users });
     }
-    return this.usersService.findAll();
   }
 
   @Patch(':id')

@@ -8,12 +8,18 @@
         {{ item.longName }}
       </router-link>
     </section>
+    <button @click="test">Test Button</button>
   </section>
 </template>
 
 <script setup lang="ts">
 import {defineProps, computed} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
+const userStore = useAuthStore()
+async function test() {
+  userStore.testEndpoint()
+}
 
 const props = defineProps<{}>()
 

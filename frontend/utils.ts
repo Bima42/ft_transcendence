@@ -1,3 +1,5 @@
+import {getCookie, setCookie} from "typescript-cookie";
+
 export async function post(
 	route: string,
 	message: string,
@@ -20,10 +22,21 @@ export async function post(
 	return response
 }
 
+/**
+ *
+ * @param route : string, the route to fetch
+ * @param message : string, the message to display if the request fails
+ *
+ * @header Cookie is not printable because of httpOnly true
+ */
 export async function get(route: string, message: string): Promise<Response> {
 	const response = await fetch(`http://localhost:3080/${route}`, {
 		method: 'GET',
 		credentials: 'include',
+		headers: new Headers({
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${getCookie('access_token')}`
+		}),
 	})
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)

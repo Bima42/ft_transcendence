@@ -1,9 +1,17 @@
-import {Controller, ForbiddenException, Get, Param, Req, Res, UseGuards} from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Req,
+  Res,
+  UseGuards
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { UserStatus } from '@prisma/client';
+import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -11,12 +19,6 @@ export class AuthController {
       private readonly authService: AuthService,
       private readonly usersService: UsersService
   ) {
-  }
-
-  @Get('42')
-  @UseGuards(AuthGuard('42'))
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async loginFortyTwo(@Res() res: Response) {
   }
 
   /**

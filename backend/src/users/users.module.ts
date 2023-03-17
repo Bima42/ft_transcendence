@@ -9,7 +9,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
 
-
+/**
+ * Users module
+ *
+ * @imports : import PassportModule and JwtModule to use JWT strategy
+ *
+ * @configure : configure middleware for all routes in this users module
+ * The use() method of the UsersMiddleware class is called for all routes in this module
+ */
 @Module({
   imports: [
     PassportModule,

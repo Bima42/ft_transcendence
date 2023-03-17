@@ -1,6 +1,7 @@
 import { get } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
+import {getCookie} from "typescript-cookie";
 
 export const useAuthStore = defineStore( 'auth', () => {
 	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
@@ -32,10 +33,17 @@ export const useAuthStore = defineStore( 'auth', () => {
 		})
 	}
 
+	const testEndpoint = function () {
+		get(`users/${user?.id}`, 'Failed to get user')
+			.then(response => response.json())
+			.then(json => console.log(json))
+	}
+
 	return {
 		user,
 		redirect,
 		login,
-		logout
+		logout,
+		testEndpoint,
 	}
 })
