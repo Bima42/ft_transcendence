@@ -1,7 +1,7 @@
 import 'phaser'
-// import type GameObjects from 'phaser'
-//
-//
+import { io } from "socket.io-client"
+
+
 class Ball extends Phaser.Physics.Arcade.Image {
 
 	constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -66,6 +66,14 @@ export default class PongScene extends Phaser.Scene {
 		this.customPong = config.customPong ?? true;
 	}
 
+    updateWorld(obj: object) {
+                this.paddle1.y = obj.paddle1;
+                this.paddle2.y = obj.paddle2;
+                this.ball.x = obj.ball.x;
+                this.ball.y = obj.ball.y;
+                this.ball.setVelocity(obj.ball.vx, obj.ball.vy);
+    }
+
     create(config) : void
     {
 		this.parseConfig(config);
@@ -74,6 +82,17 @@ export default class PongScene extends Phaser.Scene {
 		} else {
 			console.log("Classic game.");
 		}
+
+        this.socket = io("ws://localhost:3080/game");
+        this.socket.on("state", (msg: string) => {
+            try {
+                const obj = JSON.parse(msg);
+                this.updateWorld(obj);
+            } catch (error) {
+                // Drop malformed request from server
+            }
+
+        });
 
         //  Enable world bounds, but disable the sides (left, right, up, down)
         this.physics.world.setBoundsCollision(false, false, true, true);
@@ -173,8 +192,20 @@ export default class PongScene extends Phaser.Scene {
         }
 
 		this.paddle1.setVelocity(0);
-		if ( this.keys.s.isDown) { this.paddle1.setVelocityY(this.paddle1.body.maxSpeed); }
-		if ( this.keys.w.isDown) { this.paddle1.setVelocityY(-this.paddle1.body.maxSpeed); }
+		if ( this.keys.s.isDown) {
+            this.paddle1.setVelocityY(this.paddle1.body.maxSpeed);
+            this.socket.emit("move", JSON.stringify({
+                paddle:1,
+                y: this.paddle1.y,
+            }));
+        }
+		if ( this.keys.w.isDown) {
+            this.paddle1.setVelocityY(-this.paddle1.body.maxSpeed);
+            this.socket.emit("move", JSON.stringify({
+                paddle:1,
+                y: this.paddle1.y,
+            }));
+        }
 		this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, 0, 600);
 
 		this.paddle2.setVelocity(0);

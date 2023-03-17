@@ -19,6 +19,11 @@ import ChatUserList from './LeftChatList.vue';
 import ChatTopSection from "@/components/chat/ChatTopSection.vue";
 import TypeBox from "@/components/chat/TypeBox.vue";
 import ChatWindow from "@/components/chat/ChatWindow.vue";
+import { io } from "socket.io-client"
+
+console.log("Hello chat");
+const socket = io("ws://localhost:3080/chat");
+
 </script>
 
 <style scoped lang="scss">
