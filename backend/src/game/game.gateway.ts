@@ -50,13 +50,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('newJoinQueue')
   handleJoinQueue(@MessageBody() joinQueueData: JoinQueueData,
-  @ConnectedSocket() client: Socket) {
+  @ConnectedSocket() client: Socket): string {
     // handle the classicModeQueue event emitted from the client
     Logger.log(`Client ${client.id} joined queue`);
     if (joinQueueData.classic)
-        this.gameService.joinClassicModeQueue(client, joinQueueData);
+        return this.gameService.joinClassicModeQueue(client, joinQueueData);
     else
-        this.gameService.joinCustomModeQueue(client, joinQueueData);
+        return this.gameService.joinCustomModeQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')

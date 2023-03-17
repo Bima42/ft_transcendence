@@ -27,7 +27,7 @@ function joinQueue() {
     if (isLoading.value) {
         gameStore.socket.emit('newJoinQueue', {
             classic: useClassicMode
-        });
+        }, (response) => { console.log(response)});
     } else {
         gameStore.socket.emit('abortJoinQueue');
     }
