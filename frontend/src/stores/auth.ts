@@ -35,6 +35,10 @@ export const useAuthStore = defineStore( 'auth', () => {
 		})
 	}
 
+  const isLoggedIn = function () : boolean {
+    return user == null;
+  }
+
 	const testEndpoint = function () {
 		get(`users/id/${user?.id}`, 'Failed to get user')
 			.then(response => response.json())
@@ -42,10 +46,11 @@ export const useAuthStore = defineStore( 'auth', () => {
 	}
 
 	return {
-		user,
-		redirect,
-		login,
-		logout,
-		testEndpoint,
+    user,
+    redirect,
+    login,
+    logout,
+    isLoggedIn,
+    testEndpoint,
 	}
 })
