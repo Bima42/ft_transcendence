@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
 import { GameService } from './game.service';
-import { JoinQueueData } from './dto/joinQueueData.dto';
+import { GameSettingsDto } from './dto/joinQueueData.dto';
 
 
 @WebSocketGateway({
@@ -49,18 +49,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('newJoinQueue')
-  handleJoinQueue(@MessageBody() joinQueueData: JoinQueueData,
+  handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
   @ConnectedSocket() client: Socket): string {
     // handle the classicModeQueue event emitted from the client
     Logger.log(`Client ${client.id} joined queue`);
-    if (joinQueueData.classic)
-        return this.gameService.joinClassicModeQueue(client, joinQueueData);
-    else
-        return this.gameService.joinCustomModeQueue(client, joinQueueData);
+
+    return this.gameService.joinQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')
-  handleAbortQueue(@MessageBody() payload: JoinQueueData,
+  handleAbortQueue(@MessageBody() payload: GameSettingsDto,
   @ConnectedSocket() client: Socket) {
     // handle the classicModeQueue event emitted from the client
     Logger.log(`Client ${client.id} quit the queue`);

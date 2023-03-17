@@ -1,3 +1,3 @@
-export class JoinQueueData {
+export class GameSettingsDto {
     classic: boolean
 }

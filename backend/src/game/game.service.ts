@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets'
-import { JoinQueueData } from './dto/joinQueueData.dto';
+import { GameSettingsDto } from './dto/joinQueueData.dto';
 import { Game } from '@prisma/client';
 import { UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -19,27 +19,21 @@ export class GameService {
     private readonly prismaService: PrismaService
   ) {}
 
-  joinClassicModeQueue(client: Socket, payload: JoinQueueData): string {
+  joinQueue(client: Socket, gameSettings: GameSettingsDto): string {
     // Emit an event to the connected clients to join the classic mode queue
     // and add the client's socket to the queue
     Logger.log("Joined classic")
     this.classicQueue.push(client);
-    const ret = this.findOrCreateMatch()
+    const ret = this.findOrCreateMatch(gameSettings)
     .then(match => this.CreateUserGame(match))
     .catch(err => { console.log(err)});
-    return ret ? "Joined OK" : "Not joined";
-  }
-
-  joinCustomModeQueue(client: Socket, payload: JoinQueueData): string {
-    // Emit an event to the connected clients to join the custom mode queue
-    // and add the client's socket to the queue
-    //this.server.emit('customModeQueue');
-    Logger.log("Joined custom")
-    this.customQueue.push(client);
-    const match = this.findOrCreateMatch();
-    this.CreateUserGame(match);
-
-    return 'Joined custom mode queue';
+    var msg =  ret ? "Joined OK" : "Not joined";
+    if(gameSettings.classic) {
+      msg += " classic";
+    } else {
+      msg += " custom";
+    }
+    return msg;
   }
 
   async getGameDetails(gameId: number): Promise<Game> {
@@ -48,35 +42,46 @@ export class GameService {
     });
   }
 
+//   This function finds an available game with status 'SEARCHING' and returns it.
+// If no game is found, it creates a new game with status 'SEARCHING' and returns it.
+async findOrCreateMatch(gameSettings: GameSettingsDto): Promise<Game> {
+  Logger.log("find or create");
 
-  async findOrCreateMatch(): Promise<Game> {
-    // Check if there is an available game
-    Logger.log("find or csreate");
-    const availableGame = await this.prismaService.game.findFirst({
-      where: { status: 'SEARCHING' },
-    });
+  // Find an available game with status 'SEARCHING'
+  const availableGame = await this.prismaService.game.findFirst({
+      where: {
+        status: 'SEARCHING',
+      },
+  });
 
-    // If there is an available game, create a match and return game details
-    if (availableGame) {
-        return availableGame;
-    }
-
-    return await this.prismaService.game.create({
-      data: {
-        status: 'SEARCHING'
-      }
-    });
+  // If an available game is found, return it
+  if (availableGame) {
+      return availableGame;
   }
 
-    async CreateUserGame(match): Promise<UserGame> {
-      Logger.log("fcreate user");
-      Logger.log(match);
-      const userGame = await this.prismaService.userGame.create({
-          data: {
-              gameId: match.id,
-              userId: 1
-          }
-      });
-      return userGame;
-    }
+  // If no available game is found, create a new game with status 'SEARCHING' and return it
+  return await this.prismaService.game.create({
+      data: {
+          status: 'SEARCHING'
+      }
+  });
+}
+
+// This function creates a new UserGame associated with the provided match object and returns it.
+async CreateUserGame(match: Game): Promise<UserGame> {
+  Logger.log("create4 user");
+  Logger.log(match);
+
+  // Create a new UserGame associated with the provided match object and user ID 1
+  const userGame = await this.prismaService.userGame.create({
+      data: {
+          gameId: match.id,
+          userId: 1
+      }
+  });
+
+  // Return the created UserGame
+  return userGame;
+}
+
 }

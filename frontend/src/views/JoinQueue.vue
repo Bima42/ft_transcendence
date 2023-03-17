@@ -20,7 +20,7 @@ import { useGameStore } from '@/stores/game';
 
 const gameStore = useGameStore();
 const isLoading = ref(false);
-var useClassicMode = false;
+var useClassicMode = true;
 
 function joinQueue() {
     isLoading.value = !isLoading.value
