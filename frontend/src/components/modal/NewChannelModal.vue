@@ -46,10 +46,16 @@ async function onCreateNewChannel(e: Event) {
 	};
 
 	// TODO: catch error ?
-	const response = await post('chat/rooms', "Cannot create channel", newChat);
-    modalStore.resetState();
-    chatStore.currentStore = response;
-    console.log("Server response: " + JSON.stringify(response));
+	await post('chat/rooms', "Cannot create channel", newChat)
+        .then((response) => response.json())
+        .then(json => {
+            console.log("channel created: " + JSON.stringify(json));
+            modalStore.resetState();
+            chatStore.currentChat = json;
+        })
+        .catch(err => {
+            console.log("error creating channel: " + err);
+        });
 }
 
 function quitButton(e: Event) {
