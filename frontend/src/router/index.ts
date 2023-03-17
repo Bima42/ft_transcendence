@@ -36,18 +36,18 @@ const router = createRouter({
             path: '/main',
             name: 'main',
             children: [
-                {
-                   path: 'play',
-                   name: 'play',
-                   component: PlayAGameView,
-                   longName: 'Play a game',
-                },
                 // {
-                //     path: 'play',
-                //     name: 'play',
-                //     component: JoinQueueView,
-                //     longName: 'Play a game',
+                //    path: 'play',
+                //    name: 'play',
+                //    component: PlayAGameView,
+                //    longName: 'Play a game',
                 // },
+                {
+                    path: 'play',
+                    name: 'play',
+                    component: JoinQueueView,
+                    longName: 'Play a game',
+                },
                 {
                     path: 'score',
                     name: 'score',
