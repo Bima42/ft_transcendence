@@ -19,7 +19,7 @@ function launch(containerId) {
   }
   const game = new Phaser.Game(config);
 
-  game.scene.add('PongScene', PongScene, false, {customPong: true});
+  game.scene.add('PongScene', PongScene, false, {customPong: false});
   game.scene.add('GameoverScene', GameoverScene, false, {});
 
   return game;
