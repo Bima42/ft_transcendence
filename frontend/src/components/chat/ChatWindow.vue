@@ -11,29 +11,41 @@ import { get } from "../../../utils"
 import MessageDisplay from "@/components/chat/MessageDisplay.vue";
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import { useChatStore } from '@/stores/chat';
+import type IChat from '@/interfaces/chat/IChat';
 
 const props = defineProps<{}>()
 const chatStore = useChatStore();
+const hello: string = "Hello";
 let messages = ref<IChatMessage[]>([]);
 
+chatStore.socket.on('msg', (data: IChatMessage) => {
+    console.log("Received new msg:" + JSON.stringify(data));
+    messages.value.unshift(data);
+    (document.getElementById("background_text") as HTMLElement).style.display = "none";
+});
+
 onMounted(() => {
-    chatStore.$subscribe(async (mutation, state) => {
-        const url = 'chat/rooms/' + chatStore.currentChat.id + "/messages";
+    chatStore.$onAction((context) => {
+        // this will trigger if the action succeeds and after it has fully run.
+        // it waits for any returned promised
+        context.after(async (result: IChat) => {
+            if (context.name == "setCurrentChat") {
 
-        messages.value = [];
-        const tmp_messages = await get(url, 'Failed to get messages')
-            .then((res) => res.json())
-            .catch((err) => (console.log("Error: " + err)));
+                messages.value = [];
+                const url = 'chat/rooms/' + result.id + "/messages";
+                const tmp_messages = await get(url, 'Failed to get messages')
+                    .then((res) => res.json())
+                    .catch((err) => (console.log("Error: " + err)));
 
-        messages.value = tmp_messages;
-        console.log("count = " + messages.value.length);
-        if (messages.value.length)
-            document.getElementById("background_text").style.display = "none";
-        else
-            document.getElementById("background_text").style.display = "block";
-
+                messages.value = tmp_messages;
+                const displayValue = messages.value.length ? "none" : "block";
+                (document.getElementById("background_text") as HTMLElement).style.display = displayValue;
+            }
+        })
     });
 });
+//    })
+//});
 
 </script>
 

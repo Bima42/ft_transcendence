@@ -1,6 +1,9 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
+import { ChatMessage } from '@prisma/client';
 import { Socket, Server } from 'socket.io'
+import { ChannelService } from './channel.service'
+import { NewMessageDto } from './dto/message.dto';
 
 @WebSocketGateway({
     path: "/api/socket.io",
@@ -17,22 +20,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server
 
-    constructor() { }
+    constructor(
+      private readonly channelService : ChannelService
+    ) { }
 
-    @SubscribeMessage('m')
-    handleEvent(@MessageBody() data: string,
-        @ConnectedSocket() socket: Socket): string {
-        Logger.log("Chat: new msg");
+    @SubscribeMessage('msg')
+    async handleEvent(@MessageBody() data: NewMessageDto,
+        @ConnectedSocket() socket: Socket) {
 
-        return data; // TODO: Remove ?
+        const msg = await this.channelService.postMessage(data.chatId, data);
+
+        // The server also send back to the sender, as acknowledgement and validation
+        // TODO: only send to the correct room
+        this.server.emit("msg", msg);
     }
 
     handleConnection(client: any, ...args: any[]): any {
         Logger.log(`Chat: connected... id: ${client.id}`);
+        // TODO: authentification with auth token
+        //Logger.log("Chat: auth token = " + client.handshake.auth.token);
+        //
+        //TODO: add socket to all rooms (= channels) that the user is in
     }
 
     handleDisconnect(client: any): any {
         Logger.log(`Chat: disconnect... id: ${client.id}`);
+
+        //TODO: send notifications to all users to change his status to offline
     }
 
 };

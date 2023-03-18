@@ -20,22 +20,14 @@ const userStore = useAuthStore();
 async function sendMessage() {
   if (msgContent.value.trim() == "") return;
 
-  const msg: IChatMessage = {
+  // Format: NewMessageDto from back
+  const msg = {
     content: msgContent.value,
-    user: userStore.user.username,
-    chat: chatStore.currentChat,
+    senderId: userStore.user?.id,
+    chatId: chatStore.currentChat.id,
   };
 
-  const url = "chat/rooms/" + chatStore.currentChat.id + "/messages";
-  const response = await post(url, 'Cannot send message', msg)
-    .then(response => response.json())
-    .then(json => {
-      console.log("response = " + json);
-      console.log("response2 = " + JSON.stringify(json));
-      chatStore.addMessage(msg);
-      msgContent.value = "";
-    })
-    .catch(error => console.log(error));
+    chatStore.sendMessage(msg);
 }
 </script>
 

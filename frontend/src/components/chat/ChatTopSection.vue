@@ -23,15 +23,20 @@ const privateChatList = ref([]);
 const error = ref(null);
 const chatStore = useChatStore();
 
-let currentChatName = ref(chatStore.currentChatName);
+let currentChatName = chatStore.currentChat ? ref(chatStore.currentChat.name) : ref("Chat name");
 
 chatStore.$subscribe((mutation, state) => {
-    currentChatName.value = chatStore.currentChat.name;
+    if (chatStore.currentChat)
+        currentChatName.value = chatStore.currentChat.name;
 })
 
 get('chat/rooms', 'Failed to retrieve chat list')
 	.then((res) => res.json())
-	.then((json) => (publicChatList.value = json))
+    .then((json) => {
+        publicChatList.value = json;
+        if (publicChatList.value.length > 0)
+            chatStore.setCurrentChat(publicChatList.value[0]);
+    })
 	.catch((err) => (error.value = err));
 
 // TODO: Retrieve private chats

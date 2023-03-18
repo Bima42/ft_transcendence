@@ -1,46 +1,48 @@
 <template>
-  <h2>{{ props.header }}</h2>
-  <section class="list-wrapper">
-    <ChatUserDetails v-for="userChat in userList"
-                     :userChat="userChat"
-                     :is-active="isActive[userChat.user.id] ??= false"
-                     @setActive='setActiveUser(userChat)'
-                     @setInactive='setInactiveUser(userChat)'
-    />
-  </section>
+    <h2>{{ props.header }}</h2>
+    <section class="list-wrapper">
+        <ChatUserDetails v-for="userChat in userList" :userChat="userChat"
+            :is-active="isActive[userChat.user.id] ??= false" @setActive='setActiveUser(userChat)'
+            @setInactive='setInactiveUser(userChat)' />
+    </section>
 </template>
 
 <script setup lang="ts">
 import ChatUserDetails from '@/components/chat/ChatUserDetails.vue'
 import type IUserChat from '@/interfaces/user/IUserChat';
-import { defineProps, onUpdated, ref } from 'vue'
+import { useChatStore } from '@/stores/chat';
+import { defineProps, onMounted, ref } from 'vue'
 
+const chatStore = useChatStore();
 const props = defineProps<{
-  userList: IUserChat[],
-  header: string,
+    userList: IUserChat[],
+    header: string,
 }>()
 
 // Dictionary where key is the userId and the value is a boolean
-var isActive = ref({});
+var isActive = ref<{ [key: string]: boolean }>({});
 
-onUpdated(() => {
+onMounted(() => {
+    chatStore.$subscribe(async (mutation, state) => {
 
-      props.userList.forEach((userChat: IUserChat)=> {
-        isActive.value[userChat.user.id] = false;
-      })
+        if (!props.userList)
+            return;
+        props.userList.forEach((userChat: IUserChat) => {
+            isActive.value[userChat.user.id] = false;
+        })
+    });
 });
 
 function setActiveUser(userChat: IUserChat) {
-    console.log("setActive: " + userChat.user.username);
-    props.userList.forEach((userChat: IUserChat)=> {
-        isActive[userChat.user.id] = false;
-        })
+    props.userList.forEach((userChat: IUserChat) => {
+        isActive.value[userChat.user.id] = false;
+    })
     if (userChat)
-        isActive[userChat.user.id] = true;
+        isActive.value[userChat.user.id] = true;
 }
 
 function setInactiveUser(userChat: IUserChat) {
-    isActive[userChat.user.id] = false;
+    isActive.value[userChat.user.id] = false;
 }
 
 </script>

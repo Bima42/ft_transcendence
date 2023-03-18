@@ -19,7 +19,7 @@ const friendUsers = ref<IUserChat[]>([]);
 
 onMounted(() => {
     chatStore.$subscribe(async (mutation, state) => {
-
+        if (chatStore.currentChat)
             currentRoomUsers.value = chatStore.currentChat.users;
     });
 });
