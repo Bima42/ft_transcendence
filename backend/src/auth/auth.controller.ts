@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { Response, Request } from 'express';
 import { UserStatus } from '@prisma/client';
-import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -88,7 +87,6 @@ export class AuthController {
         }
 
         res.cookie('access_token', token.access_token, {
-          httpOnly: true,
           maxAge: 1000 * 60 * 60 * 24, // 1 day
           secure: true,
           sameSite: 'none',

@@ -46,13 +46,9 @@ export class AuthService {
 					id: user.id
 				},
 				data: {
-					username,
-					email,
 					firstName,
 					lastName,
-					phoneNumber,
-					fortyTwoId,
-					avatar
+					fortyTwoId
 				}
 			});
 		}

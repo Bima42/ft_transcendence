@@ -8,7 +8,8 @@ import {
   Delete,
   Req,
   Res,
-  UseGuards
+  UseGuards,
+  ParseIntPipe
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
@@ -38,9 +39,15 @@ export class UsersController {
     return this.usersService.create(data);
   }
 
+  /**
+   * ParseIntPipe : protection to ensures that a method handler parameter is converted to a JavaScript integer
+   * (or throws an exception if the conversion fails).
+   *
+   * @param userId
+   */
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async getUserById(@Param('id') userId: number) {
+  async getUserById(@Param('id', ParseIntPipe) userId: number) {
     return this.usersService.findById(userId);
   }
 

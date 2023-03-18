@@ -1,4 +1,4 @@
-import {getCookie, setCookie} from "typescript-cookie";
+import { getCookie } from 'typescript-cookie';
 
 export async function post(
 	route: string,
@@ -16,7 +16,7 @@ export async function post(
 	}
 	if (json)
 		request.body = JSON.stringify(json)
-	const response = await fetch(`http://localhost:3080/${route}`, request)
+	const response = await fetch(`https://localhost:4443/api/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	return response
@@ -30,7 +30,7 @@ export async function post(
  * @header Cookie is not printable because of httpOnly true
  */
 export async function get(route: string, message: string): Promise<Response> {
-	const response = await fetch(`http://localhost:3080/${route}`, {
+	const response = await fetch(`https://localhost:4443/api/${route}`, {
 		method: 'GET',
 		credentials: 'include',
 		headers: new Headers({
@@ -44,7 +44,7 @@ export async function get(route: string, message: string): Promise<Response> {
 }
 
 export async function del(route: string, message: string): Promise<Response> {
-	const response = await fetch(`http://localhost:3080/${route}`, {
+	const response = await fetch(`https://localhost:4443/api/${route}`, {
 		method: 'DELETE',
 		credentials: 'include',
 	})

@@ -9,17 +9,6 @@ export class UsersService {
       private readonly prismaService: PrismaService
   ) {}
 
-
-  async getAllUsers() {
-    const users = await this.prismaService.user.findMany();
-
-    if (!users) {
-      throw new BadRequestException('No users found');
-    }
-
-    return users;
-  }
-
   async create(data: User): Promise<User> {
     const user = await this.prismaService.user.create({
       data: data

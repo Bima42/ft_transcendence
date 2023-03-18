@@ -1,0 +1,2 @@
+APP_URL=https://localhost:4443
+BACKEND_URL=https://localhost:4443/api
