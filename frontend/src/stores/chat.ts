@@ -9,9 +9,7 @@ import { getCookie } from 'typescript-cookie';
 export const useChatStore = defineStore('chat', () => {
     const socket = ref<Socket>(io("ws://localhost:3080/chat", {
       auth: { token: getCookie("access_token") }}));
-    // let currentChatMessages = ref<IChatMessage[]>([]);
     let currentChat = ref<IChat>(null);
-    // let chatsList = ref<IChat[]>([]);
 
      function sendMessage(msg: any): void {
          this.socket.emit("msg", msg);

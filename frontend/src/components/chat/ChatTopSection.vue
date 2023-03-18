@@ -1,9 +1,9 @@
 <template>
   <section class="head-wrap">
-    <div><ChatDropdownMenu :chatList="publicChatList" name="Rooms"></ChatDropdownMenu>
+    <div><ChatDropdownMenu :chatList="publicChatList" name="Rooms" @click="retrievePublicChats"></ChatDropdownMenu>
     <CustomButton id="new-channel" @click="clickHandler">+</CustomButton></div>
     <h1>{{ currentChatName }}</h1>
-    <ChatDropdownMenu :chatList="privateChatList" name="Whispers"></ChatDropdownMenu>
+    <ChatDropdownMenu :chatList="privateChatList" name="Whispers" @click="retrieveWhispers"></ChatDropdownMenu>
   </section>
 </template>
 
@@ -17,7 +17,6 @@ import {useModalStore} from "@/stores/modal"
 import NewChannelModal from '@/components/modal/NewChannelModal.vue';
 import Modal from "@/components/modal/TheModal.vue";
 
-
 const publicChatList = ref([]);
 const privateChatList = ref([]);
 const error = ref(null);
@@ -30,20 +29,32 @@ chatStore.$subscribe((mutation, state) => {
         currentChatName.value = chatStore.currentChat.name;
 })
 
-get('chat/rooms', 'Failed to retrieve chat list')
-	.then((res) => res.json())
-    .then((json) => {
-        publicChatList.value = json;
-        if (publicChatList.value.length > 0)
-            chatStore.setCurrentChat(publicChatList.value[0]);
-    })
-	.catch((err) => (error.value = err));
+function retrievePublicChats() {
+    get('chat/rooms', 'Failed to retrieve chat list')
+        .then((res) => res.json())
+        .then((json) => {
+            publicChatList.value = json;
+            // Load the first chat by default
+            if (!chatStore.currentChat && publicChatList.value.length > 0)
+                chatStore.setCurrentChat(publicChatList.value[0]);
+        })
+        .catch((err) => (error.value = err));
 
-// TODO: Retrieve private chats
-get('chat/rooms', 'Failed to retrieve whispers list')
-	.then((res) => res.json())
-	.then((json) => (privateChatList.value = json))
-	.catch((err) => (error.value = err));
+}
+// Call it when loading the page
+retrievePublicChats();
+
+
+function retrieveWhispers() {
+// TODO: Retrieve private chats properly
+
+//    get('chat/rooms', 'Failed to retrieve whispers list')
+//        .then((res) => res.json())
+//        .then((json) => (privateChatList.value = json))
+//        .catch((err) => (error.value = err));
+}
+// Call it when loading the page
+retrieveWhispers();
 
 const modalStore = useModalStore()
 
