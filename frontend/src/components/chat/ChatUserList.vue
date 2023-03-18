@@ -12,6 +12,7 @@ import ChatUserDetails from '@/components/chat/ChatUserDetails.vue'
 import type IUserChat from '@/interfaces/user/IUserChat';
 import { useChatStore } from '@/stores/chat';
 import { defineProps, onMounted, ref } from 'vue'
+import CustomButton from '../CustomButton.vue';
 
 const chatStore = useChatStore();
 const props = defineProps<{
@@ -22,15 +23,14 @@ const props = defineProps<{
 // Dictionary where key is the userId and the value is a boolean
 var isActive = ref<{ [key: string]: boolean }>({});
 
-onMounted(() => {
-    chatStore.$subscribe(async (mutation, state) => {
-
-        if (!props.userList)
-            return;
-        props.userList.forEach((userChat: IUserChat) => {
-            isActive.value[userChat.user.id] = false;
-        })
-    });
+chatStore.$onAction((context) => {
+    context.after(() => {
+        if (context.name == "setCurrentChat" && props.userList) {
+            props.userList.forEach((userChat: IUserChat) => {
+                isActive.value[userChat.user.id] = false;
+            })
+        }
+    })
 });
 
 function setActiveUser(userChat: IUserChat) {

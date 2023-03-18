@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
 import CustomButton from "@/components/CustomButton.vue";
@@ -29,21 +29,21 @@ chatStore.$subscribe((mutation, state) => {
         currentChatName.value = chatStore.currentChat.name;
 })
 
-function retrievePublicChats() {
-    get('chat/rooms', 'Failed to retrieve chat list')
+async function retrievePublicChats() {
+    await get('chat/rooms', 'Failed to retrieve chat list')
         .then((res) => res.json())
         .then((json) => {
             publicChatList.value = json;
-            // Load the first chat by default
-            if (!chatStore.currentChat && publicChatList.value.length > 0)
-                chatStore.setCurrentChat(publicChatList.value[0]);
         })
         .catch((err) => (error.value = err));
 
 }
-// Call it when loading the page
-retrievePublicChats();
 
+// Call it when loading the page
+onMounted(async () => {
+    await retrievePublicChats();
+    retrieveWhispers();
+});
 
 function retrieveWhispers() {
 // TODO: Retrieve private chats properly
@@ -53,8 +53,6 @@ function retrieveWhispers() {
 //        .then((json) => (privateChatList.value = json))
 //        .catch((err) => (error.value = err));
 }
-// Call it when loading the page
-retrieveWhispers();
 
 const modalStore = useModalStore()
 

@@ -4,7 +4,7 @@
   <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
     <div class="user-details-panel" v-show="isActive">
       <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
-      <UserDetailsCardContent></UserDetailsCardContent>
+      <UserDetailsCardContent :userChat="props.userChat"></UserDetailsCardContent>
     </div>
   </p>
 </template>

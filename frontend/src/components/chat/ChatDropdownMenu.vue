@@ -1,9 +1,9 @@
 <template>
   <dropdown class="my-dropdown-toggle"
             :options="chatList"
-            :selected="name"
+            :selected="currentChatName"
             v-on:updateOption="methodToRunOnSelect"
-            :placeholder="name"
+            :placeholder="currentChatName"
             :closeOnOutsideClick="true">
   </dropdown>
 </template>
@@ -22,9 +22,11 @@ const props = defineProps<{
     name: string,
 }>();
 
+let currentChatName = ref(props.name);
+
 onUpdated(() => {
     if (props.chatList.length) {
-        props.name = props.chatList[0].name;
+        currentChatName.value = props.chatList[0].name;
     }
 });
 

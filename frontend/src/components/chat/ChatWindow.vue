@@ -19,33 +19,35 @@ const hello: string = "Hello";
 let messages = ref<IChatMessage[]>([]);
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
-    console.log("Received new msg:" + JSON.stringify(data));
     messages.value.unshift(data);
     (document.getElementById("background_text") as HTMLElement).style.display = "none";
 });
 
-onMounted(() => {
-    chatStore.$onAction((context) => {
-        // this will trigger if the action succeeds and after it has fully run.
-        // it waits for any returned promised
-        context.after(async (result: IChat) => {
-            if (context.name == "setCurrentChat") {
+async function updateMessages(chat: IChat) {
+    if (!chat)
+        return;
+    const url = 'chat/rooms/' + chat.id + "/messages";
+    messages.value = await get(url, 'Failed to get messages')
+        .then((res) => res.json())
+        .catch((err) => {
+            console.error(err)
+            return [];
+        });
+    const displayValue = messages.value.length ? "none" : "block";
+    (document.getElementById("background_text") as HTMLElement).style.display = displayValue;
+}
+// Reload from server. TODO: from localStorage ?
+updateMessages(chatStore.currentChat);
 
-                messages.value = [];
-                const url = 'chat/rooms/' + result.id + "/messages";
-                const tmp_messages = await get(url, 'Failed to get messages')
-                    .then((res) => res.json())
-                    .catch((err) => (console.log("Error: " + err)));
-
-                messages.value = tmp_messages;
-                const displayValue = messages.value.length ? "none" : "block";
-                (document.getElementById("background_text") as HTMLElement).style.display = displayValue;
-            }
-        })
-    });
+chatStore.$onAction((context) => {
+    // this will trigger if the action succeeds and after it has fully run.
+    // it waits for any returned promised
+    context.after((result: IChat) => {
+        if (context.name == "setCurrentChat") {
+            updateMessages(result);
+        }
+    })
 });
-//    })
-//});
 
 </script>
 

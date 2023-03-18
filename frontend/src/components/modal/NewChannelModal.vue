@@ -51,12 +51,11 @@ async function onCreateNewChannel(e: Event) {
 	await post('chat/rooms', "Cannot create channel", newChat)
         .then((response) => response.json())
         .then(json => {
-            console.log("channel created: " + JSON.stringify(json));
             modalStore.resetState();
             chatStore.currentChat = json;
         })
         .catch(err => {
-            console.log("error creating channel: " + err);
+            console.error("error creating channel: " + err);
         });
 }
 
