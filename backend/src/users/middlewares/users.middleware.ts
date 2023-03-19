@@ -23,6 +23,7 @@ export class UsersMiddleware implements NestMiddleware {
 			if (user) {
 				user.status = UserStatus.ONLINE;
 				req.user = user;
+				console.log('User is online', req.user);
 			}
 			else {
 				res.status(401).send('Unauthorized, user not found');
