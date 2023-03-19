@@ -87,7 +87,7 @@ export class AuthService {
 			throw new BadRequestException('User not found');
 		}
 
-		res.cookie('access_token', '', {
+		res.cookie(process.env.JWT_COOKIE, '', {
 			httpOnly: true,
 			secure: true,
 			sameSite: 'none',

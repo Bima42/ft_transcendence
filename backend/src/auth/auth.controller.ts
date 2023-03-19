@@ -79,14 +79,14 @@ export class AuthController {
       }
 
       // Create token and set cookie
-      if (!req.cookies['access_token']) {
+      if (!req.cookies[process.env.JWT_COOKIE]) {
         const token = this.authService._createToken(user);
 
         if (!token) {
           throw new ForbiddenException('Empty token');
         }
 
-        res.cookie('access_token', token.access_token, {
+        res.cookie(process.env.JWT_COOKIE, token.access_token, {
           maxAge: 1000 * 60 * 60 * 24, // 1 day
           secure: true,
           sameSite: 'none',
@@ -109,7 +109,7 @@ export class AuthController {
       @Res({ passthrough: true }) res,
       @Param() params: { id: number })
   {
-    res.clearCookie('access_token');
+    res.clearCookie(process.env.JWT_COOKIE);
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
     await this.authService.logout(res, params.id);
   }

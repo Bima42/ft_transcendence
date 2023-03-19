@@ -1,4 +1,5 @@
 # Backend
+JWT_COOKIE=access_token
 JWT_KEY=mySecretKey
 EXPIRES_IN=60s
 PORT=3080
