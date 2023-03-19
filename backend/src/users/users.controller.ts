@@ -18,6 +18,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(
@@ -26,17 +27,18 @@ export class UsersController {
 
   @Get('login')
   async login(@Req() req: Request, @Res() res: Response) {
-    const user = req.user;
-    if (!user) {
-      res.status(401).send('Unauthorized');
-    } else {
-      res.status(200).send(user);
-    }
+    res.status(200).send(req.user);
   }
 
   @Post('create')
   async createUser(@Body() data: User): Promise<User> {
     return this.usersService.create(data);
+  }
+
+  @Get('all')
+  async getAllUsers(@Req() req: Request, @Res() res: Response) {
+    const users = await this.usersService.findAll();
+    res.status(200).send({ users });
   }
 
   /**
@@ -45,32 +47,21 @@ export class UsersController {
    *
    * @param userId
    */
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @Get('id/:id')
   async getUserById(@Param('id', ParseIntPipe) userId: number) {
     return this.usersService.findById(userId);
   }
 
-  @Get('all')
-  async getAllUsers(@Req() req: Request, @Res() res: Response) {
-    if (!req.user) {
-        res.status(401).send('Unauthorized');
-    } else {
-      const users = await this.usersService.findAll();
-      res.status(200).send({ users });
-    }
-  }
-
-  @Patch(':id')
+  @Patch('id/:id')
   async updateUser(
-        @Param('id') userId: number,
+        @Param('id', ParseIntPipe) userId: number,
         @Body() data: User
   ): Promise<User> {
       return this.usersService.update(userId, data);
   }
 
-  @Delete(':id')
-  async deleteUser(@Param('id') userId: number) {
+  @Delete('id/:id')
+  async deleteUser(@Param('id', ParseIntPipe) userId: number) {
       return this.usersService.delete(userId);
   }
 }
