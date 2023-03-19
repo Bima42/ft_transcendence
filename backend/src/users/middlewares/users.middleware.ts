@@ -22,7 +22,6 @@ export class UsersMiddleware implements NestMiddleware {
 			const user = await this.usersService.findById(verifiedToken.sub);
 			if (user) {
 				req.user = user;
-				console.log('User is online', req.user);
 			}
 			else {
 				res.status(401).send('Unauthorized, user not found');
