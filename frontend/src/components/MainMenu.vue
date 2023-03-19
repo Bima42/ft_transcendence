@@ -8,12 +8,23 @@
         {{ item.longName }}
       </router-link>
     </section>
+    <button @click="test">Test Button</button>
   </section>
 </template>
 
 <script setup lang="ts">
 import {defineProps, computed} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
+import { io } from "socket.io-client"
+const userStore = useAuthStore()
+
+async function test() {
+    const socket = io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
+        path: "/api/socket.io/",
+    });
+
+}
 
 const props = defineProps<{}>()
 

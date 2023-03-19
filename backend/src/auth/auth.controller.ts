@@ -1,7 +1,14 @@
-import {Controller, ForbiddenException, Get, Param, Req, Res, UseGuards} from '@nestjs/common';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Req,
+  Res,
+  UseGuards
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { UserStatus } from '@prisma/client';
 
@@ -11,12 +18,6 @@ export class AuthController {
       private readonly authService: AuthService,
       private readonly usersService: UsersService
   ) {
-  }
-
-  @Get('42')
-  @UseGuards(AuthGuard('42'))
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async loginFortyTwo(@Res() res: Response) {
   }
 
   /**
@@ -67,7 +68,7 @@ export class AuthController {
         email,
         firstName: first_name,
         lastName: last_name,
-        phoneNumber: phone,
+        phone: phone,
         fortyTwoId: id,
         avatar: image.versions.medium,
       });
@@ -78,15 +79,14 @@ export class AuthController {
       }
 
       // Create token and set cookie
-      if (!req.cookies['access_token']) {
+      if (!req.cookies[process.env.JWT_COOKIE]) {
         const token = this.authService._createToken(user);
 
         if (!token) {
           throw new ForbiddenException('Empty token');
         }
 
-        res.cookie('access_token', token.access_token, {
-          httpOnly: true,
+        res.cookie(process.env.JWT_COOKIE, token.access_token, {
           maxAge: 1000 * 60 * 60 * 24, // 1 day
           secure: true,
           sameSite: 'none',
@@ -109,7 +109,7 @@ export class AuthController {
       @Res({ passthrough: true }) res,
       @Param() params: { id: number })
   {
-    res.clearCookie('access_token');
+    res.clearCookie(process.env.JWT_COOKIE);
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
     await this.authService.logout(res, params.id);
   }

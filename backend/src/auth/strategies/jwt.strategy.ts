@@ -12,6 +12,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		});
 	}
 
+	/**
+	 * This function is called by NestJS when a user attempts to access a route that requires authentication.
+	 * If the token is valid, validate() returns a user object, which is then stored in the request object.
+	 * If the token is not valid, validate() throws an error, which is handled by NestJS and results in a 401 Unauthorized response to the user.
+	 */
 	async validate(payload: { id: number; email: string }) {
 		return payload;
 	}

@@ -9,11 +9,13 @@ async function bootstrap() {
   // Use cookie parser middleware
   app.use(cookieParser());
 
+  app.setGlobalPrefix('api');
+
   app.enableCors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
     allowedHeaders: 'Content-Type, Authorization, Cookie',
-    methods: 'GET,POST,DELETE',
+    methods: 'GET,PUT,PATCH,POST,DELETE',
   });
 
   const config = new DocumentBuilder()

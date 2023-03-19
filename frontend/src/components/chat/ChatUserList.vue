@@ -25,7 +25,6 @@ var isActive = ref({});
 
 onUpdated(() => {
 
-    console.log("onUpdated");
       props.userList.forEach((userChat: IUserChat)=> {
         isActive.value[userChat.user.id] = false;
       })

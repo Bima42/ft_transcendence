@@ -3,8 +3,14 @@ import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMes
 import { Socket, Server } from 'socket.io'
 
 @WebSocketGateway({
-    cors: true,
-    namespace: "chat"
+    path: "/api/socket.io",
+    namespace: "chat",
+    cors: {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+      allowedHeaders: 'Content-Type, Authorization, Cookie',
+      methods: ["GET", "POST"],
+    }
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 

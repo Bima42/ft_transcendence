@@ -40,7 +40,7 @@ const phone = ref("")
 
 function registerClick (e: MouseEvent) {
   if (e.target instanceof HTMLButtonElement && e.target.innerText === 'Register') {
-    fetch('http://localhost:3080/auth/register', {
+    fetch(`http://${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ function registerClick (e: MouseEvent) {
         username: username.value,
         email: email.value,
         password: password.value,
-        phoneNumber: phone.value
+        phone: phone.value
       })
     })
         .catch((error) => {

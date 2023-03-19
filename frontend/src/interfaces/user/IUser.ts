@@ -11,6 +11,7 @@ export default interface IUser {
 	fortyTwoID: number
 	email: string
 	avatar?: string
+  phone?: string
 	status: UserStatus
 	chats: IUserChat[]
 	games: IUserGame[]

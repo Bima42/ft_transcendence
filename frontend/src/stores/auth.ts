@@ -6,7 +6,7 @@ export const useAuthStore = defineStore( 'auth', () => {
 	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
 
 	const redirect = function () {
-		const redirect = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-92ce1a0afad1a634dcd2140cbf1a6fe599e99cb72bd310a13428b5d8187ad240&redirect_uri=http%3A%2F%2Flocalhost%3A3080%2Fauth%2F42%2Fcallback&response_type=code'
+		const redirect = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-175010164675e1a964dee80d5ce4a1ee18e22ba3fb6b0f7773673c3ff68c71d9&redirect_uri=https%3A%2F%2Flocalhost%3A4443%2Fapi%2Fauth%2F42%2Fcallback&response_type=code'
 		window.open(redirect, '_self')
 	}
 	const login = function () {
@@ -17,8 +17,8 @@ export const useAuthStore = defineStore( 'auth', () => {
 			.then(response => response.json())
 			.then(json => {
 				user = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user));
-				window.location.href = 'http://localhost:8000/index'
+				localStorage.setItem('localUser', JSON.stringify(user))
+				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
 			})
 	}
 
@@ -28,14 +28,21 @@ export const useAuthStore = defineStore( 'auth', () => {
 		get(`auth/logout/${user.id}`, 'Failed to logout').then(() => {
 			user = null
 			localStorage.removeItem('localUser');
-			window.location.href = 'http://localhost:8000/'
+			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
 		})
+	}
+
+	const testEndpoint = function () {
+		get(`users/${user?.id}`, 'Failed to get user')
+			.then(response => response.json())
+			.then(json => console.log(json))
 	}
 
 	return {
 		user,
 		redirect,
 		login,
-		logout
+		logout,
+		testEndpoint,
 	}
 })

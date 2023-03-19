@@ -20,6 +20,8 @@ RUN dos2unix /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+EXPOSE 3080
+
 ENTRYPOINT ["entrypoint.sh"]
 
 # Prod target

@@ -4,57 +4,83 @@ networks:
   transcendence: {}
 
 services:
+  server:
+    image: nginx-trans
+    build:
+      context: ./nginx
+      target: dev
+    container_name: transcendence-server
+    restart: always
+    depends_on:
+      - frontend
+    volumes:
+      - './nginx/conf.d:/etc/nginx/conf.d'
+    ports:
+      - '4443:443'
+    networks:
+      - transcendence
+
   frontend:
     image: frontend
-    container_name: my-app
-    build: ./frontend
-    volumes:
-      - './frontend:/app'
-      - '/app/node_modules'
-    ports:
-      - '8000:8000'
+    container_name: transcendence-frontend
+    restart: always
+    build:
+      context: ./frontend
+      target: dev
     depends_on:
       - backend
+    env_file:
+      - ./env/.frontend_env
+    volumes:
+      - './frontend:/app'
+      - 'frontend_modules:/app/node_modules'
+    expose:
+      - '8000'
+    networks:
+      - transcendence
 
   backend:
     image: backend
-    container_name: my-server
+    container_name: transcendence-backend
+    restart: always
     build:
       context: ./backend
       target: dev
-    networks:
-      - transcendence
+    depends_on:
+      - db
     env_file:
       - ./env/.backend_env
     volumes:
       - './backend:/server'
-      - '/server/node_modules'
-    ports:
-      - '3080:3080'
-    depends_on:
-      - db
+      - 'backend_modules:/server/node_modules'
+    expose:
+      - '3080'
+    networks:
+      - transcendence
 
   adminer:
     image: adminer
-    container_name: my-adminer
-    restart: on-failure
+    container_name: transcendence-adminer
+    restart: always
     ports:
-      - "8080:8080"
+      - '8080:8080'
     networks:
       - transcendence
 
   db:
     image: postgres:15.1-alpine
-    container_name: my-db
-    restart: on-failure
-    networks:
-      - transcendence
+    container_name: transcendence-db
+    restart: always
     env_file:
       - ./env/.postgres_env
     volumes:
       - 'data:/var/lib/postgresql/data'
     ports:
       - '5432:5432'
+    networks:
+      - transcendence
 
 volumes:
   data:
+  frontend_modules:
+  backend_modules:

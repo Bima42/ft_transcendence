@@ -1,3 +1,5 @@
+import { getCookie } from 'typescript-cookie';
+
 export async function post(
 	route: string,
 	message: string,
@@ -14,16 +16,26 @@ export async function post(
 	}
 	if (json)
 		request.body = JSON.stringify(json)
-	const response = await fetch(`http://localhost:3080/${route}`, request)
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	return response
 }
 
+/**
+ *
+ * @param route : string, the route to fetch
+ * @param message : string, the message to display if the request fails
+ *
+ * @header Cookie is not printable because of httpOnly true
+ */
 export async function get(route: string, message: string): Promise<Response> {
-	const response = await fetch(`http://localhost:3080/${route}`, {
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
-		credentials: 'include',
+		headers: new Headers({
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+		}),
 	})
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
@@ -31,7 +43,7 @@ export async function get(route: string, message: string): Promise<Response> {
 }
 
 export async function del(route: string, message: string): Promise<Response> {
-	const response = await fetch(`http://localhost:3080/${route}`, {
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'DELETE',
 		credentials: 'include',
 	})
