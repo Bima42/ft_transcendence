@@ -104,6 +104,11 @@ export class AuthController {
     }
   }
 
+  @Get('login')
+  async login(@Req() req: Request, @Res() res: Response) {
+    res.status(200).send(req.user);
+  }
+
   @Get('logout/:id')
   async logout(
       @Res({ passthrough: true }) res,

@@ -38,6 +38,6 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UsersMiddleware)
-      .forRoutes('users');
+      .forRoutes(UsersController);
   }
 }

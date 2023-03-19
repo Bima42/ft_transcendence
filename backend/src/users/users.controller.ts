@@ -25,16 +25,6 @@ export class UsersController {
       private readonly usersService: UsersService
   ) {}
 
-  @Get('login')
-  async login(@Req() req: Request, @Res() res: Response) {
-    res.status(200).send(req.user);
-  }
-
-  @Post('create')
-  async createUser(@Body() data: User): Promise<User> {
-    return this.usersService.create(data);
-  }
-
   @Get('all')
   async getAllUsers(@Req() req: Request, @Res() res: Response) {
     const users = await this.usersService.findAll();
