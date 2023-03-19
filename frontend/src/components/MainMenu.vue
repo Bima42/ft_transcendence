@@ -21,9 +21,8 @@ const userStore = useAuthStore()
 
 async function test() {
     console.log("Hello");
-    const socket = io("ws://localhost:4443/api/chat", {
-        path: "/api/socket.io/"
-        cors: true,
+    const socket = io("wss://localhost:4443/chat", {
+        path: "/api/socket.io/",
     });
 
 }
