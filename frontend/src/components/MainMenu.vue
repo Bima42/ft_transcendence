@@ -20,8 +20,7 @@ import { io } from "socket.io-client"
 const userStore = useAuthStore()
 
 async function test() {
-    console.log("Hello");
-    const socket = io("wss://localhost:4443/chat", {
+    const socket = io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
         path: "/api/socket.io/",
     });
 

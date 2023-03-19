@@ -18,7 +18,7 @@ export const useAuthStore = defineStore( 'auth', () => {
 			.then(json => {
 				user = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user))
-				window.location.href = 'https://localhost:4443/index'
+				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
 			})
 	}
 
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore( 'auth', () => {
 		get(`auth/logout/${user.id}`, 'Failed to logout').then(() => {
 			user = null
 			localStorage.removeItem('localUser');
-			window.location.href = 'https://localhost:4443/'
+			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
 		})
 	}
 

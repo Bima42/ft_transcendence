@@ -16,7 +16,7 @@ export async function post(
 	}
 	if (json)
 		request.body = JSON.stringify(json)
-	const response = await fetch(`https://localhost:4443/api/${route}`, request)
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	return response
@@ -30,12 +30,11 @@ export async function post(
  * @header Cookie is not printable because of httpOnly true
  */
 export async function get(route: string, message: string): Promise<Response> {
-	const response = await fetch(`https://localhost:4443/api/${route}`, {
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
-		credentials: 'include',
 		headers: new Headers({
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${getCookie('access_token')}`
+			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
 		}),
 	})
 	if (!response.ok)
@@ -44,7 +43,7 @@ export async function get(route: string, message: string): Promise<Response> {
 }
 
 export async function del(route: string, message: string): Promise<Response> {
-	const response = await fetch(`https://localhost:4443/api/${route}`, {
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'DELETE',
 		credentials: 'include',
 	})

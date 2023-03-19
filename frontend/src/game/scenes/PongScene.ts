@@ -83,7 +83,7 @@ export default class PongScene extends Phaser.Scene {
 			console.log("Classic game.");
 		}
 
-        //this.socket = io("ws://localhost:3080/game");
+        // this.socket = io(`wss://${import.meta.env.VITE_BACKEND_URL}/game`);
         //this.socket.on("state", (msg: string) => {
         //    try {
         //        const obj = JSON.parse(msg);
