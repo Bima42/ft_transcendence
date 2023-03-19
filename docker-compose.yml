@@ -17,7 +17,6 @@ services:
       - './nginx/conf.d:/etc/nginx/conf.d'
     ports:
       - '4443:443'
-      - '8880:80'
     networks:
       - transcendence
 
@@ -35,8 +34,8 @@ services:
     volumes:
       - './frontend:/app'
       - 'frontend_modules:/app/node_modules'
-    ports:
-      - '8000:8000'
+    expose:
+      - '8000'
     networks:
       - transcendence
 
@@ -54,8 +53,8 @@ services:
     volumes:
       - './backend:/server'
       - 'backend_modules:/server/node_modules'
-    ports:
-      - '3080:3080'
+    expose:
+      - '3080'
     networks:
       - transcendence
 
