@@ -49,7 +49,7 @@ function registerClick (e: MouseEvent) {
         username: username.value,
         email: email.value,
         password: password.value,
-        phoneNumber: phone.value
+        phone: phone.value
       })
     })
         .catch((error) => {

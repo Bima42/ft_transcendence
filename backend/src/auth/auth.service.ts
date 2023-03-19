@@ -11,12 +11,12 @@ export class AuthService {
 	) {
 	}
 
-	async findOrCreate({username, email, firstName, lastName, phoneNumber, fortyTwoId, avatar}: {
+	async findOrCreate({username, email, firstName, lastName, phone, fortyTwoId, avatar}: {
 		username: string,
 		email: string,
 		firstName: string,
 		lastName: string,
-		phoneNumber: string,
+		phone: string,
 		fortyTwoId: number,
 		avatar: string
 	}) {
@@ -33,7 +33,7 @@ export class AuthService {
 					email,
 					firstName,
 					lastName,
-					phoneNumber,
+					phone,
 					fortyTwoId,
 					avatar
 				}

@@ -68,7 +68,7 @@ export class AuthController {
         email,
         firstName: first_name,
         lastName: last_name,
-        phoneNumber: phone,
+        phone: phone,
         fortyTwoId: id,
         avatar: image.versions.medium,
       });

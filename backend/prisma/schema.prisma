@@ -13,13 +13,14 @@ datasource db {
 model User {
   id          Int           @id @unique @default(autoincrement())
   twoFA       Boolean       @default(false)
+  twoFASecret String?
   fortyTwoId  Int?
   username    String        @unique @db.VarChar(255)
   email       String        @unique
   avatar      String?
   firstName   String?
   lastName    String?
-  phoneNumber String?
+  phone       String?
   status      UserStatus    @default(OFFLINE)
   chats       UserChat[]
   games       UserGame[]
