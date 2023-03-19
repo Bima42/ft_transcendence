@@ -22,7 +22,6 @@ const props = defineProps<{
 }>()
 
 onUpdated(() => {
-    console.log("onUpdated user detail");
 });
 </script>
 

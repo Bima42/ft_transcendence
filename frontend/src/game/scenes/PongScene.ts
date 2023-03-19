@@ -83,16 +83,16 @@ export default class PongScene extends Phaser.Scene {
 			console.log("Classic game.");
 		}
 
-        this.socket = io("ws://localhost:3080/game");
-        this.socket.on("state", (msg: string) => {
-            try {
-                const obj = JSON.parse(msg);
-                this.updateWorld(obj);
-            } catch (error) {
-                // Drop malformed request from server
-            }
+        //this.socket = io("ws://localhost:3080/game");
+        //this.socket.on("state", (msg: string) => {
+        //    try {
+        //        const obj = JSON.parse(msg);
+        //        this.updateWorld(obj);
+        //    } catch (error) {
+        //        // Drop malformed request from server
+        //    }
 
-        });
+        //});
 
         //  Enable world bounds, but disable the sides (left, right, up, down)
         this.physics.world.setBoundsCollision(false, false, true, true);

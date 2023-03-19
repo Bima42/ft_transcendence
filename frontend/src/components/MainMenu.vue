@@ -16,9 +16,16 @@
 import {defineProps, computed} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
+import { io } from "socket.io-client"
 const userStore = useAuthStore()
+
 async function test() {
-  userStore.testEndpoint()
+    console.log("Hello");
+    const socket = io("ws://localhost:4443/api/chat", {
+        path: "/api/socket.io/"
+        cors: true,
+    });
+
 }
 
 const props = defineProps<{}>()
