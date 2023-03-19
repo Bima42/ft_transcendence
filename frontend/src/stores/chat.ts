@@ -8,8 +8,9 @@ import { get } from '../../utils'
 
 
 export const useChatStore = defineStore('chat', () => {
-  const socket = ref<Socket>(io("ws://localhost:3080/chat", {
-    auth: { token: getCookie("access_token") }
+  const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
+    auth: { token: getCookie("access_token") },
+    path: "/api/socket.io/",
   }));
   let currentChat = ref<IChat | null>(null);
   let chats = ref<IChat[]>([]);
