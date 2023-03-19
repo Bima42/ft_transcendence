@@ -20,10 +20,7 @@ import { io } from "socket.io-client"
 const userStore = useAuthStore()
 
 async function test() {
-    const socket = io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
-        path: "/api/socket.io/",
-    });
-
+    userStore.testEndpoint()
 }
 
 const props = defineProps<{}>()

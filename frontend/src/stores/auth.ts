@@ -11,11 +11,12 @@ export const useAuthStore = defineStore( 'auth', () => {
 	}
 	const login = function () {
 		get(
-			'users/login',
+			'auth/login',
 			'Failed to login',
 		)
 			.then(response => response.json())
 			.then(json => {
+				console.log('json', json)
 				user = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user))
 				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
@@ -33,7 +34,7 @@ export const useAuthStore = defineStore( 'auth', () => {
 	}
 
 	const testEndpoint = function () {
-		get(`users/${user?.id}`, 'Failed to get user')
+		get(`users/id/${user?.id}`, 'Failed to get user')
 			.then(response => response.json())
 			.then(json => console.log(json))
 	}
