@@ -41,6 +41,7 @@ rebuild: clean
 prune: clean
 	@echo -e "${RED}Cleaning all docker environment...${RESET}"
 	@docker system prune -a -f --volumes
+	rm -rf backend/{dist,node_modules} frontend/{node_modules}
 
 
 .PHONY: dev up detached build down clean stop rebuild prune
