@@ -68,6 +68,8 @@ services:
     image: adminer
     container_name: transcendence-adminer
     restart: always
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
     ports:
       - '8080:8080'
     networks:
@@ -81,8 +83,8 @@ services:
       - ./env/.postgres.env
     volumes:
       - 'data:/var/lib/postgresql/data'
-    ports:
-      - '5432:5432'
+    expose:
+      - '5432'
     networks:
       - transcendence
 
