@@ -5,6 +5,14 @@ while [ ! -d /server ]; do
     sleep 1
 done
 
+# Wait for the database to be started
+while ! pg_isready -q --dbname="${POSTGRES_DB}" \
+                      --host="${POSTGRES_HOST}" \
+                      --port="${POSTGRES_PORT}"; do
+    echo "Waiting on database connection..."
+    sleep 1
+done
+
 # Install dependencies
 yarn install
 

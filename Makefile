@@ -29,7 +29,6 @@ down:
 clean:
 	@echo -e "${GREEN}Cleaning containers...${RESET}"
 	@docker compose down -v --remove-orphans
-	rm -rf frontend/node_modules backend/node_modules
 
 stop:
 	@echo -e "${GREEN}Stopping containers...${RESET}"
@@ -42,7 +41,6 @@ rebuild: clean
 prune: clean
 	@echo -e "${RED}Cleaning all docker environment...${RESET}"
 	@docker system prune -a -f --volumes
-	rm -rf frontend/node_modules backend/node_modules
 
 
 .PHONY: dev up detached build down clean stop rebuild prune
