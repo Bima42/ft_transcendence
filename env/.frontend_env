@@ -1,3 +1,8 @@
+# URL of the VueJS frontend app
 VITE_APP_URL=localhost:4443
+
+# URL of the NestJS backend service
 VITE_BACKEND_URL=localhost:4443/api
+
+# Name of the cookie. Must be the same as in backend
 VITE_JWT_COOKIE=access_token
