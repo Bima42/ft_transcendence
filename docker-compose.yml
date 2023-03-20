@@ -46,6 +46,9 @@ services:
     build:
       context: ./backend
       target: dev
+      args:
+        - "UID=${UID:-1000}"
+        - "GID=${GID:-1000}"
     depends_on:
       - db
     env_file:

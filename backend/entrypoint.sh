@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # Wait for the app to be mounted
 while [ ! -d /server ]; do
