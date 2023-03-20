@@ -78,7 +78,7 @@ services:
     container_name: transcendence-db
     restart: always
     env_file:
-      - ./env/.postgres_env
+      - ./env/.postgres.env
     volumes:
       - 'data:/var/lib/postgresql/data'
     ports:
