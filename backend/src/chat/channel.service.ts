@@ -2,7 +2,7 @@
 import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatMessage } from '@prisma/client';
+import { Chat, ChatType, ChatMessage, User} from '@prisma/client';
 import { NewMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 
@@ -12,8 +12,22 @@ export class ChannelService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async getAllChannels(): Promise<Array<NewChannelDto>> {
+  async getAllChannelsForUser(user: User): Promise<Array<NewChannelDto>> {
     const channels = await this.prismaService.chat.findMany({
+      where: {
+        OR: [
+          {
+            type: { equals: 'PUBLIC' },
+          },
+          {
+            users: {
+              some: {
+                userId: { equals: user.id },
+              },
+            },
+          },
+        ],
+      },
       select: {
         id: true,
         name: true,
@@ -87,7 +101,6 @@ export class ChannelService {
 
     // TODO TYR: Add channel owner and not 1
     this.UpsertUserChatRole(newChat.id, 1, UserChatRole.OWNER, 0);
-    Logger.log("Create new channel: " + newChat.name);
     return newChat;
   }
 
