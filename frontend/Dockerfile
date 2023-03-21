@@ -1,25 +1,31 @@
 # base image
 FROM node:18-alpine AS base
 
+ARG UID=1000
+ARG GID=1000
+
+# install dependencies
+RUN apk add --no-cache --update yarn shadow
+
+# Use the already generated `node` user to run the app
+RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
+USER node
+
 # set working directory
 WORKDIR /app
 
-# install yarn
-RUN apk add --no-cache yarn
-
-# install and cache app dependencies
-COPY package*.json ./
-
-COPY yarn.lock ./
+# Copy all files needed for installing dependencies
+COPY --chown=node:node package*.json yarn.lock ./
 
 # run yarn install
 RUN yarn install
 
 # Dev target
 FROM base AS dev
+USER node
 
-# change ownership of the node_modules directory to the node user
-RUN chown -R node:node /app/node_modules
+# Copy the rest of the source
+COPY --chown=node:node . .
 
 EXPOSE 8000
 

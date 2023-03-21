@@ -1,3 +1,0 @@
-VITE_APP_URL=localhost:4443
-VITE_BACKEND_URL=localhost:4443/api
-VITE_JWT_COOKIE=access_token
