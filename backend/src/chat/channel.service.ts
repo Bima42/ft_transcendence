@@ -12,28 +12,51 @@ export class ChannelService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async getAllChannelsForUser(user: User): Promise<Array<NewChannelDto>> {
-    const channels = await this.prismaService.chat.findMany({
-      where: {
-        OR: [
-          {
-            type: { equals: 'PUBLIC' },
+  async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
+    let channels: Chat[] = [];
+    if (whispers) {
+      channels = await this.prismaService.chat.findMany({
+        where: {
+          // Whispers and user is in
+          type: { equals: 'WHISPER' },
+          users: {
+            some: {
+              userId: { equals: user.id },
+            },
           },
-          {
+        },
+      });
+    } else { // Retrieve community channels where the user is allowed, which is:
+      channels = await this.prismaService.chat.findMany({
+        where: {
+          // Exclude all channel where the user is banned
+          NOT: {
             users: {
               some: {
                 userId: { equals: user.id },
+                role: { equals: 'BANNED' },
               },
             },
           },
-        ],
-      },
-      select: {
-        id: true,
-        name: true,
-        type: true
-      }
-    });
+          OR: [
+            // Public channels
+            {
+              type: { equals: 'PUBLIC' },
+            },
+            // Private channels, where user exists and is not banned
+            {
+              type: { equals: 'PRIVATE' },
+              users: {
+                some: {
+                  userId: { equals: user.id },
+                },
+              },
+            },
+
+            ],
+        },
+      });
+    }
 
     if (!channels) {
       throw new BadRequestException('No channel found');

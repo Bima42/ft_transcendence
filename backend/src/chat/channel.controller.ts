@@ -28,7 +28,8 @@ export class ChannelController {
 
   @Get('rooms')
   getAllChannels(@Req() req: Request): Promise<NewChannelDto[]> {
-    return this.channelService.getAllChannelsForUser(req.user as User);
+    const whispers : boolean = (req.query.whispers ? JSON.parse(req.query.whispers as string) : false);
+    return this.channelService.getAllChannelsForUser(req.user as User, whispers);
   }
 
   @Post('rooms')

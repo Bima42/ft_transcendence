@@ -107,6 +107,7 @@ enum UserStatus {
 enum ChatType {
   PUBLIC
   PRIVATE
+  WHISPER
   GAMECHAT
 }
 

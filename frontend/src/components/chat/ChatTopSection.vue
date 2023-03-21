@@ -46,12 +46,10 @@ onMounted(async () => {
 });
 
 function retrieveWhispers() {
-// TODO: Retrieve private chats properly
-
-//    get('chat/rooms', 'Failed to retrieve whispers list')
-//        .then((res) => res.json())
-//        .then((json) => (privateChatList.value = json))
-//        .catch((err) => (error.value = err));
+    get('chat/rooms?whispers=true', 'Failed to retrieve whispers list')
+        .then((res) => res.json())
+        .then((json) => (privateChatList.value = json))
+        .catch((err) => (error.value = err));
 }
 
 const modalStore = useModalStore()

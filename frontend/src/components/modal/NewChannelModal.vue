@@ -55,7 +55,7 @@ async function onCreateNewChannel(e: Event) {
             chatStore.currentChat = json;
         })
         .catch(err => {
-            console.log("error creating channel: " + err);
+            console.log(err);
         });
 }
 
