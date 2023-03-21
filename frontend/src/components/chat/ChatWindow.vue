@@ -34,14 +34,22 @@ async function updateMessages(chat: IChat) {
             return [];
         });
     const displayValue = messages.value.length ? "none" : "block";
-    (document.getElementById("background_text") as HTMLElement).style.display = displayValue;
+    if (messages.value.length > 0) {
+        (document.getElementById("background_text") as HTMLElement).style.display = "none";
+    } else {
+        (document.getElementById("background_text") as HTMLElement).style.display = "block";
+        (document.getElementById("background_text") as HTMLElement).textContent = "No messages";
+    }
 }
 // Reload from server. TODO: from localStorage ?
 updateMessages(chatStore.currentChat);
 
 chatStore.$onAction((context) => {
-    // this will trigger if the action succeeds and after it has fully run.
-    // it waits for any returned promised
+    if (context.name == "setCurrentChat") {
+        messages.value = [];
+        (document.getElementById("background_text") as HTMLElement).style.display = "block";
+        (document.getElementById("background_text") as HTMLElement).textContent = "Loading...";
+    }
     context.after((result: IChat) => {
         if (context.name == "setCurrentChat") {
             updateMessages(result);

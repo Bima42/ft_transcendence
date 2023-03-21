@@ -58,6 +58,7 @@ function clickHandler(e: Event) {
   if (!e.target)
     return
   const target = e.target as HTMLElement
+  // TODO: Remove ?
   if (target.id === 'new-channel') {
     modalStore.loadAndDisplay(Modal, NewChannelModal, {})
   }
