@@ -1,6 +1,6 @@
 <template>
   <div class="chat-input-container">
-    <input v-model="msgContent" type="text" placeholder="Type a message...">
+    <input v-model="msgContent" type="text" placeholder="Type a message..." v-on:keyup.enter="sendMessage">
     <CustomButton @click="sendMessage">Send</CustomButton>
   </div>
 </template>
@@ -28,6 +28,7 @@ async function sendMessage() {
   };
 
     chatStore.sendMessage(msg);
+    msgContent.value = "";
 }
 </script>
 
