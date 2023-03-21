@@ -1,9 +1,9 @@
 <template>
   <dropdown class="my-dropdown-toggle"
             :options="chatList"
-            :selected="name"
+            :selected="currentChatName"
             v-on:updateOption="methodToRunOnSelect"
-            :placeholder="name"
+            :placeholder="currentChatName"
             :closeOnOutsideClick="true">
   </dropdown>
 </template>
@@ -11,28 +11,37 @@
 <script setup lang="ts">
 
 import { get } from '../../../utils'
-import { ref } from 'vue'
+import { onUpdated, ref } from 'vue'
 import dropdown from 'vue-dropdowns';
 import { useChatStore } from '@/stores/chat';
 import type IChat from '@/interfaces/chat/IChat';
 
 let chatStore = useChatStore();
 const props = defineProps<{
-    chatList: Object,
-    name: String,
+    chatList: IChat[],
+    name: string,
 }>();
 
+let currentChatName = ref(props.name);
+
+onUpdated(() => {
+    if (props.chatList.length) {
+        currentChatName.value = props.chatList[0].name;
+    }
+});
 
 async function methodToRunOnSelect(payload: IChat) {
 
+    // Dont do anything if already on the selected chat
+    if (chatStore.currentChat && payload.id == chatStore.currentChat.id)
+        return;
 
     const url = 'chat/rooms/' + payload.id
-    //chatStore.currentChat = payload;
-    const newChannel = await get(url, 'Cannot load channel')
+    await get(url, 'Cannot load channel')
         .then((res) => res.json())
+        .then((newChannel) => {
+            chatStore.setCurrentChat(newChannel)})
         .catch((err) => console.log(err));
-    chatStore.currentChat = newChannel;
-
 }
 </script>
 

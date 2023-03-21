@@ -1,7 +1,21 @@
 
-import { Body, Controller, Get, Delete, Param, ParseIntPipe, Post, Put, HttpException, HttpStatus, Logger} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Req,
+  HttpException,
+  HttpStatus,
+  Logger
+} from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { Chat, ChatMessage, UserChatRole } from '@prisma/client';
+import { Request } from 'express'
+import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { NewMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
@@ -13,8 +27,9 @@ export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
   @Get('rooms')
-  getAllChannels(): Promise<NewChannelDto[]> {
-    return this.channelService.getAllChannels();
+  getAllChannels(@Req() req: Request): Promise<NewChannelDto[]> {
+    const whispers : boolean = (req.query.whispers ? JSON.parse(req.query.whispers as string) : false);
+    return this.channelService.getAllChannelsForUser(req.user as User, whispers);
   }
 
   @Post('rooms')

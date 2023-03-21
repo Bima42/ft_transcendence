@@ -4,12 +4,12 @@
   <p>Here you can create a new channel, please fill the following info :</p>
   <div class="chat-input-container">
     <input v-model="chatName" type="text" placeholder="Chose the name of the channel" class="chat-input">
-    <input type="password" placeholder="Set Password" class="chat-input">
-    <input type="password" placeholder="Confirm Password" class="chat-input">
+    <input v-model="chatPassword" type="password" placeholder="Set Password" class="chat-input">
+    <input v-model="chatPassword2" type="password" placeholder="Confirm Password" class="chat-input">
     <input type="text" placeholder="Invite users to the channel" class="chat-input">
     <div class="radio-buttons">
-      <label><input type="radio" name="type" value="private">Private</label>
-      <label><input type="radio" name="type" value="public">Public</label>
+      <label><input v-model="chatType" type="radio" name="type" value="PRIVATE">Private</label>
+      <label><input v-model="chatType" type="radio" name="type" value="PUBLIC">Public</label>
     </div>
     <div class="button-container">
       <CustomButton @click="onCreateNewChannel">Create</CustomButton>
@@ -29,15 +29,17 @@ import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore();
-const data = modalStore.data.data
 
 const chatName = ref('');
+const chatPassword = ref('');
+const chatPassword2 = ref('');
+const chatType = ref('');
 
 async function onCreateNewChannel(e: Event) {
 
 	const newChat : IChat = {
 		id: undefined,
-		type: 'PUBLIC',
+		type: (chatType.value == 'PRIVATE' ? 'PRIVATE' : 'PUBLIC'),
 		name: chatName.value,
 		createdAt: undefined,
 		updatedAt: undefined,
@@ -46,10 +48,15 @@ async function onCreateNewChannel(e: Event) {
 	};
 
 	// TODO: catch error ?
-	const response = await post('chat/rooms', "Cannot create channel", newChat);
-    modalStore.resetState();
-    chatStore.currentStore = response;
-    console.log("Server response: " + JSON.stringify(response));
+	await post('chat/rooms', "Cannot create channel", newChat)
+        .then((response) => response.json())
+        .then(json => {
+            modalStore.resetState();
+            chatStore.currentChat = json;
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }
 
 function quitButton(e: Event) {

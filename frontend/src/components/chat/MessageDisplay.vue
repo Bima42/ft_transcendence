@@ -11,16 +11,17 @@
 import {defineProps, computed} from 'vue'
 import UserAvatar from "@/components/UserAvatar.vue";
 import { useAuthStore } from "@/stores/auth"
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
 const authStore = useAuthStore()
 const props = defineProps<{
-  message: object,
+  message: IChatMessage,
 }>()
 
-let text_position = props.message.user.username as String
+let text_position = props.message.userId as number;
 
 const textPosition = computed(() => {
-  return text_position === authStore.user.username ? 'right' : 'left'
+  return text_position === authStore.user.id ? 'right' : 'left'
 })
 </script>
 

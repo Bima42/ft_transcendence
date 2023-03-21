@@ -12,16 +12,23 @@ import {ref, onMounted } from 'vue'
 import ChatUserList from '@/components/chat/ChatUserList.vue'
 import {useChatStore} from "@/stores/chat";
 import type IUserChat from '@/interfaces/user/IUserChat';
+import type IChat from '@/interfaces/chat/IChat';
 
 const chatStore = useChatStore();
 const currentRoomUsers = ref<IUserChat[]>([]);
 const friendUsers = ref<IUserChat[]>([]);
 
-onMounted(() => {
-    chatStore.$subscribe(async (mutation, state) => {
+function updateLists(chat: IChat) {
+    if (!chat) { return; }
+    currentRoomUsers.value = chat.users;
+}
 
-            currentRoomUsers.value = chatStore.currentChat.users;
-    });
+chatStore.$onAction((context) => {
+    context.after((result: IChat) => {
+        if (context.name == "setCurrentChat" && result) {
+            updateLists(result);
+        }
+    })
 });
 
 </script>

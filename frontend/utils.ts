@@ -12,6 +12,7 @@ export async function post(
 		headers: new Headers({
 			'Content-Type': 'application/json',
 			'Accept': 'application/json',
+			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
 		}),
 	}
 	if (json)
@@ -45,7 +46,10 @@ export async function get(route: string, message: string): Promise<Response> {
 export async function del(route: string, message: string): Promise<Response> {
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'DELETE',
-		credentials: 'include',
+    headers: new Headers({
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+    }),
 	})
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)

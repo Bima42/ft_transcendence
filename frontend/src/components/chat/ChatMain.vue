@@ -19,7 +19,18 @@ import ChatUserList from './LeftChatList.vue';
 import ChatTopSection from "@/components/chat/ChatTopSection.vue";
 import TypeBox from "@/components/chat/TypeBox.vue";
 import ChatWindow from "@/components/chat/ChatWindow.vue";
+import { onMounted } from 'vue';
+import { useChatStore } from '@/stores/chat';
 
+const chatStore = useChatStore();
+
+onMounted(async () => {
+    // Load the first chat by default
+    await chatStore.refreshChatList();
+    if (chatStore.chats.length > 0) {
+        chatStore.setCurrentChat(chatStore.chats[0]);
+    }
+});
 
 </script>
 

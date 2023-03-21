@@ -33,6 +33,7 @@ import * as process from 'process';
     AuthService,
     JwtStrategy
   ],
+  exports: [UsersService, UsersMiddleware, AuthService],
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

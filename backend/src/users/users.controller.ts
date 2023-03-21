@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { UsersMiddleware } from './middlewares/users.middleware';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
