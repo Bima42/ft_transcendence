@@ -4,6 +4,9 @@ FROM node:18-alpine AS base
 ARG UID=1000
 ARG GID=1000
 
+EXPOSE 3080
+ENTRYPOINT ["entrypoint.sh"]
+
 RUN apk update && apk upgrade \
     && apk add --no-cache --quiet --update shadow dos2unix postgresql-client
 
@@ -18,20 +21,25 @@ COPY --chown=node:node package*.json yarn.lock ./
 
 RUN yarn install
 
-# Dev target
-FROM base AS dev
-
 # Copy the rest of the source
 COPY --chown=node:node . ./
+
 
 USER root
 RUN dos2unix entrypoint.sh \
     && chmod +x entrypoint.sh \
     && mv entrypoint.sh /usr/local/bin
 
-EXPOSE 3080
-USER node
+############# DEVELOPMENT ###############
+FROM base AS dev
 
-ENTRYPOINT ["entrypoint.sh"]
+ENV NODE_ENV="development"
 
-# Prod target
+CMD ["yarn", "start:dev"]
+
+############# PRODUCTION ###############
+FROM base AS prod
+
+ENV NODE_ENV="production"
+
+CMD ["yarn", "start:prod"]
