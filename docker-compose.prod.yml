@@ -18,6 +18,7 @@ services:
       - './frontend/dist:/var/www/html'
     ports:
       - '4443:443'
+      - '8880:80'
     networks:
       - transcendence
 
