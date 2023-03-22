@@ -39,4 +39,5 @@ CMD ["yarn", "dev"]
 FROM base AS prod
 USER node
 
+# CMD ["/bin/sh", "-c", "yarn build"]
 CMD ["yarn", "build"]

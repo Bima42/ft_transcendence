@@ -37,7 +37,7 @@ services:
     env_file:
       - ./env/.frontend.env
     volumes:
-      - './frontend:/app'
+      - './frontend/dist:/app/dist'
       - 'frontend_modules:/app/node_modules'
     expose:
       - '8000'
