@@ -6,16 +6,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { get } from "../../../utils"
 import MessageDisplay from "@/components/chat/MessageDisplay.vue";
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import { useChatStore } from '@/stores/chat';
 import type IChat from '@/interfaces/chat/IChat';
 
-const props = defineProps<{}>()
 const chatStore = useChatStore();
-const hello: string = "Hello";
 let messages = ref<IChatMessage[]>([]);
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
@@ -33,7 +31,6 @@ async function updateMessages(chat: IChat) {
             console.error(err)
             return [];
         });
-    const displayValue = messages.value.length ? "none" : "block";
     if (messages.value.length > 0) {
         (document.getElementById("background_text") as HTMLElement).style.display = "none";
     } else {

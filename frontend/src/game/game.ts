@@ -3,7 +3,7 @@ import BootScene from '@/game/scenes/BootScene'
 import PongScene from '@/game/scenes/PongScene'
 import GameoverScene from '@/game/scenes/GameoverScene'
 
-function launch(containerId) {
+function launch(containerId) : Phaser.Game {
 	const config = {
 		type: Phaser.AUTO,
 		width: 800,

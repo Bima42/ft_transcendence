@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import ChatUserList from '@/components/chat/ChatUserList.vue'
 import {useChatStore} from "@/stores/chat";
 import type IUserChat from '@/interfaces/user/IUserChat';

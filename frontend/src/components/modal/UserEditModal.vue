@@ -9,12 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import {useModalStore} from "@/stores/modal"
 import UserAvatar from "@/components/UserAvatar.vue";
 import UserHighestScore from "@/components/UserHighestScore.vue";
-
-const modalStore = useModalStore()
-const data = modalStore.data.data
 </script>
 
 <style scoped lang="scss">

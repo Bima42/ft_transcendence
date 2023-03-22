@@ -18,10 +18,10 @@ const props = defineProps<{
   message: IChatMessage,
 }>()
 
-let text_position = props.message.userId as number;
+let text_position = props.message.user.id as number;
 
 const textPosition = computed(() => {
-  return text_position === authStore.user.id ? 'right' : 'left'
+  return text_position === authStore.user?.id ? 'right' : 'left'
 })
 </script>
 

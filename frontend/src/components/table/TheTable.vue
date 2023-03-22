@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th v-for="(header, index) in tableHeaders" :key="index">{{ header.name }}</th>
+          <th v-for="(header, index) in tableHeaders" :key="index">{{ header['name'] }}</th>
         </tr>
       </thead>
       <tbody>

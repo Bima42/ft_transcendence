@@ -30,7 +30,6 @@ import UserAvatar from '@/components/UserAvatar.vue'
 const userStore = useAuthStore()
 const modalStore = useModalStore()
 const router = useRouter()
-const props = defineProps<{}>()
 
 async function clickHandler(e: Event) {
     if (!e.target)

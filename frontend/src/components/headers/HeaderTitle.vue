@@ -6,8 +6,6 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{}>()
-
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia';
-import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IChat from '@/interfaces/chat/IChat'
 import { io, Socket } from "socket.io-client"
 import { getCookie } from 'typescript-cookie';
@@ -19,7 +18,7 @@ export const useChatStore = defineStore('chat', () => {
     this.socket.emit("msg", msg);
   }
 
-  async function setCurrentChat(newChat: IChat): IChat {
+  async function setCurrentChat(newChat: IChat): Promise<IChat> {
     const url = 'chat/rooms/' + newChat.id;
     await get(url, 'Cannot load channel')
         .then((res) => res.json())

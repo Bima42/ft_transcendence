@@ -14,13 +14,13 @@
 import CustomButton from '@/components/CustomButton.vue';
 
 const classic_click = () => {
-    document.querySelector('#custom_btn').className = 'disabled_button';
-    document.querySelector('#classic_btn').className = 'enabled_button';
+    (document.querySelector('#custom_btn') as HTMLElement).className = 'disabled_button';
+    (document.querySelector('#classic_btn') as HTMLElement).className = 'enabled_button';
 }
 
 const custom_click = () => {
-    document.querySelector('#custom_btn').className = 'enabled_button';
-    document.querySelector('#classic_btn').className = 'disabled_button';
+    (document.querySelector('#custom_btn') as HTMLElement).className = 'enabled_button';
+    (document.querySelector('#classic_btn') as HTMLElement).className = 'disabled_button';
 }
 </script>
 

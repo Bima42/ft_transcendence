@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 
-let gameInstance = null
+let gameInstance : Phaser.Game
 const containerId = 'game-container'
 const game = await import(/* webpackChunkName: "game" */ '@/game/game')
 
