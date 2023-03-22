@@ -6,18 +6,17 @@ while [ ! -d /server ]; do
     sleep 1
 done
 
+# craft the var from all others:
+export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}?schema=public"
+
 # Wait for the database to be started
 while ! pg_isready -q --dbname="${POSTGRES_DB}" \
                       --host="${POSTGRES_HOST}" \
                       --port="${POSTGRES_PORT}"; do
-    echo "Waiting on database connection..."
+    echo "Waiting on database connection... postgresql://${POSTGRES_USER}:<***>@${POSTGRES_HOST}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}?schema=public"
     sleep 1
 done
 
-echo "Database URL = ${DATABASE_URL}"
-
-# craft the var from all others:
-export DATABASE_URL="postgresql://${POSTGRES_USER:-db}:${POSTGRES_PASSWORD:-mypassword}@${POSTGRES_HOST:-db}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}?schema=public"
 
 if [ "${NODE_ENV:-production}" = "development" ];then
     echo "Starting in development environment."

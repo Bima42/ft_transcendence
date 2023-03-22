@@ -57,9 +57,6 @@ services:
       - db
     env_file:
       - ./env/.backend.env
-    volumes:
-      - './backend:/server'
-      - 'backend_modules:/server/node_modules'
     expose:
       - '3080'
     networks:
