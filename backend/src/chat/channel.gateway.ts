@@ -54,12 +54,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async handleConnection(client: any, ...args: any[]) {
 
         // Extract user id from token
-        const userId = this.authService.verifyToken(client.handshake.auth.token);
-        if (!userId) {
+        const token = client.handshake.auth.token;
+        if (!token) {
           client.disconnect();
           Logger.log("WS: client has no token. dropped.");
           return ;
         }
+        const userId = this.authService.verifyToken(token);
 
         const user = await this.usersService.findById(userId.sub);
         if (!user) {
