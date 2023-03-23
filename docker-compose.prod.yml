@@ -16,6 +16,8 @@ services:
     volumes:
       - './nginx/conf.d/production.conf:/etc/nginx/conf.d/default.conf'
       - './frontend/dist:/var/www/html'
+    env_file:
+      - ./env/.frontend.env
     ports:
       - '4443:443'
       - '8880:80'
