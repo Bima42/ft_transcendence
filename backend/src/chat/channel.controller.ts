@@ -58,14 +58,17 @@ export class ChannelController {
   }
 
   @Post('rooms/:id/messages')
-  PostMessage(@Param('id', new ParseIntPipe()) id: number, @Body() data: NewMessageDto) {
-	  return this.channelService.postMessage(id, data);
+  PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: Request, @Body() data: NewMessageDto) {
+	  return this.channelService.postMessage(req.user as User, id, data);
   }
 
   @Put('rooms/:id/mute/:user')
   MuteUserToChat(@Param('id', new ParseIntPipe()) chatId: number,
 				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(chatId, userId, UserChatRole.MEMBER, 10);
+    let mutedUntil: Date = new Date();
+    // TODO: specify a dynamic number of seconds muted
+    mutedUntil.setSeconds(mutedUntil.getSeconds() + 20);
+		return this.channelService.UpsertUserChatRole(chatId, userId, UserChatRole.MEMBER, mutedUntil);
 	}
 
   @Put('rooms/:id/add/:user')

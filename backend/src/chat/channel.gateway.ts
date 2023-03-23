@@ -34,11 +34,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async handleEvent(@MessageBody() data: NewMessageDto,
         @ConnectedSocket() socket: Socket) {
 
-        const msg = await this.channelService.postMessage(data.chatId, data);
+        const user : User = this.userSockets[socket.id];
+        const msg = await this.channelService.postMessage(user, data.chatId, data)
+        .then(msg => {
+          this.server.emit("msg", msg);
+          return msg
+        })
+        .catch(err => {
+          Logger.log(err);
+          return err;
+        });
+        if (typeof msg === "string")
+          return msg;
 
         // The server also send back to the sender, as acknowledgement and validation
         // TODO: only send to the correct room
-        this.server.emit("msg", msg);
     }
 
     async handleConnection(client: any, ...args: any[]) {

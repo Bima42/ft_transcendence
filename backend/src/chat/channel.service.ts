@@ -112,7 +112,7 @@ export class ChannelService {
     });
   }
 
-  async createChannel(user: user, newChannel: NewChannelDto): Promise<Chat> {
+  async createChannel(user: User, newChannel: NewChannelDto): Promise<Chat> {
     let existingChannel = await this.findByName(newChannel.name);
     if (existingChannel) {
       return existingChannel;
@@ -181,13 +181,31 @@ export class ChannelService {
   }
 
   async postMessage(user: User, chatId: number, data: NewMessageDto): Promise<ChatMessage> {
-    let chat = await this.findChannelById(chatId);
+    const chat = await this.findChannelById(chatId);
     if (!chat) {
       return Promise.reject("No chat");
     }
 
-    // TODO: check that user is allowed to send to a room
-    // i.e UserChatRole exists, is not banned neither muted
+    // Check if user is allowed to post a message:
+    const chatRole = await this.prismaService.userChat.findFirst({
+      where: {
+        chatId: chat.id,
+        userId: user.id
+      }
+    });
+    // Not a member of a private chat
+    if (!chatRole && chat.type != "PUBLIC")
+      return Promise.reject("stranger");
+    // Banned from chat
+    if (chatRole && chatRole.role == "BANNED")
+      return Promise.reject("banned");
+    // Muted
+    if (chatRole && chatRole.mutedUntil) {
+      if ((chatRole.mutedUntil as Date).getTime() > Date.now())
+        return Promise.reject("muted");
+      else // Unmute
+        this.UpsertUserChatRole(chatId, user.id, chatRole.role, null);
+    }
 
     const msg = await this.prismaService.chatMessage.create({
       data: {
@@ -217,7 +235,7 @@ export class ChannelService {
     return HttpStatus.OK;
   }
 
-  async UpsertUserChatRole(chatId: number, userId: number, newRole: UserChatRole, mutedUntil): Promise<HttpStatus> {
+  async UpsertUserChatRole(chatId: number, userId: number, newRole: UserChatRole, mutedUntil: Date): Promise<HttpStatus> {
     var userChat = await this.prismaService.userChat.findFirst({
       where: {
         AND: [
@@ -245,6 +263,7 @@ export class ChannelService {
     }
 
     userChat.role = newRole;
+    userChat.mutedUntil = mutedUntil;
     Logger.log("Update role: chat: " + chatId + ", user: " + userId + ", role: " + newRole);
     await this.prismaService.userChat.update({
       where: { id: userChat.id },
