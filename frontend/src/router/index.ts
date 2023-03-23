@@ -49,6 +49,12 @@ const router = createRouter({
                     component: JoinQueueView,
                     longName: 'Play a game',
                 },
+                // {
+                //     path: 'game/:gameId',
+                //     name: 'game',
+                //     component: PlayAGameView,
+                //     longName: 'Game',
+                // },
                 {
                     path: 'score',
                     name: 'score',

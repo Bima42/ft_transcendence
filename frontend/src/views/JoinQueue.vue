@@ -7,6 +7,8 @@
             {{ isLoading ? 'Abort' : 'Join queue' }}
         </CustomButton>
         <LoadingGame v-if="isLoading"></LoadingGame>
+        <button id="validateBtn">Validate</button>
+
     </div>
 
 </template>
@@ -21,6 +23,31 @@ import { useGameStore } from '@/stores/game';
 const gameStore = useGameStore();
 const isLoading = ref(false);
 var useClassicMode = true;
+const socket = io();
+
+// Emit the 'join-queue' event when the user clicks a button to join the queue
+joinQueueBtn.addEventListener('click', () => {
+  const gameSettings = {
+    classic: true, // or false for custom games
+    // other game settings
+  };
+  socket.emit('join-queue', gameSettings);
+});
+
+// Listen for the 'match-found' event
+socket.on('match-found', (matchId) => {
+  // Display a message to the user indicating that a match has been found
+  messageDiv.textContent = `Match found! Match ID: ${matchId}. Click the "validate" button to start the game.`;
+
+  // Enable the "validate" button
+  validateBtn.disabled = false;
+
+  // Listen for the 'validate' event
+  validateBtn.addEventListener('click', () => {
+    // Emit the 'validate' event to the server
+    socket.emit('validate');
+  });
+});
 
 function joinQueue() {
     isLoading.value = !isLoading.value
@@ -48,10 +75,16 @@ gameStore.socket.on('connect', () => {
   console.log(`Connected to server with ID ${gameStore.socket.id}`);
 });
 
+
+
+
 gameStore.socket.on('matchFound', (opponentId: string) => {
   console.log(`Match found with opponent ${opponentId}`);
-  // Load the game view and pass in the opponent ID
+  isLoading.value = false;
+  // Redirect the user to the game page with the opponent ID
+  router.push(`/game/${opponentId}`);
 });
+
 
 
 function joinCustomModeQueue() {
