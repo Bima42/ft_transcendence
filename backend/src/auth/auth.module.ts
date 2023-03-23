@@ -16,6 +16,7 @@ import {UsersMiddleware} from "../users/middlewares/users.middleware";
       UsersService,
       JwtService,
   ],
+  exports: [ AuthService ]
 })
 export class AuthModule  implements NestModule {
   configure(consumer: MiddlewareConsumer) {
