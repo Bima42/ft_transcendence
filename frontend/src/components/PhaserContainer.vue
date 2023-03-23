@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
+import type IGame from '@/interfaces/game/IGame';
 
 let gameInstance = null
 const containerId = 'game-container'
 const game = await import(/* webpackChunkName: "game" */ '@/game/game')
 
+const props = defineProps<{
+  currentGame: IGame,
+}>();
+
 onMounted(() => {
-  gameInstance = game.launch(containerId)
+  gameInstance = game.launch(containerId, props.currentGame);
 })
 
 onUnmounted(() => {

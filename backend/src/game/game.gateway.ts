@@ -6,8 +6,14 @@ import { GameSettingsDto } from './dto/joinQueueData.dto';
 
 
 @WebSocketGateway({
-    cors: true,
-    namespace: "game"
+    path: "/api/socket.io",
+    namespace: "game",
+    cors: {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+      allowedHeaders: 'Content-Type, Authorization, Cookie',
+      methods: ["GET", "POST"],
+    }
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
@@ -28,8 +34,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
             ball: {
                 x: 350,
                 y: 300,
-                vx: 20,
-                vy: 20,
+                vx: 300,
+                vy: 300,
             }
         };
         this.server.emit("state", JSON.stringify(broadcastMsg));
@@ -61,7 +67,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleAbortQueue(@MessageBody() payload: GameSettingsDto,
   @ConnectedSocket() client: Socket) {
     // handle the classicModeQueue event emitted from the client
-    Logger.log(`Client ${client.id} quit the queue`);
+    return this.gameService.quitQueue(client);
   }
 // }
 

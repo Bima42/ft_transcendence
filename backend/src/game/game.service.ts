@@ -19,129 +19,63 @@ export class GameService {
     private readonly prismaService: PrismaService
   ) {}
 
-  // joinQueue(client: Socket, gameSettings: GameSettingsDto): string {
-  //   // Emit an event to the connected clients to join the classic mode queue
-  //   // and add the client's socket to the queue
-  //   Logger.log("Joined classic")
-  //   this.classicQueue.push(client);
-  //   const ret = this.findOrCreateMatch(gameSettings)
-  //   .then(match => this.CreateUserGame(match))
-  //   .catch(err => { console.log(err)});
-  //   var msg =  ret ? "Joined OK" : "Not joined";
-  //   if(gameSettings.classic) {
-  //     msg += " classic";
-  //   } else {
-  //     msg += " custom";
-  //   }
-  //   return msg;
-  // }
-
-  // joinQueue(client: Socket, gameSettings: GameSettingsDto): string {
-  //   // Emit an event to the connected clients to join the classic mode queue
-  //   // and add the client's socket to the queue
-  //   Logger.log("Joined classic")
-  //   this.classicQueue.push(client);
-  
-  //   // Find or create a match and create a UserGame
-  //   this.findOrCreateMatch(gameSettings)
-  //   .then(async match => {
-  //     await this.CreateUserGame(match);
-  
-  //     // Check if there are enough players to start the game
-  //     const clients = this.classicQueue.splice(0, 2);
-  //     if (clients.length === 2) {
-  //       // Start the game
-  //       await this.startGame(match, clients);
-  //     }
-  //   })
-  //   .catch(err => { console.log(err)});
-  
-  //   // Return a message indicating whether the user joined the classic or custom queue
-  //   let msg = gameSettings.classic ? "Joined classic" : "Joined custom";
-  //   return `${msg} queue`;
-  // }
-  
-  // joinQueue(client: Socket, gameSettings: GameSettingsDto): string {
-  //   // Add the client's socket to the appropriate queue based on the game settings
-  //   if (gameSettings.classic) {
-  //     this.classicQueue.push(client);
-  //   } else {
-  //     this.customQueue.push(client);
-  //   }
-  
-  //   // Find or create a match and create a UserGame
-  //   this.findOrCreateMatch(gameSettings)
-  //   .then(async match => {
-  //     await this.CreateUserGame(match);
-  
-  //     // Check if there are enough players to start the game
-  //     let clients: Socket[] = [];
-  //     if (gameSettings.classic) {
-  //       clients = this.classicQueue.splice(0, 2);
-  //     } else {
-  //       clients = this.customQueue.splice(0, 2);
-  //     }
-  
-  //     if (clients.length === 2) {
-  //       // Start the game
-  //       await this.startGame(match, clients);
-  //     }
-  //   })
-  //   .catch(err => { console.log(err)});
-  
-  //   // Return a message indicating whether the user joined the classic or custom queue
-  //   let msg = gameSettings.classic ? "Joined classic" : "Joined custom";
-  //   return `${msg} queue`;
-  // }
-  
   joinQueue(client: Socket, gameSettings: GameSettingsDto): string {
+    Logger.log(`${client.id} joined the queue`);
+
     // Add the client's socket to the appropriate queue based on the game settings
-    if (gameSettings.classic) {
-      this.classicQueue.push(client);
-    } else {
-      this.customQueue.push(client);
-    }
-  
+    const queue = gameSettings.classic ? this.classicQueue : this.customQueue;
+    queue.push(client);
+
     // Find or create a match and create a UserGame
     this.findOrCreateMatch(gameSettings)
     .then(async match => {
       await this.CreateUserGame(match);
-  
+
       // Check if there are enough players to start the game
-      let clients: Socket[] = [];
-      if (gameSettings.classic) {
-        clients = this.classicQueue.splice(0, 2);
-      } else {
-        clients = this.customQueue.splice(0, 2);
-      }
-  
-      if (clients.length === 2) {
+      if (queue.length >= 2) {
+        let players = queue.splice(0, 2);
         // Emit an event to the clients to indicate that a match has been found
-        clients.forEach(c => {
-          c.emit('match-found', match.id);
+        players.forEach(p => {
+          p.emit('matchFound', match);
         });
-  
+
         // Wait for the clients to emit a 'validate' event before starting the game
-        const validatedPromises = clients.map(c => {
-          return new Promise(resolve => {
-            c.once('validate', () => {
-              resolve();
-            });
-          });
-        });
-        await Promise.all(validatedPromises);
-  
+        // const validatedPromises = clients.map(c => {
+        //   return new Promise(resolve => {
+        //     c.once('validate', () => {
+        //       resolve("adf");
+        //     });
+        //   });
+        // });
+        // await Promise.all(validatedPromises);
+
         // Start the game
-        await this.startGame(match, clients);
+        Logger.log(`starting the game !`);
+        await this.startGame(match, players);
       }
     })
-    .catch(err => { console.log(err)});
-  
+    .catch(err => {
+      Logger.log(err)
+    });
+
     // Return a message indicating whether the user joined the classic or custom queue
     let msg = gameSettings.classic ? "Joined classic" : "Joined custom";
     return `${msg} queue`;
   }
-  
+
+  quitQueue (client: Socket) {
+    const idx_classic = this.classicQueue.indexOf(client);
+    if (idx_classic >= 0) {
+      Logger.log(`Client ${client.id} quit the classic queue`);
+      this.classicQueue.splice(idx_classic, 1);
+    }
+    const idx_custom = this.customQueue.indexOf(client);
+    if (idx_custom >= 0) {
+      Logger.log(`Client ${client.id} quit the custom queue`);
+      this.customQueue.splice(idx_custom, 1);
+    }
+  }
+
 
   async getGameDetails(gameId: number): Promise<Game> {
     return await this.prismaService.game.findUnique({
@@ -177,7 +111,7 @@ async findOrCreateMatch(gameSettings: GameSettingsDto): Promise<Game> {
 // This function creates a new UserGame associated with the provided match object and returns it.
 async CreateUserGame(match: Game): Promise<UserGame> {
   Logger.log("create4 user");
-  Logger.log(match);
+  // Logger.log(match);
 
   // Create a new UserGame associated with the provided match object and user ID 1
   const userGame = await this.prismaService.userGame.create({
@@ -192,8 +126,6 @@ async CreateUserGame(match: Game): Promise<UserGame> {
 }
 
 
-
-
 private async startGame(game: Game, clients: Socket[]): Promise<void> {
   Logger.log("Starting game");
 
@@ -204,7 +136,7 @@ private async startGame(game: Game, clients: Socket[]): Promise<void> {
   });
 
   // Emit an event to the connected clients to start the game
-  this.server.to(clients.map(client => client.id)).emit('start_game', { gameId: game.id });
+  this.server.to(clients.map(client => client.id)).emit('matchFound', game);
 }
 
 
