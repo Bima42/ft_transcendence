@@ -33,8 +33,8 @@ export class ChannelController {
   }
 
   @Post('rooms')
-  async createNewChannel(@Body() data: NewChannelDto) : Promise<Chat> {
-	  return this.channelService.createChannel(data)
+  async createNewChannel(@Req() req: Request, @Body() data: NewChannelDto) : Promise<Chat> {
+	  return this.channelService.createChannel(req.user as User, data)
   }
 
   @Get('rooms/:id')

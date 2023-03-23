@@ -100,7 +100,7 @@ export class ChannelService {
     return chatDto;
   }
 
-  async findById(chatId: number): Promise<Chat> {
+  async findChannelById(chatId: number): Promise<Chat> {
     return this.prismaService.chat.findUnique({
       where: { id: +chatId }
     });
@@ -112,7 +112,7 @@ export class ChannelService {
     });
   }
 
-  async createChannel(newChannel: NewChannelDto): Promise<Chat> {
+  async createChannel(user: user, newChannel: NewChannelDto): Promise<Chat> {
     let existingChannel = await this.findByName(newChannel.name);
     if (existingChannel) {
       return existingChannel;
@@ -122,8 +122,7 @@ export class ChannelService {
       data: newChannel
     });
 
-    // TODO TYR: Add channel owner and not 1
-    this.UpsertUserChatRole(newChat.id, 1, UserChatRole.OWNER, 0);
+    this.UpsertUserChatRole(newChat.id, user.id, UserChatRole.OWNER, 0);
     return newChat;
   }
 
@@ -147,7 +146,7 @@ export class ChannelService {
     })
 
     // Delete Chat
-    const chatOutput = await this.prismaService.chat.delete({
+    this.prismaService.chat.delete({
       where: { id: chatId },
     });
 
@@ -157,7 +156,7 @@ export class ChannelService {
   }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
-    let chat = await this.findById(chatId);
+    let chat = await this.findChannelById(chatId);
     if (!chat)
       return [];
     Logger.log("returning some message");
@@ -181,8 +180,8 @@ export class ChannelService {
     });
   }
 
-  async postMessage(chatId: number, data: NewMessageDto): Promise<ChatMessage> {
-    let chat = await this.findById(chatId);
+  async postMessage(user: User, chatId: number, data: NewMessageDto): Promise<ChatMessage> {
+    let chat = await this.findChannelById(chatId);
     if (!chat) {
       return Promise.reject("No chat");
     }
@@ -193,7 +192,7 @@ export class ChannelService {
     const msg = await this.prismaService.chatMessage.create({
       data: {
         content: data.content,
-        user: { connect: { id: 1 } },
+        user: { connect: { id: user.id } },
         chat: { connect: { id: chatId } }
       }
     });
