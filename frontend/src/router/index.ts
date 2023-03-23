@@ -10,26 +10,6 @@ import JoinQueueView from '@/views/JoinQueue.vue'
 import redirectHandler from '@/components/redirectHandler.vue';
 import { useAuthStore } from '@/stores/auth'
 
-function skipIfLoggedIn(to, from, next) {
-  const authStore = useAuthStore();
-
-  if (authStore.isLoggedIn()) {
-    next();
-  } else {
-      next({name: '/index' });
-  }
-}
-
-function requireAuth(to, from, next) {
-    const authStore = useAuthStore();
-
-    if (authStore.isLoggedIn()) {
-        next()
-    } else {
-      next({ name: '' })
-    }
-  }
-
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -37,25 +17,21 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: LoginView,
-            beforeEnter: skipIfLoggedIn,
         },
         {
             path: '/index',
             name: 'index',
             component: IndexView,
-            beforeEnter: requireAuth,
         },
         {
             path: '/credits',
             name: 'credits',
             component: CreditsView,
-            beforeEnter: requireAuth,
         },
         {
             path: '/table',
             name: 'table',
             component: TableView,
-            beforeEnter: requireAuth,
         },
         {
             path: '/main',
@@ -65,28 +41,24 @@ const router = createRouter({
                 //    path: 'play',
                 //    name: 'play',
                 //    component: PlayAGameView,
-                //    beforeEnter: requireAuth,
                 //    longName: 'Play a game',
                 // },
-                 {
+                {
                     path: 'play',
                     name: 'play',
                     component: JoinQueueView,
-                    beforeEnter: requireAuth,
                     longName: 'Play a game',
-                 },
+                },
                 {
                     path: 'score',
                     name: 'score',
                     component: ScoreBoardView,
-                    beforeEnter: requireAuth,
                     longName: 'Scoreboard',
                 },
                 {
                     path: 'community',
                     name: 'community',
                     component: CommunityView,
-                    beforeEnter: requireAuth,
                     longName: 'Community',
                 },
             ]
@@ -98,5 +70,16 @@ const router = createRouter({
         }
     ]
 })
+
+router.beforeEach((to, _from) => {
+  const authStore = useAuthStore();
+
+  if ( to.path.startsWith("/main") && ! authStore.isLoggedIn()) {
+    return '/';
+  }
+  if ( to.path == '/' && authStore.isLoggedIn()) {
+    return '/index';
+  }
+});
 
 export default router

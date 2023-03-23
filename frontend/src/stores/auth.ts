@@ -36,7 +36,7 @@ export const useAuthStore = defineStore( 'auth', () => {
 	}
 
   const isLoggedIn = function () : boolean {
-    return user == null;
+    return user != null;
   }
 
 	const testEndpoint = function () {
