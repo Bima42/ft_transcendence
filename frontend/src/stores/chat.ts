@@ -16,7 +16,12 @@ export const useChatStore = defineStore('chat', () => {
   let chats = ref<IChat[]>([]);
 
   function sendMessage(msg: any): void {
-    this.socket.emit("msg", msg);
+    this.socket.emit("msg", msg, (answer: any) => {
+      // Handle from here if the server answer something (i.e error)
+      // for example 'banned', 'muted', etc.
+      console.log("answer = " + JSON.stringify(answer));
+
+    });
   }
 
   async function setCurrentChat(newChat: IChat): IChat {

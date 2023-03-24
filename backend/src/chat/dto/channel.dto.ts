@@ -1,6 +1,17 @@
+import { IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
+import { ChatType } from '@prisma/client';
+
+
 export class NewChannelDto {
+  @IsNotEmpty()
 	name: string;
-	// type: string;
+
+  @IsEnum(ChatType)
+  type: ChatType;
+
+  @IsOptional()
+  @IsNotEmpty()
+  password?: string;
 }
 
 export class DetailedChannelDto {
