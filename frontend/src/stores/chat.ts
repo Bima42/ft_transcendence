@@ -1,10 +1,11 @@
-import { ref } from 'vue'
+import { customRef, ref } from 'vue'
 import { defineStore } from 'pinia';
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IChat from '@/interfaces/chat/IChat'
 import { io, Socket } from "socket.io-client"
 import { getCookie } from 'typescript-cookie';
 import { get } from '../../utils'
+import type IUserChat from '@/interfaces/user/IUserChat';
 
 
 export const useChatStore = defineStore('chat', () => {
@@ -44,9 +45,20 @@ export const useChatStore = defineStore('chat', () => {
         })
         .catch((err) => console.log(err));
     return this.chats;
+  }
 
+  function findUserIdFromName(name: string): number | null {
+      const users = this.currentChat.users;
+      let id = null;
+      users.forEach((user: IUserChat)=>{
+        if (user.user.username === name) {
+          id = user.user.id;
+          return;
+        }
+      });
+      return id;
 
   }
 
-  return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList }
+  return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList, findUserIdFromName }
 })
