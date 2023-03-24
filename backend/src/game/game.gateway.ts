@@ -1,17 +1,26 @@
 import { Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
+import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
+import { GameService } from './game.service';
+import { GameSettingsDto } from './dto/joinQueueData.dto';
+
 
 @WebSocketGateway({
-    cors: true,
-    namespace: "game"
+    path: "/api/socket.io",
+    namespace: "game",
+    cors: {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+      allowedHeaders: 'Content-Type, Authorization, Cookie',
+      methods: ["GET", "POST"],
+    }
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
     @WebSocketServer()
     server: Server
 
-    constructor() { }
+    constructor(private readonly gameService: GameService) { }
 
     @SubscribeMessage('move')
     handleEvent(@MessageBody() data: string,
@@ -25,8 +34,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             ball: {
                 x: 350,
                 y: 300,
-                vx: 20,
-                vy: 20,
+                vx: 300,
+                vy: 300,
             }
         };
         this.server.emit("state", JSON.stringify(broadcastMsg));
@@ -40,5 +49,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleDisconnect(client: any): any {
         Logger.log(`Game: disconnect... id: ${client.id}`);
     }
+
+  afterInit(server: Server) {
+    Logger.log('WebSocket server initialized');
+  }
+
+  @SubscribeMessage('newJoinQueue')
+  handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
+  @ConnectedSocket() client: Socket): string {
+    // handle the classicModeQueue event emitted from the client
+    Logger.log(`Client ${client.id} joined queue`);
+
+    return this.gameService.joinQueue(client, joinQueueData);
+  }
+
+  @SubscribeMessage('abortJoinQueue')
+  handleAbortQueue(@MessageBody() payload: GameSettingsDto,
+  @ConnectedSocket() client: Socket) {
+    // handle the classicModeQueue event emitted from the client
+    return this.gameService.quitQueue(client);
+  }
+// }
 
 };

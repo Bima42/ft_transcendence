@@ -1,6 +1,9 @@
 import 'phaser'
 import { io } from "socket.io-client"
+import type IGame from '@/interfaces/game/IGame'
+import { useGameStore } from '@/stores/game'
 
+const gameStore = useGameStore();
 
 class Ball extends Phaser.Physics.Arcade.Image {
 
@@ -63,7 +66,7 @@ export default class PongScene extends Phaser.Scene {
 
 	private parseConfig(config) {
 		this.maxScore = config.maxScore ?? 3;
-		this.customPong = config.customPong ?? true;
+		this.classic = config.classic ?? true;
 	}
 
     updateWorld(obj: object) {
@@ -74,41 +77,35 @@ export default class PongScene extends Phaser.Scene {
                 this.ball.setVelocity(obj.ball.vx, obj.ball.vy);
     }
 
-    create(config) : void
+    create(config : IGame) : void
     {
 		this.parseConfig(config);
-		if (this.customPong) {
-			console.log("Custom game !");
-		} else {
-			console.log("Classic game.");
-		}
 
-        // this.socket = io(`wss://${import.meta.env.VITE_BACKEND_URL}/game`);
-        //this.socket.on("state", (msg: string) => {
-        //    try {
-        //        const obj = JSON.parse(msg);
-        //        this.updateWorld(obj);
-        //    } catch (error) {
-        //        // Drop malformed request from server
-        //    }
+    this.socket = gameStore.socket;
+    this.socket.on("state", (msg: string) => {
+       try {
+           const obj = JSON.parse(msg);
+           this.updateWorld(obj);
+       } catch (error) {
+           // Drop malformed request from server
+       }
+    });
 
-        //});
-
-        //  Enable world bounds, but disable the sides (left, right, up, down)
-        this.physics.world.setBoundsCollision(false, false, true, true);
+    //  Enable world bounds, but disable the sides (left, right, up, down)
+    this.physics.world.setBoundsCollision(false, false, true, true);
 
 		this.ball = new Ball(this, 400, 300);
 		this.ball.setData('uponStart', true);
 
-        this.paddle1 = new Paddle(this, 20, 300, 1);
-        this.paddle2 = new Paddle(this, 780, 300, 2);
-        this.physics.add.collider(this.ball, this.paddle1, this.hitPaddle, null, this);
-        this.physics.add.collider(this.ball, this.paddle2, this.hitPaddle, null, this);
+    this.paddle1 = new Paddle(this, 20, 300, 1);
+    this.paddle2 = new Paddle(this, 780, 300, 2);
+    this.physics.add.collider(this.ball, this.paddle1, this.hitPaddle, null, this);
+    this.physics.add.collider(this.ball, this.paddle2, this.hitPaddle, null, this);
 
 		this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
 		this.scores = [0, 0];
 
-		if (this.customPong)
+		if (!this.classic)
 		{
 			this.obstacle1 = new Obstacle(this, 200, 300, 'red');;
 			this.obstacle2 = new Obstacle(this, 300, 200, 'yellow');

@@ -26,5 +26,9 @@ button {
   &.fat {
     font-weight: 900;
   }
+
+  :disabled {
+    background: $light-gray;
+  }
 }
 </style>
