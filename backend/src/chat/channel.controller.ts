@@ -63,31 +63,42 @@ export class ChannelController {
   }
 
   @Put('rooms/:id/mute/:user')
-  MuteUserToChat(@Param('id', new ParseIntPipe()) chatId: number,
+  MuteUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
 				@Param('user', new ParseIntPipe()) userId: number) {
     let mutedUntil: Date = new Date();
     // TODO: specify a dynamic number of seconds muted
     mutedUntil.setSeconds(mutedUntil.getSeconds() + 20);
-		return this.channelService.UpsertUserChatRole(chatId, userId, UserChatRole.MEMBER, mutedUntil);
+		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, mutedUntil);
 	}
 
   @Put('rooms/:id/add/:user')
-  AddUserToChat(@Param('id', new ParseIntPipe()) chatId: number,
+  AddUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
 				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(chatId, userId, UserChatRole.MEMBER, 0);
+		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null);
 	}
 
   @Put('rooms/:chat/kick/:user')
-  KickUserFromChat(@Param('chat', new ParseIntPipe()) chatId: number,
+  KickUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
 				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.deleteUserChatRole(chatId, userId)
+		return this.channelService.deleteUserChatRole(req.user as User, chatId, userId)
 	}
 
   @Put('rooms/:chat/ban/:user')
-  // FIXME: not working
-  BanUserFromChat(@Param('chat', new ParseIntPipe()) chatId: number,
+  BanUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
 				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(chatId, userId, UserChatRole.BANNED, 0)
+		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.BANNED, null)
+	}
+
+  @Put('rooms/:chat/promote/:user')
+  PromoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
+				@Param('user', new ParseIntPipe()) userId: number) {
+		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.ADMIN, null)
+	}
+
+  @Put('rooms/:chat/demote/:user')
+  DemoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
+				@Param('user', new ParseIntPipe()) userId: number) {
+		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null)
 	}
 
 	@Get('users/online')

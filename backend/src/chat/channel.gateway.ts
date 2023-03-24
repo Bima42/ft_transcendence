@@ -37,6 +37,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const user : User = this.userSockets[socket.id];
         const msg = await this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
+          // TODO: only send to the correct room
+          // The server also send back to the sender, as acknowledgement and validation
           this.server.emit("msg", msg);
           return msg
         })
@@ -44,11 +46,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           Logger.log(err);
           return err;
         });
+        // send error back to the client
         if (typeof msg === "string")
           return msg;
-
-        // The server also send back to the sender, as acknowledgement and validation
-        // TODO: only send to the correct room
     }
 
     async handleConnection(client: any, ...args: any[]) {
