@@ -21,7 +21,6 @@ export class ChannelService {
   ) { }
 
   async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
-    Logger.log(`Return all channels for user ${user.username}`);
     let channels: Chat[] = [];
     if (whispers) {
       channels = await this.prismaService.chat.findMany({
@@ -176,7 +175,6 @@ export class ChannelService {
     let chat = await this.findChannelById(chatId);
     if (!chat)
       return [];
-    Logger.log("returning some message");
     return this.prismaService.chatMessage.findMany({
       skip: 0,
       take: nbrMsgs,
