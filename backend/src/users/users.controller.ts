@@ -43,12 +43,20 @@ export class UsersController {
     return this.usersService.findById(userId);
   }
 
+  @Patch('id/twofa/:id')
+  async updateUserTwoFa(
+      @Param('id', ParseIntPipe) userId: number,
+      @Body() datas: any
+  ) {
+    return this.usersService.updateTwoFa(userId, datas.twoFA);
+  }
+
   @Patch('id/:id')
   async updateUser(
         @Param('id', ParseIntPipe) userId: number,
         @Body() data: User
   ): Promise<User> {
-      return this.usersService.update(userId, data);
+      return this.usersService.updateData(userId, data);
   }
 
   @Delete('id/:id')

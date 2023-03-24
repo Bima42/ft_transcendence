@@ -20,14 +20,14 @@
 import {ref, defineProps} from 'vue'
 import {useRouter} from 'vue-router'
 import {useModalStore} from '@/stores/modal'
-import {useAuthStore} from '@/stores/auth'
+import {useUserStore} from '@/stores/auth'
 
 import BurgerButton from '@/components/headers/BurgerButton.vue'
 import Modal from '@/components/modal/TheModal.vue'
 import UserModal from '@/components/modal/UserEditModal.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 
-const userStore = useAuthStore()
+const userStore = useUserStore()
 const modalStore = useModalStore()
 const router = useRouter()
 const props = defineProps<{}>()

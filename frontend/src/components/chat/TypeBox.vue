@@ -10,12 +10,12 @@ import CustomButton from '@/components/CustomButton.vue';
 import { post } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
-import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/auth';
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
-const userStore = useAuthStore();
+const userStore = useUserStore();
 
 async function sendMessage() {
   if (msgContent.value.trim() == "") return;

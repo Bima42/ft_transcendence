@@ -2,6 +2,8 @@ import {BadRequestException, Injectable} from '@nestjs/common';
 import {PrismaService} from '../prisma/prisma.service';
 import {JwtService} from '@nestjs/jwt';
 import {Response} from 'express';
+import {User} from '@prisma/client';
+import {authenticator} from 'otplib';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,7 @@ export class AuthService {
 		phone: string,
 		fortyTwoId: number,
 		avatar: string
-	}) {
+	}): Promise<User> {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email: email
@@ -51,6 +53,25 @@ export class AuthService {
 					fortyTwoId
 				}
 			});
+		}
+	}
+
+	async generateTwoFactorAuthSecret(user: User) {
+		const secret = authenticator.generateSecret();
+		const otpAuthUrl = authenticator.keyuri(user.email, 'Transcendence', secret);
+
+		await this.prismaService.user.update({
+			where: {
+				id: user.id
+			},
+			data: {
+				twoFASecret: secret
+			}
+		});
+
+		return {
+			secret,
+			otpAuthUrl
 		}
 	}
 

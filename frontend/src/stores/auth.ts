@@ -1,8 +1,8 @@
-import { get } from '../../utils'
+import { get, patch } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 
-export const useAuthStore = defineStore( 'auth', () => {
+export const useUserStore = defineStore( 'auth', () => {
 	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
 
 	const redirect = function () {
@@ -18,7 +18,6 @@ export const useAuthStore = defineStore( 'auth', () => {
 		)
 			.then(response => response.json())
 			.then(json => {
-				console.log('json', json)
 				user = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user))
 				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
@@ -39,6 +38,15 @@ export const useAuthStore = defineStore( 'auth', () => {
     return user != null;
   }
 
+	const updateTwoFaStatus = function (status: boolean) {
+		if (!user)
+			return
+		user.twoFA = status
+		patch(`users/id/twofa/${user.id}`, 'Failed to update user', { twoFA: user.twoFA })
+			.then(response => response.json())
+			.then(json => {})
+	}
+
 	const testEndpoint = function () {
 		get(`users/id/${user?.id}`, 'Failed to get user')
 			.then(response => response.json())
@@ -51,6 +59,7 @@ export const useAuthStore = defineStore( 'auth', () => {
     login,
     logout,
     isLoggedIn,
+		updateTwoFaStatus,
     testEndpoint,
 	}
 })

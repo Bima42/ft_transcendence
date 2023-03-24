@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/auth';
 
-const userStore = useAuthStore()
+const userStore = useUserStore()
 
 userStore.login()
 </script>

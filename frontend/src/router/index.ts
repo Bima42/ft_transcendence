@@ -8,7 +8,7 @@ import CommunityView from '@/views/CommunityView.vue'
 import TableView from '@/components/table/TheTable.vue'
 import JoinQueueView from '@/views/JoinQueue.vue'
 import redirectHandler from '@/components/redirectHandler.vue';
-import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/auth'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,7 +73,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from) => {
-  const authStore = useAuthStore();
+  const authStore = useUserStore();
 
   if ( to.path.startsWith("/main") && ! authStore.isLoggedIn()) {
     return '/';

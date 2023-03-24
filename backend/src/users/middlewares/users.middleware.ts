@@ -11,8 +11,8 @@ export class UsersMiddleware implements NestMiddleware {
 	) {}
 
 	async use(req: Request, res: Response, next: NextFunction) {
-    const authHeader = req.headers.authorization
-    const token = authHeader && authHeader.split(' ')[1]
+		const authHeader = req.headers.authorization
+		const token = authHeader && authHeader.split(' ')[1]
 		if (!token) {
 			res.status(401).send('Middleware: Unauthorized !');
 			return;
