@@ -38,7 +38,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
                 vy: 300,
             }
         };
-        this.server.emit("state", JSON.stringify(broadcastMsg));
+        // this.server.emit("state", JSON.stringify(broadcastMsg));
         return data; // TODO: Remove ?
     }
 
