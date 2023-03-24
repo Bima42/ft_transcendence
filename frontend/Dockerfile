@@ -5,7 +5,7 @@ ARG UID=1000
 ARG GID=1000
 
 # install dependencies
-RUN apk add --no-cache --update yarn shadow nginx
+RUN apk add --no-cache --update yarn shadow
 
 # Use the already generated `node` user to run the app
 RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
@@ -23,21 +23,20 @@ RUN yarn install
 # Copy the rest of the source
 COPY --chown=node:node . .
 
-EXPOSE 8000
-
 ################## DEV ###################
 # Dev target
 FROM base AS dev
 USER node
 
+EXPOSE 8000
+
 # start app
 CMD ["yarn", "dev"]
-
 
 ################## PROD ##################
 
 FROM base AS prod
 USER node
 
-# CMD ["/bin/sh", "-c", "yarn build"]
+# build app
 CMD ["yarn", "build"]
