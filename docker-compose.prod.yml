@@ -5,16 +5,19 @@ networks:
 
 services:
   server:
-    image: trans-nginx
+    image: trans-nginx-prod
     build:
       context: ./nginx
       target: dev
-    container_name: transcendence-server
+    container_name: transcendence-nginx-prod
     restart: always
     depends_on:
       - frontend
     volumes:
-      - './nginx/conf.d/development.conf:/etc/nginx/conf.d/default.conf'
+      - './nginx/conf.d/production.conf:/etc/nginx/conf.d/default.conf'
+      - './frontend/dist:/var/www/html'
+    env_file:
+      - ./env/.frontend.env
     ports:
       - '4443:443'
       - '8880:80'
@@ -22,12 +25,12 @@ services:
       - transcendence
 
   frontend:
-    image: trans-frontend
-    container_name: transcendence-frontend
-    restart: always
+    image: trans-frontend-prod
+    container_name: transcendence-frontend-prod
+    restart: "no"
     build:
       context: ./frontend
-      target: dev
+      target: prod
       args:
         - "UID=${UID:-1000}"
         - "GID=${GID:-1000}"
@@ -36,7 +39,7 @@ services:
     env_file:
       - ./env/.frontend.env
     volumes:
-      - './frontend:/app'
+      - './frontend/dist:/app/dist'
       - 'frontend_modules:/app/node_modules'
     expose:
       - '8000'
@@ -44,12 +47,12 @@ services:
       - transcendence
 
   backend:
-    image: trans-backend
-    container_name: transcendence-backend
+    image: trans-backend-prod
+    container_name: transcendence-backend-prod
     restart: always
     build:
       context: ./backend
-      target: dev
+      target: prod
       args:
         - "UID=${UID:-1000}"
         - "GID=${GID:-1000}"
@@ -57,9 +60,6 @@ services:
       - db
     env_file:
       - ./env/.backend.env
-    volumes:
-      - './backend:/server'
-      - 'backend_modules:/server/node_modules'
     expose:
       - '3080'
     networks:

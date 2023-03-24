@@ -20,14 +20,23 @@ COPY --chown=node:node package*.json yarn.lock ./
 # run yarn install
 RUN yarn install
 
+# Copy the rest of the source
+COPY --chown=node:node . .
+
+################## DEV ###################
 # Dev target
 FROM base AS dev
 USER node
-
-# Copy the rest of the source
-COPY --chown=node:node . .
 
 EXPOSE 8000
 
 # start app
 CMD ["yarn", "dev"]
+
+################## PROD ##################
+
+FROM base AS prod
+USER node
+
+# build app
+CMD ["yarn", "build"]
