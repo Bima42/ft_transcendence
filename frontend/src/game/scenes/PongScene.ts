@@ -64,7 +64,13 @@ export default class PongScene extends Phaser.Scene {
 
     }
 
-	private parseConfig(config) {
+	private parseConfig(config: IGame) {
+
+    if (!config) {
+      this.maxScore = 3;
+      this.classic = true;
+      return;
+    }
 		this.maxScore = config.maxScore ?? 3;
 		this.classic = config.classic ?? true;
 	}
