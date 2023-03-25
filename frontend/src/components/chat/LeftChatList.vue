@@ -31,6 +31,10 @@ chatStore.$onAction((context) => {
     })
 });
 
+chatStore.socket.on("updateChannelList", () => {
+  console.log("update Chat list !");
+});
+
 </script>
 
 <style scoped lang="scss">

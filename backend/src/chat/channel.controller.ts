@@ -14,6 +14,7 @@ import {
   Logger
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
+import { ChatGateway } from './channel.gateway';
 import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
@@ -24,7 +25,10 @@ import { length } from 'class-validator';
 @ApiTags('Chat')
 @Controller('chat')
 export class ChannelController {
-  constructor(private channelService: ChannelService) {}
+  constructor(
+    private channelService: ChannelService,
+    private channelGateway: ChatGateway,
+  ){}
 
   @Get('rooms')
   getAllChannels(@Req() req: Request): Promise<NewChannelDto[]> {
@@ -86,6 +90,7 @@ export class ChannelController {
       default:
         break;
     }
+    this.channelGateway.server.emit("updateChannelList");
   }
 
 
