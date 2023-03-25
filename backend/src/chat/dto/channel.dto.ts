@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsDefined, Matches, IsNotEmpty, IsEnum, IsOptional, IsNumber, IsAlpha, IsIn, IsPositive } from 'class-validator';
 import { ChatType } from '@prisma/client';
 
 
@@ -21,4 +21,20 @@ export class DetailedChannelDto {
 	updatedAt: Date;
 	users: any; // FIXME TYR: Should be a Dto ?
 
+}
+
+export class ChatAction {
+  @IsNumber()
+  chatId: number;
+
+  @Matches(/[a-zA-Z0-9_-]{2,20}/)
+  username: string;
+
+  @IsIn(['add', 'kick', 'ban', 'mute', 'promote', 'demote'])
+  type: string
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  muteDuration: number
 }

@@ -18,7 +18,7 @@ import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { NewMessageDto } from './dto/message.dto';
-import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import { ChatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
 @ApiTags('Chat')
@@ -62,47 +62,31 @@ export class ChannelController {
 	  return this.channelService.postMessage(req.user as User, id, data);
   }
 
-  @Put('rooms/:id/mute/:user')
-  MuteUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-    let mutedUntil: Date = new Date();
-    // TODO: specify a dynamic number of seconds muted
-    mutedUntil.setSeconds(mutedUntil.getSeconds() + 20);
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, mutedUntil);
-	}
+  @Put('rooms/:id/user')
+  UpsertUserChat(@Req() req: Request, @Body() action: ChatAction, @Param('id', new ParseIntPipe()) chatId: number) {
+    const user = req.user as User;
+    switch (action.type) {
+      case 'kick':
+        this.channelService.deleteUserChatRole(user, chatId, action.username);
+        break;
+      case 'add':
+      case 'demote':
+        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, null);
+        break;
+      case 'mute':
+        if (!action.muteDuration)
+          return ;
+        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, action.muteDuration);
+        break;
+      case 'ban':
+        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.BANNED, null);
+        break;
+      case 'promote':
+        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.ADMIN, null);
+      default:
+        break;
+    }
+  }
 
-  @Put('rooms/:id/add/:user')
-  AddUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null);
-	}
 
-  @Put('rooms/:chat/kick/:user')
-  KickUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.deleteUserChatRole(req.user as User, chatId, userId)
-	}
-
-  @Put('rooms/:chat/ban/:user')
-  BanUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.BANNED, null)
-	}
-
-  @Put('rooms/:chat/promote/:user')
-  PromoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.ADMIN, null)
-	}
-
-  @Put('rooms/:chat/demote/:user')
-  DemoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null)
-	}
-
-	@Get('users/online')
-	GetOnlineUsers() {
-		return "me"
-	}
 }
