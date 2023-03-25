@@ -3,14 +3,17 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Post,
   Req,
   Res,
   UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +30,7 @@ export class AuthController {
    * @param res
    */
   @Get('42/callback')
-  async loginFortyTwoCallback(@Req() req: Request, @Res() res: Response) {
+  async loginFortyTwoCallback(@Req() req: RequestWithUser, @Res() res: Response) {
     // Query to /oauth/authorize made by frontend with the custom url
     // We get here after user has accepted to share his data with our app
 
@@ -105,17 +108,29 @@ export class AuthController {
   }
 
   @Get('login')
-  async login(@Req() req: Request, @Res() res: Response) {
+  async login(@Req() req: RequestWithUser, @Res() res: Response) {
     res.status(200).send(req.user);
   }
 
   @Get('logout/:id')
   async logout(
-      @Res({ passthrough: true }) res,
-      @Param() params: { id: number })
-  {
-    res.clearCookie(process.env.JWT_COOKIE);
+    @Res({ passthrough: true }) res,
+    @Param() params: { id: number }
+  ) {
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
-    await this.authService.logout(res, params.id);
+    await this.authService.logout(res);
+    res.status(302).redirect(`${process.env.FRONTEND_URL}/`);
+  }
+
+  @Post('2fa/generate')
+  async generate2fa(@Req() req: RequestWithUser, @Res() res: Response) {
+    const user = req.user;
+    if (user.twoFA) {
+      const otpauthUrl = await this.authService.generateTwoFactorAuthSecret(req.user);
+      const qrCodeImage = await this.authService.generateQrCode(res, otpauthUrl);
+      res.status(200).json({ qrCodeImage: qrCodeImage });
+    } else {
+      res.status(400).send('2FA already enabled');
+    }
   }
 }

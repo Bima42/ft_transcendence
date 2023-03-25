@@ -1,15 +1,18 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
-import {PrismaService} from '../prisma/prisma.service';
-import {JwtService} from '@nestjs/jwt';
-import {Response} from 'express';
-import {User} from '@prisma/client';
-import {authenticator} from 'otplib';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { User } from '@prisma/client';
+import { UsersService } from '../users/users.service';
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private readonly prismaService: PrismaService,
-		private readonly jwtService: JwtService
+		private readonly jwtService: JwtService,
+		private readonly usersService: UsersService
 	) {
 	}
 
@@ -57,22 +60,20 @@ export class AuthService {
 	}
 
 	async generateTwoFactorAuthSecret(user: User) {
-		const secret = authenticator.generateSecret();
-		const otpAuthUrl = authenticator.keyuri(user.email, 'Transcendence', secret);
-
-		await this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				twoFASecret: secret
-			}
+		const secret = speakeasy.generateSecret();
+		const otpauthUrl = speakeasy.otpauthURL({
+			secret: secret.base32,
+			label: 'Transcendence',
+			issuer: 'Transcendence',
 		});
 
-		return {
-			secret,
-			otpAuthUrl
-		}
+		await this.usersService.setTwoFaSecret(user.id, secret.base32);
+
+		return otpauthUrl
+	}
+
+	async generateQrCode(res: Response, otpauthUrl: string) {
+		return QRCode.toDataURL(otpauthUrl);
 	}
 
 	_createToken(user: any) {
@@ -97,24 +98,8 @@ export class AuthService {
 			});
 	}
 
-	async logout(res: Response, userId: number) {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				id: +userId
-			}
-		});
-
-		if (!user) {
-			throw new BadRequestException('User not found');
-		}
-
-		res.cookie(process.env.JWT_COOKIE, '', {
-			httpOnly: true,
-			secure: true,
-			sameSite: 'none',
-			maxAge: 0,
-		});
-
+	async logout(res: Response) {
+		res.clearCookie(process.env.JWT_COOKIE);
 		return res.status(200).send('Sign out success');
 	}
 }

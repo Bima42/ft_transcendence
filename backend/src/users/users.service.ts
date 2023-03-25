@@ -34,24 +34,6 @@ export class UsersService {
     return user;
   }
 
-  async updateTwoFa(userId: number, enableTwoFA: boolean): Promise<User> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: +userId
-      }
-    })
-    if (user.twoFA !== enableTwoFA) {
-      return this.prismaService.user.update({
-        where: {
-          id: +userId
-        },
-        data: {
-          twoFA: { set: enableTwoFA }
-        }
-      });
-    }
-  }
-
   async findAll(): Promise<User[]> {
     const users = await this.prismaService.user.findMany();
 
@@ -79,6 +61,36 @@ export class UsersService {
         id: +userId
       },
       data: data
+    });
+  }
+
+  async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: +userId
+      }
+    })
+
+    if (user.twoFA !== enableTwoFA) {
+      return this.prismaService.user.update({
+        where: {
+          id: +userId
+        },
+        data: {
+          twoFA: { set: enableTwoFA }
+        }
+      });
+    }
+  }
+
+  async setTwoFaSecret(userId: number, secret: string): Promise<User> {
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        twoFASecret: secret
+      }
     });
   }
 

@@ -17,6 +17,7 @@ import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { UsersMiddleware } from './middlewares/users.middleware';
+import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -27,7 +28,7 @@ export class UsersController {
   ) {}
 
   @Get('all')
-  async getAllUsers(@Req() req: Request, @Res() res: Response) {
+  async getAllUsers(@Req() req: RequestWithUser, @Res() res: Response) {
     const users = await this.usersService.findAll();
     res.status(200).send({ users });
   }
@@ -43,12 +44,12 @@ export class UsersController {
     return this.usersService.findById(userId);
   }
 
-  @Patch('id/twofa/:id')
+  @Patch('twofa/:id')
   async updateUserTwoFa(
       @Param('id', ParseIntPipe) userId: number,
       @Body() datas: any
   ) {
-    return this.usersService.updateTwoFa(userId, datas.twoFA);
+    return this.usersService.updateTwoFaStatus(userId, datas.twoFA);
   }
 
   @Patch('id/:id')

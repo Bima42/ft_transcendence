@@ -41,10 +41,13 @@ export const useUserStore = defineStore( 'auth', () => {
 	const updateTwoFaStatus = function (status: boolean) {
 		if (!user)
 			return
-		user.twoFA = status
-		patch(`users/id/twofa/${user.id}`, 'Failed to update user', { twoFA: user.twoFA })
+
+		patch(`users/twofa/${user.id}`, 'Failed to update user', { twoFA: status })
 			.then(response => response.json())
-			.then(json => {})
+			.then(json => {
+				user = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user))
+			})
 	}
 
 	const testEndpoint = function () {
