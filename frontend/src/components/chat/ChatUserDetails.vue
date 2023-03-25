@@ -22,7 +22,13 @@ const props = defineProps<{
 }>()
 
 const getClassNames = () => {
-  return props.userChat.role.toLowerCase();
+  let classes = props.userChat.role.toLowerCase();
+  const now = new Date();
+  if (props.userChat.mutedUntil && props.userChat.mutedUntil > now) {
+    console.log(`${props.userChat.user.username} is muted`);
+    classes += " muted";
+  }
+  return classes;
 }
 
 onUpdated(() => {
@@ -50,6 +56,13 @@ p {
 
   &.owner {
     color: blue;
+
+  }
+
+  &.muted {
+    outline-color: $yellow;
+    outline-width: 3px;
+    outline-style: solid;
   }
 
   .user-details-background {

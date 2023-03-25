@@ -341,13 +341,14 @@ export class ChannelService {
       newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
       // If already muted, check if done or not
       if (!targetUserChat.mutedUntil || newMutedUntil > targetUserChat.mutedUntil) {
+        Logger.log("Set muted");
           targetUserChat.mutedUntil = newMutedUntil;
       }
     }
     // Check if the muted until is expired
     const dateNow = new Date();
-    if (targetUserChat.mutedUntil < dateNow)
-      targetUserChat.mutedUntil = null;
+    // if (targetUserChat.mutedUntil < dateNow)
+    //   targetUserChat.mutedUntil = null;
 
 
     let diffMuted = 0;
