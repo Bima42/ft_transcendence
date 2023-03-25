@@ -7,11 +7,12 @@
 
 <script setup lang="ts">
 import CustomButton from '@/components/CustomButton.vue';
-import { post } from '../../../utils';
+import { put } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
 import { useAuthStore } from '@/stores/auth';
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import type IChatAction from '@/interfaces/chat/IChatAction';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
@@ -40,22 +41,31 @@ async function executeCommand(cmd: string[]) {
             'invite',          // Invite another user to play !
             ];
 
-  switch (cmd[0]) {
+  const cmdName = cmd[0].slice(1);
+  switch (cmdName) {
+    case 'kick':
     case 'add':
-      const targetId = chatStore.findUserIdFromName(cmd[1]);
-      const url = `chat/rooms/${chatStore.currentChat.id}/add/${targetId}`;
-      await put(url, 'cannot add user')
+    case 'ban':
+    case 'promote':
+    case 'demote':
+    case 'mute':
+      const action: IChatAction = {
+        chatId: chatStore.currentChat.id,
+        username: cmd[1],
+        muteDuration: (cmd.length >= 3 ? parseInt(cmd[2]) : null),
+        type: cmdName,
+      };
+      const url = `chat/rooms/${chatStore.currentChat.id}/user`;
+      console.log(`url = ${url}`);
+      console.log(`action = ${JSON.stringify(action)}`);
+      await put(url, `cannot ${cmdName} user`, action)
+      .catch(err => console.error(err))
       break;
-
     default:
+      console.error(`unknown chat command: ${cmd[0]}`);
       break;
   }
 
-  if (! commandsList.includes(cmd[0].slice(1))){
-    console.error(`unknown chat command: ${cmd[0]}`);
-    return;
-  }
-  console.log(`targetId = ${targetId}`);
 }
 
 async function sendMessage() {

@@ -47,18 +47,5 @@ export const useChatStore = defineStore('chat', () => {
     return this.chats;
   }
 
-  function findUserIdFromName(name: string): number | null {
-      const users = this.currentChat.users;
-      let id = null;
-      users.forEach((user: IUserChat)=>{
-        if (user.user.username === name) {
-          id = user.user.id;
-          return;
-        }
-      });
-      return id;
-
-  }
-
-  return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList, findUserIdFromName }
+  return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList }
 })
