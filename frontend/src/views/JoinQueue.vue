@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import {ref} from 'vue';
-import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/multiusage/CustomButton.vue'
 import GameSettings from '@/components/game/GameSettings.vue'
 import LoadingGame from '@/components/game/LoadingGame.vue';
 import { useGameStore } from '@/stores/game';

@@ -23,7 +23,7 @@
 import { ref } from 'vue'
 import {useModalStore} from "@/stores/modal";
 import {useChatStore} from "@/stores/chat";
-import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/multiusage/CustomButton.vue'
 import {post} from '../../../utils'
 import type IChat from '@/interfaces/chat/IChat'
 

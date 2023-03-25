@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/components/multiusage/CustomButton.vue';
 import { post } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
