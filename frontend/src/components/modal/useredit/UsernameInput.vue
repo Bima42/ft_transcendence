@@ -1,21 +1,14 @@
 <template>
-    <div>
-        <div v-if="!editing">
+    <div class="userinput-wrapper">
+        <template v-if="editing">
             <span>{{ userValue }}</span>
-            <button @click="startEditing">
-                <i class="fas fa-pencil-alt">Check</i>
-            </button>
-        </div>
-
-        <div v-else>
+            <font-awesome-icon @click="startEditing" icon="fa-pencil" />
+        </template>
+        <template v-else>
             <input v-model="userValue" @keydown.enter="save" />
-            <button @click="save">
-                <i class="fas fa-check"></i>
-            </button>
-            <button @click="cancel">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+            <font-awesome-icon @click="save" icon="fa-solid fa-check" />
+            <font-awesome-icon @click="cancel" icon="fa-solid fa-xmark" />
+        </template>
     </div>
 </template>
 
@@ -26,16 +19,45 @@ const editing = ref(true);
 
 const userValue = ref('mamamCItaxX')
 const startEditing = () => {
-    editing.value = true;
+    editing.value = !editing.value;
 };
 
 const save = () => {
-    editing.value = false;
+    editing.value = !editing.value;
 };
 
 const cancel = () => {
-    editing.value = false;
+    editing.value = !editing.value;
 };
 </script>
 <style scoped lang="scss">
+.userinput-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    .fa-pencil {
+        color: $yellow;
+        &:hover {
+            cursor: pointer;
+            filter: hue-rotate(180deg);
+        }
+    }
+
+    .fa-xmark {
+        color: red;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .fa-check {
+        color: green;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
 </style>
