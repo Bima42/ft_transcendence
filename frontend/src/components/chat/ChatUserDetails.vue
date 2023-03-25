@@ -1,11 +1,11 @@
 <template>
-  <p @click="$emit('setActive')">
+  <p @click="$emit('setActive')" :class="getClassNames()"> <!-- Added :class binding to add dynamic class names based on the user's role -->
       {{ userChat.user.username }}
-  <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
-    <div class="user-details-panel" v-show="isActive">
-      <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
-      <UserDetailsCardContent :userChat="props.userChat"></UserDetailsCardContent>
-    </div>
+      <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
+      <div class="user-details-panel" v-show="isActive">
+        <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
+        <UserDetailsCardContent :userChat="props.userChat"></UserDetailsCardContent>
+      </div>
   </p>
 </template>
 
@@ -21,6 +21,10 @@ const props = defineProps<{
   isActive: boolean,
 }>()
 
+const getClassNames = () => {
+  return props.userChat.role.toLowerCase();
+}
+
 onUpdated(() => {
 });
 </script>
@@ -30,6 +34,21 @@ p {
   cursor: pointer;
   text-align: left;
   color: white;
+
+  &.member { /* Added style for admin class */
+    color: white;
+  }
+  &.admin { /* Added style for admin class */
+    color: green;
+  }
+
+  &.banned { /* Added style for banned class */
+    color: red;
+  }
+
+  &.owner { /* Added style for owner class */
+    color: blue;
+  }
 
   .user-details-background {
     position: fixed;
