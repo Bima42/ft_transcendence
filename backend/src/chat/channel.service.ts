@@ -95,7 +95,11 @@ export class ChannelService {
         chatId: true,
         role: true,
         mutedUntil: true
-      }
+      },
+      orderBy: [
+        { role: "asc", },
+        { userId: "desc", },
+      ],
     })
     let chatDto: DetailedChannelDto = {
       id: chatId,

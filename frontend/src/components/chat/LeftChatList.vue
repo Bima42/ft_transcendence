@@ -31,8 +31,8 @@ chatStore.$onAction((context) => {
     })
 });
 
-chatStore.socket.on("updateChannelList", () => {
-  console.log("update Chat list !");
+chatStore.socket.on("updateChannelList", (chat: IChat) => {
+  updateLists(chat);
 });
 
 </script>

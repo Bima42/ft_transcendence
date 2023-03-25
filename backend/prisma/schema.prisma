@@ -113,8 +113,8 @@ enum ChatType {
 
 enum UserChatRole {
   OWNER
-  MEMBER
   ADMIN
+  MEMBER
   BANNED
 }
 

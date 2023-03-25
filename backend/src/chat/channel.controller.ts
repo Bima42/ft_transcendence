@@ -67,30 +67,31 @@ export class ChannelController {
   }
 
   @Put('rooms/:id/user')
-  UpsertUserChat(@Req() req: Request, @Body() action: ChatAction, @Param('id', new ParseIntPipe()) chatId: number) {
+  async UpsertUserChat(@Req() req: Request, @Body() action: ChatAction, @Param('id', new ParseIntPipe()) chatId: number) {
     const user = req.user as User;
     switch (action.type) {
       case 'kick':
-        this.channelService.deleteUserChatRole(user, chatId, action.username);
+        await this.channelService.deleteUserChatRole(user, chatId, action.username);
         break;
       case 'add':
       case 'demote':
-        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, null);
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, null);
         break;
       case 'mute':
         if (!action.muteDuration)
           return ;
-        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, action.muteDuration);
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, action.muteDuration);
         break;
       case 'ban':
-        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.BANNED, null);
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.BANNED, null);
         break;
       case 'promote':
-        this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.ADMIN, null);
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.ADMIN, null);
       default:
         break;
     }
-    this.channelGateway.server.emit("updateChannelList");
+    const userchat = await this.channelService.getChannelDetails(chatId);
+    this.channelGateway.server.emit("updateChannelList", userchat);
   }
 
 

@@ -1,6 +1,6 @@
 <template>
   <p @click="$emit('setActive')" :class="getClassNames()"> <!-- Added :class binding to add dynamic class names based on the user's role -->
-      {{ userChat.user.username }}
+      {{ (userChat.user.status == "ONLINE" ? "✅ ": "🔴 ") + userChat.user.username  }}
       <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
       <div class="user-details-panel" v-show="isActive">
         <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
@@ -34,19 +34,21 @@ p {
   cursor: pointer;
   text-align: left;
   color: white;
+  align-self: left;
 
-  &.member { /* Added style for admin class */
+  &.member {
     color: white;
   }
-  &.admin { /* Added style for admin class */
+  &.admin {
     color: green;
   }
 
-  &.banned { /* Added style for banned class */
+  &.banned {
     color: red;
+    text-decoration: line-through;
   }
 
-  &.owner { /* Added style for owner class */
+  &.owner {
     color: blue;
   }
 
