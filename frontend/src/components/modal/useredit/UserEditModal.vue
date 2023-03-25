@@ -21,20 +21,19 @@ const data = modalStore.data.data
 <style scoped lang="scss">
 .left-wrap {
     display: flex;
-    width: 50%;
     height: 100%;
     justify-content: space-evenly;
     align-items: center;
     flex-direction: column;
     gap: 20px;
+    padding: 20px;
 }
 
 .right-wrap {
     display: flex;
-    width: 50%;
-    height: 100%;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    padding: 20px;
 }
 </style>
