@@ -4,14 +4,18 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import {UsersMiddleware} from "../users/middlewares/users.middleware";
+import { UsersMiddleware } from '../users/middlewares/users.middleware';
+import { TwoFaController } from './2fa/twofa.controller';
+import { TwoFaService } from './2fa/twofa.service';
 
 @Module({
   controllers: [
-      AuthController
+      AuthController,
+      TwoFaController
   ],
   providers: [
       AuthService,
+      TwoFaService,
       PrismaService,
       UsersService,
       JwtService,
@@ -23,6 +27,6 @@ export class AuthModule  implements NestModule {
     consumer
       .apply(UsersMiddleware)
       .exclude('auth/42/callback')
-      .forRoutes(AuthController)
+      .forRoutes(AuthController, TwoFaController)
   }
 }

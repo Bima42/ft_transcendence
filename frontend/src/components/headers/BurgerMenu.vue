@@ -20,7 +20,7 @@
 import {ref, defineProps} from 'vue'
 import {useRouter} from 'vue-router'
 import {useModalStore} from '@/stores/modal'
-import {useUserStore} from '@/stores/auth'
+import {useUserStore} from '@/stores/user'
 
 import BurgerButton from '@/components/headers/BurgerButton.vue'
 import Modal from '@/components/modal/TheModal.vue'

@@ -19,7 +19,7 @@
 import UsernameInput from '@/components/modal/useredit/UsernameInput.vue';
 import UserAvatar from '@/components/multiusage/UserAvatar.vue';
 import UserHighestScore from '@/components/modal/useredit/UserHighestScore.vue';
-import { useUserStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import { post } from '../../../../utils';
 

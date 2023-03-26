@@ -8,7 +8,7 @@ import CommunityView from '@/views/CommunityView.vue'
 import TableView from '@/components/table/TheTable.vue'
 import JoinQueueView from '@/views/JoinQueue.vue'
 import redirectHandler from '@/components/redirectHandler.vue';
-import { useUserStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
 
 const router = createRouter({

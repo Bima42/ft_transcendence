@@ -54,7 +54,7 @@ export const useUserStore = defineStore( 'auth', () => {
 
 	const verifyTwoFaCode = function (code: string) {
 		post(
-			'auth/2fa/verify',
+			'2fa/verify',
 			'Failed to verify 2fa code',
 			{ code: code }
 		)

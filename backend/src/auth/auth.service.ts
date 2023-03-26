@@ -1,11 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { User } from '@prisma/client';
 import { UsersService } from '../users/users.service';
-import * as speakeasy from 'speakeasy';
-import * as QRCode from 'qrcode';
+import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +12,50 @@ export class AuthService {
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,
 		private readonly usersService: UsersService
-	) {
+	) {}
+
+	async getUserDatasFrom42Api(req: RequestWithUser) {
+		// Query to /oauth/authorize made by frontend with the custom url
+		// We get here after user has accepted to share his data with our app
+
+		// Get code from query params
+		const { code } = req.query;
+
+		// POST request to /oauth/token to get access_token, must be on server side
+		const tokenResponse = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				grant_type: 'authorization_code',
+				client_id: process.env.FORTYTWO_API_UID,
+				client_secret: process.env.FORTYTWO_API_SECRET,
+				code: code,
+				redirect_uri: process.env.FORTYTWO_API_CALLBACK,
+			}),
+		});
+		const tokenData = await tokenResponse.json();
+
+		// We can use the token to make requests to the API
+		// GET request to /v2/me to get user data
+		const userDataResponse = await fetch('https://api.intra.42.fr/v2/me', {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${tokenData.access_token}`,
+			},
+		});
+		return userDataResponse.json();
+	}
+
+	storeTokenInCookie(user: User, res: Response) {
+		const token = this._createToken(user);
+
+		res.cookie(process.env.JWT_COOKIE, token.access_token, {
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+			secure: true,
+			sameSite: 'none',
+		});
 	}
 
 	async findOrCreate({username, email, firstName, lastName, phone, fortyTwoId, avatar}: {
@@ -57,43 +99,6 @@ export class AuthService {
 				}
 			});
 		}
-	}
-
-	async verifyTwoFactorAuthCode(user: User, code: string) {
-		const verified = speakeasy.totp.verify({
-			secret: user.twoFASecret,
-			encoding: 'base32',
-			token: code
-		});
-		if (!verified) {
-			throw new BadRequestException('Invalid code');
-		}
-		this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				twoFAAuthenticated: true
-			},
-		});
-	}
-
-	async generateTwoFactorAuthSecret(user: User) {
-		const secret = speakeasy.generateSecret();
-		const otpauthUrl = speakeasy.otpauthURL({
-			secret: secret.base32,
-			encoding: 'base32',
-			label: 'Transcendence',
-			issuer: 'Transcendence',
-		});
-
-		await this.usersService.setTwoFaSecret(user.id, secret.base32);
-
-		return otpauthUrl;
-	}
-
-	async generateQrCode(res: Response, otpauthUrl: string) {
-		return QRCode.toDataURL(otpauthUrl);
 	}
 
 	_createToken(user: any) {

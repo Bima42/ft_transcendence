@@ -10,7 +10,7 @@
 import CustomButton from '@/components/multiusage/CustomButton.vue';
 import {ref} from 'vue'
 import {useChatStore} from '@/stores/chat';
-import {useUserStore} from '@/stores/auth';
+import {useUserStore} from '@/stores/user';
 import ChatCommandHelper from '@/components/chat/chatcommands/ChatCommandHelper.vue';
 
 const msgContent = ref('');

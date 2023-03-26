@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import {defineProps, computed} from 'vue'
 import UserAvatar from "@/components/multiusage/UserAvatar.vue";
-import { useUserStore } from "@/stores/auth"
+import { useUserStore } from "@/stores/user"
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
 const authStore = useUserStore()
