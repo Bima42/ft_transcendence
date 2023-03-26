@@ -8,16 +8,14 @@
 
 <script setup lang="ts">
 import CustomButton from '@/components/multiusage/CustomButton.vue';
-import {post} from '../../../utils';
 import {ref} from 'vue'
 import {useChatStore} from '@/stores/chat';
-import {useAuthStore} from '@/stores/auth';
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import {useUserStore} from '@/stores/user';
 import ChatCommandHelper from '@/components/chat/chatcommands/ChatCommandHelper.vue';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
-const userStore = useAuthStore();
+const userStore = useUserStore();
 
 async function sendMessage() {
     if (msgContent.value.trim() == '') return;
@@ -26,7 +24,7 @@ async function sendMessage() {
     const msg = {
         content: msgContent.value,
         senderId: userStore.user?.id,
-        chatId: chatStore.currentChat.id,
+        chatId: chatStore.currentChat?.id,
     };
 
     chatStore.sendMessage(msg);

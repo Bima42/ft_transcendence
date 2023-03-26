@@ -10,7 +10,7 @@ export default interface IUser {
 	twoFA: boolean
 	fortyTwoID: number
 	email: string
-	avatar?: string
+	avatar: string
   phone?: string
 	status: UserStatus
 	chats: IUserChat[]

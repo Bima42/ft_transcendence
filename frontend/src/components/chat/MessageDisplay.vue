@@ -10,10 +10,10 @@
 <script setup lang="ts">
 import {defineProps, computed} from 'vue'
 import UserAvatar from "@/components/multiusage/UserAvatar.vue";
-import { useAuthStore } from "@/stores/auth"
+import { useUserStore } from "@/stores/user"
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
-const authStore = useAuthStore()
+const authStore = useUserStore()
 const props = defineProps<{
   message: IChatMessage,
 }>()

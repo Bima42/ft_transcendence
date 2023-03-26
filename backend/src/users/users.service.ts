@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
-import { OnlineUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -56,12 +55,42 @@ export class UsersService {
     });
   }
 
-  async update(userId: number, data: User): Promise<User> {
+  async updateData(userId: number, data: User): Promise<User> {
     return  this.prismaService.user.update({
       where: {
         id: +userId
       },
       data: data
+    });
+  }
+
+  async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: +userId
+      }
+    })
+
+    if (user.twoFA !== enableTwoFA) {
+      return this.prismaService.user.update({
+        where: {
+          id: +userId
+        },
+        data: {
+          twoFA: { set: enableTwoFA }
+        }
+      });
+    }
+  }
+
+  async setTwoFaSecret(userId: number, secret: string): Promise<User> {
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        twoFASecret: secret
+      }
     });
   }
 

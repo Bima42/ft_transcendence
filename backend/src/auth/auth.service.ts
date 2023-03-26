@@ -1,14 +1,61 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
-import {PrismaService} from '../prisma/prisma.service';
-import {JwtService} from '@nestjs/jwt';
-import {Response} from 'express';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { User } from '@prisma/client';
+import { UsersService } from '../users/users.service';
+import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private readonly prismaService: PrismaService,
-		private readonly jwtService: JwtService
-	) {
+		private readonly jwtService: JwtService,
+		private readonly usersService: UsersService
+	) {}
+
+	async getUserDatasFrom42Api(req: RequestWithUser) {
+		// Query to /oauth/authorize made by frontend with the custom url
+		// We get here after user has accepted to share his data with our app
+
+		// Get code from query params
+		const { code } = req.query;
+
+		// POST request to /oauth/token to get access_token, must be on server side
+		const tokenResponse = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				grant_type: 'authorization_code',
+				client_id: process.env.FORTYTWO_API_UID,
+				client_secret: process.env.FORTYTWO_API_SECRET,
+				code: code,
+				redirect_uri: process.env.FORTYTWO_API_CALLBACK,
+			}),
+		});
+		const tokenData = await tokenResponse.json();
+
+		// We can use the token to make requests to the API
+		// GET request to /v2/me to get user data
+		const userDataResponse = await fetch('https://api.intra.42.fr/v2/me', {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${tokenData.access_token}`,
+			},
+		});
+		return userDataResponse.json();
+	}
+
+	storeTokenInCookie(user: User, res: Response) {
+		const token = this._createToken(user);
+
+		res.cookie(process.env.JWT_COOKIE, token.access_token, {
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+			secure: true,
+			sameSite: 'none',
+		});
 	}
 
 	async findOrCreate({username, email, firstName, lastName, phone, fortyTwoId, avatar}: {
@@ -19,7 +66,7 @@ export class AuthService {
 		phone: string,
 		fortyTwoId: number,
 		avatar: string
-	}) {
+	}): Promise<User> {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email: email
@@ -76,24 +123,8 @@ export class AuthService {
 			});
 	}
 
-	async logout(res: Response, userId: number) {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				id: +userId
-			}
-		});
-
-		if (!user) {
-			throw new BadRequestException('User not found');
-		}
-
-		res.cookie(process.env.JWT_COOKIE, '', {
-			httpOnly: true,
-			secure: true,
-			sameSite: 'none',
-			maxAge: 0,
-		});
-
+	async logout(res: Response) {
+		res.clearCookie(process.env.JWT_COOKIE);
 		return res.status(200).send('Sign out success');
 	}
 }
