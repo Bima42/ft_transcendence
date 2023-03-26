@@ -14,8 +14,8 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
-import UserAvatar from '@/components/UserAvatar.vue'
-import CustomButton from "@/components/CustomButton.vue";
+import UserAvatar from '@/components/multiusage/UserAvatar.vue'
+import CustomButton from "@/components/multiusage/CustomButton.vue";
 import type IUserChat from '@/interfaces/user/IUserChat';
 
 const props = defineProps<{
