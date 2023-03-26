@@ -9,6 +9,7 @@ import TableView from '@/components/table/TheTable.vue'
 import JoinQueueView from '@/views/JoinQueue.vue'
 import redirectHandler from '@/components/redirectHandler.vue';
 import { useUserStore } from '@/stores/auth'
+import TwoFaView from '@/views/TwoFaView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,17 +69,24 @@ const router = createRouter({
             path: '/redirectHandler',
             name: 'redirectHandler',
             component: redirectHandler,
+        },
+        {
+            path: '/2fa',
+            name: '2fa',
+            component: TwoFaView,
         }
     ]
 })
 
 router.beforeEach((to, _from) => {
-  const authStore = useUserStore();
+  const userStore = useUserStore();
 
-  if ( to.path.startsWith("/main") && ! authStore.isLoggedIn()) {
+  if ( to.path.startsWith("/main") && ! userStore.isLoggedIn()) {
+    userStore.user = null;
+    localStorage.removeItem('localUser');
     return '/';
   }
-  if ( to.path == '/' && authStore.isLoggedIn()) {
+  if ( to.path == '/' && userStore.isLoggedIn()) {
     return '/index';
   }
 });

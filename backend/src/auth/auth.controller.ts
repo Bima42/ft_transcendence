@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   ForbiddenException,
   Get,
@@ -6,13 +7,11 @@ import {
   Post,
   Req,
   Res,
-  UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
-import { JwtAuthGuard } from './guards/jwt.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @Controller('auth')
@@ -76,11 +75,6 @@ export class AuthController {
         avatar: image.versions.medium,
       });
 
-      // Update user status
-      if (user) {
-        await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
-      }
-
       // Create token and set cookie
       if (!req.cookies[process.env.JWT_COOKIE]) {
         const token = this.authService._createToken(user);
@@ -96,20 +90,25 @@ export class AuthController {
         });
       }
 
-      // Redirect to frontend redirectHandler
-      const redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
+      let redirectUrl = '';
+      if (!user.twoFA || user.twoFAAuthenticated)
+        redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
+      else
+        redirectUrl = `${process.env.FRONTEND_URL}/2fa`;
       res.status(302).redirect(redirectUrl);
     }
 
     catch (e) {
-      console.error(e);
-      res.status(500).send('Authentication via 42 API failed');
+      res.status(500).send(e);
     }
   }
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    res.status(200).send(req.user);
+    const user = req.user;
+
+    await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
+    res.status(200).send(user);
   }
 
   @Get('logout/:id')
@@ -120,6 +119,38 @@ export class AuthController {
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
     await this.authService.logout(res);
     res.status(302).redirect(`${process.env.FRONTEND_URL}/`);
+  }
+
+  @Post('2fa/verify')
+  async verify2fa(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+    @Body() datas: { code: string }
+  ){
+    const user = req.user;
+    try {
+      await this.authService.verifyTwoFactorAuthCode(user, datas.code);
+
+      if (req.cookies[process.env.JWT_COOKIE])
+        res.clearCookie(process.env.JWT_COOKIE);
+
+      const token = this.authService._createToken(user);
+      if (!token) {
+        throw new ForbiddenException('Empty token');
+      }
+
+      res.cookie(process.env.JWT_COOKIE, token.access_token, {
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+        secure: true,
+        sameSite: 'none',
+      });
+
+      const redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
+      res.status(302).redirect(redirectUrl);
+    }
+    catch (e) {
+      res.status(500).send(e);
+    }
   }
 
   @Post('2fa/generate')

@@ -1,6 +1,7 @@
-import { get, patch } from '../../utils'
+import { get, patch, post } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
+import { getCookie } from 'typescript-cookie';
 
 export const useUserStore = defineStore( 'auth', () => {
 	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
@@ -35,7 +36,8 @@ export const useUserStore = defineStore( 'auth', () => {
 	}
 
   const isLoggedIn = function () : boolean {
-    return user != null;
+		const token = getCookie(import.meta.env.VITE_JWT_COOKIE);
+    return user != null && token != null;
   }
 
 	const updateTwoFaStatus = function (status: boolean) {
@@ -47,6 +49,18 @@ export const useUserStore = defineStore( 'auth', () => {
 			.then(json => {
 				user = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user))
+			})
+	}
+
+	const verifyTwoFaCode = function (code: string) {
+		post(
+			'auth/2fa/verify',
+			'Failed to verify 2fa code',
+			{ code: code }
+		)
+			.then(response => response.json())
+			.then(json => {
+
 			})
 	}
 
@@ -63,6 +77,7 @@ export const useUserStore = defineStore( 'auth', () => {
     logout,
     isLoggedIn,
 		updateTwoFaStatus,
+		verifyTwoFaCode,
     testEndpoint,
 	}
 })
