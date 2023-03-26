@@ -14,6 +14,9 @@ import { get } from '../../../utils'
 import { onUpdated, ref } from 'vue'
 import dropdown from 'vue-dropdowns';
 import { useChatStore } from '@/stores/chat';
+import { useModalStore } from '@/stores/modal';
+import Modal from "@/components/modal/TheModal.vue";
+import ChatPasswordModal from '@/components/modal/ChatPasswordModal.vue';
 import type IChat from '@/interfaces/chat/IChat';
 
 let chatStore = useChatStore();
@@ -30,6 +33,8 @@ onUpdated(() => {
     }
 });
 
+const modalStore = useModalStore()
+
 async function methodToRunOnSelect(payload: IChat) {
 
     // Dont do anything if already on the selected chat
@@ -40,9 +45,16 @@ async function methodToRunOnSelect(payload: IChat) {
     await get(url, 'Cannot load channel')
         .then((res) => res.json())
         .then((newChannel) => {
-            chatStore.setCurrentChat(newChannel)})
+            if (newChannel.users)
+                chatStore.setCurrentChat(newChannel)
+            else {
+                newChannel.id = payload.id;
+                modalStore.loadAndDisplay(Modal, ChatPasswordModal, newChannel)
+            }
+        })
         .catch((err) => console.log(err));
 }
+
 </script>
 
 <style lang="scss">

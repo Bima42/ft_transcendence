@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatType, ChatMessage, User} from '@prisma/client';
+import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
 import { NewMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 
@@ -18,7 +18,8 @@ import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 export class ChannelService {
   constructor(
     private readonly prismaService: PrismaService
-  ) { }
+  ) {
+  }
 
   async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
     let channels: Chat[] = [];
@@ -70,15 +71,34 @@ export class ChannelService {
       throw new BadRequestException('No channel found');
     }
 
+    if (channels.length == 0) {
+      const general :NewChannelDto = {
+          name: "General",
+          type: 'PUBLIC',
+      }
+      // Create the default chat
+      Logger.log("Contructor");
+      const generalChannel = await this.prismaService.chat.upsert({
+        where: { id: 1 },
+        create: general,
+        update: general,
+      })
+      if (generalChannel) {
+        channels.push(generalChannel);
+      }
+    }
+
     return channels;
   }
 
   // Return the detailed description of the chat, except for the messages
-  async getChannelDetails(chatId: number): Promise<DetailedChannelDto> {
+  async getChannelDetails(user: User, chatId: number): Promise<DetailedChannelDto | NewChannelDto> {
+
     let chat = await this.prismaService.chat.findUnique({
       where: { id: +chatId },
       select: {
         id: true,
+        type: true,
         name: true,
         createdAt: true,
         updatedAt: true
@@ -90,6 +110,7 @@ export class ChannelService {
     let users = await this.prismaService.userChat.findMany({
       where: { chatId: chatId },
       select: {
+        id: true,
         userId: true,
         user: true,
         chatId: true,
@@ -107,6 +128,17 @@ export class ChannelService {
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt,
       users: users,
+    }
+
+    // Check that
+    const found = (users as UserChat[]).find((el: UserChat) => (el.userId == user.id && el.role != 'BANNED'));
+    if (!found) {
+      const newDto : NewChannelDto = {
+        name: chat.name,
+        type: chat.type,
+      };
+      Logger.log(`User not found in chat. returning newChannelDto.`);
+      return newDto;
     }
 
     return chatDto;
@@ -130,6 +162,7 @@ export class ChannelService {
       return existingChannel;
     }
 
+    // FIXME: hash password in the database !
     let newChat = await this.prismaService.chat.create({
       data: newChannel
     });
@@ -146,14 +179,37 @@ export class ChannelService {
     return newChat;
   }
 
-  async updateChannel(chatId: number, newData: NewChannelDto) {
+  async updateChannel(user: User, chatId: number, newData: NewChannelDto) {
+    // Get the current role of the request user
+    const reqUserChat = await this.prismaService.userChat.findFirst ({
+      where: {
+          chatId: chatId,
+          userId: user.id,
+      },
+    });
+    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+      throw new ForbiddenException('Not authorized to update Channel');
+    }
+
+    // FIXME: hash password in the database !
     return this.prismaService.chat.update({
       where: { id: chatId },
       data: newData
     });
   }
 
-  async deleteChannel(chatId: number) {
+  async deleteChannel(user: User, chatId: number) {
+
+    // Get the current role of the request user
+    const reqUserChat = await this.prismaService.userChat.findFirst ({
+      where: {
+          chatId: chatId,
+          userId: user.id,
+      },
+    });
+    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+      throw new ForbiddenException('Not authorized to delete Channel');
+    }
 
     // Delete UserChatRole
     const roleOutput = await this.prismaService.userChat.deleteMany({
@@ -173,6 +229,52 @@ export class ChannelService {
     Logger.log("Deleted chat " + chatId + ": "
       + roleOutput.count + " roles and " + MsgOutput.count + " messages erased");
 
+  }
+
+  async joinChannel(user: User, chatId: number, newData: NewChannelDto): Promise<DetailedChannelDto | NewChannelDto> {
+    const chat : Chat = await this.findChannelById(chatId);
+
+    // check password
+    // FIXME: get password from hash in the database !
+    if (!newData.password || newData.password != chat.password) {
+      Logger.log("Password is wrong");
+      return newData;
+    }
+
+    Logger.log("Password is true");
+    // add userRole
+    await this.prismaService.userChat.create({
+      data: {
+        role: "MEMBER",
+        chatId: chatId,
+        userId: user.id,
+      }
+    });
+
+    // Return full chat (with users)
+    let users = await this.prismaService.userChat.findMany({
+      where: { chatId: chatId },
+      select: {
+        id: true,
+        userId: true,
+        user: true,
+        chatId: true,
+        role: true,
+        mutedUntil: true
+      },
+      orderBy: [
+        { role: "asc", },
+        { userId: "desc", },
+      ],
+    })
+    let chatDto: DetailedChannelDto = {
+      id: chatId,
+      name: chat.name,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+      users: users,
+    }
+    return chatDto;
   }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
@@ -206,13 +308,22 @@ export class ChannelService {
     }
 
     // Check if user is allowed to post a message:
-    const chatRole = await this.prismaService.userChat.findFirst({
+    var chatRole = await this.prismaService.userChat.findFirst({
       where: {
         chatId: chat.id,
         userId: user.id
       }
     });
-    // Not a member of a private chat
+    if (!chatRole && chat.type == "PUBLIC") {
+      chatRole = await this.prismaService.userChat.create({
+        data: {
+          chatId: chat.id,
+          userId: user.id,
+        }
+      })
+    }
+
+      // Not a member of a private chat
     if (!chatRole && chat.type != "PUBLIC")
       return Promise.reject("stranger");
     // Banned from chat

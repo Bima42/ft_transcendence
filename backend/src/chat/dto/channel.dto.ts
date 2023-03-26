@@ -23,7 +23,7 @@ export class DetailedChannelDto {
 
 }
 
-export class ChatAction {
+export class UserchatAction {
   @IsNumber()
   chatId: number;
 

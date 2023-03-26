@@ -48,6 +48,7 @@ model Chat {
   id        Int           @id @unique @default(autoincrement())
   type      ChatType      @default(PUBLIC)
   name      String?
+  password  String?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   messages  ChatMessage[]

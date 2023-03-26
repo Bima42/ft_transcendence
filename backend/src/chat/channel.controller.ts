@@ -19,7 +19,7 @@ import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { NewMessageDto } from './dto/message.dto';
-import { ChatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
 @ApiTags('Chat')
@@ -42,18 +42,23 @@ export class ChannelController {
   }
 
   @Get('rooms/:id')
-  async getOneChannel(@Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto> {
-	  return this.channelService.getChannelDetails(id);
+  async getOneChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto | NewChannelDto> {
+	  return this.channelService.getChannelDetails(req.user as User, id);
   }
 
   @Put('rooms/:id')
-  async updateChannel(@Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-	return this.channelService.updateChannel(id, data);
+  async updateChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+	return this.channelService.updateChannel(req.user as User, id, data);
   }
 
   @Delete('rooms/:id')
-  async DeleteChannel(@Param('id', new ParseIntPipe()) id: number) {
-	return this.channelService.deleteChannel(id);
+  async DeleteChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
+	return this.channelService.deleteChannel(req.user as User, id);
+  }
+
+  @Put('rooms/:id/join')
+  async joinChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+	return this.channelService.joinChannel(req.user as User, id, data);
   }
 
   @Get('rooms/:id/messages')
@@ -67,7 +72,7 @@ export class ChannelController {
   }
 
   @Put('rooms/:id/user')
-  async UpsertUserChat(@Req() req: Request, @Body() action: ChatAction, @Param('id', new ParseIntPipe()) chatId: number) {
+  async UpsertUserChat(@Req() req: Request, @Body() action: UserchatAction, @Param('id', new ParseIntPipe()) chatId: number) {
     const user = req.user as User;
     switch (action.type) {
       case 'kick':
@@ -90,7 +95,7 @@ export class ChannelController {
       default:
         break;
     }
-    const userchat = await this.channelService.getChannelDetails(chatId);
+    const userchat = await this.channelService.getChannelDetails(user, chatId);
     this.channelGateway.server.emit("updateChannelList", userchat);
   }
 

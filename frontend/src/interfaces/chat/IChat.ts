@@ -5,6 +5,7 @@ export default interface IChat {
 	id: number
 	type: ChatType
 	name?: string
+  password?: string
 	createdAt: Date
 	updatedAt: Date
 	messages: IChatMessage[]

@@ -1,18 +1,11 @@
 <template>
     <div class="newchannel-modal-wrapper">
-        <h1>Create a new channel</h1>
-        <p>Here you can create a new channel, please fill the following info :</p>
+        <h1>Channel {{ modalStore.data.name }} is locked !</h1>
+        <p>Please enter the password:</p>
         <div class="chat-input-container">
-            <input v-model="chatName" type="text" placeholder="Chose the name of the channel" class="chat-input">
-            <input v-model="chatPassword" type="password" placeholder="Set Password" class="chat-input">
-            <input v-model="chatPassword2" type="password" placeholder="Confirm Password" class="chat-input">
-            <input type="text" placeholder="Invite users to the channel" class="chat-input">
-            <div class="radio-buttons">
-                <label><input v-model="chatType" type="radio" name="type" value="PRIVATE">Private</label>
-                <label><input v-model="chatType" type="radio" name="type" value="PUBLIC">Public</label>
-            </div>
+            <input v-model="chatPassword" type="password" placeholder="password" class="chat-input">
             <div class="button-container">
-                <CustomButton @click="onCreateNewChannel">Create</CustomButton>
+                <CustomButton @click="onJoinChannel">Join</CustomButton>
                 <CustomButton @click="quitButton" styles="cancel">Quit</CustomButton>
             </div>
         </div>
@@ -20,48 +13,42 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import {ref, defineProps} from 'vue'
 import {useModalStore} from '@/stores/modal';
 import {useChatStore} from '@/stores/chat';
 import CustomButton from '@/components/multiusage/CustomButton.vue'
-import {post} from '../../../utils'
+import {put} from '../../../utils'
 import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore();
 
-const chatName = ref('');
 const chatPassword = ref('');
-const chatPassword2 = ref('');
-const chatType = ref('');
 
-async function onCreateNewChannel(e: Event) {
+console.log(`Joining new room: ${JSON.stringify(modalStore.data as IChat)}`);
+async function onJoinChannel(_e: Event) {
 
-    // TODO: check that both passwords are the same
-    const newChat: IChat = {
-        id: undefined,
-        type: (chatType.value == 'PRIVATE' ? 'PRIVATE' : 'PUBLIC'),
-        name: chatName.value,
-        password: chatPassword.value,
-        createdAt: undefined,
-        updatedAt: undefined,
-        messages: undefined,
-        users: undefined
-    };
+    let newChat : IChat = modalStore.data as IChat;
+    newChat.password = chatPassword.value;
 
-    // TODO: catch error ?
-    await post('chat/rooms', 'Cannot create channel', newChat)
-        .then((response) => response.json())
-        .then(json => {
-            modalStore.resetState();
-            chatStore.currentChat = json;
+    await put(`chat/rooms/${newChat.id}/join`, 'Cannot join channel', newChat)
+        .then((response) => {
+            return response.json()
+        })
+        .then((chat : IChat) => {
+            if (chat.users) {
+                chatStore.setCurrentChat(chat)
+                modalStore.resetState();
+            } else {
+                // TODO: show something to the user that the password was wrong
+            }
         })
         .catch(err => {
             console.log(err);
         });
 }
 
-function quitButton(e: Event) {
+function quitButton(_e: Event) {
     modalStore.resetState();
 }
 </script>
