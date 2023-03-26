@@ -79,10 +79,6 @@ export class AuthController {
       if (!req.cookies[process.env.JWT_COOKIE]) {
         const token = this.authService._createToken(user);
 
-        if (!token) {
-          throw new ForbiddenException('Empty token');
-        }
-
         res.cookie(process.env.JWT_COOKIE, token.access_token, {
           maxAge: 1000 * 60 * 60 * 24, // 1 day
           secure: true,
@@ -135,9 +131,6 @@ export class AuthController {
         res.clearCookie(process.env.JWT_COOKIE);
 
       const token = this.authService._createToken(user);
-      if (!token) {
-        throw new ForbiddenException('Empty token');
-      }
 
       res.cookie(process.env.JWT_COOKIE, token.access_token, {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
@@ -145,8 +138,7 @@ export class AuthController {
         sameSite: 'none',
       });
 
-      const redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
-      res.status(302).redirect(redirectUrl);
+      res.status(200).send({ twoFAAuthenticated: true });
     }
     catch (e) {
       res.status(500).send(e);

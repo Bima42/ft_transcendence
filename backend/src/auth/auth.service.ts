@@ -60,23 +60,29 @@ export class AuthService {
 	}
 
 	async verifyTwoFactorAuthCode(user: User, code: string) {
-		console.log('secret', user.twoFASecret, 'code', code);
 		const verified = speakeasy.totp.verify({
 			secret: user.twoFASecret,
 			encoding: 'base32',
 			token: code
 		});
 		if (!verified) {
-			console.log('verified failed');
 			throw new BadRequestException('Invalid code');
 		}
-		user.twoFAAuthenticated = true;
+		this.prismaService.user.update({
+			where: {
+				id: user.id
+			},
+			data: {
+				twoFAAuthenticated: true
+			},
+		});
 	}
 
 	async generateTwoFactorAuthSecret(user: User) {
 		const secret = speakeasy.generateSecret();
 		const otpauthUrl = speakeasy.otpauthURL({
 			secret: secret.base32,
+			encoding: 'base32',
 			label: 'Transcendence',
 			issuer: 'Transcendence',
 		});

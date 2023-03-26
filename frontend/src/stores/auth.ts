@@ -60,8 +60,11 @@ export const useUserStore = defineStore( 'auth', () => {
 		)
 			.then(response => response.json())
 			.then(json => {
-
+				if (json.twoFAAuthenticated) {
+					login();
+				}
 			})
+			.catch(error => console.log(error))
 	}
 
 	const testEndpoint = function () {
