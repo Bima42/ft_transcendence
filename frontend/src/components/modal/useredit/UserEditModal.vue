@@ -32,7 +32,7 @@ const toggleTwoFaStatus = () => {
 }
 
 const generateQrCode = () => {
-  post('auth/2fa/generate', 'Impossible to generate QR code: Please try again later')
+  post('2fa/generate', 'Impossible to generate QR code: Please try again later')
       .then(response => response.json())
       .then(data => {
         qrCodeImage.value = data.qrCodeImage
