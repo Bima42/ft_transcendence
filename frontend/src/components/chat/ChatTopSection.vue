@@ -11,7 +11,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { get } from '../../../utils'
 import ChatDropdownMenu from "@/components/chat/ChatDropdownMenu.vue";
-import CustomButton from "@/components/CustomButton.vue";
+import CustomButton from "@/components/multiusage/CustomButton.vue";
 import { useChatStore } from '@/stores/chat'
 import {useModalStore} from "@/stores/modal"
 import NewChannelModal from '@/components/modal/NewChannelModal.vue';

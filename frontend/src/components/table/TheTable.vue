@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/components/multiusage/CustomButton.vue';
 
 const props = defineProps<{
   data: object[],

@@ -6,9 +6,15 @@ import router from '@/router'
 
 import '@/assets/main.css'
 
-const app = createApp(App)
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-app.use(createPinia())
-app.use(router)
+import { faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 
-app.mount('#app')
+library.add(faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft)
+
+createApp(App)
+	.component('font-awesome-icon', FontAwesomeIcon)
+	.use(createPinia())
+	.use(router)
+	.mount('#app')

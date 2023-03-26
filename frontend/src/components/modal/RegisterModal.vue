@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import {defineProps, ref} from 'vue'
-import CustomButton from '@/components/CustomButton.vue'
+import CustomButton from '@/components/multiusage/CustomButton.vue'
 import {useRouter} from "vue-router";
 const router = useRouter()
 

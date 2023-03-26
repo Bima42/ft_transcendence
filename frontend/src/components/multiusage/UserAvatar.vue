@@ -36,8 +36,8 @@ const props = defineProps<{
   }
 
   &.small {
-    width: 4vw;
-    height: 4vw;
+    width: 50px;
+    height: 50px;
   }
 
   img {

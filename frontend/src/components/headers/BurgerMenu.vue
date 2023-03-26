@@ -24,8 +24,8 @@ import {useUserStore} from '@/stores/auth'
 
 import BurgerButton from '@/components/headers/BurgerButton.vue'
 import Modal from '@/components/modal/TheModal.vue'
-import UserModal from '@/components/modal/UserEditModal.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
+import UserModal from '@/components/modal/useredit/UserEditModal.vue'
+import UserAvatar from '@/components/multiusage/UserAvatar.vue'
 
 const userStore = useUserStore()
 const modalStore = useModalStore()
