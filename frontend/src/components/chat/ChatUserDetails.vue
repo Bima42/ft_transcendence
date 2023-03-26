@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits, onUpdated } from 'vue'
-import XButton from '@/components/XButton.vue'
+import XButton from '@/components/multiusage/XButton.vue'
 import UserDetailsCardContent from '@/components/chat/UserDetailsCardContent.vue'
 import type IUserChat from '@/interfaces/user/IUserChat';
 

@@ -12,7 +12,7 @@ import ChatUserDetails from '@/components/chat/ChatUserDetails.vue'
 import type IUserChat from '@/interfaces/user/IUserChat';
 import { useChatStore } from '@/stores/chat';
 import { defineProps, onMounted, ref } from 'vue'
-import CustomButton from '../CustomButton.vue';
+import CustomButton from '../multiusage/CustomButton.vue';
 
 const chatStore = useChatStore();
 const props = defineProps<{

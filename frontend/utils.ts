@@ -86,3 +86,20 @@ export async function put(
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	return response
 }
+
+export async function patch(
+	route: string,
+	message: string,
+	json: Record<string, unknown>
+): Promise<Response> {
+	const request: RequestInit = {
+		method: 'PATCH',
+		headers: headers,
+	}
+	if (json)
+		request.body = JSON.stringify(json)
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	if (!response.ok)
+		throw new Error(`${message} (status ${response.status}): ${response.body}`)
+	return response
+}

@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-	constructor() {
+	constructor(
+		private readonly usersService: UsersService
+	) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 			ignoreExpiration: true,
@@ -17,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	 * If the token is valid, validate() returns a user object, which is then stored in the request object.
 	 * If the token is not valid, validate() throws an error, which is handled by NestJS and results in a 401 Unauthorized response to the user.
 	 */
-	async validate(payload: { id: number; email: string }) {
-		return payload;
+	async validate(payload: any) {
+		return await this.usersService.findById(payload.sub);
 	}
 }

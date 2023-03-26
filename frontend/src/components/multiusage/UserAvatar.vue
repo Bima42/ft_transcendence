@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
 
-const userStore = useAuthStore()
+const userStore = useUserStore()
 
 const props = defineProps<{
   type: String,
@@ -36,8 +36,8 @@ const props = defineProps<{
   }
 
   &.small {
-    width: 4vw;
-    height: 4vw;
+    width: 50px;
+    height: 50px;
   }
 
   img {

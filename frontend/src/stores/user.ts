@@ -1,8 +1,9 @@
-import { get } from '../../utils'
+import { get, patch, post } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
+import { getCookie } from 'typescript-cookie';
 
-export const useAuthStore = defineStore( 'auth', () => {
+export const useUserStore = defineStore( 'auth', () => {
 	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
 
 	const redirect = function () {
@@ -18,7 +19,6 @@ export const useAuthStore = defineStore( 'auth', () => {
 		)
 			.then(response => response.json())
 			.then(json => {
-				console.log('json', json)
 				user = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user))
 				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
@@ -36,8 +36,36 @@ export const useAuthStore = defineStore( 'auth', () => {
 	}
 
   const isLoggedIn = function () : boolean {
-    return user != null;
+		const token = getCookie(import.meta.env.VITE_JWT_COOKIE);
+    return user != null && token != null;
   }
+
+	const updateTwoFaStatus = function (status: boolean) {
+		if (!user)
+			return
+
+		patch(`users/twofa/${user.id}`, 'Failed to update user', { twoFA: status })
+			.then(response => response.json())
+			.then(json => {
+				user = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user))
+			})
+	}
+
+	const verifyTwoFaCode = function (code: string) {
+		post(
+			'2fa/verify',
+			'Failed to verify 2fa code',
+			{ code: code }
+		)
+			.then(response => response.json())
+			.then(json => {
+				if (json.twoFAAuthenticated) {
+					login();
+				}
+			})
+			.catch(error => console.log(error))
+	}
 
 	const testEndpoint = function () {
 		get(`users/id/${user?.id}`, 'Failed to get user')
@@ -51,6 +79,8 @@ export const useAuthStore = defineStore( 'auth', () => {
     login,
     logout,
     isLoggedIn,
+		updateTwoFaStatus,
+		verifyTwoFaCode,
     testEndpoint,
 	}
 })

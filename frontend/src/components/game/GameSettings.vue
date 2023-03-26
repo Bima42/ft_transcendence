@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { defineEmits } from 'vue';
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/components/multiusage/CustomButton.vue';
 
 
 const emit = defineEmits(['JoinClassic', 'JoinCustom'])
@@ -20,7 +20,6 @@ const classic_click = () => {
     document.querySelector('#custom_btn').className = 'disabled_button';
     document.querySelector('#classic_btn').className = 'enabled_button';
     emit('JoinClassic')
-
 }
 
 const custom_click = () => {

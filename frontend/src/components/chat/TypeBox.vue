@@ -1,22 +1,23 @@
 <template>
-  <div class="chat-input-container">
-    <input v-model="msgContent" type="text" placeholder="Type a message..." v-on:keyup.enter="sendMessage">
-    <CustomButton @click="sendMessage">Send</CustomButton>
-  </div>
+    <div class="chat-input-container">
+        <input v-model="msgContent" type="text" placeholder="Type a message..." v-on:keyup.enter="sendMessage">
+        <CustomButton @click="sendMessage"><font-awesome-icon icon="fa-solid fa-paper-plane" /></CustomButton>
+        <ChatCommandHelper/>
+    </div>
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/CustomButton.vue';
+import CustomButton from '@/components/multiusage/CustomButton.vue';
 import { put } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
-import { useAuthStore } from '@/stores/auth';
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import { useUserStore } from '@/stores/user';
+import ChatCommandHelper from '@/components/chat/chatcommands/ChatCommandHelper.vue';
 import type IChatAction from '@/interfaces/chat/IChatAction';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
-const userStore = useAuthStore();
+const userStore = useUserStore();
 
 async function executeCommand(cmd: string[]) {
   if (! chatStore.currentChat )
@@ -93,20 +94,22 @@ async function sendMessage() {
 
 <style scoped lang="scss">
 .chat-input-container {
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    padding-left: 10px;
+    position: relative;
 
-  input {
-    flex: 1;
-    height: 30px;
-    border: 1px solid yellow;
-    background-color: rgb(49, 49, 47);
-    border-radius: 5px;
-    padding: 0 10px;
-    margin-right: 5px;
-    color: white;
-  }
+    input {
+        flex: 1;
+        height: 30px;
+        border: 1px solid yellow;
+        background-color: rgb(49, 49, 47);
+        border-radius: 5px;
+        padding: 0 10px;
+        margin-right: 5px;
+        color: white;
+    }
 }
 </style>
