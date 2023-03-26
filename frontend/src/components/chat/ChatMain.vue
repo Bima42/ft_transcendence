@@ -31,7 +31,6 @@ onMounted(async () => {
         chatStore.setCurrentChat(chatStore.chats[0]);
     }
 });
-
 </script>
 
 <style scoped lang="scss">
