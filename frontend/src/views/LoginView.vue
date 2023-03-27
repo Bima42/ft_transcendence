@@ -3,6 +3,7 @@
     <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
     <div class="buttons-container">
       <LoginButton styles="fat">Login with 42</LoginButton>
+      <CustomButton styles="fat" @click="loginAsBob">Login as bob</CustomButton>
     </div>
   </section>
 </template>
@@ -10,6 +11,12 @@
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
 import LoginButton from "@/components/LoginButton.vue";
+import CustomButton from '@/components/multiusage/CustomButton.vue'
+
+async function loginAsBob() {
+  const redirect = "https://localhost:4443/api/auth/bob"
+  window.open(redirect, '_self')
+}
 
 const router = useRouter()
 </script>
