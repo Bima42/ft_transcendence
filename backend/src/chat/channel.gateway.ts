@@ -35,6 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() socket: Socket) {
 
         const user : User = this.userSockets[socket.id];
+        Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
         const msg = await this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
           // TODO: only send to the correct room

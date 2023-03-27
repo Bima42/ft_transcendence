@@ -62,8 +62,8 @@ export class ChannelController {
   }
 
   @Put('rooms/:id/leave')
-  async leaveChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-    return this.channelService.leaveChannel(req.user as User, id, data);
+  async leaveChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
+    return this.channelService.leaveChannel(req.user as User, id);
   }
 
   @Get('rooms/:id/messages')

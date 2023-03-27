@@ -65,9 +65,13 @@ async function executeCommand(cmd: string[]) {
     case 'leave':
       url = `chat/rooms/${chatStore.currentChat.id}/leave`;
       await put(url, `cannot leave channel`, {})
+      .then(() => {
+        chatStore.setCurrentChat(null);
+      })
       .catch(err => console.error(err))
+      break;
     default:
-      console.error(`unknown chat command: ${cmd[0]}`);
+      console.error(`unknown chat command: ${cmdName}`);
       break;
   }
 }
@@ -91,7 +95,7 @@ async function sendMessage() {
 
     chatStore.sendMessage(sentMsg);
   }
-  //msgContent.value = "";
+  msgContent.value = "";
 }
 </script>
 

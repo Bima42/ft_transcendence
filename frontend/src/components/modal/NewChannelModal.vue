@@ -42,12 +42,13 @@ async function onCreateNewChannel(e: Event) {
         id: undefined,
         type: (chatType.value == 'PRIVATE' ? 'PRIVATE' : 'PUBLIC'),
         name: chatName.value,
-        password: chatPassword.value,
         createdAt: undefined,
         updatedAt: undefined,
         messages: undefined,
         users: undefined
     };
+    if( chatPassword.value )
+        newChat.password = chatPassword.value;
 
     // TODO: catch error ?
     await post('chat/rooms', 'Cannot create channel', newChat)

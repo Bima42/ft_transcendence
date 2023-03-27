@@ -45,7 +45,7 @@ async function methodToRunOnSelect(payload: IChat) {
     await get(url, 'Cannot load channel')
         .then((res) => res.json())
         .then((newChannel) => {
-            if (newChannel.users)
+            if (typeof newChannel.users !== 'undefined')
                 chatStore.setCurrentChat(newChannel)
             else {
                 newChannel.id = payload.id;
