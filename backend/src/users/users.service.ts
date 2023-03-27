@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, UserStatus } from '@prisma/client';
+import { User, UserChat,UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -112,5 +112,13 @@ export class UsersService {
         id: +userId
        }
      });
+  }
+
+  async getAlluserchat(userId): Promise<UserChat[]> {
+    return this.prismaService.userChat.findMany({
+      where: {
+        userId: userId
+      },
+    });
   }
 }

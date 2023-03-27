@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
-import { User, ChatMessage } from '@prisma/client';
+import { User, UserChat, ChatMessage } from '@prisma/client';
 import { Socket, Server } from 'socket.io'
 import { ChannelService } from './channel.service'
 import { NewMessageDto } from './dto/message.dto';
@@ -38,9 +38,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
         const msg = await this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
-          // TODO: only send to the correct room
+          // DONE: only send to the correct room
           // The server also send back to the sender, as acknowledgement and validation
-          this.server.emit("msg", msg);
+          this.server.to(JSON.stringify(data.chatId)).emit("msg", msg);
           return msg
         })
         .catch(err => {
@@ -75,6 +75,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         //TODO: set user status online
         //TODO: add socket to all rooms (= channels) that the user is in
+        
+        const chats = await this.usersService.getAlluserchat(user.id);
+        chats.forEach((userchat: UserChat) => {
+            Logger.log(`chat = ${userchat.chatId}`)
+            client.join(JSON.stringify(userchat.chatId))
+        })
     }
 
     handleDisconnect(client: any): any {
@@ -85,6 +91,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         //TODO: set user status offline
         //TODO: send notifications to all users to change his status to offline
+
     }
 
 };
