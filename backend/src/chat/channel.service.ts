@@ -13,11 +13,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
 import { NewMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import bcrypt from 'bcrypt'
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChannelService {
   constructor(
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
+    private readonly userService: UsersService,
   ) {
   }
 
@@ -163,6 +166,11 @@ export class ChannelService {
     }
 
     // FIXME: hash password in the database !
+    if (newChannel.password) {
+      const saltRounds = 10;
+      const newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
+    }
+
     let newChat = await this.prismaService.chat.create({
       data: newChannel
     });
@@ -397,36 +405,18 @@ export class ChannelService {
   }
 
   async UpsertUserChatRole(user: User, chatId: number, targetUsername: string, newRole: UserChatRole, muteDuration: number | null): Promise<HttpStatus> {
-    // Get the current role of the request user
-    const reqUserChat = await this.prismaService.userChat.findFirst ({
-      where: {
-          chatId: chatId,
-          userId: user.id,
-      },
-    });
-    if (!reqUserChat || (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER')){
+
+    const reqUserChat = await findUserchatFromIds(chatId, user.id);
+    if (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER') {
       throw new ForbiddenException('Not authorized to update role');
     }
 
     // Get the target user from username:
-    const targetUser = await this.prismaService.user.findUnique({
-      where: {
-        username: targetUsername,
-      }
-    });
-    if (!targetUser) {
-      throw new NotFoundException('target user not found');
-    }
+    const targetUser = await this.userService.findByName(targetUsername);
 
     // Get the current role of the target user
-    var targetUserChat = await this.prismaService.userChat.findFirst({
-      where: {
-        AND: [
-          { chatId: chatId },
-          { userId: targetUser.id }
-        ]
-      },
-    });
+    var targetUserChat = await findUserchatFromIds(chatId, targetUser.id);
+
     if (!targetUserChat) {
       Logger.log(`${targetUser.username}#${targetUser.id}'s role is created for chat ${chatId}: ${newRole}`);
       await this.prismaService.userChat.create({
@@ -473,4 +463,24 @@ export class ChannelService {
     });
     return HttpStatus.OK;
   }
+}
+
+async function upsertUserchat(userchat: Userchat) {
+
+
+}
+
+async function findUserchatFromIds(chatId: number, userId: number) : Promise<UserChat | null> {
+  const userchat = await this.prismaService.userChat.findFirst ({
+        where: {
+            chatId: chatId,
+            userId: userId,
+        },
+      });
+  return userchat;
+
+}
+
+async function isUserAllowed(user: User, chat: Chat): Promise<boolean> {
+  return true;
 }

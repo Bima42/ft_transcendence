@@ -48,17 +48,22 @@ export class ChannelController {
 
   @Put('rooms/:id')
   async updateChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-	return this.channelService.updateChannel(req.user as User, id, data);
+    return this.channelService.updateChannel(req.user as User, id, data);
   }
 
   @Delete('rooms/:id')
   async DeleteChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
-	return this.channelService.deleteChannel(req.user as User, id);
+    return this.channelService.deleteChannel(req.user as User, id);
   }
 
   @Put('rooms/:id/join')
   async joinChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-	return this.channelService.joinChannel(req.user as User, id, data);
+    return this.channelService.joinChannel(req.user as User, id, data);
+  }
+
+  @Put('rooms/:id/leave')
+  async leaveChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+    return this.channelService.leaveChannel(req.user as User, id, data);
   }
 
   @Get('rooms/:id/messages')

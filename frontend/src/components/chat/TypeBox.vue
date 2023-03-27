@@ -43,6 +43,8 @@ async function executeCommand(cmd: string[]) {
             ];
 
   const cmdName = cmd[0].slice(1);
+  let url = `chat/rooms/${chatStore.currentChat.id}/user`;
+  let action: IChatAction;
   switch (cmdName) {
     case 'kick':
     case 'add':
@@ -50,23 +52,24 @@ async function executeCommand(cmd: string[]) {
     case 'promote':
     case 'demote':
     case 'mute':
-      const action: IChatAction = {
+      action = {
         chatId: chatStore.currentChat.id,
         username: cmd[1],
         muteDuration: (cmd.length >= 3 ? parseInt(cmd[2]) : null),
         type: cmdName,
       };
-      const url = `chat/rooms/${chatStore.currentChat.id}/user`;
-      console.log(`url = ${url}`);
-      console.log(`action = ${JSON.stringify(action)}`);
       await put(url, `cannot ${cmdName} user`, action)
       .catch(err => console.error(err))
       break;
+
+    case 'leave':
+      url = `chat/rooms/${chatStore.currentChat.id}/leave`;
+      await put(url, `cannot leave channel`, {})
+      .catch(err => console.error(err))
     default:
       console.error(`unknown chat command: ${cmd[0]}`);
       break;
   }
-
 }
 
 async function sendMessage() {
