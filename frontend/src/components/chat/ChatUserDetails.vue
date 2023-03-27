@@ -1,11 +1,11 @@
 <template>
-  <p @click="$emit('setActive')">
-      {{ userChat.user.username }}
-  <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
-    <div class="user-details-panel" v-show="isActive">
-      <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
-      <UserDetailsCardContent :userChat="props.userChat"></UserDetailsCardContent>
-    </div>
+  <p @click="$emit('setActive')" :class="getClassNames()"> <!-- Added :class binding to add dynamic class names based on the user's role -->
+      {{ (userChat.user.status == "ONLINE" ? "✅ ": "🔴 ") + userChat.user.username  }}
+      <div class="user-details-background" v-show="isActive" @click.stop="$emit('setInactive')"></div>
+      <div class="user-details-panel" v-show="isActive">
+        <XButton :size="'small'" class="exit-button" @click.stop="$emit('setInactive')"/>
+        <UserDetailsCardContent :userChat="props.userChat"></UserDetailsCardContent>
+      </div>
   </p>
 </template>
 
@@ -21,6 +21,16 @@ const props = defineProps<{
   isActive: boolean,
 }>()
 
+const getClassNames = () => {
+  let classes = props.userChat.role.toLowerCase();
+  const now = new Date();
+  if (props.userChat.mutedUntil && props.userChat.mutedUntil > now) {
+    console.log(`${props.userChat.user.username} is muted`);
+    classes += " muted";
+  }
+  return classes;
+}
+
 onUpdated(() => {
 });
 </script>
@@ -30,6 +40,30 @@ p {
   cursor: pointer;
   text-align: left;
   color: white;
+  align-self: left;
+
+  &.member {
+    color: white;
+  }
+  &.admin {
+    color: green;
+  }
+
+  &.banned {
+    color: red;
+    text-decoration: line-through;
+  }
+
+  &.owner {
+    color: blue;
+
+  }
+
+  &.muted {
+    outline-color: $yellow;
+    outline-width: 3px;
+    outline-style: solid;
+  }
 
   .user-details-background {
     position: fixed;

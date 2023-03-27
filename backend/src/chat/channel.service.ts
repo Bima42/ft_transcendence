@@ -10,15 +10,19 @@ import {
 } from '@nestjs/common';
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatType, ChatMessage, User} from '@prisma/client';
+import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
 import { NewMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import * as bcrypt from 'bcrypt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChannelService {
   constructor(
-    private readonly prismaService: PrismaService
-  ) { }
+    private readonly prismaService: PrismaService,
+    private readonly userService: UsersService,
+  ) {
+  }
 
   async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
     let channels: Chat[] = [];
@@ -63,6 +67,7 @@ export class ChannelService {
 
             ],
         },
+        orderBy: { id: "asc" },
       });
     }
 
@@ -70,19 +75,31 @@ export class ChannelService {
       throw new BadRequestException('No channel found');
     }
 
+    if (channels.length == 0) {
+      const general :NewChannelDto = {
+          name: "General",
+          type: 'PUBLIC',
+      }
+      // Create the default chat
+      Logger.log("Generate the general chat");
+      const generalChannel = await this.prismaService.chat.upsert({
+        where: { id: 1 },
+        create: general,
+        update: general,
+      })
+      if (generalChannel) {
+        channels.push(generalChannel);
+      }
+    }
+
     return channels;
   }
 
   // Return the detailed description of the chat, except for the messages
-  async getChannelDetails(chatId: number): Promise<DetailedChannelDto> {
-    let chat = await this.prismaService.chat.findUnique({
+  async getChannelDetails(user: User, chatId: number): Promise<DetailedChannelDto | NewChannelDto> {
+
+    let chat: Chat = await this.prismaService.chat.findUnique({
       where: { id: +chatId },
-      select: {
-        id: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true
-      }
     });
 
     // TODO TYR: When the chat is not found
@@ -90,13 +107,29 @@ export class ChannelService {
     let users = await this.prismaService.userChat.findMany({
       where: { chatId: chatId },
       select: {
+        id: true,
         userId: true,
         user: true,
         chatId: true,
         role: true,
         mutedUntil: true
-      }
+      },
+      orderBy: [
+        { role: "asc", },
+        { userId: "desc", },
+      ],
     })
+
+    // Check that the user has access to the detailed chat
+    const found = (users as UserChat[]).find((el: UserChat) => (el.userId == user.id && el.role != 'BANNED'));
+    if (!found && !(chat.type == "PUBLIC" && !chat.password)) {
+      const newDto : NewChannelDto = {
+        name: chat.name,
+        type: chat.type,
+      };
+      return newDto;
+    }
+
     let chatDto: DetailedChannelDto = {
       id: chatId,
       name: chat.name,
@@ -104,7 +137,6 @@ export class ChannelService {
       updatedAt: chat.updatedAt,
       users: users,
     }
-
     return chatDto;
   }
 
@@ -126,6 +158,12 @@ export class ChannelService {
       return existingChannel;
     }
 
+    // FIXME: hash password in the database !
+    if (newChannel.password) {
+      const saltRounds = 10;
+      newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
+    }
+
     let newChat = await this.prismaService.chat.create({
       data: newChannel
     });
@@ -142,14 +180,33 @@ export class ChannelService {
     return newChat;
   }
 
-  async updateChannel(chatId: number, newData: NewChannelDto) {
+  async updateChannel(user: User, chatId: number, newChannel: NewChannelDto) {
+    // Get the current role of the request user
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+      throw new ForbiddenException('Not authorized to update Channel');
+    }
+
+    // FIXME: hash password in the database !
+    // TODO: can we remove the channel password ?
+    if (newChannel.password) {
+      const saltRounds = 10;
+      newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
+    }
+
     return this.prismaService.chat.update({
       where: { id: chatId },
-      data: newData
+      data: newChannel
     });
   }
 
-  async deleteChannel(chatId: number) {
+  async deleteChannel(user: User, chatId: number) {
+
+    // Get the current role of the request user
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+      throw new ForbiddenException('Not authorized to delete Channel');
+    }
 
     // Delete UserChatRole
     const roleOutput = await this.prismaService.userChat.deleteMany({
@@ -169,6 +226,70 @@ export class ChannelService {
     Logger.log("Deleted chat " + chatId + ": "
       + roleOutput.count + " roles and " + MsgOutput.count + " messages erased");
 
+  }
+
+  async joinChannel(user: User, chatId: number, newData: NewChannelDto): Promise<DetailedChannelDto | NewChannelDto> {
+    const chat : Chat = await this.findChannelById(chatId);
+
+
+    // Cannot join private chat, must be added by an admin
+    if (chat.type != 'PUBLIC')
+      throw new ForbiddenException('Not authorized to join channel');
+
+    // check password
+    // FIXME: get password from hash in the database !
+    if (newData.password && ! await bcrypt.compare(newData.password, chat.password)) {
+      return newData;
+    }
+
+    // add userRole
+    await this.prismaService.userChat.create({
+      data: {
+        role: "MEMBER",
+        chatId: chatId,
+        userId: user.id,
+      }
+    });
+
+    // Return full chat (with users)
+    let users = await this.prismaService.userChat.findMany({
+      where: { chatId: chatId },
+      select: {
+        id: true,
+        userId: true,
+        user: true,
+        chatId: true,
+        role: true,
+        mutedUntil: true
+      },
+      orderBy: [
+        { role: "asc", },
+        { userId: "desc", },
+      ],
+    })
+    let chatDto: DetailedChannelDto = {
+      id: chatId,
+      name: chat.name,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+      users: users,
+    }
+    return chatDto;
+  }
+
+  async leaveChannel(user: User, chatId: number) {
+
+    Logger.log(`${user.username}#${user.id} wants to leave channel ${chatId}`);
+    // Get the current role of the request user
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (!reqUserChat || reqUserChat.role == 'BANNED'){
+      throw new ForbiddenException('Not authorized to leave Channel');
+    }
+
+    // delete userRole
+    await this.prismaService.userChat.delete({
+      where: { id: reqUserChat.id }
+    });
   }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
@@ -202,24 +323,29 @@ export class ChannelService {
     }
 
     // Check if user is allowed to post a message:
-    const chatRole = await this.prismaService.userChat.findFirst({
-      where: {
-        chatId: chat.id,
-        userId: user.id
+    var chatRole = await this.findUserchatFromIds(chatId, user.id);
+    if (!chatRole) {
+      if (chat.type == "PUBLIC" && !chat.password) {
+        // Add the user to public chat
+        chatRole = await this.prismaService.userChat.create({
+          data: {
+            chatId: chat.id,
+            userId: user.id,
+          }
+        })
+      } else {
+        // Not a member of a private chat
+        Logger.log("User is a stranger from chat");
+        return Promise.reject("stranger");
       }
-    });
-    // Not a member of a private chat
-    if (!chatRole && chat.type != "PUBLIC")
-      return Promise.reject("stranger");
+    }
+
     // Banned from chat
-    if (chatRole && chatRole.role == "BANNED")
+    if (chatRole.role == "BANNED")
       return Promise.reject("banned");
     // Muted
-    if (chatRole && chatRole.mutedUntil) {
-      if ((chatRole.mutedUntil as Date).getTime() > Date.now())
+    if (chatRole.mutedUntil && (chatRole.mutedUntil as Date).getTime() > Date.now()) {
         return Promise.reject("muted");
-      else // Unmute
-        this.UpsertUserChatRole(user, chatId, user.id, chatRole.role, null);
     }
 
     const msg = await this.prismaService.chatMessage.create({
@@ -232,110 +358,115 @@ export class ChannelService {
     return msg;
   }
 
-  async deleteUserChatRole(user: User, chatId: number, targetUserId: number) {
-    // Get the current role of the request user
-    const reqUserChat = await this.prismaService.userChat.findFirst ({
-      where: {
-          chatId: chatId,
-          userId: user.id,
-      },
-    });
-    if (!reqUserChat || (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER')){
+  async deleteUserChatRole(user: User, chatId: number, targetUsername: string) {
+    // Check current user permissions
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER') {
       throw new ForbiddenException('Not authorized to kick');
     }
 
+    // Get the target user from username:
+    const targetUser = await this.userService.findByName(targetUsername);
+
     // Get the current role of the target user
-    var targetUserChat = await this.prismaService.userChat.findFirst({
-      where: {
-        chatId: chatId,
-        userId: targetUserId,
-      },
-      include: {
-        user: true
-      },
-    });
-    if (!targetUserChat) {
-      throw new NotFoundException('target user not found');
-    }
-    // Admin cannot kick the owner
-    if (reqUserChat.role == 'ADMIN' && targetUserChat.role == 'OWNER'){
+    var targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
+
+    // Cannot kick the owner
+    if (targetUserChat.role == 'OWNER'){
       throw new ForbiddenException('Not authorized to kick');
     }
 
     // Cannot kick a banned user, otherwise it will reset its permissions and he
     // could rejoin the chat
-    if (targetUserChat.role != UserChatRole.BANNED) {
-      Logger.log(`${user.username}#${user.id} kicked ${targetUserChat.user.username}#${targetUserChat.user.id} from chat ${chatId}`);
-      await this.prismaService.userChat.delete({
-        where: { id: targetUserChat.id },
-      });
+    if (targetUserChat.role == UserChatRole.BANNED) {
+      return HttpStatus.AMBIGUOUS;
     }
+
+    Logger.log(`${user.username}#${user.id} kicked ${targetUser.username}#${targetUser.id} from chat ${chatId}`);
+    await this.prismaService.userChat.delete({
+      where: { id: targetUserChat.id },
+    });
     return HttpStatus.OK;
   }
 
-  async UpsertUserChatRole(user: User, chatId: number, userId: number, newRole: UserChatRole, mutedUntil: Date | null): Promise<HttpStatus> {
-    // Get the current role of the request user
-    const reqUserChat = await this.prismaService.userChat.findFirst ({
-      where: {
-          chatId: chatId,
-          userId: user.id,
-      },
-    });
-    if (!reqUserChat || (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER')){
+  async UpsertUserChatRole(user: User, chatId: number, targetUsername: string, newRole: UserChatRole, muteDuration: number | null): Promise<HttpStatus> {
+
+    // Check current user permissions
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER') {
       throw new ForbiddenException('Not authorized to update role');
     }
 
-    var userChat = await this.prismaService.userChat.findFirst({
-      where: {
-        AND: [
-          { chatId: chatId },
-          { userId: userId }
-        ]
-      },
-    });
-    if (!userChat) {
-      Logger.log(`${userId}'s role is created for chat ${chatId}: ${newRole}`);
+    // Get the target user from username:
+    const targetUser = await this.userService.findByName(targetUsername);
+
+    // Get the current role of the target user
+    var targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
+
+    if (!targetUserChat) {
+      // Create the user role
+      Logger.log(`${targetUser.username}#${targetUser.id}'s role is created for chat ${chatId}: ${newRole}`);
+      const mutedUntil = this.updateMutedUntil(null, muteDuration);
       await this.prismaService.userChat.create({
         data: {
           chatId: chatId,
-          userId: userId,
+          userId: targetUser.id,
           role: newRole,
+          mutedUntil: mutedUntil,
         }
       });
       return HttpStatus.OK;
     }
 
-    if (userChat.role == UserChatRole.OWNER) {
+    if (targetUserChat.role == UserChatRole.OWNER) {
       Logger.log("Cannot change role from owner");
       throw new ForbiddenException("Owner is untouchable");
     }
 
-    userChat.role = newRole;
+    // Update user with new values:
+    targetUserChat.role = newRole;
+    targetUserChat.mutedUntil = this.updateMutedUntil(targetUserChat.mutedUntil, muteDuration);
 
-    // Update the mutedUntil
-    const now = new Date();
-    let diffMuted = null;
-    // If already muted, check if done or not
-    if (userChat.mutedUntil) {
-      diffMuted = (userChat.mutedUntil.getTime() - now.getTime()) / 1000;
-      // If the new value is higher, take the new value
-      if (mutedUntil > userChat.mutedUntil)
-        userChat.mutedUntil = mutedUntil;
-      else if (diffMuted < 0)
-        userChat.mutedUntil = null;
-    }
-    else {
-      userChat.mutedUntil = mutedUntil;
-    }
-
-    if (userChat.mutedUntil)
-      diffMuted = (userChat.mutedUntil.getTime() - now.getTime()) / 1000;
-    Logger.log(`${userId}'s role is updated for chat ${chatId}: ${newRole} (muted for: ${diffMuted} sec)`);
+    // Log
+    let diffMuted = 0;
+    const dateNow = new Date();
+    if (targetUserChat.mutedUntil)
+      diffMuted = (targetUserChat.mutedUntil.getTime() - dateNow.getTime()) / 1000;
+    Logger.log(`${targetUser.username}#${targetUser.id}'s role is updated for chat ${chatId}: ${newRole} (muted for: ${diffMuted} sec)`);
 
     await this.prismaService.userChat.update({
-      where: { id: userChat.id },
-      data: userChat
+      where: { id: targetUserChat.id },
+      data: targetUserChat
     });
     return HttpStatus.OK;
   }
+
+  updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number) : Date | null {
+    if (muteDuration) {
+      let newMutedUntil = new Date();
+      newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
+      if (!currentMutedUntil || newMutedUntil > currentMutedUntil) {
+          return newMutedUntil;
+      } else {
+        return currentMutedUntil;
+      }
+    }
+    // Check if the muted until is expired
+    const dateNow = new Date();
+    if (!currentMutedUntil || currentMutedUntil < dateNow)
+      return null;
+
+    return currentMutedUntil;
+}
+
+  async findUserchatFromIds(chatIdd: number, userIdd: number) : Promise<UserChat | null> {
+    const userchat = await this.prismaService.userChat.findFirst ({
+          where: {
+              chatId: chatIdd,
+              userId: userIdd,
+          },
+        });
+    return userchat;
+  }
+
 }

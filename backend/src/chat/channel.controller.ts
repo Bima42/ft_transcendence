@@ -14,17 +14,21 @@ import {
   Logger
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
+import { ChatGateway } from './channel.gateway';
 import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { NewMessageDto } from './dto/message.dto';
-import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
 @ApiTags('Chat')
 @Controller('chat')
 export class ChannelController {
-  constructor(private channelService: ChannelService) {}
+  constructor(
+    private channelService: ChannelService,
+    private channelGateway: ChatGateway,
+  ){}
 
   @Get('rooms')
   getAllChannels(@Req() req: Request): Promise<NewChannelDto[]> {
@@ -38,18 +42,28 @@ export class ChannelController {
   }
 
   @Get('rooms/:id')
-  async getOneChannel(@Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto> {
-	  return this.channelService.getChannelDetails(id);
+  async getOneChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto | NewChannelDto> {
+	  return this.channelService.getChannelDetails(req.user as User, id);
   }
 
   @Put('rooms/:id')
-  async updateChannel(@Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-	return this.channelService.updateChannel(id, data);
+  async updateChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+    return this.channelService.updateChannel(req.user as User, id, data);
   }
 
   @Delete('rooms/:id')
-  async DeleteChannel(@Param('id', new ParseIntPipe()) id: number) {
-	return this.channelService.deleteChannel(id);
+  async DeleteChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
+    return this.channelService.deleteChannel(req.user as User, id);
+  }
+
+  @Put('rooms/:id/join')
+  async joinChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
+    return this.channelService.joinChannel(req.user as User, id, data);
+  }
+
+  @Put('rooms/:id/leave')
+  async leaveChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
+    return this.channelService.leaveChannel(req.user as User, id);
   }
 
   @Get('rooms/:id/messages')
@@ -62,47 +76,33 @@ export class ChannelController {
 	  return this.channelService.postMessage(req.user as User, id, data);
   }
 
-  @Put('rooms/:id/mute/:user')
-  MuteUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-    let mutedUntil: Date = new Date();
-    // TODO: specify a dynamic number of seconds muted
-    mutedUntil.setSeconds(mutedUntil.getSeconds() + 20);
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, mutedUntil);
-	}
+  @Put('rooms/:id/user')
+  async UpsertUserChat(@Req() req: Request, @Body() action: UserchatAction, @Param('id', new ParseIntPipe()) chatId: number) {
+    const user = req.user as User;
+    switch (action.type) {
+      case 'kick':
+        await this.channelService.deleteUserChatRole(user, chatId, action.username);
+        break;
+      case 'add':
+      case 'demote':
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, null);
+        break;
+      case 'mute':
+        if (!action.muteDuration)
+          return ;
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, action.muteDuration);
+        break;
+      case 'ban':
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.BANNED, null);
+        break;
+      case 'promote':
+        await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.ADMIN, null);
+      default:
+        break;
+    }
+    const userchat = await this.channelService.getChannelDetails(user, chatId);
+    this.channelGateway.server.emit("updateChannelList", userchat);
+  }
 
-  @Put('rooms/:id/add/:user')
-  AddUserToChat(@Req() req: Request, @Param('id', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null);
-	}
 
-  @Put('rooms/:chat/kick/:user')
-  KickUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.deleteUserChatRole(req.user as User, chatId, userId)
-	}
-
-  @Put('rooms/:chat/ban/:user')
-  BanUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.BANNED, null)
-	}
-
-  @Put('rooms/:chat/promote/:user')
-  PromoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.ADMIN, null)
-	}
-
-  @Put('rooms/:chat/demote/:user')
-  DemoteUserFromChat(@Req() req: Request, @Param('chat', new ParseIntPipe()) chatId: number,
-				@Param('user', new ParseIntPipe()) userId: number) {
-		return this.channelService.UpsertUserChatRole(req.user as User, chatId, userId, UserChatRole.MEMBER, null)
-	}
-
-	@Get('users/online')
-	GetOnlineUsers() {
-		return "me"
-	}
 }

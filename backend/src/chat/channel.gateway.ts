@@ -35,6 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() socket: Socket) {
 
         const user : User = this.userSockets[socket.id];
+        Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
         const msg = await this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
           // TODO: only send to the correct room
@@ -70,7 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.userSockets[client.id] = user;
 
-        Logger.log(`Chat: user connected: ${user.username}`);
+        Logger.log(`Chat: ${user.username}#${user.id} connected`);
 
         //TODO: set user status online
         //TODO: add socket to all rooms (= channels) that the user is in
@@ -79,7 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleDisconnect(client: any): any {
 
         const user : User = this.userSockets[client.id];
-        Logger.log(`Chat: user disconnected: ${user.username}`);
+        Logger.log(`Chat: ${user.username}#${user.id} disconnected`);
         delete this.userSockets[client.id];
 
         //TODO: set user status offline

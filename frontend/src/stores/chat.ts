@@ -1,10 +1,11 @@
-import { ref } from 'vue'
+import { customRef, ref } from 'vue'
 import { defineStore } from 'pinia';
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IChat from '@/interfaces/chat/IChat'
 import { io, Socket } from "socket.io-client"
 import { getCookie } from 'typescript-cookie';
 import { get } from '../../utils'
+import type IUserChat from '@/interfaces/user/IUserChat';
 
 
 export const useChatStore = defineStore('chat', () => {
@@ -25,6 +26,8 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function setCurrentChat(newChat: IChat): IChat {
+    if (!newChat)
+      newChat = this.chats[0];
     const url = 'chat/rooms/' + newChat.id;
     await get(url, 'Cannot load channel')
         .then((res) => res.json())
@@ -44,8 +47,6 @@ export const useChatStore = defineStore('chat', () => {
         })
         .catch((err) => console.log(err));
     return this.chats;
-
-
   }
 
   return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList }
