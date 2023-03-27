@@ -3,10 +3,12 @@ import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
 import { GameController } from './game.controller';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsersModule } from 'src/users/users.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 
 @Module({
-  imports: [],
+  imports: [UsersModule, AuthModule],
   providers: [PrismaService, GameService, GameGateway],
   controllers: [GameController],
   exports: [GameService],

@@ -5,12 +5,18 @@ import { GameSettingsDto } from './dto/joinQueueData.dto';
 import { Game } from '@prisma/client';
 import { UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { GameServer } from './gameserver';
 
 
 @Injectable()
 export class GameService {
   private classicQueue: Socket[] = [];
   private customQueue: Socket[] = [];
+
+  // Array of all currently running games
+  private gameServers: GameServer[] = [];
+  // A map socket.id => GameServer
+  private gameSockets: { [key: string]: GameServer } = {};
 
   @WebSocketServer()
   server: Server
@@ -63,7 +69,7 @@ export class GameService {
     return `${msg} queue`;
   }
 
-  quitQueue (client: Socket) {
+  quitQueue (user: User) {
     const idx_classic = this.classicQueue.indexOf(client);
     if (idx_classic >= 0) {
       Logger.log(`Client ${client.id} quit the classic queue`);
@@ -137,6 +143,13 @@ private async startGame(game: Game, clients: Socket[]): Promise<void> {
 
   // Emit an event to the connected clients to start the game
   this.server.to(clients.map(client => client.id)).emit('matchFound', game);
+
+  // Create the game server
+  this.gameServers.push(new GameServer({server: this.server}));
+}
+
+async   findGameFromSocket(socketId: string) : Promise<GameServer>{
+  return this.gameSockets[socketId];
 }
 
 

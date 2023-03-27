@@ -52,22 +52,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           return msg;
     }
 
-    async handleConnection(client: any, ...args: any[]) {
+    private async verifyUser(token: string) : Promise<User> {
 
-        // Extract user id from token
-        const token = client.handshake.auth.token;
-        if (!token) {
-          client.disconnect();
-          Logger.log("WS: client has no token. dropped.");
-          return ;
-        }
+        if (!token)
+          return null;
+
         const userId = this.authService.verifyToken(token);
 
-        const user = await this.usersService.findById(userId.sub);
+        return await this.usersService.findById(userId.sub);
+
+    }
+
+    async handleConnection(client: any, ...args: any[]) {
+
+        const user = await this.verifyUser(client.handshake.auth.token);
         if (!user) {
-          client.disconnect();
-          Logger.log("WS: client cannot be identified: dropped.");
-          return;
+          Logger.log("WS: client is not identified. dropped.");
+          return ;
         }
         this.userSockets[client.id] = user;
 

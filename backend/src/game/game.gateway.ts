@@ -1,8 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
+import { User } from '@prisma/client';
 import { GameService } from './game.service';
 import { GameSettingsDto } from './dto/joinQueueData.dto';
+import { GameServer } from './gameserver'
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 
 @WebSocketGateway({
@@ -17,33 +21,53 @@ import { GameSettingsDto } from './dto/joinQueueData.dto';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
+    private userSockets: { [key: string]: User } = {};
+
     @WebSocketServer()
     server: Server
 
-    constructor(private readonly gameService: GameService) { }
-
-    @SubscribeMessage('move')
-    handleEvent(@MessageBody() data: string,
-        @ConnectedSocket() socket: Socket): string {
-
-        const msg = JSON.parse(data);
-
-        const broadcastMsg = {
-            paddle1: msg.y,
-            paddle2: msg.y,
-            ball: {
-                x: 350,
-                y: 300,
-                vx: 300,
-                vy: 300,
-            }
-        };
-        // this.server.emit("state", JSON.stringify(broadcastMsg));
-        return data; // TODO: Remove ?
+    constructor(private readonly gameService: GameService,
+                private readonly authService : AuthService,
+                private readonly usersService: UsersService,
+               ) {
     }
 
-    handleConnection(client: any, ...args: any[]): any {
-        Logger.log(`Game: connected... id: ${client.id}`);
+    @SubscribeMessage('move')
+    async handleEvent(@MessageBody() data: string,
+        @ConnectedSocket() socket: Socket) {
+
+        const msg = JSON.parse(data);
+        const user =  this.userSockets[socket.id];
+
+        const game = await this.gameService.findGameFromSocket(socket.id);
+        if (!game) {
+          return;
+        }
+
+        game.onPlayerMove();
+        // this.server.emit("state", JSON.stringify(broadcastMsg));
+    }
+
+    private async verifyUser(token: string) : Promise<User> {
+
+        if (!token)
+          return null;
+
+        const userId = this.authService.verifyToken(token);
+
+        return await this.usersService.findById(userId.sub);
+    }
+
+    async handleConnection(client: any, ...args: any[]) {
+
+        const user = await this.verifyUser(client.handshake.auth.token);
+        if (!user) {
+          Logger.log("WS: client is not verified. dropped.");
+          return ;
+        }
+        this.userSockets[client.id] = user;
+
+        Logger.log(`Game: ${user.username}#${user.id} connected`);
     }
 
     handleDisconnect(client: any): any {
@@ -58,7 +82,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
   @ConnectedSocket() client: Socket): string {
     // handle the classicModeQueue event emitted from the client
-    Logger.log(`Client ${client.id} joined queue`);
+
+    const user =  this.userSockets[client.id];
+    Logger.log(`Client ${user.username} joined queue`);
 
     return this.gameService.joinQueue(client, joinQueueData);
   }
@@ -67,6 +93,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleAbortQueue(@MessageBody() payload: GameSettingsDto,
   @ConnectedSocket() client: Socket) {
     // handle the classicModeQueue event emitted from the client
+    const user =  this.userSockets[client.id];
     return this.gameService.quitQueue(client);
   }
 // }

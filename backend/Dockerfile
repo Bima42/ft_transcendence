@@ -8,7 +8,13 @@ EXPOSE 3080
 ENTRYPOINT ["entrypoint.sh"]
 
 RUN apk update && apk upgrade \
-    && apk add --no-cache --quiet --update shadow dos2unix postgresql-client
+    && apk add --no-cache --quiet --update shadow dos2unix postgresql-client python3 \
+    build-base \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev
 
 # Use the already generated `node` user to run the app
 RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
