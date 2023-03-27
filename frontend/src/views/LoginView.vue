@@ -4,6 +4,7 @@
         <ButtonCustom :loading="loading" :click="login" :style="'login'">
             Login with 42
         </ButtonCustom>
+      <ButtonCustom styles="fat" @click="loginAsBob">Login as bob</ButtonCustom>
     </section>
 </template>
 
@@ -11,6 +12,11 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+
+async function loginAsBob() {
+  const redirect = "https://localhost:4443/api/auth/bob"
+  window.open(redirect, '_self')
+}
 
 const loading = ref(false)
 
