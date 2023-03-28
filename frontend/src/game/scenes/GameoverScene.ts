@@ -20,12 +20,12 @@ export default class GameoverScene extends Scene {
 
 		this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C)
 			.on('up', function(key, event) {
-			this.scene.start('PongScene', { customPong: false })
+			this.scene.start('PongScene', { classic: true })
 			}, this);
 
 		this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 			.on('up', function(key, event) {
-			this.scene.start('PongScene', { customPong: true })
+			this.scene.start('PongScene', { classic: false })
 			}, this);
     }
 

@@ -11,10 +11,13 @@ function launch(containerId: any, gameSettings: IGame) {
 		height: 600,
 		parent: containerId,
 		physics: {
-			default: 'arcade',
-			arcade: {
-				debug: false
-			}
+			default: 'matter',
+      matter: {
+        gravity: {
+          y: 0
+        },
+      },
+      debug: false,
 		},
 		scene: [BootScene]
   }
