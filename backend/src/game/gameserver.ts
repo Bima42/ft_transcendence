@@ -1,54 +1,55 @@
-
+import { Engine, Bodies, Render, Runner, Composite, Events, World } from "matter-js";
+// import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { Game } from '@prisma/client';
+
+const fps = 10;
 
 type PlayerMoveDto = {
   y: number
 }
 
-type WorldState = {
-  ball: {
-    x: number,
-    y: number,
-    vx: number,
-    vy: number,
-  }
-      paddle1: number
-      paddle2: number
-}
-
-class GameSettings {
-  classic?: boolean;
-  maxScore?: number = 3;
-  server: Server;
-  player1?: Socket;
-  player2?: Socket;
-}
-
 export class GameServer {
-  private ball: {
-    x: number,
-    y: number,
-    vx: number,
-    vy: number,
-  }
-  private paddle1: number;
-  private paddle2: number;
+  private ball: any;
+  private paddle1: any;
+  private paddle2: any;
   private cancelInterval;
+  private engine!: any;
+  private world!: any;
+  private roomID: string;
 
   constructor(private server: Server,
               private game: Game,
               private players : Socket[]) {
-    this.ball = {x: 0, y: 0, vx: 0, vy: 0};
+    Logger.log("Hey Matter");
+    this.roomID = String(this.game.id);
 
-    this.cancelInterval = setInterval(() => this.update(), 1000);
+    // Init MatterJS
+    this.engine = Engine.create();
+    this.world = this.engine.world;
+    this.world.gravity.y = 0.01;
+    this.world.bounds = {
+      min: {x: 0, y: 0},
+      max: {x: 800, y: 600},
+    }
+
+    Logger.log("Hey Matter2");
+    this.ball = Bodies.rectangle(400, 300, 22, 22);
+    World.add(this.engine.world, this.ball);
+
+    this.paddle1 = Bodies.rectangle(20, 300, 24, 104);
+    this.paddle2 = Bodies.rectangle(770, 300, 24, 104);
+
+    this.cancelInterval = setInterval(() => {
+    this.update();
+}, 1000 / fps);
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
     Logger.log(`PlayerMove from ${socket.data.user.username}: ${JSON.stringify(playerMove)}`);
-    this.paddle1 = playerMove.y;
-    socket.to(String(this.game.id)).emit("enemyMove", playerMove);
+    this.paddle1.position.y = playerMove.y;
+    socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 
   onPlayerDisconnect() {
@@ -59,9 +60,21 @@ export class GameServer {
 
 
   update() {
-    Logger.log("Game update " + this.ball.x);
-    this.ball.x++
-    this.server.to(String(this.game.id)).emit("state")
+    Logger.log("Ball = " + JSON.stringify(this.ball.position));
+    Engine.update(this.engine, 1000 / fps);
+
+    const world : WorldState = {
+      ball: {
+        x: this.ball.position.x,
+        y: this.ball.position.y,
+        vx: this.ball.velocity.x,
+        vy: this.ball.velocity.y,
+      },
+      paddle1: this.paddle1.position.y,
+      paddle2: this.paddle2.position.y,
+      obstacles: [],
+    }
+    this.server.to(String(this.game.id)).emit("state", world)
   }
 
 
@@ -70,61 +83,79 @@ export class GameServer {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// class Ball extends Phaser.Physics.Arcade.Image {
-//   body: Phaser.Physics.Arcade.Body;
+// class Ball extends Matter.Bodies.circle {
 //
-// 	constructor(scene: Phaser.Scene, x: number, y: number) {
-// 		super(scene, x, y, 'assets', 'ball1')
-// 		scene.add.existing(this);
-// 		scene.physics.add.existing(this);
-// 		this.setCollideWorldBounds(true).setBounce(1);
-// 		this.body.maxSpeed = 700;
-// 	}
-// }
+//   public maxSpeed = 15;
 //
-// class Paddle extends Phaser.Physics.Arcade.Image {
-//   body: Phaser.Physics.Arcade.Body;
-//
-//
-// 	constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
-// 		super(scene, x, y, 'assets', 'paddle' + nPlayer)
-// 		scene.add.existing(this);
-// 		scene.physics.add.existing(this);
-// 		this.setImmovable();
-//         this.angle = 90;
-// 		this.setSize(this.height, this.width);
-// 		this.body.maxSpeed = 700;
-// 	}
-// }
-//
-// class GameSettings {
-//   classic: boolean;
-//   maxScore: number = 3;
-//   socket: Server;
-// }
-//
-// class WorldState {
-//   ball: {
-//     x: number,
-//     y: number,
-//     vx: number,
-//     vy: number,
+//   constructor(scene: Phaser.Scene, x: number, y: number) {
+//     super(scene.matter.world, x, y, 'assets', 'ball1')
+//     scene.add.existing(this);
+//     scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+//     this.setFriction(0, 0, 0);
+//     this.setBounce(1);
 //   }
-//       paddle1: number
-//       paddle2: number
+//
 // }
 //
-// class Obstacle extends Phaser.Physics.Arcade.Image {
-//   body: Phaser.Physics.Arcade.Body;
+// class Paddle extends Phaser.Physics.Matter.Image {
 //
-// 	constructor(scene: Phaser.Scene, x: number, y: number, color: string) {
-// 		super(scene, x, y, 'assets', color + '1')
-// 		scene.add.existing(this);
-// 		scene.physics.add.existing(this);
-// 		this.body.maxSpeed = 200;
-// 		this.setImmovable().setVelocityY(this.body.maxSpeed).setCollideWorldBounds(true).setBounce(1)
-// 	}
+//   public maxSpeed = 10;
+//
+//   constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
+//     super(scene.matter.world, x, y, 'assets', 'paddle' + nPlayer, {isStatic: true,chamfer: { radius: 15 }})
+//     scene.add.existing(this);
+//     scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+//     this.setFixedRotation();
+//     this.setRotation(Math.PI / 2);
+//     this.setSize(this.height, this.width);
+//   }
+//
+//
 // }
+//
+// class Obstacle extends Phaser.Physics.Matter.Image {
+//
+//   private maxSpeed = 2;
+//   private dir = -1;
+//
+//   constructor(scene: Phaser.Scene, x: number, y: number, color: string) {
+//     super(scene.matter.world, x, y, 'assets', color + '1')
+//     scene.add.existing(this);
+//     scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+//     this.setBounce(1);
+//     this.setStatic(true);
+//     this.setFriction(0);
+//     this.setVelocity(0, 2);
+//   }
+//
+//   update () {
+//     this.y += this.dir * this.maxSpeed;
+//     if (this.y < 15 || this.y > 585)
+//       this.dir *= -1;
+//   }
+//
+// }
+
+class GameSettings {
+  classic: boolean = true;
+  maxScore: number = 3;
+}
+
+type WorldState = {
+  ball: {
+    x: number,
+    y: number,
+    vx: number,
+    vy: number,
+  }
+  paddle1: number
+  paddle2: number
+  obstacles: {
+    x: number,
+    y: number
+  }[]
+}
+
 //
 // export class PongScene extends Phaser.Scene {
 //

@@ -116,11 +116,11 @@ export default class PongScene extends Phaser.Scene {
     this.ball.x = state.ball.x;
     this.ball.y = state.ball.y;
     this.ball.setVelocity(state.ball.vx, state.ball.vy);
-    let i = 0;
-    state.obstacles.forEach((o) => {
-      this.obstacles[i].x = o.x;
-      i = i + 1;
-    })
+    // let i = 0;
+    // state.obstacles.forEach((o) => {
+    //   this.obstacles[i].x = o.x;
+    //   i = i + 1;
+    // })
   }
 
   create(config: IGame): void {
@@ -128,7 +128,10 @@ export default class PongScene extends Phaser.Scene {
 
     this.socket = gameStore.socket as Socket;
     this.socket.on("state", (state: WorldState) => {
+      try {
+        console.log("State = " + JSON.stringify(state))
         this.updateWorld(state);
+      } catch {}
       }
     );
 
@@ -160,7 +163,7 @@ export default class PongScene extends Phaser.Scene {
     this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
     this.scores = [0, 0];
 
-    if (this.config.classic) {
+    if (! this.config.classic) {
       this.obstacles[0] = new Obstacle(this, 200, 300, 'red');
       this.obstacles[1] = new Obstacle(this, 300, 200, 'yellow');
       this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
