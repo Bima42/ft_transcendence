@@ -86,6 +86,7 @@ model UserGame {
 
 model Game {
   id        Int        @id @unique @default(autoincrement())
+  type      GameType   @default(CLASSIC)
   status    GameStatus @default(SEARCHING)
   createdAt DateTime   @default(now())
   endedAt   DateTime?
@@ -124,4 +125,9 @@ enum GameStatus {
   SEARCHING
   STARTED
   ENDED
+}
+
+enum GameType {
+  CLASSIC
+  CUSTOM
 }

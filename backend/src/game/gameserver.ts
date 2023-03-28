@@ -1,4 +1,3 @@
-import Phaser from 'phaser'
 
 import { Socket, Server } from "socket.io";
 
@@ -31,14 +30,17 @@ export class GameServer {
     this.ball = {x: 0, y: 0, vx: 0, vy: 0};
     this.server = config.server;
 
-    // this.cancelInterval = setInterval(() => this.update(), 1000);
+    this.cancelInterval = setInterval(() => this.update(), 1000);
 
-    this.server.on("move", (playerMove: PlayerMoveDto) => this.onPlayerMove());
   }
 
   // onPlayerMove(_playerMove: PlayerMoveDto) {
-  onPlayerMove() {
-    console.log("PlayerMove");
+  onPlayerMove(socket: Socket) {
+    console.log(`PlayerMove from ${socket.data.user.username}`);
+  }
+
+  onPlayerDisconnect() {
+
   }
 
 

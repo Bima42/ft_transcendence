@@ -37,15 +37,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         @ConnectedSocket() socket: Socket) {
 
         const msg = JSON.parse(data);
-        const user =  this.userSockets[socket.id];
 
-        const game = await this.gameService.findGameFromSocket(socket.id);
-        if (!game) {
+        const gameServer = socket.data.gameServer;
+        if (!gameServer) {
+          Logger.log("No game server found");
           return;
         }
 
-        game.onPlayerMove();
-        // this.server.emit("state", JSON.stringify(broadcastMsg));
+        gameServer.onPlayerMove(socket);
     }
 
     private async verifyUser(token: string) : Promise<User> {
@@ -67,33 +66,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         }
         this.userSockets[client.id] = user;
 
+        // attach the user to the socket
+        client.data.user = user;
+
+        // client joins its own rooms, so that we send messages to all his devices
+        client.join(user.username);
+
         Logger.log(`Game: ${user.username}#${user.id} connected`);
     }
 
     handleDisconnect(client: any): any {
-        Logger.log(`Game: disconnect... id: ${client.id}`);
+        Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
+        this.gameService.quitQueue(client.data.user);
     }
 
   afterInit(server: Server) {
     Logger.log('WebSocket server initialized');
+    this.gameService.setServer(server);
   }
 
   @SubscribeMessage('newJoinQueue')
   handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
-  @ConnectedSocket() client: Socket): string {
-    // handle the classicModeQueue event emitted from the client
-
-    const user =  this.userSockets[client.id];
-    Logger.log(`Client ${user.username} joined queue`);
-
+                  @ConnectedSocket() client: Socket): string {
     return this.gameService.joinQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')
-  handleAbortQueue(@MessageBody() payload: GameSettingsDto,
-  @ConnectedSocket() client: Socket) {
-    // handle the classicModeQueue event emitted from the client
-    const user =  this.userSockets[client.id];
+  handleAbortQueue(@ConnectedSocket() client: Socket) {
     return this.gameService.quitQueue(client);
   }
 // }
