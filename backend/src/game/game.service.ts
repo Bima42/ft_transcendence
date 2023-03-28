@@ -125,8 +125,7 @@ async CreateUserGame(match: Game): Promise<UserGame> {
 
 
 private async startGame(game: Game, players: Socket[]): Promise<void> {
-  Logger.log(`starting the game between
-             ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+  Logger.log(`starting the game between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
   // Update the game status to 'STARTED'
   await this.prismaService.game.update({
@@ -135,10 +134,13 @@ private async startGame(game: Game, players: Socket[]): Promise<void> {
   });
 
   // Create the game server
-  const gameServer = new GameServer({server: this.server});
+  const gameServer = new GameServer(this.server, game, players);
   this.gameServers.push(gameServer);
-  players[0].data.gameServer = gameServer;
-  players[1].data.gameServer = gameServer;
+  players.forEach((player) => {
+      player.data.gameServer = gameServer;
+      player.data.game = game;
+      player.join(String(game.id))
+  })
 }
 
 async   findGameFromUser( user: User) : Promise<GameServer>{

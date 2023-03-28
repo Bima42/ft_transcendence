@@ -33,10 +33,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     }
 
     @SubscribeMessage('move')
-    async handleEvent(@MessageBody() data: string,
+    async handleEvent(@MessageBody() data: any,
         @ConnectedSocket() socket: Socket) {
-
-        const msg = JSON.parse(data);
 
         const gameServer = socket.data.gameServer;
         if (!gameServer) {
@@ -44,7 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
           return;
         }
 
-        gameServer.onPlayerMove(socket);
+        gameServer.onPlayerMove(socket, data);
     }
 
     private async verifyUser(token: string) : Promise<User> {
@@ -77,7 +75,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     handleDisconnect(client: any): any {
         Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
-        this.gameService.quitQueue(client.data.user);
+        this.gameService.quitQueue(client);
     }
 
   afterInit(server: Server) {

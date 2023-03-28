@@ -1,8 +1,21 @@
 
 import { Socket, Server } from "socket.io";
+import { Logger } from "@nestjs/common";
+import { Game } from '@prisma/client';
 
 type PlayerMoveDto = {
   y: number
+}
+
+type WorldState = {
+  ball: {
+    x: number,
+    y: number,
+    vx: number,
+    vy: number,
+  }
+      paddle1: number
+      paddle2: number
 }
 
 class GameSettings {
@@ -22,31 +35,33 @@ export class GameServer {
   }
   private paddle1: number;
   private paddle2: number;
-  private server: Server;
-  private clients: Socket[];
   private cancelInterval;
 
-  constructor(config: GameSettings) {
+  constructor(private server: Server,
+              private game: Game,
+              private players : Socket[]) {
     this.ball = {x: 0, y: 0, vx: 0, vy: 0};
-    this.server = config.server;
 
     this.cancelInterval = setInterval(() => this.update(), 1000);
-
   }
 
-  // onPlayerMove(_playerMove: PlayerMoveDto) {
-  onPlayerMove(socket: Socket) {
-    console.log(`PlayerMove from ${socket.data.user.username}`);
+  onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
+    Logger.log(`PlayerMove from ${socket.data.user.username}: ${JSON.stringify(playerMove)}`);
+    this.paddle1 = playerMove.y;
+    socket.to(String(this.game.id)).emit("enemyMove", playerMove);
   }
 
   onPlayerDisconnect() {
+    console.log
+    this.cancelInterval();
 
   }
 
 
   update() {
-    console.log("Game update " + this.ball.x);
+    Logger.log("Game update " + this.ball.x);
     this.ball.x++
+    this.server.to(String(this.game.id)).emit("state")
   }
 
 

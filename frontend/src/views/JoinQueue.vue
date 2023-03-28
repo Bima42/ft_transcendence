@@ -70,6 +70,7 @@ gameStore.socket.on('connect', () => {
 gameStore.socket.on('matchFound', (opponentId: string) => {
   console.log(`Match found with opponent ${opponentId}`);
   isLoading.value = false;
+  gameStore.socket.off('matchFound');
 });
 
 
