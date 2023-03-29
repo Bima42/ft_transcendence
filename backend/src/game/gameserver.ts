@@ -1,10 +1,14 @@
-import { Engine, Bodies, Render, Runner, Composite, Events, World } from "matter-js";
+import { Engine, Bodies, Common, Collision, Body, Render, Runner, Composite, Events, World } from "matter-js";
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { Game } from '@prisma/client';
 
-const fps = 10;
+const fps = 20;
+const ballMaxSpeed = 10;
+const world_width = 800;
+const world_height = 600;
+const wall_thickness = 50;
 
 type PlayerMoveDto = {
   y: number
@@ -14,53 +18,129 @@ export class GameServer {
   private ball: any;
   private paddle1: any;
   private paddle2: any;
-  private cancelInterval;
+  private cancelInterval: any;
   private engine!: any;
   private world!: any;
   private roomID: string;
+  private players: any;
+  private wall;
+  private scores: Array<number> = [0, 0];
+  private maxScore: number = 3
 
   constructor(private server: Server,
               private game: Game,
-              private players : Socket[]) {
-    Logger.log("Hey Matter");
+              sockets: Socket[]) {
     this.roomID = String(this.game.id);
+    this.players = [];
+    this.players.push(sockets[0])
+    this.players.push(sockets[1])
 
     // Init MatterJS
     this.engine = Engine.create();
-    this.world = this.engine.world;
-    this.world.gravity.y = 0.01;
-    this.world.bounds = {
-      min: {x: 0, y: 0},
-      max: {x: 800, y: 600},
-    }
+    this.engine.gravity.y = 0;
 
-    Logger.log("Hey Matter2");
-    this.ball = Bodies.rectangle(400, 300, 22, 22);
-    World.add(this.engine.world, this.ball);
 
-    this.paddle1 = Bodies.rectangle(20, 300, 24, 104);
-    this.paddle2 = Bodies.rectangle(770, 300, 24, 104);
 
-    // this.cancelInterval = setInterval(() => { this.update(); }, 1000 / fps);
+    this.ball = Bodies.rectangle(world_width / 2, world_height / 2 + 200, 22, 22);
+    Body.setInertia(this.ball, Infinity);
+    this.ball.friction = 0;
+    this.ball.frictionAir = 0;
+    this.ball.frictionStatic = 0;
+    this.ball.restitution = 1;
+    Composite.add(this.engine.world, this.ball);
+
+    this.paddle1 = Bodies.rectangle(40, 300, 24, 104, {isStatic: true});
+    Body.setInertia(this.paddle1, Infinity);
+    Composite.add(this.engine.world, this.paddle1);
+    this.paddle2 = Bodies.rectangle(740, 300, 24, 104, {isStatic: true});
+    Body.setInertia(this.paddle2, Infinity);
+    Composite.add(this.engine.world, this.paddle2);
+
+    // Walls
+    const worldOption = { isStatic: true };
+    Composite.add(this.engine.world, [
+      Bodies.rectangle(world_width/2, -wall_thickness/2, world_width, wall_thickness, worldOption), // upper wall
+      Bodies.rectangle(world_width/2, world_height + wall_thickness/2, world_width, wall_thickness, worldOption), // lower wall
+      Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
+      Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption)]) // right wall
+
+    this.onStartGame();
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
-    Logger.log(`PlayerMove from ${socket.data.user.username}: ${JSON.stringify(playerMove)}`);
+    Logger.log(`Game#${this.roomID}: PlayerMove from ${socket.data.user.username}: ${JSON.stringify(playerMove)}`);
     this.paddle1.position.y = playerMove.y;
     socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 
-  onPlayerDisconnect() {
-    console.log
-    this.cancelInterval();
-
+  onPlayerDisconnect(client: Socket) {
+    Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected. abort game`);
+    clearInterval(this.cancelInterval);
+    this.players[0].data.game = null;
+    this.players[0].data.gameServer = null;
+    this.players[1].data.game = null;
+    this.players[1].data.gameServer = null;
+    this.server.to(this.roomID).emit("playerDisconnect")
   }
 
+  onPlayerIsReady(client: Socket) {
+    Logger.log(`Game#${this.roomID}: ${client.data.user.username} is ready to play`);
+    client.data.isReady = true;
+    if (this.players[0].data.isReady && this.players[1].data.isReady)
+      this.onStartGame();
+  }
+
+  onStartGame() {
+    Logger.log(`Game#${this.roomID}: Starting game !`);
+      this.server.emit("gameover")
+    setTimeout(() => {
+    this.cancelInterval = setInterval(() => { this.update(); }, 1000 / fps);
+    }, 500);
+    this.server.to(this.roomID).emit("startGame");
+    Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: ballMaxSpeed});
+  }
+
+  private resetLevel(): void {
+    if (this.ball.position.x < 0) {
+      this.scores[1] += 1;
+    } else {
+      this.scores[0] += 1;
+    }
+    //
+    if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
+      Logger.log(`Game#${this.roomID}: Game over !`)
+      this.server.to(this.roomID).emit("gameover")
+      return;
+    } else {
+      Logger.log(`Game#${this.roomID}: point ended`);
+      this.server.to(this.roomID).emit("pointEnd")
+      // Reset ball
+      this.ball.setVelocity(0);
+      this.ball.setPosition(world_width / 2, world_width / 2);
+    }
+
+    clearInterval(this.cancelInterval);
+  }
 
   update() {
-    Logger.log("Ball = " + JSON.stringify(this.ball.position));
+    // console.log(`Game#${this.roomID}: Ball = ${JSON.stringify(this.ball.position)}, paddle1 = ${JSON.stringify(this.paddle1.position)}, paddle2 = ${JSON.stringify(this.paddle2.position)}`);
     Engine.update(this.engine, 1000 / fps);
 
+    if (Collision.collides(this.ball, this.paddle1)) {
+      this.hitPaddle(this.ball, this.paddle1)
+    }
+    if (Collision.collides(this.ball, this.paddle2)) {
+      this.hitPaddle(this.ball, this.paddle2)
+    }
+
+    if (this.ball.x < 0 || this.ball.x > 800) {
+      this.resetLevel();
+    }
+
+    this.sendStateToClients();
+  }
+
+  sendStateToClients() {
     const world : WorldState = {
       ball: {
         x: this.ball.position.x,
@@ -73,6 +153,22 @@ export class GameServer {
       obstacles: [],
     }
     this.server.to(String(this.game.id)).emit("state", world)
+
+  }
+
+  hitPaddle(ball: any, paddle: any) {
+    const minAngle = 30;
+    const percentage = Common.clamp((ball.position.y - paddle.position.y + 104 / 2) / 104, 0, 1)
+    var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+    // Mirror translation for the paddle on the left
+    if (ball.position.x < 300)
+      newAngle *= -1;
+    // convert to radian
+    newAngle *= Math.PI / 180;
+    Body.setVelocity(this.ball, {
+      x: ballMaxSpeed * Math.sin(newAngle),
+      y: ballMaxSpeed * Math.cos(newAngle)
+    });
   }
 
 

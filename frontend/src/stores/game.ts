@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia';
 import { io, Socket } from "socket.io-client"
 import { getCookie } from 'typescript-cookie';
-import type IGame from '@/interfaces/game/IGame'
+import type IGameSettings from '@/interfaces/game/IGameSettings';
 
 export const useGameStore = defineStore('game', () => {
   const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/game`, {
@@ -10,7 +10,7 @@ export const useGameStore = defineStore('game', () => {
     path: "/api/socket.io/",
   }));
 
-  let currentGame = ref<IGame>(null);
+  let currentGame = ref<IGameSettings>(null);
 
 
   return { socket, currentGame }

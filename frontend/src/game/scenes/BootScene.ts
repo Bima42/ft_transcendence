@@ -16,6 +16,7 @@ export default class BootScene extends Scene {
   }
 
   create () {
+    this.scene.launch('UiScene')
     this.scene.start('PongScene')
   }
 }

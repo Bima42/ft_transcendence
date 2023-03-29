@@ -1,8 +1,13 @@
 import Phaser from 'phaser'
 import { Socket } from "socket.io-client"
 import type IGame from '@/interfaces/game/IGame'
+import type IUser from '@/interfaces/user/IUser'
+import type GameType from '@/interfaces/game/IGame'
+import type GameStatus from '@/interfaces/game/IGame'
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
+import type UiScene from './UiScene'
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -33,8 +38,6 @@ class Paddle extends Phaser.Physics.Matter.Image {
     this.setRotation(Math.PI / 2);
     this.setSize(this.height, this.width);
   }
-
-
 }
 
 class Obstacle extends Phaser.Physics.Matter.Image {
@@ -60,11 +63,6 @@ class Obstacle extends Phaser.Physics.Matter.Image {
 
 }
 
-class GameSettings {
-  classic: boolean = true;
-  maxScore: number = 3;
-}
-
 type WorldState = {
   ball: {
     x: number,
@@ -80,48 +78,50 @@ type WorldState = {
   }[]
 }
 
+class GameSettings {
+  public maxScore: number = 3
+  public type: GameType = 'CLASSIC'
+  public player1!: IUser
+  public player2!: IUser
+}
+
 export default class PongScene extends Phaser.Scene {
 
-  private config: GameSettings;
+  private config = new GameSettings();
   private ball!: Ball;
   private paddle1!: Paddle;
   private paddle2!: Paddle;
+  private myPaddle!: Paddle;
+  private otherPaddle!: Paddle;
   private keys: any;
-  private scores: Array<number> = [0, 0];
-  private scoreText: any;
+  public scores: Array<number> = [0, 0];
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
   private isReady: boolean = false;
-  private startButton!: Phaser.GameObjects.Text;
 
-  private countdown: number = 0;
-  private countdownEvent!: Phaser.Time.TimerEvent
 
   constructor() {
     super({ key: 'PongScene' })
-    this.config = new GameSettings();
   }
 
   preload() {
 
   }
 
-  private parseConfig(config: IGame) {
-
-    if (!config) {
-      this.config.maxScore = 3;
-      this.config.classic = true;
-      return;
-    }
-    this.config.maxScore = 3;
-    this.config.classic = (config.type == 'CLASSIC' ? true : false) ?? true;
+  private parseConfig(config: IGameSettings) {
 
     console.log(`config = ${JSON.stringify(config)}`);
-    // if (config.player1.id == userStore.user?.id)
-    //   console.log("Player 1");
-    // else
-    //   console.log("Player 2");
-
+    if (!config) {
+      console.warn('no game settings provided');
+      this.config.maxScore = 3;
+      this.config.type = 'CLASSIC';
+      return;
+    }
+    this.config = new GameSettings();
+    this.config.type = config.game.type;
+    this.config.player1 = config.player1;
+    this.config.player2 = config.player1;
+    this.config.maxScore = 3;
   }
 
   private updateWorld(state: WorldState) {
@@ -137,18 +137,19 @@ export default class PongScene extends Phaser.Scene {
     // })
   }
 
-  create(config: IGame): void {
+
+  create(config: IGameSettings): void {
     this.parseConfig(config);
-    if (this.config.classic) {
-      console.log("Classic game.");
+    if (this.config.type == 'CLASSIC') {
+      console.log(`Game #${config.game.id}: Classic game.`);
     } else {
-      console.log("Custom game !");
+      console.log(`Game #${config.game.id}: Custom game.`);
     }
 
     this.socket = gameStore.socket as Socket;
     this.socket.on("state", (state: WorldState) => {
       try {
-        console.log("State = " + JSON.stringify(state))
+        // console.log("State = " + JSON.stringify(state))
         this.updateWorld(state);
       } catch {}
       }
@@ -157,11 +158,27 @@ export default class PongScene extends Phaser.Scene {
     this.socket.on("enemyMove", (msg: any) => {
       const y = msg.y || 0;
       console.log(`enemy moved at position: ${y}`)
-      this.paddle2.y = msg.y;
+      this.paddle2.y = y;
+    });
+
+    this.socket.on("startGame", () => {
+      this.startGame()
+      const uiScene = this.scene.get('UiScene') as UiScene;
+      uiScene.startGame();
+    });
+
+    this.socket.on("playerDisconnect", () => {
+      const uiScene = this.scene.get('UiScene') as UiScene;
+      uiScene.onPlayerDisconnect()
+    });
+
+    this.socket.on("pointFinish", () => {
+        console.log("Point finished");
     });
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
-    this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
+    // this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
+    // this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
 
     this.ball = new Ball(this, 400, 300);
     this.ball.setData('uponStart', true);
@@ -172,10 +189,7 @@ export default class PongScene extends Phaser.Scene {
     this.ball.setOnCollideWith(this.paddle1, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
     this.ball.setOnCollideWith(this.paddle2, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
 
-    this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
-    this.scores = [0, 0];
-
-    if (! this.config.classic) {
+    if ( this.config.type != 'CLASSIC') {
       this.obstacles[0] = new Obstacle(this, 200, 300, 'red');
       this.obstacles[1] = new Obstacle(this, 300, 200, 'yellow');
       this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
@@ -190,9 +204,18 @@ export default class PongScene extends Phaser.Scene {
     //  Input events
     this.keys = this.input.keyboard.addKeys('s,w');
 
-    this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, 'Start game')
-    this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: 2});
-    this.waitingRoom();
+    this.myPaddle = this.paddle1;
+    this.otherPaddle = this.paddle2;
+    // If it is the second player
+    if (this.config.player2 && this.config.player2.id == userStore.user?.id){
+      // rotate the screen
+      this.cameras.main.setRotation(Math.PI);
+      // inverse controls
+      this.myPaddle = this.paddle2;
+      this.otherPaddle = this.paddle1;
+    }
+
+
   }
 
   private resetBall() {
@@ -212,48 +235,13 @@ export default class PongScene extends Phaser.Scene {
     }
 
     this.resetBall();
-    this.waitingRoom();
+    (this.scene.get('UiScene') as UiScene).waitingRoom();
   }
 
-  private waitingRoom() {
-    this.isReady = false;
-    this.startButton.setOrigin(0.5)
-      .setVisible(true)
-      .setText("Ready")
-      .setPadding(10)
-      .setStyle({ backgroundColor: '#111' })
-      .setInteractive({ useHandCursor: true })
-      .on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
-      .on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
-      .on('pointerdown', () => {
-        this.isReady = true;
-        this.startButton.setText("Waiting for opponent...")
-          .setStyle({ fill: '#FFF' })
-          .off('pointerover')
-          .off('pointerout')
-
-        this.startGame();
-    })
-  }
 
 
   private startGame() {
-    this.countdown = 3;
-    this.startButton.setText(String(this.countdown));
-    this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown });
-    this.time.addEvent(this.countdownEvent);
-  }
 
-  private onCountdown() {
-    console.log("onCountdown");
-
-      this.countdown--;
-      this.startButton.setText(String(this.countdown));
-      if (this.countdown == 0) {
-
-        this.startButton.setVisible(false);
-        this.ball.setVelocity(-this.ball.maxSpeed, 0);
-      }
   }
 
   hitObstacle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
@@ -268,38 +256,39 @@ export default class PongScene extends Phaser.Scene {
   }
 
     hitPaddle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
-      let ball = data.bodyA.gameObject as Ball;
-      let paddle = data.bodyB.gameObject as Paddle;
-      const minAngle = 30;
-      const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
-      var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
-      // Mirror translation for the paddle on the left
-      if (ball.x < 300)
-        newAngle *= -1;
-      // convert to radian
-      newAngle *= Math.PI / 180;
-      ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
-  //
+      // let ball = data.bodyA.gameObject as Ball;
+      // let paddle = data.bodyB.gameObject as Paddle;
+      // const minAngle = 30;
+      // const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
+      // var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+      // // Mirror translation for the paddle on the left
+      // if (ball.x < 300)
+      //   newAngle *= -1;
+      // // convert to radian
+      // newAngle *= Math.PI / 180;
+      // ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
+      //
   }
 
   update() {
-    this.scoreText.setText(this.scores[0] + " - " + this.scores[1]);
-    Phaser.Display.Align.In.Center(this.scoreText, this.add.zone(400, 30, 800, 400));
 
-    if (this.ball.x < 0 || this.ball.x > 800) {
-      this.resetLevel();
-    }
+    // if (this.ball.x < 0 || this.ball.x > 800) {
+    //   this.resetLevel();
+    // }
 
     this.paddle1.setVelocity(0);
+    let move = false;
     if (this.keys.s.isDown) {
-      this.paddle1.y += this.paddle1.maxSpeed;
-      this.socket.emit("move", { y: this.paddle1.y });
+      this.myPaddle.y += this.myPaddle.maxSpeed;
+      move = true;
     }
     if (this.keys.w.isDown) {
-      this.paddle1.y -= this.paddle1.maxSpeed;
-      this.socket.emit("move", { y: this.paddle1.y });
+      this.myPaddle.y -= this.myPaddle.maxSpeed;
+      move = true;
     }
-    this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, 0, 600);
+    this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, 600);
+    if (move)
+      this.socket.emit("move", { y: this.myPaddle.y });
 
     this.obstacles.forEach((o) => o.update());
   }

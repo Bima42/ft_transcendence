@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocke
 import { Socket, Server } from 'socket.io'
 import { User } from '@prisma/client';
 import { GameService } from './game.service';
-import { GameSettingsDto } from './dto/joinQueueData.dto';
+import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { GameServer } from './gameserver'
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -38,11 +38,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
         const gameServer = socket.data.gameServer;
         if (!gameServer) {
-          Logger.log("No game server found");
           return;
         }
 
         gameServer.onPlayerMove(socket, data);
+    }
+
+    @SubscribeMessage('gameover')
+    async onGameover(@MessageBody() data: any) {
+
+      Logger.log("gameover......");
     }
 
     private async verifyUser(token: string) : Promise<User> {
@@ -55,28 +60,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         return await this.usersService.findById(userId.sub);
     }
 
-    async handleConnection(client: any, ...args: any[]) {
+  async handleConnection(client: any, ...args: any[]) {
 
-        const user = await this.verifyUser(client.handshake.auth.token);
-        if (!user) {
-          Logger.log("WS: client is not verified. dropped.");
-          return ;
-        }
-        this.userSockets[client.id] = user;
+      const user = await this.verifyUser(client.handshake.auth.token);
+      if (!user) {
+        Logger.log("WS: client is not verified. dropped.");
+        return ;
+      }
+      this.userSockets[client.id] = user;
 
-        // attach the user to the socket
-        client.data.user = user;
+      // attach the user to the socket
+      client.data.user = user;
 
-        // client joins its own rooms, so that we send messages to all his devices
-        client.join(user.username);
+      // client joins its own rooms, so that we send messages to all his devices
+      client.join(user.username);
 
-        Logger.log(`Game: ${user.username}#${user.id} connected`);
-    }
+      Logger.log(`Game: ${user.username}#${user.id} connected`);
+  }
 
-    handleDisconnect(client: any): any {
-        Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
-        this.gameService.quitQueue(client);
-    }
+  handleDisconnect(client: any): any {
+      Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
+      this.gameService.onPlayerDisconnect(client);
+  }
 
   afterInit(server: Server) {
     Logger.log('WebSocket server initialized');
@@ -84,7 +89,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('newJoinQueue')
-  handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
+  handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
                   @ConnectedSocket() client: Socket): string {
     return this.gameService.joinQueue(client, joinQueueData);
   }
@@ -92,6 +97,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('abortJoinQueue')
   handleAbortQueue(@ConnectedSocket() client: Socket) {
     return this.gameService.quitQueue(client);
+  }
+
+  @SubscribeMessage('playerReady')
+  handlePlayerIsReady(@ConnectedSocket() client: Socket) {
+      return this.gameService.playerIsReady(client);
   }
 // }
 

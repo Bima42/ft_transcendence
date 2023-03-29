@@ -3,6 +3,7 @@ import BootScene from '@/game/scenes/BootScene'
 import PongScene from '@/game/scenes/PongScene'
 import GameoverScene from '@/game/scenes/GameoverScene'
 import type IGame from '@/interfaces/game/IGame'
+import UiScene from './scenes/UiScene'
 
 function launch(containerId: any, gameSettings: IGame) {
 	const config = {
@@ -24,6 +25,7 @@ function launch(containerId: any, gameSettings: IGame) {
   const game = new Phaser.Game(config);
 
   game.scene.add('PongScene', PongScene, false, gameSettings);
+  game.scene.add('UiScene', UiScene, false, gameSettings);
   game.scene.add('GameoverScene', GameoverScene, false, {});
 
   return game;

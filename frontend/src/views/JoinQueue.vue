@@ -18,8 +18,8 @@ import CustomButton from '@/components/multiusage/CustomButton.vue'
 import GameSettings from '@/components/game/GameSettings.vue'
 import LoadingGame from '@/components/game/LoadingGame.vue';
 import { useGameStore } from '@/stores/game';
-import type IGame from '@/interfaces/game/IGame';
 import { useRouter } from 'vue-router'
+import type IGameSettings from '@/interfaces/game/IGameSettings';
 
 const router = useRouter()
 
@@ -52,10 +52,10 @@ function onJoinCustom() {
 }
 
 // Listen for the 'match-found' event
-gameStore.socket.on('matchFound', (match: IGame) => {
+gameStore.socket.on('matchFound', (gameSettings: IGameSettings) => {
   (document.getElementById("join_btn") as HTMLButtonElement).disabled = true;
   isLoading.value = false;
-  gameStore.currentGame = match;
+  gameStore.currentGame= gameSettings;
   gameStore.socket.off('matchFound');
 
   // Redirect the user to the game page with the opponent ID

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets'
-import { GameSettingsDto } from './dto/joinQueueData.dto';
+import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { Game } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -22,13 +22,15 @@ export class GameService {
 
   constructor(
     private readonly prismaService: PrismaService
-  ) {}
+  ) {
+
+  }
 
   setServer(server: Server) {
     this.server = server;
   }
 
-  joinQueue(socket: Socket, gameSettings: GameSettingsDto): string {
+  joinQueue(socket: Socket, gameSettings: JoinQueueDto): string {
 
     const user: User = socket.data.user;
 
@@ -82,7 +84,7 @@ export class GameService {
 
 //   This function finds an available game with status 'SEARCHING' and returns it.
 // If no game is found, it creates a new game with status 'SEARCHING' and returns it.
-async findOrCreateMatch(gameSettings: GameSettingsDto): Promise<Game> {
+async findOrCreateMatch(gameSettings: JoinQueueDto): Promise<Game> {
 
   // Find an available game with status 'SEARCHING'
   const availableGame = await this.prismaService.game.findFirst({
@@ -99,6 +101,7 @@ async findOrCreateMatch(gameSettings: GameSettingsDto): Promise<Game> {
   // If no available game is found, create a new game with status 'SEARCHING' and return it
   return await this.prismaService.game.create({
       data: {
+          type: gameSettings.type,
           status: 'SEARCHING'
       }
   });
@@ -121,15 +124,14 @@ async CreateUserGame(match: Game): Promise<UserGame> {
 
 
 private async startGame(match: Game, players: Socket[]): Promise<void> {
-  Logger.log(`starting the game between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+  Logger.log(`Game#${match.id}: match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
   // Emit an event to the clients to indicate that a match has been found
   const gameSettings : GameSettingsDto = {
-    type: match.type,
+    game: match,
     player1: players[0].data.user,
     player2: players[1].data.user,
   }
-  Logger.log(`Settings = ${match}`);
   this.server.to(players[0].data.user.username)
              .to(players[1].data.user.username)
              .emit("matchFound", gameSettings);
@@ -146,12 +148,27 @@ private async startGame(match: Game, players: Socket[]): Promise<void> {
   players.forEach((player) => {
       player.data.gameServer = gameServer;
       player.data.game = match;
+      player.data.isReady = false;
       player.join(String(match.id))
   })
 }
 
-async   findGameFromUser( user: User) : Promise<GameServer>{
+onPlayerDisconnect(client: Socket) {
+  if (client.data.gameServer != null) {
+    client.data.gameServer.onPlayerDisconnect(client);
+    this.gameServers.splice(client.data.gameServer);
+  }
+  this.quitQueue(client);
+  Logger.log("NGame = " + this.gameServers.length);
+}
+
+async findGameFromUser( user: User) : Promise<GameServer>{
   return this.gameSockets[user.id];
+}
+
+playerIsReady(client: Socket) {
+  if (client.data.gameServer)
+    client.data.gameServer.onPlayerIsReady(client);
 }
 
 

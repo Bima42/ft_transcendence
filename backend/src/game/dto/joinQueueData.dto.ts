@@ -1,7 +1,13 @@
-import { User, GameType } from '@prisma/client'
+import { IsEnum } from 'class-validator'
+import { User, Game, GameType } from '@prisma/client'
 
-export type GameSettingsDto =  {
-    type: GameType,
+export class JoinQueueDto {
+  @IsEnum(GameType)
+  type: GameType
+}
+
+export type GameSettingsDto = {
+    game: Game
     player1: User,
     player2: User,
 }
