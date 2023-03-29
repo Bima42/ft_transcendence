@@ -8,13 +8,7 @@ EXPOSE 3080
 ENTRYPOINT ["entrypoint.sh"]
 
 RUN apk update && apk upgrade \
-    && apk add --no-cache --quiet --update shadow dos2unix postgresql-client python3 \
-    build-base \
-    g++ \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    giflib-dev
+    && apk add --no-cache --quiet --update shadow dos2unix postgresql-client python3
 
 # Use the already generated `node` user to run the app
 RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
@@ -29,7 +23,6 @@ RUN yarn install
 
 # Copy the rest of the source
 COPY --chown=node:node . ./
-
 
 USER root
 RUN dos2unix entrypoint.sh \
