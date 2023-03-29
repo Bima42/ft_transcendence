@@ -290,6 +290,8 @@ export class ChannelService {
     await this.prismaService.userChat.delete({
       where: { id: reqUserChat.id }
     });
+
+   this.deleteChatIfEmpty(chatId);
   }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
@@ -467,6 +469,33 @@ export class ChannelService {
           },
         });
     return userchat;
+  }
+
+  async deleteChatIfEmpty(chatId: number): Promise<void> {
+
+    const chat = await this.prismaService.chat.findUnique ({
+      where: { id: chatId },
+      include: { users: true },
+    });
+
+    if (!chat) {
+      throw new NotFoundException(`Chat not found`);
+    }
+
+    if (chat.users.length === 0 && !(chat.id == 1)) {
+      Logger.log(`Chat ${chat.name} deleted because empty`);
+
+      await this.prismaService.chatMessage.deleteMany({
+        where: {
+          chatId: chatId,
+        },
+      })
+      await this.prismaService.chat.delete({
+        where: {
+          id: chatId,
+        },
+      });
+    }
   }
 
 }
