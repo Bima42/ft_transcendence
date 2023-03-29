@@ -4,7 +4,7 @@ import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { Game } from '@prisma/client';
 
-const fps = 20;
+const fps = 1;
 const ballMaxSpeed = 10;
 const world_width = 800;
 const world_height = 600;
@@ -68,8 +68,12 @@ export class GameServer {
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
-    Logger.log(`Game#${this.roomID}: PlayerMove from ${socket.data.user.username}: ${JSON.stringify(playerMove)}`);
-    this.paddle1.position.y = playerMove.y;
+    const idx = this.players.indexOf(socket);
+    Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
+    if (idx == 0)
+      this.paddle2.position.y = playerMove.y;
+    else if (idx == 1)
+      this.paddle1.position.y = playerMove.y;
     socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 

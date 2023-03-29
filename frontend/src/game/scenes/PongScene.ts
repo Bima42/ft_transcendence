@@ -157,8 +157,7 @@ export default class PongScene extends Phaser.Scene {
 
     this.socket.on("enemyMove", (msg: any) => {
       const y = msg.y || 0;
-      console.log(`enemy moved at position: ${y}`)
-      this.paddle2.y = y;
+      this.otherPaddle.y = y;
     });
 
     this.socket.on("startGame", () => {
@@ -210,9 +209,11 @@ export default class PongScene extends Phaser.Scene {
     if (this.config.player2 && this.config.player2.id == userStore.user?.id){
       // rotate the screen
       this.cameras.main.setRotation(Math.PI);
-      // inverse controls
+      // inverse paddles
       this.myPaddle = this.paddle2;
       this.otherPaddle = this.paddle1;
+      // inverse control
+      this.myPaddle.maxSpeed *= -1;
     }
 
 
