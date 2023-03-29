@@ -277,22 +277,28 @@ export class ChannelService {
     return chatDto;
   }
 
-  async leaveChannel(user: User, chatId: number) {
+    async leaveChannel(user: User, chatId: number) {
 
-    Logger.log(`${user.username}#${user.id} wants to leave channel ${chatId}`);
-    // Get the current role of the request user
-    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
-    if (!reqUserChat || reqUserChat.role == 'BANNED'){
-      throw new ForbiddenException('Not authorized to leave Channel');
+      Logger.log(`${user.username}#${user.id} wants to leave channel ${chatId}`);
+      // Get the current role of the request user
+      const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+      if (!reqUserChat || reqUserChat.role == 'BANNED'){
+        throw new ForbiddenException('Not authorized to leave Channel');
+      }
+
+      // Check if the user is the OWNER before passing the role to another user
+      if (reqUserChat.role === 'OWNER') {
+        // Pass the OWNER role to the next user
+        await this.passOwnerRole(chatId, user.id);
+      }
+
+      // delete userRole
+      await this.prismaService.userChat.delete({
+        where: { id: reqUserChat.id }
+      });
+
+      this.deleteChatIfEmpty(chatId);
     }
-
-    // delete userRole
-    await this.prismaService.userChat.delete({
-      where: { id: reqUserChat.id }
-    });
-
-   this.deleteChatIfEmpty(chatId);
-  }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
     let chat = await this.findChannelById(chatId);
@@ -498,4 +504,23 @@ export class ChannelService {
     }
   }
 
+  async passOwnerRole(chatId: number, leavingOwner: number): Promise<void> {
+    // Find the user that will become the new owner
+    const userChat = await this.prismaService.userChat.findFirst({
+      where: {
+        chatId: chatId,
+        userId: { not: leavingOwner },
+        role: { not: 'BANNED' },
+      },
+      orderBy: { id: 'asc' },
+    });
+    if (!userChat) {
+      return
+    }
+    // Update the role of the user that will become the new owner
+    await this.prismaService.userChat.update({
+      where: { id: userChat.id },
+      data: { role: 'OWNER' },
+    });
+  }
 }
