@@ -91,6 +91,11 @@ export default class PongScene extends Phaser.Scene {
   private scoreText: any;
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
+  private isReady: boolean = false;
+  private startButton!: Phaser.GameObjects.Text;
+
+  private countdown: number = 0;
+  private countdownEvent!: Phaser.Time.TimerEvent
 
   constructor() {
     super({ key: 'PongScene' })
@@ -179,17 +184,15 @@ export default class PongScene extends Phaser.Scene {
       // this.obstacles.forEach((obstacle) => {
       //   this.ball.setOnCollideWith(obstacle, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitObstacle(data));
       // });
+      //
     }
 
     //  Input events
     this.keys = this.input.keyboard.addKeys('s,w');
 
-    this.input.on('pointerup', (_pointer: any) => {
-      if (this.ball.getData('uponStart')) {
-        this.ball.setVelocity(-this.ball.maxSpeed, 0);
-        this.ball.setData('uponStart', false);
-      }
-    }, this);
+    this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, 'Start game')
+    this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: 2});
+    this.waitingRoom();
   }
 
   private resetBall() {
@@ -209,6 +212,48 @@ export default class PongScene extends Phaser.Scene {
     }
 
     this.resetBall();
+    this.waitingRoom();
+  }
+
+  private waitingRoom() {
+    this.isReady = false;
+    this.startButton.setOrigin(0.5)
+      .setVisible(true)
+      .setText("Ready")
+      .setPadding(10)
+      .setStyle({ backgroundColor: '#111' })
+      .setInteractive({ useHandCursor: true })
+      .on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
+      .on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
+      .on('pointerdown', () => {
+        this.isReady = true;
+        this.startButton.setText("Waiting for opponent...")
+          .setStyle({ fill: '#FFF' })
+          .off('pointerover')
+          .off('pointerout')
+
+        this.startGame();
+    })
+  }
+
+
+  private startGame() {
+    this.countdown = 3;
+    this.startButton.setText(String(this.countdown));
+    this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown });
+    this.time.addEvent(this.countdownEvent);
+  }
+
+  private onCountdown() {
+    console.log("onCountdown");
+
+      this.countdown--;
+      this.startButton.setText(String(this.countdown));
+      if (this.countdown == 0) {
+
+        this.startButton.setVisible(false);
+        this.ball.setVelocity(-this.ball.maxSpeed, 0);
+      }
   }
 
   hitObstacle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
