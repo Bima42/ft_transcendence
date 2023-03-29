@@ -41,9 +41,7 @@ export class GameServer {
     this.paddle1 = Bodies.rectangle(20, 300, 24, 104);
     this.paddle2 = Bodies.rectangle(770, 300, 24, 104);
 
-    this.cancelInterval = setInterval(() => {
-    this.update();
-}, 1000 / fps);
+    // this.cancelInterval = setInterval(() => { this.update(); }, 1000 / fps);
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {

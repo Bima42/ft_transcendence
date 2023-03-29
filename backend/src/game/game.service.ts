@@ -40,7 +40,7 @@ export class GameService {
     }
 
     // Add the client's socket to the appropriate queue based on the game settings
-    const queue = gameSettings.classic ? this.classicQueue : this.customQueue;
+    const queue = gameSettings.type == 'CLASSIC' ? this.classicQueue : this.customQueue;
     queue.push(socket);
 
     Logger.log(`${user.username}#${user.id} joined the queue`);
@@ -54,10 +54,6 @@ export class GameService {
       if (queue.length >= 2) {
         let players = queue.splice(0, 2);
 
-        // Emit an event to the clients to indicate that a match has been found
-        this.server.to(players[0].data.user.username)
-                   .to(players[1].data.user.username)
-                   .emit("matchFound", match);
 
         // Start the game
         await this.startGame(match, players);
@@ -68,7 +64,7 @@ export class GameService {
     });
 
     // Return a message indicating whether the user joined the classic or custom queue
-    let msg = gameSettings.classic ? "Joined classic" : "Joined custom";
+    let msg = gameSettings.type == 'CLASSIC' ? "Joined classic" : "Joined custom";
     return `OK`;
   }
 
@@ -124,22 +120,33 @@ async CreateUserGame(match: Game): Promise<UserGame> {
 }
 
 
-private async startGame(game: Game, players: Socket[]): Promise<void> {
+private async startGame(match: Game, players: Socket[]): Promise<void> {
   Logger.log(`starting the game between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+
+  // Emit an event to the clients to indicate that a match has been found
+  const gameSettings : GameSettingsDto = {
+    type: match.type,
+    player1: players[0].data.user,
+    player2: players[1].data.user,
+  }
+  Logger.log(`Settings = ${match}`);
+  this.server.to(players[0].data.user.username)
+             .to(players[1].data.user.username)
+             .emit("matchFound", gameSettings);
 
   // Update the game status to 'STARTED'
   await this.prismaService.game.update({
-      where: { id: game.id },
+      where: { id: match.id },
       data: { status: 'STARTED' }
   });
 
   // Create the game server
-  const gameServer = new GameServer(this.server, game, players);
+  const gameServer = new GameServer(this.server, match, players);
   this.gameServers.push(gameServer);
   players.forEach((player) => {
       player.data.gameServer = gameServer;
-      player.data.game = game;
-      player.join(String(game.id))
+      player.data.game = match;
+      player.join(String(match.id))
   })
 }
 

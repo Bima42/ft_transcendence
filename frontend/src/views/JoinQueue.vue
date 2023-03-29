@@ -54,10 +54,9 @@ function onJoinCustom() {
 // Listen for the 'match-found' event
 gameStore.socket.on('matchFound', (match: IGame) => {
   (document.getElementById("join_btn") as HTMLButtonElement).disabled = true;
+  isLoading.value = false;
   gameStore.currentGame = match;
-
-  // FIXME: get this info from server
-  gameStore.currentGame.classic = useClassicMode;
+  gameStore.socket.off('matchFound');
 
   // Redirect the user to the game page with the opponent ID
   router.push(`game`);
@@ -66,17 +65,6 @@ gameStore.socket.on('matchFound', (match: IGame) => {
 gameStore.socket.on('connect', () => {
   console.log(`Connected to server with ID ${gameStore.socket.id}`);
 });
-
-gameStore.socket.on('matchFound', (opponentId: string) => {
-  console.log(`Match found with opponent ${opponentId}`);
-  isLoading.value = false;
-  gameStore.socket.off('matchFound');
-});
-
-
-
-function joinCustomModeQueue() {
-}
 
 </script>
 

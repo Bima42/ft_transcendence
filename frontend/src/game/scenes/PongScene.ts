@@ -2,8 +2,10 @@ import Phaser from 'phaser'
 import { Socket } from "socket.io-client"
 import type IGame from '@/interfaces/game/IGame'
 import { useGameStore } from '@/stores/game'
+import { useUserStore } from '@/stores/user'
 
 const gameStore = useGameStore();
+const userStore = useUserStore();
 
 class Ball extends Phaser.Physics.Matter.Image {
 
@@ -107,7 +109,14 @@ export default class PongScene extends Phaser.Scene {
       return;
     }
     this.config.maxScore = 3;
-    this.config.classic = config.classic ?? true;
+    this.config.classic = (config.type == 'CLASSIC' ? true : false) ?? true;
+
+    console.log(`config = ${JSON.stringify(config)}`);
+    // if (config.player1.id == userStore.user?.id)
+    //   console.log("Player 1");
+    // else
+    //   console.log("Player 2");
+
   }
 
   private updateWorld(state: WorldState) {
@@ -125,6 +134,11 @@ export default class PongScene extends Phaser.Scene {
 
   create(config: IGame): void {
     this.parseConfig(config);
+    if (this.config.classic) {
+      console.log("Classic game.");
+    } else {
+      console.log("Custom game !");
+    }
 
     this.socket = gameStore.socket as Socket;
     this.socket.on("state", (state: WorldState) => {
@@ -140,13 +154,6 @@ export default class PongScene extends Phaser.Scene {
       console.log(`enemy moved at position: ${y}`)
       this.paddle2.y = msg.y;
     });
-
-    this.parseConfig(config);
-    if (this.config.classic) {
-      console.log("Classic game.");
-    } else {
-      console.log("Custom game !");
-    }
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
     this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
