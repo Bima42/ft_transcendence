@@ -97,7 +97,6 @@ export default class PongScene extends Phaser.Scene {
   public scores: Array<number> = [0, 0];
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
-  private isReady: boolean = false;
 
 
   constructor() {
@@ -239,10 +238,8 @@ export default class PongScene extends Phaser.Scene {
     (this.scene.get('UiScene') as UiScene).waitingRoom();
   }
 
-
-
+  // Before Countdown: not a lot to do in the game part
   private startGame() {
-
   }
 
   hitObstacle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
@@ -272,10 +269,6 @@ export default class PongScene extends Phaser.Scene {
   }
 
   update() {
-
-    // if (this.ball.x < 0 || this.ball.x > 800) {
-    //   this.resetLevel();
-    // }
 
     this.paddle1.setVelocity(0);
     let move = false;

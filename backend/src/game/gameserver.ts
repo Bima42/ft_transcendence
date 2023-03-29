@@ -5,12 +5,11 @@ import { Logger } from "@nestjs/common";
 import { Game } from '@prisma/client';
 
 // At what pace the simulation is run
-const fps = 20;
+const fps = 60;
 // At what frequency we send the state to the clients
-const syncPerSec = 20;
+const syncPerSec = 10;
 // Duration of the countdown between the start (ms)
-// const CountdownDuration = 3000
-const CountdownDuration = 500
+const CountdownDuration = 3000
 
 const ballMaxSpeed = 10;
 const world_width = 800;
@@ -48,7 +47,6 @@ export class GameServer {
     this.engine.gravity.y = 0;
 
 
-
     this.ball = Bodies.rectangle(world_width / 2, world_height / 2 + 200, 22, 22);
     Body.setInertia(this.ball, Infinity);
     this.ball.friction = 0;
@@ -72,12 +70,13 @@ export class GameServer {
       Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
       Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption)]) // right wall
 
-    this.onStartGame();
+    // TODO: remove
+    // this.onStartGame();
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
     const idx = this.players.indexOf(socket);
-    Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
+    // Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
     if (idx == 0)
       this.paddle2.position.y = playerMove.y;
     else if (idx == 1)
@@ -98,18 +97,32 @@ export class GameServer {
 
   onPlayerIsReady(client: Socket) {
     Logger.log(`Game#${this.roomID}: ${client.data.user.username} is ready to play`);
+
     client.data.isReady = true;
+
+    // Check if everybody is ready
     if (this.players[0].data.isReady && this.players[1].data.isReady)
       this.onStartGame();
   }
 
   onStartGame() {
     Logger.log(`Game#${this.roomID}: Starting game !`);
-      this.server.emit("gameover")
-    setTimeout(() => { this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps); }, CountdownDuration);
-    setTimeout(() => { this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec); }, CountdownDuration);
+    //
+    // Warn clients that we are about to start
     this.server.to(this.roomID).emit("startGame");
-    Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: ballMaxSpeed});
+
+    // Start simulation after countdown
+    setTimeout(() => {
+    Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
+    this.updateWorld();
+      this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
+    }, CountdownDuration);
+
+    // start syncing with client after countdown
+    setTimeout(() => {
+      this.sendStateToClients();
+      this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
+    }, CountdownDuration);
   }
 
   private resetLevel(): void {

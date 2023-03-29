@@ -46,11 +46,12 @@ export default class UiScene extends Phaser.Scene {
       this.startButton.text = "Player disconnected"
   }
 
+  // At the start of the countdown
   startGame() {
-    // this.countdown = 3;
-    // this.startButton.setText("3");
-    // this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
-    // this.time.addEvent(this.countdownEvent);
+    this.countdown = 3;
+    this.startButton.setText("3");
+    this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
+    this.time.addEvent(this.countdownEvent);
   }
 
   waitingRoom() {
@@ -78,7 +79,6 @@ export default class UiScene extends Phaser.Scene {
     this.startButton.setText(String(this.countdown));
     if (this.countdown == 0) {
       this.startButton.setVisible(false);
-      // this.ball.setVelocity(-this.ball.maxSpeed, 0);
     }
   }
 
