@@ -3,7 +3,7 @@ import { onMounted, onUnmounted } from 'vue'
 import type IGame from '@/interfaces/game/IGame';
 
 let gameInstance = null
-const containerId = 'game-container'
+const containerId = 'gameContainer'
 const game = await import(/* webpackChunkName: "game" */ '@/game/game')
 
 const props = defineProps<{
@@ -20,9 +20,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div :id="containerId">
-        <canvas id="mygamecanvas"></canvas>
-    </div>
+    <div :id="containerId"></div>
 </template>
 
 <style scoped lang="scss">

@@ -1,6 +1,5 @@
 <template>
   <section class="gamePong">
-    <h1> PLAYERS</h1>
     <Suspense>
       <PhaserContainer :current-game="currentGame"/>
 
