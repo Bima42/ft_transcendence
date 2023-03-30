@@ -102,6 +102,7 @@ export default class PongScene extends Phaser.Scene {
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
   private canMove: boolean = false;
+  private uiScene!: UiScene;
 
 
   constructor() {
@@ -114,7 +115,6 @@ export default class PongScene extends Phaser.Scene {
 
   private parseConfig(config: IGameSettings) {
 
-    console.log(`config = ${JSON.stringify(config)}`);
     if (!config) {
       console.warn('no game settings provided');
       this.config.maxScore = 3;
@@ -150,6 +150,9 @@ export default class PongScene extends Phaser.Scene {
     // })
   }
 
+  private updateEnemy(y: number) {
+      this.otherPaddle.y = y;
+  }
 
   create(config: IGameSettings): void {
     this.parseConfig(config);
@@ -164,19 +167,17 @@ export default class PongScene extends Phaser.Scene {
     );
 
     this.socket.on("enemyMove", (msg: any) => {
-      const y = msg.y || 0;
-      this.otherPaddle.y = y;
+      this.updateEnemy(msg.y ?? 0)
     });
 
     this.socket.on("startGame", () => {
       this.startGame()
-      const uiScene = this.scene.get('UiScene') as UiScene;
-      uiScene.startGame();
+      this.uiScene.startGame();
     });
 
     this.socket.on("playerDisconnect", () => {
-      const uiScene = this.scene.get('UiScene') as UiScene;
-      uiScene.onPlayerDisconnect()
+      console.log("playerDisconnect"),
+      this.uiScene.onPlayerDisconnect()
     });
 
     this.socket.on("pointFinish", () => {
@@ -188,7 +189,6 @@ export default class PongScene extends Phaser.Scene {
     // this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
 
     this.ball = new Ball(this, 400, 300);
-    this.ball.setData('uponStart', true);
     this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
 
     this.paddle1 = new Paddle(this, 20, 300, 1);
@@ -223,7 +223,7 @@ export default class PongScene extends Phaser.Scene {
       // inverse control
       this.myPaddle.maxSpeed *= -1;
     }
-
+    this.uiScene = this.scene.get("UiScene") as UiScene;
 
   }
 

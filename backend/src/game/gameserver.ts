@@ -27,10 +27,8 @@ export class GameServer {
   private IntervalUpdate: any;
   private IntervalSync: any;
   private engine!: any;
-  private world!: any;
   private roomID: string;
   private players: any;
-  private wall;
   private scores: Array<number> = [0, 0];
   private maxScore: number = 3
 
@@ -47,7 +45,7 @@ export class GameServer {
     this.engine.gravity.y = 0;
 
 
-    this.ball = Bodies.rectangle(world_width / 2, world_height / 2 + 200, 22, 22);
+    this.ball = Bodies.rectangle(world_width / 2, world_height / 2, 22, 22);
     Body.setInertia(this.ball, Infinity);
     this.ball.friction = 0;
     this.ball.frictionAir = 0;
