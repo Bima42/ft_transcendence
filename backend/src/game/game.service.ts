@@ -45,7 +45,7 @@ export class GameService {
     const queue = gameSettings.type == 'CLASSIC' ? this.classicQueue : this.customQueue;
     queue.push(socket);
 
-    Logger.log(`${user.username}#${user.id} joined the queue`);
+    Logger.log(`${user.username}#${user.id} joined the ${gameSettings.type} queue`);
 
     // Find or create a match and create a UserGame
     this.findOrCreateMatch(gameSettings)

@@ -32,7 +32,7 @@ function joinQueue() {
     // Joining queue !
     if (isLoading.value) {
         gameStore.socket.emit('newJoinQueue', {
-            classic: useClassicMode
+            type: useClassicMode ? "CLASSIC" : "CUSTOM"
         }, (response: string) => { console.log(response)});
     }
     // Aborting queue
