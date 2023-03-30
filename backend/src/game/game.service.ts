@@ -27,7 +27,7 @@ export class GameService {
     this.server = server;
 
     // Abort ongoing games:
-    const currentGames = await this.prismaService.game.updateMany({
+    await this.prismaService.game.updateMany({
       where: {
         status: "STARTED"
       },
@@ -42,14 +42,13 @@ export class GameService {
 
   async checkCurrentGames() {
     this.gameServers.forEach(async (serv) => {
-      Logger.log(`Checking game ${serv.getStatus()}`);
       if (serv.getStatus() == "ABORTED") {
-        Logger.log("I notice a game is aborted !");
+        Logger.log(`Game #${serv.game.id} is aborted !`);
 
-        // TODO: Remove properly
+        this.gameServers.splice(this.gameServers.indexOf(serv));
 
       } else if (serv.getStatus() == "ENDED") {
-        Logger.log("I notice a game is finished !");
+        Logger.log(`Game #${serv.game.id} is finished !`);
 
         await this.prismaService.game.update({
           where: {
@@ -57,10 +56,11 @@ export class GameService {
           },
           data: {
             status: "ENDED"
-            // TODO: Add score to DB
+            // TODO: Add scores from the game to DB (UserGame)
           }
         })
-
+        // TODO: Update player score in DB (total victories)
+        this.gameServers.splice(this.gameServers.indexOf(serv));
       }
     })
   }
@@ -110,6 +110,7 @@ export class GameService {
   quitQueue (socket: Socket) {
     if (!socket.data.user)
       return;
+    // FIXME: This clear both queues all the time !
     this.classicQueue = this.classicQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
     this.customQueue = this.customQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
     Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the queue`);
@@ -160,7 +161,6 @@ async CreateUserGame(match: Game): Promise<UserGame> {
   // Return the created UserGame
   return userGame;
 }
-
 
 private async startGame(match: Game, players: Socket[]): Promise<void> {
   Logger.log(`Game#${match.id}: match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
@@ -214,7 +214,9 @@ async onPlayerDisconnect(client: Socket) {
     client.data.gameServer.onPlayerDisconnect(client);
 
     // Destroy the gameServer (TODO: try reconnection)
-    this.gameServers.splice(client.data.gameServer);
+    const idx = this.gameServers.indexOf(client.data.gameServers);
+    if (idx > -1)
+      this.gameServers.splice(client.data.gameServer);
     // The socket doesn't need to be updated as it will be deleted
   }
   this.quitQueue(client);

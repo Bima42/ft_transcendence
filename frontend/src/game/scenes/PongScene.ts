@@ -103,8 +103,6 @@ export default class PongScene extends Phaser.Scene {
   private socket!: Socket;
   private canMove: boolean = false;
   private uiScene!: UiScene;
-  private enemyPos: number | null = null;
-  private worldState: WorldState | null = null;
 
 
   constructor() {
@@ -153,24 +151,16 @@ export default class PongScene extends Phaser.Scene {
     })
   }
 
-  private updateEnemy(y: number) {
-      if (!this.otherPaddle){
-        return
-      }
-      this.enemyPos = y;
-  }
-
-  create(config: IGameSettings): void {
+  create(): void {
     this.parseConfig(gameStore.currentGame);
-
     this.socket = gameStore.socket as Socket;
+
     this.socket.on("state", (state: WorldState) => {
-      this.worldState = state;
+      this.updateWorld(state);
     });
 
     this.socket.on("enemyMove", (msg: any) => {
-      // console.log("enemyMove: " + JSON.stringify(msg));
-      this.updateEnemy(msg.y ?? 0)
+      this.otherPaddle.y = msg.y ?? 0;
     });
 
     this.socket.on("startGame", () => {
@@ -179,19 +169,18 @@ export default class PongScene extends Phaser.Scene {
     });
 
     this.socket.on("playerDisconnect", () => {
-      console.log("playerDisconnect"),
+      resetSocketGameListener(this.socket);
       this.uiScene.onPlayerDisconnect()
       this.scene.pause()
     });
 
     this.socket.on("pointEnd", (score: IPointWon) => {
-        console.log("Point finished");
         this.uiScene.onPointEnd(score);
         this.resetLevel();
     });
 
     this.socket.on("gameover", (score: IPointWon) => {
-      console.log("Game over");
+      resetSocketGameListener(this.socket);
       this.uiScene.onGameover(score);
       this.scene.stop('UiScene');
       this.scene.start("GameoverScene");
@@ -199,7 +188,6 @@ export default class PongScene extends Phaser.Scene {
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
     this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
-    // this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
 
     this.ball = new Ball(this, 400, 300);
     this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
@@ -214,11 +202,6 @@ export default class PongScene extends Phaser.Scene {
       this.obstacles[1] = new Obstacle(this, 300, 200, 'yellow');
       this.obstacles[3] = new Obstacle(this, 500, 100, 'green');
       this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
-
-      // this.obstacles.forEach((obstacle) => {
-      //   this.ball.setOnCollideWith(obstacle, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitObstacle(data));
-      // });
-      //
     }
 
     //  Input events
@@ -236,8 +219,8 @@ export default class PongScene extends Phaser.Scene {
       // inverse control
       this.myPaddle.maxSpeed *= -1;
     }
-    this.uiScene = this.scene.get("UiScene") as UiScene;
 
+    this.uiScene = this.scene.get("UiScene") as UiScene;
   }
 
   private resetLevel(): void {
@@ -255,15 +238,14 @@ export default class PongScene extends Phaser.Scene {
     this.canMove = true;
   }
 
-  hitObstacle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
+  hitObstacle( _data: Phaser.Types.Physics.Matter.MatterCollisionData) {
     // let ball = data.bodyA.gameObject as Ball;
     // let obstacle = data.bodyB.gameObject as Obstacle;
-
-    // // // Make sure that the ball keeps the same speed;
+    //
+    // // Make sure that the ball keeps the same speed;
     // ball.body.speed = ball.maxSpeed;
-    // // // Make sure that the obstacle keeps the same speed;
+    // // Make sure that the obstacle keeps the same speed;
     // obstacle.body.speed = obstacle.maxSpeed;
-
   }
 
     hitPaddle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
@@ -303,18 +285,16 @@ export default class PongScene extends Phaser.Scene {
 
     this.handleInput();
 
-    if (this.enemyPos) {
-      this.otherPaddle.y = this.enemyPos;
-      this.enemyPos = null;
-    }
-    if (this.worldState) {
-      this.updateWorld(this.worldState)
-      this.worldState = null;
-    } else {
     if (this.canMove)
       this.obstacles.forEach((o) => o.update());
-    }
   }
-
-
 };
+
+function resetSocketGameListener(socket: Socket) {
+  socket.removeAllListeners("state");
+  socket.removeAllListeners("enemyMove");
+  socket.removeAllListeners("startGame");
+  socket.removeAllListeners("playerDisconnect");
+  socket.removeAllListeners("pointEnd");
+  socket.removeAllListeners("gameover");
+}

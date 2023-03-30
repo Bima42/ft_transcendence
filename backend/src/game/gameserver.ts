@@ -113,11 +113,21 @@ export class GameServer {
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
     const idx = this.players.indexOf(socket);
-    // Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
+    let paddle: any;
     if (idx == 0)
-      Body.setPosition(this.paddle2, {x: this.paddle2.position.x, y: playerMove.y})
+      paddle = this.paddle2;
     else if (idx == 1)
-      Body.setPosition(this.paddle1, {x: this.paddle1.position.x, y: playerMove.y})
+      paddle = this.paddle1;
+    else
+      return;
+
+    // Refuse too big movements
+    if (playerMove.y - paddle.y > 20) {
+      Logger.log("Cheater");
+      return;
+    }
+
+    Body.setPosition(paddle, {x: paddle.position.x, y: playerMove.y})
     socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 
