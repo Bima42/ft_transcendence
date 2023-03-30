@@ -234,7 +234,6 @@ export default class PongScene extends Phaser.Scene {
 
   // Before Countdown: not a lot to do in the game part
   private startGame() {
-    console.log("start game !");
     this.canMove = true;
   }
 
