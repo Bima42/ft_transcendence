@@ -82,6 +82,7 @@ model UserGame {
   gameId Int
   user   User @relation(fields: [userId], references: [id])
   userId Int
+  score  Int @default(0)
 }
 
 model Game {
@@ -125,6 +126,7 @@ enum GameStatus {
   SEARCHING
   STARTED
   ENDED
+  ABORTED
 }
 
 enum GameType {

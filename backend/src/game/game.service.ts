@@ -26,13 +26,25 @@ export class GameService {
 
   }
 
-  setServer(server: Server) {
+  async init(server: Server) {
     this.server = server;
+
+    // Abort ongoing games:
+    const currentGames = await this.prismaService.game.updateMany({
+      where: {
+        status: "STARTED"
+      },
+      data: {
+        status: "ABORTED"
+      }
+    })
   }
 
   joinQueue(socket: Socket, gameSettings: JoinQueueDto): string {
 
     const user: User = socket.data.user;
+    if (!user)
+      return;
 
     // Verify if the user already in queue:
     if (this.classicQueue.find((el) => el.data.user.id === user.id) ||
@@ -71,6 +83,8 @@ export class GameService {
   }
 
   quitQueue (socket: Socket) {
+    if (!socket.data.user)
+      return;
     this.classicQueue = this.classicQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
     this.customQueue = this.customQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
     Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the queue`);
@@ -145,6 +159,8 @@ private async startGame(match: Game, players: Socket[]): Promise<void> {
   // Create the game server
   const gameServer = new GameServer(this.server, match, players);
   this.gameServers.push(gameServer);
+
+  // Link all infos to socket
   players.forEach((player) => {
       player.data.gameServer = gameServer;
       player.data.game = match;
@@ -153,13 +169,30 @@ private async startGame(match: Game, players: Socket[]): Promise<void> {
   })
 }
 
-onPlayerDisconnect(client: Socket) {
+async onPlayerDisconnect(client: Socket) {
+  // Logger.log(`Socket gameserver = ${JSON.stringify(client.data.gameServer)}`);
+  Logger.log(`Socket game = ${JSON.stringify(client.data.game)}`);
+
+  if (client.data.game) {
+    // Update the status in the database
+    await this.prismaService.game.update({
+      where: {
+        id: client.data.game.id
+      },
+      data: {
+        status: "ABORTED",
+      }
+    })
+  }
   if (client.data.gameServer != null) {
+    // Warn the gameServer
     client.data.gameServer.onPlayerDisconnect(client);
+
+    // Destroy the gameServer (TODO: try reconnection)
     this.gameServers.splice(client.data.gameServer);
+    // The socket doesn't need to be updated as it will be deleted
   }
   this.quitQueue(client);
-  Logger.log("NGame = " + this.gameServers.length);
 }
 
 async findGameFromUser( user: User) : Promise<GameServer>{

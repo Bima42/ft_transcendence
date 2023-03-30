@@ -83,9 +83,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       this.gameService.onPlayerDisconnect(client);
   }
 
-  afterInit(server: Server) {
+  async afterInit(server: Server) {
     Logger.log('WebSocket server initialized');
-    this.gameService.setServer(server);
+    await this.gameService.init(server);
   }
 
   @SubscribeMessage('newJoinQueue')
