@@ -2,7 +2,8 @@ import { Engine, Bodies, Common, Collision, Body, Render, Runner, Composite, Eve
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
-import { Game } from '@prisma/client';
+import { Game, GameStatus } from '@prisma/client';
+import { PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
 
 // At what pace the simulation is run
 const fps = 60;
@@ -22,21 +23,12 @@ const obstacles_def = [
   {x: 600, y: 500, color: 'blue'},
 ]
 
-type PlayerMoveDto = {
-  y: number
-}
-
 class Obstacle {
   public body: any; // Matter-js body
   private maxSpeed = 2;
   private dir = 1;
 
   constructor(x: number, y: number) {
-    // Body.setInertia(this.body, Infinity)
-    // this.setBounce(1);
-    // this.setStatic(true);
-    // this.setFriction(0);
-    // this.setVelocity(0, 2);
     const worldOption = {
       isStatic: true,
     }
@@ -52,7 +44,6 @@ class Obstacle {
 
 }
 
-
 export class GameServer {
   private ball: any;
   private paddle1: any;
@@ -63,12 +54,12 @@ export class GameServer {
   private roomID: string;
   private players: any;
   private scores: Array<number> = [0, 0];
-  private maxScore: number = 3
+  private maxScore: number = 5
   private obstacles = [];
-  private canPlayerMove: boolean = false;
+  private status: GameStatus = "STARTED";
 
   constructor(private server: Server,
-              private game: Game,
+              public game: Game,
               sockets: Socket[]) {
     this.roomID = String(this.game.id);
     this.players = [];
@@ -100,8 +91,9 @@ export class GameServer {
     Composite.add(this.engine.world, [
       Bodies.rectangle(world_width/2, -wall_thickness/2, world_width, wall_thickness, worldOption), // upper wall
       Bodies.rectangle(world_width/2, world_height + wall_thickness/2, world_width, wall_thickness, worldOption), // lower wall
-      Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
-      Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption)]) // right wall
+      // Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
+      // Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // right wall
+    ])
 
       if (game.type != "CLASSIC") {
         Logger.log(`Game#${this.roomID}: custom mode`);
@@ -131,8 +123,14 @@ export class GameServer {
 
   onPlayerDisconnect(client: Socket) {
     Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected. abort game`);
+
+    this.status = "ABORTED"
+
+    // Clear the intervals
     clearInterval(this.IntervalUpdate);
     clearInterval(this.IntervalSync);
+
+    // Cleanup the sockets
     this.players[0].data.game = null;
     this.players[0].data.gameServer = null;
     this.players[1].data.game = null;
@@ -146,12 +144,13 @@ export class GameServer {
     client.data.isReady = true;
 
     // Check if everybody is ready
-    if (this.players[0].data.isReady && this.players[1].data.isReady)
+    if (this.players[0].data.isReady && this.players[1].data.isReady) {
+      Logger.log(`Game#${this.roomID}: Starting game !`);
       this.onStartGame();
+    }
   }
 
   onStartGame() {
-    Logger.log(`Game#${this.roomID}: Starting game !`);
     //
     // Warn clients that we are about to start
     this.server.to(this.roomID).emit("startGame");
@@ -161,38 +160,49 @@ export class GameServer {
       Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
     }, CountdownDuration);
 
-    // Start simulation after countdown
+    // Start simulation
     this.updateWorld();
     this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
 
-    // start syncing with client after countdown
+    // start syncing with client
     this.sendStateToClients();
     this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
   }
 
   private resetLevel(): void {
 
-    Logger.log(`Game#${this.roomID}: Reset level !`);
+    // Update score
     if (this.ball.position.x < 0) {
       this.scores[1] += 1;
     } else {
       this.scores[0] += 1;
     }
-    //
-    if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
-      Logger.log(`Game#${this.roomID}: Game over !`)
-      this.server.to(this.roomID).emit("gameover")
-      return;
-    } else {
-      Logger.log(`Game#${this.roomID}: point ended`);
-      this.server.to(this.roomID).emit("pointEnd")
-      // Reset ball
-      this.ball.setVelocity(0);
-      this.ball.setPosition(world_width / 2, world_width / 2);
-    }
+    Logger.log(`Game#${this.roomID}: ${this.scores[0]} - ${this.scores[1]}`);
 
+    // Reset ball
+    Body.setVelocity(this.ball, {x: 0, y: 0});
+    Body.setPosition(this.ball, {x:world_width / 2, y: world_height / 2});
+
+    // TODO: Reset paddles
+
+    // TODO: Reset Obstacles
+
+    // reset Intervals
     clearInterval(this.IntervalUpdate);
     clearInterval(this.IntervalSync);
+
+    const pointWon: PointWonDto = {
+      score1: this.scores[0],
+      score2: this.scores[1],
+    }
+    if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
+      Logger.log(`Game#${this.roomID}: Gameover`);
+      this.status = "ENDED"
+      this.server.to(this.roomID).emit("gameover", pointWon)
+    } else {
+      this.server.to(this.roomID).emit("pointEnd", pointWon)
+      this.onStartGame();
+    }
   }
 
   updateWorld() {
@@ -209,7 +219,7 @@ export class GameServer {
       this.hitPaddle(this.ball, this.paddle2)
     }
 
-    if (this.ball.x < 0 || this.ball.x > 800) {
+    if (this.ball.position.x < 0 || this.ball.position.x > 800) {
       this.resetLevel();
     }
 
@@ -218,7 +228,7 @@ export class GameServer {
 
   sendStateToClients() {
 
-    const world : WorldState = {
+    const world : WorldStateDto = {
       ball: {
         x: this.ball.position.x,
         y: this.ball.position.y,
@@ -257,25 +267,8 @@ export class GameServer {
       y: ballMaxSpeed * Math.cos(newAngle)
     });
   }
-};
 
-type WorldState = {
-  ball: {
-    x: number,
-    y: number,
-    vx: number,
-    vy: number,
+  getStatus(): GameStatus {
+    return this.status;
   }
-  paddle1: {
-    x: number,
-    y: number,
-  }
-  paddle2: {
-    x: number,
-    y: number,
-  }
-  obstacles: {
-    x: number,
-    y: number,
-  }[]
-}
+};

@@ -4,6 +4,7 @@ import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type IUser from '@/interfaces/user/IUser';
+import type { IPointWon } from '@/interfaces/game/IGameCommunication';
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -11,7 +12,8 @@ const userStore = useUserStore();
 export default class UiScene extends Phaser.Scene {
   private gameSettings: IGameSettings
   private startButtonText: string = ""
-  private scoreLine: any;
+  private scoreWidget: any;
+  private scoreWidgetContent: string = ''
   private startButton!: Phaser.GameObjects.Text;
   private isReady: boolean = false;
   private countdown: number = 0;
@@ -29,10 +31,11 @@ export default class UiScene extends Phaser.Scene {
   create(config: IGameSettings) {
     this.gameSettings = gameStore.currentGame;
 
-    let text = '0 - 0'
+    this.scoreWidgetContent = '0 - 0'
     if (config)
-      text = this.gameSettings.player1.username + " 0 - 0 " + this.gameSettings.player2.username;
-    this.scoreLine = this.add.text(0, 50, text, { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
+      this.scoreWidgetContent = this.gameSettings.player1.username + " 0 - 0 " + this.gameSettings.player2.username;
+    this.scoreWidget = this.add.text(0, 50, this.scoreWidgetContent, { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
+
     this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, '')
     this.startButtonText = "I am Ready !"
     this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1});
@@ -50,11 +53,9 @@ export default class UiScene extends Phaser.Scene {
     const pongScene = this.scene.get('PongScene') as PongScene;
     const scores = pongScene.scores;
 
-    if (this.gameSettings) {
-      this.scoreLine.text = this.gameSettings.player1.username + " " + scores[0] + " - " + scores[1] + " " + this.gameSettings.player2.username;
-    }
-    Phaser.Display.Align.In.Center(this.scoreLine, this.add.zone(400, 30, 800, 400));
+    Phaser.Display.Align.In.Center(this.scoreWidget, this.add.zone(400, 30, 800, 400));
 
+    this.scoreWidget.setText(this.scoreWidgetContent);
     this.startButton.setText(this.startButtonText);
   }
 
@@ -68,6 +69,20 @@ export default class UiScene extends Phaser.Scene {
       console.log("Player disconnected");
       this.startButton.setVisible(true)
       this.startButtonText = `${this.otherPlayer.username} disconnected.`
+  }
+
+  onPointEnd(score: IPointWon) {
+    console.log("point ended")
+    if (this.gameSettings)
+      this.scoreWidgetContent = this.gameSettings.player1.username + " " + String(score.score1) + " - " + String(score.score2) + " " + this.gameSettings.player2.username;
+    else
+      this.scoreWidgetContent = String(score.score1) + " - " + String(score.score2);
+    this.startGame();
+  }
+
+  onGameover(_score: IPointWon) {
+    console.log("gameover")
+
   }
 
   // At the start of the countdown

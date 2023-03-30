@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { WebSocketServer } from '@nestjs/websockets'
 import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { Game } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
@@ -15,8 +14,6 @@ export class GameService {
 
   // Array of all currently running games
   private gameServers: GameServer[] = [];
-  // A map socket.id => GameServer
-  private gameSockets: { [key: string]: GameServer } = {};
 
   server: Server
 
@@ -36,6 +33,34 @@ export class GameService {
       },
       data: {
         status: "ABORTED"
+      }
+    })
+
+    // Verify if games are finished every now and then
+    setInterval(async () => { this.checkCurrentGames() }, 2000)
+  }
+
+  async checkCurrentGames() {
+    this.gameServers.forEach(async (serv) => {
+      Logger.log(`Checking game ${serv.getStatus()}`);
+      if (serv.getStatus() == "ABORTED") {
+        Logger.log("I notice a game is aborted !");
+
+        // TODO: Remove properly
+
+      } else if (serv.getStatus() == "ENDED") {
+        Logger.log("I notice a game is finished !");
+
+        await this.prismaService.game.update({
+          where: {
+            id: serv.game.id,
+          },
+          data: {
+            status: "ENDED"
+            // TODO: Add score to DB
+          }
+        })
+
       }
     })
   }
@@ -193,10 +218,6 @@ async onPlayerDisconnect(client: Socket) {
     // The socket doesn't need to be updated as it will be deleted
   }
   this.quitQueue(client);
-}
-
-async findGameFromUser( user: User) : Promise<GameServer>{
-  return this.gameSockets[user.id];
 }
 
 playerIsReady(client: Socket) {

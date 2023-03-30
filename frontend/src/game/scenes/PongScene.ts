@@ -6,6 +6,7 @@ import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
+import type { IPointWon } from '@/interfaces/game/IGameCommunication'
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -183,12 +184,21 @@ export default class PongScene extends Phaser.Scene {
       this.scene.pause()
     });
 
-    this.socket.on("pointFinish", () => {
+    this.socket.on("pointEnd", (score: IPointWon) => {
         console.log("Point finished");
+        this.uiScene.onPointEnd(score);
+        this.resetLevel();
+    });
+
+    this.socket.on("gameover", (score: IPointWon) => {
+      console.log("Game over");
+      this.uiScene.onGameover(score);
+      this.scene.stop('UiScene');
+      this.scene.start("GameoverScene");
     });
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
-    this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
+    this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
     // this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
 
     this.ball = new Ball(this, 400, 300);
@@ -230,24 +240,13 @@ export default class PongScene extends Phaser.Scene {
 
   }
 
-  private resetBall() {
+  private resetLevel(): void {
     this.ball.setVelocity(0);
     this.ball.setPosition(400, 300);
-    this.ball.setData('uponStart', true);
-  }
 
-  private resetLevel(): void {
-    if (this.ball.x < 0) {
-      this.scores[1] += 1;
-    } else {
-      this.scores[0] += 1;
-    }
-    if (this.scores[0] >= this.config.maxScore || this.scores[1] >= this.config.maxScore) {
-      this.scene.start("GameoverScene");
-    }
+    // TODO: Reset paddles
 
-    this.resetBall();
-    (this.scene.get('UiScene') as UiScene).waitingRoom();
+    // TODO: Reset obstacles
   }
 
   // Before Countdown: not a lot to do in the game part
