@@ -15,10 +15,43 @@ const ballMaxSpeed = 10;
 const world_width = 800;
 const world_height = 600;
 const wall_thickness = 50;
+const obstacles_def = [
+  {x: 200, y: 300, color: 'red'},
+  {x: 300, y: 200, color: 'yellow'},
+  {x: 500, y: 100, color: 'green'},
+  {x: 600, y: 500, color: 'blue'},
+]
 
 type PlayerMoveDto = {
   y: number
 }
+
+class Obstacle {
+  public body: any; // Matter-js body
+  private maxSpeed = 2;
+  private dir = 1;
+
+  constructor(x: number, y: number) {
+    // Body.setInertia(this.body, Infinity)
+    // this.setBounce(1);
+    // this.setStatic(true);
+    // this.setFriction(0);
+    // this.setVelocity(0, 2);
+    const worldOption = {
+      isStatic: true,
+    }
+    this.body = Bodies.rectangle(x, y, 64, 32, worldOption);
+  }
+
+  // Move up and down, boucing on the 'walls'
+  update () {
+    Body.translate(this.body, {x: 0, y: this.dir * this.maxSpeed})
+    if (this.body.position.y < 15 || this.body.position.y > 585)
+      this.dir *= -1;
+  }
+
+}
+
 
 export class GameServer {
   private ball: any;
@@ -31,6 +64,8 @@ export class GameServer {
   private players: any;
   private scores: Array<number> = [0, 0];
   private maxScore: number = 3
+  private obstacles = [];
+  private canPlayerMove: boolean = false;
 
   constructor(private server: Server,
               private game: Game,
@@ -68,6 +103,18 @@ export class GameServer {
       Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
       Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption)]) // right wall
 
+      if (game.type != "CLASSIC") {
+        Logger.log(`Game#${this.roomID}: custom mode`);
+
+        // Add obstacles
+        obstacles_def.forEach((o) => {
+          this.obstacles.push(new Obstacle(o.x, o.y))
+        })
+        this.obstacles.forEach((o) => {
+          Composite.add(this.engine.world, o.body)
+        })
+      }
+
     // TODO: remove
     // this.onStartGame();
   }
@@ -76,9 +123,9 @@ export class GameServer {
     const idx = this.players.indexOf(socket);
     // Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
     if (idx == 0)
-      Body.setPosition(this.paddle2, {x: this.paddle2.position.x, y: playerMove.y}, false)
+      Body.setPosition(this.paddle2, {x: this.paddle2.position.x, y: playerMove.y})
     else if (idx == 1)
-      Body.setPosition(this.paddle1, {x: this.paddle1.position.x, y: playerMove.y}, false)
+      Body.setPosition(this.paddle1, {x: this.paddle1.position.x, y: playerMove.y})
     socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 
@@ -109,18 +156,18 @@ export class GameServer {
     // Warn clients that we are about to start
     this.server.to(this.roomID).emit("startGame");
 
-    // Start simulation after countdown
+    // lauch ball after countdown
     setTimeout(() => {
-    Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
-    this.updateWorld();
-      this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
+      Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
     }, CountdownDuration);
 
+    // Start simulation after countdown
+    this.updateWorld();
+    this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
+
     // start syncing with client after countdown
-    setTimeout(() => {
-      this.sendStateToClients();
-      this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
-    }, CountdownDuration);
+    this.sendStateToClients();
+    this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
   }
 
   private resetLevel(): void {
@@ -150,13 +197,15 @@ export class GameServer {
 
   updateWorld() {
     Engine.update(this.engine, 1000 / fps);
-    // Just a fix for some crazy stuff happening
-    Body.setSpeed(this.ball, ballMaxSpeed);
 
-    if (Collision.collides(this.ball, this.paddle1)) {
+    // Just a fix for some crazy stuff happening
+    if (Body.getSpeed(this.ball) > ballMaxSpeed)
+      Body.setSpeed(this.ball, ballMaxSpeed);
+
+    if (Collision.collides(this.ball, this.paddle1, null)) {
       this.hitPaddle(this.ball, this.paddle1)
     }
-    if (Collision.collides(this.ball, this.paddle2)) {
+    if (Collision.collides(this.ball, this.paddle2, null)) {
       this.hitPaddle(this.ball, this.paddle2)
     }
 
@@ -164,6 +213,7 @@ export class GameServer {
       this.resetLevel();
     }
 
+    this.obstacles.forEach((o) => o.update())
   }
 
   sendStateToClients() {
@@ -185,6 +235,10 @@ export class GameServer {
       },
       obstacles: [],
     }
+    this.obstacles.forEach((o) => world.obstacles.push({
+      x: o.body.position.x,
+      y: o.body.position.y,
+    }))
     this.server.to(String(this.game.id)).emit("state", world)
 
   }
@@ -222,6 +276,6 @@ type WorldState = {
   }
   obstacles: {
     x: number,
-    y: number
+    y: number,
   }[]
 }

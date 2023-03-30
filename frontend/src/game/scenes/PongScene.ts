@@ -12,7 +12,7 @@ const userStore = useUserStore();
 
 class Ball extends Phaser.Physics.Matter.Image {
 
-  public maxSpeed = 15;
+  public maxSpeed = 10;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene.matter.world, x, y, 'assets', 'ball1')
@@ -50,7 +50,6 @@ class Obstacle extends Phaser.Physics.Matter.Image {
     this.setBounce(1);
     this.setStatic(true);
     this.setFriction(0);
-    this.setVelocity(0, 2);
   }
 
   update () {
@@ -103,6 +102,8 @@ export default class PongScene extends Phaser.Scene {
   private socket!: Socket;
   private canMove: boolean = false;
   private uiScene!: UiScene;
+  private enemyPos: number | null = null;
+  private worldState: WorldState | null = null;
 
 
   constructor() {
@@ -143,30 +144,31 @@ export default class PongScene extends Phaser.Scene {
     this.ball.x = state.ball.x;
     this.ball.y = state.ball.y;
     this.ball.setVelocity(state.ball.vx, state.ball.vy);
-    // let i = 0;
-    // state.obstacles.forEach((o) => {
-    //   this.obstacles[i].x = o.x;
-    //   i = i + 1;
-    // })
+    let i = 0;
+    state.obstacles.forEach((o) => {
+      this.obstacles[i].x = o.x;
+      this.obstacles[i].y = o.y;
+      i++
+    })
   }
 
   private updateEnemy(y: number) {
-      this.otherPaddle.y = y;
+      if (!this.otherPaddle){
+        return
+      }
+      this.enemyPos = y;
   }
 
   create(config: IGameSettings): void {
-    this.parseConfig(config);
+    this.parseConfig(gameStore.currentGame);
 
     this.socket = gameStore.socket as Socket;
     this.socket.on("state", (state: WorldState) => {
-      try {
-        // console.log("State = " + JSON.stringify(state))
-        this.updateWorld(state);
-      } catch {}
-      }
-    );
+      this.worldState = state;
+    });
 
     this.socket.on("enemyMove", (msg: any) => {
+      // console.log("enemyMove: " + JSON.stringify(msg));
       this.updateEnemy(msg.y ?? 0)
     });
 
@@ -178,6 +180,7 @@ export default class PongScene extends Phaser.Scene {
     this.socket.on("playerDisconnect", () => {
       console.log("playerDisconnect"),
       this.uiScene.onPlayerDisconnect()
+      this.scene.pause()
     });
 
     this.socket.on("pointFinish", () => {
@@ -199,8 +202,8 @@ export default class PongScene extends Phaser.Scene {
     if ( this.config.type != 'CLASSIC') {
       this.obstacles[0] = new Obstacle(this, 200, 300, 'red');
       this.obstacles[1] = new Obstacle(this, 300, 200, 'yellow');
-      this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
       this.obstacles[3] = new Obstacle(this, 500, 100, 'green');
+      this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
 
       // this.obstacles.forEach((obstacle) => {
       //   this.ball.setOnCollideWith(obstacle, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitObstacle(data));
@@ -299,9 +302,19 @@ export default class PongScene extends Phaser.Scene {
 
   update() {
 
-    // this.paddle1.setVelocity(0);
     this.handleInput();
-    this.obstacles.forEach((o) => o.update());
+
+    if (this.enemyPos) {
+      this.otherPaddle.y = this.enemyPos;
+      this.enemyPos = null;
+    }
+    if (this.worldState) {
+      this.updateWorld(this.worldState)
+      this.worldState = null;
+    } else {
+    if (this.canMove)
+      this.obstacles.forEach((o) => o.update());
+    }
   }
 
 

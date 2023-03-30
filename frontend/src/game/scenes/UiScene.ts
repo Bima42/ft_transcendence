@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
+import type IUser from '@/interfaces/user/IUser';
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -15,6 +16,7 @@ export default class UiScene extends Phaser.Scene {
   private isReady: boolean = false;
   private countdown: number = 0;
   private countdownEvent!: Phaser.Time.TimerEvent
+  private otherPlayer!: IUser
 
   constructor() {
     super({ key: 'UiScene' })
@@ -25,7 +27,7 @@ export default class UiScene extends Phaser.Scene {
   }
 
   create(config: IGameSettings) {
-    this.gameSettings = config;
+    this.gameSettings = gameStore.currentGame;
 
     let text = '0 - 0'
     if (config)
@@ -34,6 +36,11 @@ export default class UiScene extends Phaser.Scene {
     this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, '')
     this.startButtonText = "I am Ready !"
     this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1});
+
+    if(userStore.user?.id == this.gameSettings.player1.id)
+      this.otherPlayer = this.gameSettings.player2;
+    else
+      this.otherPlayer = this.gameSettings.player1;
 
     if (config)
       this.waitingRoom();
@@ -51,10 +58,16 @@ export default class UiScene extends Phaser.Scene {
     this.startButton.setText(this.startButtonText);
   }
 
+  onServerDisconnect() {
+      console.log("Server disconnected");
+      this.startButton.setVisible(true)
+      this.startButtonText = `Server disconnected.`
+  }
+
   onPlayerDisconnect() {
       console.log("Player disconnected");
       this.startButton.setVisible(true)
-      this.startButtonText = "Player disconnected"
+      this.startButtonText = `${this.otherPlayer.username} disconnected.`
   }
 
   // At the start of the countdown
