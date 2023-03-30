@@ -67,6 +67,25 @@ export const useUserStore = defineStore( 'auth', () => {
 			.catch(error => console.log(error))
 	}
 
+	const uploadAvatar = function (file: FormData) {
+		fetch(
+			`https://${import.meta.env.VITE_BACKEND_URL}/users/avatar/${user?.id}`,
+			{
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+				},
+				body: file
+			},
+		)
+			.then(response => response.json())
+			.then(json => {
+				user = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user))
+			})
+			.catch(error => console.log(error))
+	}
+
 	const testEndpoint = function () {
 		get(`users/id/${user?.id}`, 'Failed to get user')
 			.then(response => response.json())
@@ -81,6 +100,7 @@ export const useUserStore = defineStore( 'auth', () => {
     isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
+		uploadAvatar,
     testEndpoint,
 	}
 })
