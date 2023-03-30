@@ -25,7 +25,7 @@ export default class UiScene extends Phaser.Scene {
 
   create(config: IGameSettings) {
     this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
-    this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, 'Start game')
+    this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, '')
     this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1});
     this.waitingRoom();
   }
@@ -58,7 +58,7 @@ export default class UiScene extends Phaser.Scene {
     this.isReady = false;
     this.startButton.setOrigin(0.5)
       .setVisible(true)
-      .setText("Ready")
+      .setText("I am Ready !")
       .setPadding(10)
       .setStyle({ backgroundColor: '#111' })
       .setInteractive({ useHandCursor: true })

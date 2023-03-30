@@ -1,9 +1,7 @@
 import Phaser from 'phaser'
 import { Socket } from "socket.io-client"
-import type IGame from '@/interfaces/game/IGame'
 import type IUser from '@/interfaces/user/IUser'
 import type GameType from '@/interfaces/game/IGame'
-import type GameStatus from '@/interfaces/game/IGame'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
@@ -70,8 +68,14 @@ type WorldState = {
     vx: number,
     vy: number,
   }
-  paddle1: number
-  paddle2: number
+  paddle1: {
+    x: number,
+    y: number,
+  }
+  paddle2: {
+    x: number,
+    y: number,
+  }
   obstacles: {
     x: number,
     y: number
@@ -97,6 +101,7 @@ export default class PongScene extends Phaser.Scene {
   public scores: Array<number> = [0, 0];
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
+  private canMove: boolean = false;
 
 
   constructor() {
@@ -121,11 +126,20 @@ export default class PongScene extends Phaser.Scene {
     this.config.player1 = config.player1;
     this.config.player2 = config.player1;
     this.config.maxScore = 3;
+
+    const gameNumber = config ? config.game.id : 0
+    if (this.config.type == 'CLASSIC') {
+      console.log(`Game #${gameNumber}: Classic game.`);
+    } else {
+      console.log(`Game #${gameNumber}: Custom game.`);
+    }
   }
 
   private updateWorld(state: WorldState) {
-    this.paddle1.y = state.paddle1;
-    this.paddle2.y = state.paddle2;
+    this.paddle1.x = state.paddle1.x;
+    this.paddle1.y = state.paddle1.y;
+    this.paddle2.x = state.paddle2.x;
+    this.paddle2.y = state.paddle2.y;
     this.ball.x = state.ball.x;
     this.ball.y = state.ball.y;
     this.ball.setVelocity(state.ball.vx, state.ball.vy);
@@ -139,11 +153,6 @@ export default class PongScene extends Phaser.Scene {
 
   create(config: IGameSettings): void {
     this.parseConfig(config);
-    if (this.config.type == 'CLASSIC') {
-      console.log(`Game #${config.game.id}: Classic game.`);
-    } else {
-      console.log(`Game #${config.game.id}: Custom game.`);
-    }
 
     this.socket = gameStore.socket as Socket;
     this.socket.on("state", (state: WorldState) => {
@@ -175,7 +184,7 @@ export default class PongScene extends Phaser.Scene {
     });
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
-    // this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
+    this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
     // this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, true, true);
 
     this.ball = new Ball(this, 400, 300);
@@ -240,6 +249,8 @@ export default class PongScene extends Phaser.Scene {
 
   // Before Countdown: not a lot to do in the game part
   private startGame() {
+    console.log("start game !");
+    this.canMove = true;
   }
 
   hitObstacle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
@@ -254,36 +265,42 @@ export default class PongScene extends Phaser.Scene {
   }
 
     hitPaddle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
-      // let ball = data.bodyA.gameObject as Ball;
-      // let paddle = data.bodyB.gameObject as Paddle;
-      // const minAngle = 30;
-      // const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
-      // var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
-      // // Mirror translation for the paddle on the left
-      // if (ball.x < 300)
-      //   newAngle *= -1;
-      // // convert to radian
-      // newAngle *= Math.PI / 180;
-      // ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
-      //
+      let ball = data.bodyA.gameObject as Ball;
+      let paddle = data.bodyB.gameObject as Paddle;
+      const minAngle = 30;
+      const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
+      var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+      // Mirror translation for the paddle on the left
+      if (ball.x < 300)
+        newAngle *= -1;
+      // convert to radian
+      newAngle *= Math.PI / 180;
+      ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
+  }
+
+  handleInput() {
+    if (!this.canMove)
+      return ;
+
+    let moved = false;
+    if (this.keys.s.isDown) {
+      this.myPaddle.y += this.myPaddle.maxSpeed;
+      moved = true;
+    }
+    if (this.keys.w.isDown) {
+      this.myPaddle.y -= this.myPaddle.maxSpeed;
+      moved = true;
+    }
+    if (moved) {
+      this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, 600);
+      this.socket.emit("move", { y: this.myPaddle.y });
+    }
   }
 
   update() {
 
-    this.paddle1.setVelocity(0);
-    let move = false;
-    if (this.keys.s.isDown) {
-      this.myPaddle.y += this.myPaddle.maxSpeed;
-      move = true;
-    }
-    if (this.keys.w.isDown) {
-      this.myPaddle.y -= this.myPaddle.maxSpeed;
-      move = true;
-    }
-    this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, 600);
-    if (move)
-      this.socket.emit("move", { y: this.myPaddle.y });
-
+    // this.paddle1.setVelocity(0);
+    this.handleInput();
     this.obstacles.forEach((o) => o.update());
   }
 

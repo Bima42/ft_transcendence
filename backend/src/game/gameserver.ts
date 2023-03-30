@@ -55,10 +55,10 @@ export class GameServer {
     this.ball.restitution = 1;
     Composite.add(this.engine.world, this.ball);
 
-    this.paddle1 = Bodies.rectangle(40, 300, 24, 104, {isStatic: true});
+    this.paddle1 = Bodies.rectangle(20, 300, 24, 104, {isStatic: true});
     Body.setInertia(this.paddle1, Infinity);
     Composite.add(this.engine.world, this.paddle1);
-    this.paddle2 = Bodies.rectangle(740, 300, 24, 104, {isStatic: true});
+    this.paddle2 = Bodies.rectangle(780, 300, 24, 104, {isStatic: true});
     Body.setInertia(this.paddle2, Infinity);
     Composite.add(this.engine.world, this.paddle2);
 
@@ -78,9 +78,9 @@ export class GameServer {
     const idx = this.players.indexOf(socket);
     // Logger.log(`Game#${this.roomID}: PlayerMove from idx ${idx}: ${JSON.stringify(playerMove)}`);
     if (idx == 0)
-      this.paddle2.position.y = playerMove.y;
+      Body.setPosition(this.paddle2, {x: this.paddle2.position.x, y: playerMove.y}, false)
     else if (idx == 1)
-      this.paddle1.position.y = playerMove.y;
+      Body.setPosition(this.paddle1, {x: this.paddle1.position.x, y: playerMove.y}, false)
     socket.to(this.roomID).emit("enemyMove", playerMove);
   }
 
@@ -151,8 +151,9 @@ export class GameServer {
   }
 
   updateWorld() {
-    // console.log(`Game#${this.roomID}: Ball = ${JSON.stringify(this.ball.position)}, paddle1 = ${JSON.stringify(this.paddle1.position)}, paddle2 = ${JSON.stringify(this.paddle2.position)}`);
     Engine.update(this.engine, 1000 / fps);
+    // Just a fix for some crazy stuff happening
+    Body.setSpeed(this.ball, ballMaxSpeed);
 
     if (Collision.collides(this.ball, this.paddle1)) {
       this.hitPaddle(this.ball, this.paddle1)
@@ -168,6 +169,7 @@ export class GameServer {
   }
 
   sendStateToClients() {
+
     const world : WorldState = {
       ball: {
         x: this.ball.position.x,
@@ -175,8 +177,14 @@ export class GameServer {
         vx: this.ball.velocity.x,
         vy: this.ball.velocity.y,
       },
-      paddle1: this.paddle1.position.y,
-      paddle2: this.paddle2.position.y,
+      paddle1: {
+        x: this.paddle1.position.x,
+        y: this.paddle1.position.y,
+      },
+      paddle2: {
+        x: this.paddle2.position.x,
+        y: this.paddle2.position.y,
+      },
       obstacles: [],
     }
     this.server.to(String(this.game.id)).emit("state", world)
@@ -197,15 +205,7 @@ export class GameServer {
       y: ballMaxSpeed * Math.cos(newAngle)
     });
   }
-
-
 };
-
-
-class GameSettings {
-  classic: boolean = true;
-  maxScore: number = 3;
-}
 
 type WorldState = {
   ball: {
@@ -214,8 +214,14 @@ type WorldState = {
     vx: number,
     vy: number,
   }
-  paddle1: number
-  paddle2: number
+  paddle1: {
+    x: number,
+    y: number,
+  }
+  paddle2: {
+    x: number,
+    y: number,
+  }
   obstacles: {
     x: number,
     y: number
