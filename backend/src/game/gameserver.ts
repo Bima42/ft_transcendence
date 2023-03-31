@@ -53,6 +53,8 @@ class Obstacle {
   // Move up and down, boucing on the 'walls'
   update () {
     Body.translate(this.body, this.speed)
+    if (this.body.position.x < this.width / 2 || this.body.position.x > worldWidth - this.width / 2) {
+      this.speed.x *= -1;
     if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2) {
       this.speed.y *= -1;
     }

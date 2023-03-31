@@ -65,7 +65,7 @@ class Obstacle extends Phaser.Physics.Matter.Image {
   update () {
     this.x += this.speed.x;
     this.y += this.speed.y;
-    if (this.x < this.width / 2 || this.y > pong.worldWidth - this.width / 2)
+    if (this.x < this.width / 2 || this.x > pong.worldWidth - this.width / 2)
       this.speed.x *= -1;
     if (this.y < this.height / 2 || this.y > pong.worldHeight - this.height / 2)
       this.speed.y *= -1;
