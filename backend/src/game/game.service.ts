@@ -227,5 +227,18 @@ playerIsReady(client: Socket) {
     client.data.gameServer.onPlayerIsReady(client);
 }
 
+getCurrentGame(user: User) : GameSettingsDto | null {
+  if (!user)
+    return null;
+  const currentServer = this.gameServers.find((serv) => {
+    const players = serv.getPlayers();
+    if (players.find((usr) => usr.id == user.id))
+      return true;
+  })
+  Logger.log(`Found the gameserver: ${currentServer?.game.id}`);
+  if (!currentServer)
+    return null;
+  return currentServer.toGameSettingsDto();
+}
 
 }

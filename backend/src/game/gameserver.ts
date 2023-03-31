@@ -2,8 +2,9 @@ import { Engine, Bodies, Common, Collision, Body, Render, Runner, Composite, Eve
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
-import { Game, GameStatus } from '@prisma/client';
+import { Game, GameStatus, User } from '@prisma/client';
 import { PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
+import { GameSettingsDto } from "./dto/joinQueueData.dto";
 
 // At what pace the simulation is run
 const fps = 60;
@@ -215,7 +216,7 @@ export class GameServer {
     }
   }
 
-  updateWorld() {
+  private updateWorld() {
     Engine.update(this.engine, 1000 / fps);
 
     // Just a fix for some crazy stuff happening
@@ -228,16 +229,13 @@ export class GameServer {
     if (Collision.collides(this.ball, this.paddle2, null)) {
       this.hitPaddle(this.ball, this.paddle2)
     }
-
     if (this.ball.position.x < 0 || this.ball.position.x > 800) {
       this.resetLevel();
     }
-
     this.obstacles.forEach((o) => o.update())
   }
 
-  sendStateToClients() {
-
+  private sendStateToClients() {
     const world : WorldStateDto = {
       ball: {
         x: this.ball.position.x,
@@ -260,10 +258,9 @@ export class GameServer {
       y: o.body.position.y,
     }))
     this.server.to(String(this.game.id)).emit("state", world)
-
   }
 
-  hitPaddle(ball: any, paddle: any) {
+  private hitPaddle(ball: any, paddle: any) {
     const minAngle = 30;
     const percentage = Common.clamp((ball.position.y - paddle.position.y + 104 / 2) / 104, 0, 1)
     var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
@@ -280,5 +277,21 @@ export class GameServer {
 
   getStatus(): GameStatus {
     return this.status;
+  }
+
+  getPlayers(): User[] {
+    let players = [];
+    players.push(this.players[0].data.user);
+    players.push(this.players[1].data.user);
+    return players;
+  }
+
+  toGameSettingsDto(): GameSettingsDto {
+    const users = this.getPlayers();
+    return {
+      game: this.game,
+      player1: users[0],
+      player2: users[1],
+    };
   }
 };
