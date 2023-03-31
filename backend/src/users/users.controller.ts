@@ -9,15 +9,16 @@ import {
   Req,
   Res,
   UseGuards,
-  ParseIntPipe
+  ParseIntPipe,
+  UseInterceptors, UploadedFile, ParseFilePipeBuilder
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
-import { UsersMiddleware } from './middlewares/users.middleware';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -63,5 +64,20 @@ export class UsersController {
   @Delete('id/:id')
   async deleteUser(@Param('id', ParseIntPipe) userId: number) {
       return this.usersService.delete(userId);
+  }
+
+  @Post('avatar/:id')
+  @UseInterceptors(FileInterceptor('avatar', { dest: './uploads' }))
+  async updateAvatar(
+      @Param('id', ParseIntPipe) userId: number,
+      @UploadedFile(
+        new ParseFilePipeBuilder()
+          .addFileTypeValidator({ fileType: 'jpeg|png|jpg' })
+          .addMaxSizeValidator({ maxSize: 10000000 })
+          .build()
+      )  file: Express.Multer.File
+  ) {
+      console.log(file);
+      return this.usersService.updateAvatar(userId, file.path);
   }
 }

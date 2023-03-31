@@ -72,8 +72,10 @@ export const useUserStore = defineStore( 'auth', () => {
 			`https://${import.meta.env.VITE_BACKEND_URL}/users/avatar/${user?.id}`,
 			{
 				method: 'POST',
+				mode: 'cors',
+				credentials: 'include',
 				headers: {
-					'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+					'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`,
 				},
 				body: file
 			},

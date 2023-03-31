@@ -95,6 +95,17 @@ export class UsersService {
     }
   }
 
+  async updateAvatar(userId: number, avatar: string): Promise<User> {
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        avatar: avatar
+      }
+    });
+  }
+
   async setTwoFaSecret(userId: number, secret: string): Promise<User> {
     return this.prismaService.user.update({
       where: {

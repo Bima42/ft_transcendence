@@ -43,26 +43,10 @@ const generateQrCode = () => {
 
 async function uploadAvatar(event: Event) {
   const file = (event.target as HTMLInputElement).files![0]
-  const maxSize = 1024 * 1024 * 2 // 2MB
-  if (file.size > maxSize) {
-    alert('File is too big!')
-    return
-  }
 
   const formData = new FormData()
-  formData.append('avatar', file)
-
+  formData.append('avatar', file, file.name)
   userStore.uploadAvatar(formData)
-
-  // const response = await fetch('/api/user/avatar', {
-  //   method: 'POST',
-  //   body: formData
-  // })
-  //
-  // if (response.ok) {
-  //   const data = await response.json()
-  //   userStore.updateAvatar(data.avatar)
-  // }
 }
 </script>
 

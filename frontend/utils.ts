@@ -65,6 +65,7 @@ export async function del(route: string, message: string): Promise<Response> {
 *
 * @param route: the route to delete
 * @param message: string, the message to display if the request fails
+* @param json: the json to send in the body
 *
   * @return
 */
