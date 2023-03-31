@@ -35,5 +35,7 @@ export class WorldStateDto {
   obstacles: {
     x: number
     y: number
+    vx: number
+    vy: number
   }[]
 }

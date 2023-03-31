@@ -33,7 +33,7 @@ function joinQueue() {
     if (isLoading.value) {
         gameStore.socket.emit('newJoinQueue', {
             type: useClassicMode ? "CLASSIC" : "CUSTOM"
-        }, (response: string) => { console.log(response)});
+        });
     }
     // Aborting queue
     else {
@@ -43,20 +43,16 @@ function joinQueue() {
 
 function onJoinClassic() {
     useClassicMode = true;
-    console.log("classic");
 }
 
 function onJoinCustom() {
     useClassicMode = false;
-    console.log("custom");
 }
 
 // Listen for the 'match-found' event
-gameStore.socket.on('matchFound', (gameSettings: IGameSettings) => {
+gameStore.socket.once('matchFound', (gameSettings: IGameSettings) => {
   (document.getElementById("join_btn") as HTMLButtonElement).disabled = true;
   isLoading.value = false;
-  gameStore.currentGame= gameSettings;
-  gameStore.socket.off('matchFound');
 
   // Redirect the user to the game page with the opponent ID
   router.push(`game`);

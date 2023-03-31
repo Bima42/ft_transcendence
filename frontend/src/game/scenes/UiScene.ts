@@ -5,9 +5,37 @@ import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type IUser from '@/interfaces/user/IUser';
 import type { IPointWon } from '@/interfaces/game/IGameCommunication';
+import * as pong from "../GameConsts"
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
+
+// class Modal {
+//   private background: Phaser.GameObjects.Rectangle;
+//   private textWidget: Phaser.GameObjects.Text;
+//
+//   constructor(private scene : Phaser.Scene,
+//               text: string,
+//               private type: "INFO" | "OK" = "INFO") {
+//     this.background = this.scene.add.rectangle(
+//     this.textWidget = this.scene.add.text(this.scene.cameras.main.centerX,
+//                                           this.scene.cameras.main.centerY - 50,
+//                                           text)
+//   }
+//
+//   setText(text: string) {
+//
+//   }
+//
+//   setVisible(visible: boolean) {
+//     this.textWidget.setVisible(visible);
+//     this.background.setVisible(visible);
+//     this.button.setVisible(visible);
+//   }
+//
+//   setType
+//
+// }
 
 export default class UiScene extends Phaser.Scene {
   private gameSettings!: IGameSettings
@@ -18,6 +46,7 @@ export default class UiScene extends Phaser.Scene {
   private myPlayer!: IUser
   private otherPlayer!: IUser
   private isPlayer1: boolean = false;
+  // private modal!: Modal;
 
   constructor() {
     super({ key: 'UiScene' })
@@ -27,32 +56,41 @@ export default class UiScene extends Phaser.Scene {
 
   }
 
-  create(config: IGameSettings) {
+  create() {
+    // this.modal = new Modal("");
     this.gameSettings = gameStore.currentGame;
+    this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
 
+    if (!this.gameSettings) {
+      console.error("No game settings in store");
+      // TODO: show error message
+      // this.scene.stop('UiScene');
+      this.scoreWidget.setText("No game. Invite someone or get in the queue !");
+      return;
+    }
     // Are we player 1 or 2 ?
     if(userStore.user?.id == this.gameSettings.player1.id) {
+      console.log("player 1");
       this.isPlayer1 = true;
       this.myPlayer = this.gameSettings.player1;
       this.otherPlayer = this.gameSettings.player2;
     } else {
+      console.log("player 2");
       this.isPlayer1 = false;
       this.myPlayer = this.gameSettings.player2;
       this.otherPlayer = this.gameSettings.player1;
     }
 
-    this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
     this.updateScoreWidgetContent(0, 0);
     this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !")
     this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1});
 
-    if (config)
-      this.waitingRoom();
+    this.waitingRoom();
+
   }
 
   update() {
-
-    Phaser.Display.Align.In.Center(this.scoreWidget, this.add.zone(400, 30, 800, 400));
+    Phaser.Display.Align.In.Center(this.scoreWidget, this.add.zone(pong.worldWidth / 2, 30, pong.worldWidth, 400));
 
   }
 
@@ -66,6 +104,20 @@ export default class UiScene extends Phaser.Scene {
       console.log("Player disconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
+  }
+
+  onPlayerReconnect() {
+      console.log("Player reconnected");
+      this.startButton.setVisible(true)
+      this.startButton.setText(`${this.otherPlayer.username} reconnected!`)
+      setTimeout(() => {
+        this.startButton.setVisible(false);
+      }, pong.ReconnectBreakMs);
+  }
+
+  onAbortGame() {
+      this.startButton.setVisible(true)
+      this.startButton.setText(`Game aborted, sorry !\nYou can leave this page`)
   }
 
   updateScoreWidgetContent(score1: number, score2: number) {
@@ -117,6 +169,7 @@ export default class UiScene extends Phaser.Scene {
       .on('pointerdown', () => {
         this.startButton.setText("Waiting for opponent...")
           .setStyle({ fill: '#FFF' })
+          .setInteractive({ useHandCursor: false })
           .off('pointerover')
           .off('pointerout')
           .off('pointerdown')

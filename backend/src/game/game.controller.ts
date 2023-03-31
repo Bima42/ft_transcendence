@@ -18,7 +18,8 @@ export class GameController {
       const gameSettings = this.gameService.getCurrentGame(req.user as User);
       if (!gameSettings)
         res.status(404).send("Game not Found");
-      res.status(200).json(gameSettings);
+      else
+        res.status(200).json(gameSettings);
   }
 
 }

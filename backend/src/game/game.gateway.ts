@@ -44,10 +44,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         gameServer.onPlayerMove(socket, data);
     }
 
-    @SubscribeMessage('gameover')
-    async onGameover(@MessageBody() data: any) {
-
-      Logger.log("gameover......");
+    @SubscribeMessage('playerDisconnect')
+    async handlePlayerDisconnect(@ConnectedSocket() socket: Socket) {
+      this.gameService.onPlayerDisconnect(socket);
     }
 
     private async verifyUser(token: string) : Promise<User> {
@@ -69,13 +68,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       }
       this.userSockets[client.id] = user;
 
+      Logger.log(`Game: ${user.username}#${user.id} connected`);
+
       // attach the user to the socket
       client.data.user = user;
 
       // client joins its own rooms, so that we send messages to all his devices
       client.join(user.username);
 
-      Logger.log(`Game: ${user.username}#${user.id} connected`);
   }
 
   handleDisconnect(client: any): any {
@@ -86,6 +86,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async afterInit(server: Server) {
     Logger.log('WebSocket server initialized');
     await this.gameService.init(server);
+  }
+
+  @SubscribeMessage('reconnect')
+  handleReconnect(@ConnectedSocket() client: Socket) {
+      // Try to reconnect to current game if there is one
+      this.gameService.tryToReconnect(client)
   }
 
   @SubscribeMessage('newJoinQueue')

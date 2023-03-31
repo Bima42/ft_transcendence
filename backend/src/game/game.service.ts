@@ -37,26 +37,34 @@ export class GameService {
     })
 
     // Verify if games are finished every now and then
-    setInterval(async () => { this.checkCurrentGames() }, 2000)
+    setInterval(async () => { this.checkCurrentGames() }, 10000)
   }
 
   async checkCurrentGames() {
     this.gameServers.forEach(async (serv) => {
       if (serv.getStatus() == "ABORTED") {
-        Logger.log(`Game #${serv.game.id} is aborted !`);
+        Logger.log(`Game #${serv.game.id} written as aborted in DB`);
 
         this.gameServers.splice(this.gameServers.indexOf(serv));
 
       } else if (serv.getStatus() == "ENDED") {
-        Logger.log(`Game #${serv.game.id} is finished !`);
+        Logger.log(`Game #${serv.game.id} written as ended in DB`);
+        const players = serv.getPlayers()
+        const scores = serv.getScore();
 
         await this.prismaService.game.update({
           where: {
             id: serv.game.id,
           },
           data: {
-            status: "ENDED"
-            // TODO: Add scores from the game to DB (UserGame)
+            status: "ENDED",
+            // // TODO: Add scores from the game to DB (UserGame)
+            // users: {
+            //   update: {
+            //     where: {id: players[0].id },
+            //     data: { score: scores[0] },
+            //   },
+            // },
           }
         })
         // TODO: Update player score in DB (total victories)
@@ -110,10 +118,16 @@ export class GameService {
   quitQueue (socket: Socket) {
     if (!socket.data.user)
       return;
-    // FIXME: This clear both queues all the time !
-    this.classicQueue = this.classicQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
-    this.customQueue = this.customQueue.filter((el) => { el.data.user.username !== socket.data.user.username});
-    Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the queue`);
+    const idx_classic = this.classicQueue.indexOf(socket);
+    if (idx_classic >= 0) {
+      Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the classic queue`);
+      this.classicQueue.splice(idx_classic, 1);
+    }
+    const idx_custom = this.customQueue.indexOf(socket);
+    if (idx_custom >= 0) {
+      Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the custom queue`);
+      this.customQueue.splice(idx_custom, 1);
+    }
   }
 
   async getGameDetails(gameId: number): Promise<Game> {
@@ -195,29 +209,9 @@ private async startGame(match: Game, players: Socket[]): Promise<void> {
 }
 
 async onPlayerDisconnect(client: Socket) {
-  // Logger.log(`Socket gameserver = ${JSON.stringify(client.data.gameServer)}`);
-  Logger.log(`Socket game = ${JSON.stringify(client.data.game)}`);
-
-  if (client.data.game) {
-    // Update the status in the database
-    await this.prismaService.game.update({
-      where: {
-        id: client.data.game.id
-      },
-      data: {
-        status: "ABORTED",
-      }
-    })
-  }
   if (client.data.gameServer != null) {
     // Warn the gameServer
     client.data.gameServer.onPlayerDisconnect(client);
-
-    // Destroy the gameServer (TODO: try reconnection)
-    const idx = this.gameServers.indexOf(client.data.gameServers);
-    if (idx > -1)
-      this.gameServers.splice(client.data.gameServer);
-    // The socket doesn't need to be updated as it will be deleted
   }
   this.quitQueue(client);
 }
@@ -225,6 +219,17 @@ async onPlayerDisconnect(client: Socket) {
 playerIsReady(client: Socket) {
   if (client.data.gameServer)
     client.data.gameServer.onPlayerIsReady(client);
+}
+
+tryToReconnect(client: Socket) {
+  const currentServer = this.gameServers.find((serv) => {
+    const players = serv.getPlayers();
+    if (players.find((usr) => usr.id == client.data.user.id))
+      return true;
+  })
+  if (!currentServer)
+    return ;
+  currentServer.onPlayerReconnect(client);
 }
 
 getCurrentGame(user: User) : GameSettingsDto | null {
@@ -235,9 +240,10 @@ getCurrentGame(user: User) : GameSettingsDto | null {
     if (players.find((usr) => usr.id == user.id))
       return true;
   })
-  Logger.log(`Found the gameserver: ${currentServer?.game.id}`);
-  if (!currentServer)
+  if (!currentServer) {
+    Logger.log(`No game found for ${user.username}`);
     return null;
+  }
   return currentServer.toGameSettingsDto();
 }
 

@@ -10,6 +10,8 @@ import { GameSettingsDto } from "./dto/joinQueueData.dto";
 const fps = 60;
 // At what frequency we send the state to the clients
 const syncPerSec = 10;
+
+const disconnectTimeoutDuration = 10000
 // Duration of the countdown between the start (ms)
 const countdownDuration = 3000
 
@@ -23,7 +25,6 @@ const ballMaxSpeed = 10;
 const paddleX = 20;
 const paddleSize = {x: 24, y: 104}
 // Round corner on the paddle
-const paddleChamferRadius = 12;
 const cheaterDetectionLimit = 20;
 // The minimum bouncing angle from the paddle
 // The ball will go with an angle between x and (180 - x)
@@ -38,8 +39,7 @@ const obstacles_def = [
 
 class Obstacle {
   public body: any; // Matter-js body
-  private maxSpeed = 2;
-  private dir = -1;
+  public speed = {x: 0, y: 2};
   private width = 64;
   private height = 32;
 
@@ -52,9 +52,10 @@ class Obstacle {
 
   // Move up and down, boucing on the 'walls'
   update () {
-    Body.translate(this.body, {x: 0, y: this.dir * this.maxSpeed})
-    if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2)
-      this.dir *= -1;
+    Body.translate(this.body, this.speed)
+    if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2) {
+      this.speed.y *= -1;
+    }
   }
 
 }
@@ -63,16 +64,17 @@ export class GameServer {
   private ball: any;
   private paddle1: any;
   private paddle2: any;
-  private IntervalUpdate: any;
-  private IntervalSync: any;
+  private IntervalUpdate: NodeJS.Timer;
+  private IntervalSync: NodeJS.Timer;
+  private disconnectTimeout: NodeJS.Timeout;
   private engine!: any;
   private roomID: string;
-  private players: any;
+  private players: Socket[] = [];
   private scores: Array<number> = [0, 0];
   private maxScore: number = 5
-  private obstacles = [];
+  private obstacles: Obstacle[] = [];
   private status: GameStatus = "STARTED";
-  private isRunning = false;
+  private hasStarted = false;
 
   constructor(private server: Server,
               public game: Game,
@@ -107,8 +109,8 @@ export class GameServer {
     Composite.add(this.engine.world, [
       Bodies.rectangle(worldWidth/2, -wallThickness/2, worldWidth, wallThickness, worldOption), // upper wall
       Bodies.rectangle(worldWidth/2, worldHeight + wallThickness/2, worldWidth, wallThickness, worldOption), // lower wall
-      // Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
-      // Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // right wall
+      // Bodies.rectangle(-wall_thickness/2, worldHeight/2, wall_thickness, worldHeight, worldOption), // left wall
+      // Bodies.rectangle(worldWidth + wall_thickness/2, worldHeight/2, wall_thickness, worldHeight, worldOption), // right wall
     ])
 
       if (game.type != "CLASSIC") {
@@ -145,20 +147,47 @@ export class GameServer {
   }
 
   onPlayerDisconnect(client: Socket) {
-    Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected. abort game`);
+    Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected`);
 
-    this.status = "ABORTED"
+    // check if already disconnected
+    if (client.data.isReady) {
+      client.data.isReady = false;
+      this.disconnectTimeout = setTimeout(() => { this.onAbortGame() }, disconnectTimeoutDuration);
+      this.onPause();
+      client.to(this.roomID).emit("playerDisconnect")
+      this.resetLevel();
+    }
+    if (this.players[0].disconnected && this.players[1].disconnected)
+      this.onAbortGame();
+  }
 
-    // Clear the intervals
-    clearInterval(this.IntervalUpdate);
-    clearInterval(this.IntervalSync);
+  onPlayerReconnect(client: Socket) {
+    if (!this.hasStarted) {
+      this.sendStateToClients()
+      return;
+    }
 
-    // Cleanup the sockets
-    this.players[0].data.game = null;
-    this.players[0].data.gameServer = null;
-    this.players[1].data.game = null;
-    this.players[1].data.gameServer = null;
-    this.server.to(this.roomID).emit("playerDisconnect")
+    Logger.log(`Game#${this.roomID}: ${client.data.user.username} reconnected`);
+    clearTimeout(this.disconnectTimeout)
+
+    // Socket shenanigans
+    client.join(this.roomID);
+    this.updateGameDataOnSockets();
+    client.data.isReady = true;
+    this.players.forEach((el, idx) => {
+      if (el.data.user.id == client.data.user.id && el.disconnected) {
+        this.players[idx] = client;
+      }
+    });
+    this.sendStateToClients();
+
+    this.server.to(this.roomID).emit("playerReconnect")
+
+    // lauch ball after countdown
+    setTimeout(() => {
+      Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
+      this.onResume();
+    }, 2000);
   }
 
   onPlayerIsReady(client: Socket) {
@@ -167,16 +196,31 @@ export class GameServer {
     client.data.isReady = true;
 
     // Check if everybody is ready
-    if (this.players[0].data.isReady && this.players[1].data.isReady) {
+    if (!this.hasStarted && this.players[0].data.isReady && this.players[1].data.isReady) {
       Logger.log(`Game#${this.roomID}: Starting game !`);
       this.onStartGame();
     }
   }
 
+  private onAbortGame() {
+    Logger.log(`Game#${this.roomID} aborted`);
+    this.status = "ABORTED"
+
+    this.cleanupGameDataOnSockets()
+    this.server.to(this.roomID).emit("abortGame")
+  }
+
+  private onGameover(pointWon: PointWonDto) {
+      Logger.log(`Game#${this.roomID}: Gameover`);
+      this.status = "ENDED"
+      this.cleanupGameDataOnSockets()
+      this.server.to(this.roomID).emit("gameover", pointWon)
+  }
+
   onStartGame() {
-    // If already running, dont run again
-    if (this.isRunning)
-      return;
+
+    this.hasStarted =true;
+    this.onResume();
 
     // Warn clients that we are about to start
     this.server.to(this.roomID).emit("startGame");
@@ -186,6 +230,47 @@ export class GameServer {
       Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
     }, countdownDuration);
 
+  }
+
+  private updateScore() {
+    // Update score
+    if (this.ball.position.x < 0) {
+      this.scores[1] += 1;
+    } else {
+      this.scores[0] += 1;
+    }
+    Logger.log(`Game#${this.roomID}: ${this.scores[0]} - ${this.scores[1]}`);
+
+    const pointWon: PointWonDto = {
+      score1: this.scores[0],
+      score2: this.scores[1],
+    }
+    if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
+      this.onGameover(pointWon);
+    } else {
+      this.server.to(this.roomID).emit("pointEnd", pointWon)
+    }
+  }
+
+  private resetLevel(): void {
+
+    // Reset ball
+    Body.setVelocity(this.ball, {x: 0, y: 0});
+    Body.setPosition(this.ball, {x:worldWidth / 2, y: worldHeight / 2});
+
+    Body.setPosition(this.paddle1, {x:paddleX, y: worldHeight / 2});
+    Body.setPosition(this.paddle2, {x:worldWidth - paddleX, y: worldHeight / 2});
+
+    // TODO: Reset Obstacles
+
+  }
+
+  private onPause() {
+    clearInterval(this.IntervalUpdate);
+    clearInterval(this.IntervalSync);
+  }
+
+  private onResume() {
     // Start simulation
     this.updateWorld();
     this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
@@ -195,44 +280,10 @@ export class GameServer {
     this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
   }
 
-  private resetLevel(): void {
-
-    // Update score
-    if (this.ball.position.x < 0) {
-      this.scores[1] += 1;
-    } else {
-      this.scores[0] += 1;
-    }
-    Logger.log(`Game#${this.roomID}: ${this.scores[0]} - ${this.scores[1]}`);
-
-    // Reset ball
-    Body.setVelocity(this.ball, {x: 0, y: 0});
-    Body.setPosition(this.ball, {x:worldWidth / 2, y: worldHeight / 2});
-
-    // TODO: Reset paddles
-
-    // TODO: Reset Obstacles
-
-    // reset Intervals
-    clearInterval(this.IntervalUpdate);
-    clearInterval(this.IntervalSync);
-
-    const pointWon: PointWonDto = {
-      score1: this.scores[0],
-      score2: this.scores[1],
-    }
-    if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
-      Logger.log(`Game#${this.roomID}: Gameover`);
-      this.status = "ENDED"
-      this.server.to(this.roomID).emit("gameover", pointWon)
-    } else {
-      this.server.to(this.roomID).emit("pointEnd", pointWon)
-      this.onStartGame();
-    }
-  }
-
   private updateWorld() {
+
     Engine.update(this.engine, 1000 / fps);
+    this.obstacles.forEach((o) => o.update())
 
     // Just a fix for some crazy stuff happening
     if (Body.getSpeed(this.ball) > ballMaxSpeed)
@@ -244,10 +295,13 @@ export class GameServer {
     if (Collision.collides(this.ball, this.paddle2, null)) {
       this.hitPaddle(this.ball, this.paddle2)
     }
-    if (this.ball.position.x < 0 || this.ball.position.x > worldWidth) {
+    if (this.ball.position.x < -ballSize.x || this.ball.position.x > worldWidth + ballSize.x) {
+      this.updateScore();
       this.resetLevel();
+      this.onPause()
+      if (this.status != "ENDED")
+        this.onStartGame();
     }
-    this.obstacles.forEach((o) => o.update())
   }
 
   private sendStateToClients() {
@@ -271,8 +325,10 @@ export class GameServer {
     this.obstacles.forEach((o) => world.obstacles.push({
       x: o.body.position.x,
       y: o.body.position.y,
+      vx: o.speed.x,
+      vy: o.speed.y,
     }))
-    this.server.to(String(this.game.id)).emit("state", world)
+    this.server.to(this.roomID).emit("state", world)
   }
 
   private hitPaddle(ball: any, paddle: any) {
@@ -294,6 +350,20 @@ export class GameServer {
     });
   }
 
+  private updateGameDataOnSockets() {
+    this.players.forEach((s) => {
+      s.data.game = this.game;
+      s.data.gameServer = this;
+    })
+  }
+
+  private cleanupGameDataOnSockets() {
+    this.players.forEach((s) => {
+      s.data.game = null;
+      s.data.gameServer = null;
+    })
+  }
+
   getStatus(): GameStatus {
     return this.status;
   }
@@ -303,6 +373,10 @@ export class GameServer {
     players.push(this.players[0].data.user);
     players.push(this.players[1].data.user);
     return players;
+  }
+
+  getScore(): Array<number> {
+    return this.scores;
   }
 
   toGameSettingsDto(): GameSettingsDto {

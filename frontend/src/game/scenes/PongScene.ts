@@ -7,7 +7,9 @@ import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
 import type { IPointWon } from '@/interfaces/game/IGameCommunication'
+import { get } from '../../../utils'
 import * as pong from "../GameConsts"
+
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -28,6 +30,7 @@ class Ball extends Phaser.Physics.Matter.Image {
 
 class Paddle extends Phaser.Physics.Matter.Image {
 
+  private initPos: {x: number, y: number}
   public maxSpeed = 10;
 
   constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
@@ -37,13 +40,18 @@ class Paddle extends Phaser.Physics.Matter.Image {
     this.setFixedRotation();
     this.setRotation(Math.PI / 2);
     this.setSize(this.height, this.width);
+    this.initPos = {x: x, y:y}
+  }
+
+  reset() {
+    this.x = this.initPos.x;
+    this.y = this.initPos.y;
   }
 }
 
 class Obstacle extends Phaser.Physics.Matter.Image {
 
-  private maxSpeed = 2;
-  private dir = -1;
+  public speed = {x: 0, y: 2};
 
   constructor(scene: Phaser.Scene, x: number, y: number, color: string) {
     super(scene.matter.world, x, y, 'assets', color + '1')
@@ -55,9 +63,12 @@ class Obstacle extends Phaser.Physics.Matter.Image {
   }
 
   update () {
-    this.y += this.dir * this.maxSpeed;
+    this.x += this.speed.x;
+    this.y += this.speed.y;
+    if (this.x < this.width / 2 || this.y > pong.worldWidth - this.width / 2)
+      this.speed.x *= -1;
     if (this.y < this.height / 2 || this.y > pong.worldHeight - this.height / 2)
-      this.dir *= -1;
+      this.speed.y *= -1;
   }
 
 }
@@ -79,7 +90,9 @@ type WorldState = {
   }
   obstacles: {
     x: number,
-    y: number
+    y: number,
+    vx: number,
+    vy: number,
   }[]
 }
 
@@ -147,15 +160,25 @@ export default class PongScene extends Phaser.Scene {
     state.obstacles.forEach((o) => {
       this.obstacles[i].x = o.x;
       this.obstacles[i].y = o.y;
+      this.obstacles[i].speed.x = o.vx;
+      this.obstacles[i].speed.y = o.vy;
       i++
     })
   }
 
-  create(): void {
-    this.parseConfig(gameStore.currentGame);
+  async create() {
     this.socket = gameStore.socket as Socket;
-
     resetSocketGameListener(this.socket);
+
+    // Get the current game from the server and put it into the store
+    await get('game/current', "Cannot get game config")
+      .then(answer => answer.json())
+      .then((gameSettings : IGameSettings) => {
+        gameStore.currentGame = gameSettings;
+        this.parseConfig(gameSettings)
+      })
+      .catch ((e: Error) => { console.error(e) })
+
     this.socket.on("state", (state: WorldState) => {
       this.updateWorld(state);
     });
@@ -170,9 +193,25 @@ export default class PongScene extends Phaser.Scene {
     });
 
     this.socket.on("playerDisconnect", () => {
-      resetSocketGameListener(this.socket);
       this.uiScene.onPlayerDisconnect()
-      this.scene.pause()
+      this.scene.pause(this)
+      this.resetLevel();
+    });
+
+    this.socket.on("playerReconnect", () => {
+      this.uiScene.onPlayerReconnect()
+      this.isRunning = false;
+      this.scene.pause(this)
+      setTimeout(() => {
+        this.isRunning = true;
+        this.scene.resume(this)
+      }, pong.ReconnectBreakMs);
+    });
+
+    this.socket.on("abortGame", () => {
+      resetSocketGameListener(this.socket);
+      this.uiScene.onAbortGame()
+      this.scene.pause(this)
     });
 
     this.socket.on("pointEnd", (score: IPointWon) => {
@@ -186,6 +225,13 @@ export default class PongScene extends Phaser.Scene {
       this.scene.stop('UiScene');
       this.scene.start("GameoverScene");
     });
+
+    // Send disconnect message when destroying the game
+    this.events.on('destroy', () => {
+      this.socket.emit("playerDisconnect");
+      resetSocketGameListener(this.socket);
+    })
+
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
     this.matter.world.setBounds(0, 0, pong.worldWidth, pong.worldHeight, 32, false, false, true, true);
@@ -222,13 +268,18 @@ export default class PongScene extends Phaser.Scene {
     }
 
     this.uiScene = this.scene.get("UiScene") as UiScene;
+    setTimeout(() => {
+      gameStore.socket.emit("reconnect")
+    }, 500)
+
   }
 
   private resetLevel(): void {
     this.ball.setVelocity(0);
     this.ball.setPosition(pong.worldWidth / 2, pong.worldHeight / 2);
 
-    // TODO: Reset paddles
+    this.paddle1.reset()
+    this.paddle2.reset()
 
     // TODO: Reset obstacles
   }
@@ -293,6 +344,8 @@ function resetSocketGameListener(socket: Socket) {
   socket.removeAllListeners("enemyMove");
   socket.removeAllListeners("startGame");
   socket.removeAllListeners("playerDisconnect");
+  socket.removeAllListeners("playerReconnect");
+  socket.removeAllListeners("abortGame");
   socket.removeAllListeners("pointEnd");
   socket.removeAllListeners("gameover");
 }
