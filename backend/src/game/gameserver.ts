@@ -261,6 +261,10 @@ export class GameServer {
   }
 
   private hitPaddle(ball: any, paddle: any) {
+    // Dont apply this when already past the paddle
+    if (ball.position.x < world_width / 2 && ball.position.x < paddle.position.x + 104
+        || ball.position.x > world_width / 2 && ball.position.x > paddle.position.x)
+      return;
     const minAngle = 30;
     const percentage = Common.clamp((ball.position.y - paddle.position.y + 104 / 2) / 104, 0, 1)
     var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
