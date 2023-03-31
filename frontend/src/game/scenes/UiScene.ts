@@ -123,8 +123,7 @@ export default class UiScene extends Phaser.Scene {
 
   updateScoreWidgetContent(score1: number, score2: number) {
     let printedScore = [];
-    // Not sure why not the opposite, but ok
-    if (! this.isPlayer1) {
+    if (this.isPlayer1) {
       printedScore.push(score1);
       printedScore.push(score2);
     } else {
