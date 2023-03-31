@@ -56,11 +56,12 @@ export default class UiScene extends Phaser.Scene {
 
   }
 
-  create() {
+  create(config: IGameSettings) {
     // this.modal = new Modal("");
-    this.gameSettings = gameStore.currentGame;
+    this.gameSettings = config;
     this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
 
+    console.log(`config = ${JSON.stringify(this.gameSettings)}`)
     if (!this.gameSettings) {
       console.error("No game settings in store");
       // TODO: show error message
@@ -69,7 +70,7 @@ export default class UiScene extends Phaser.Scene {
       return;
     }
     // Are we player 1 or 2 ?
-    if(userStore.user?.id == this.gameSettings.player1.id) {
+    if(userStore.user?.id == this.gameSettings.player1?.id) {
       console.log("player 1");
       this.isPlayer1 = true;
       this.myPlayer = this.gameSettings.player1;
@@ -115,9 +116,9 @@ export default class UiScene extends Phaser.Scene {
       }, pong.ReconnectBreakMs);
   }
 
-  onAbortGame() {
+  onAbortGame(reason: string) {
       this.startButton.setVisible(true)
-      this.startButton.setText(`Game aborted, sorry !\nYou can leave this page`)
+      this.startButton.setText(`Game aborted: ${reason}\nYou can leave this page`)
   }
 
   updateScoreWidgetContent(score1: number, score2: number) {

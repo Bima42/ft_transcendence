@@ -17,9 +17,9 @@ export class GameController {
   getCurrentGame(@Req() req: Request, @Res() res: Response) {
       const gameSettings = this.gameService.getCurrentGame(req.user as User);
       if (!gameSettings)
-        res.status(404).send("Game not Found");
+        return res.status(404).send("Game not Found");
       else
-        res.status(200).json(gameSettings);
+        return res.status(200).json(gameSettings);
   }
 
 }

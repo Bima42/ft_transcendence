@@ -44,6 +44,14 @@ export class GameService {
     this.gameServers.forEach(async (serv) => {
       if (serv.getStatus() == "ABORTED") {
         Logger.log(`Game #${serv.game.id} written as aborted in DB`);
+        await this.prismaService.game.update({
+          where: {
+            id: serv.game.id,
+          },
+          data: {
+            status: "ABORTED",
+          }
+        })
 
         this.gameServers.splice(this.gameServers.indexOf(serv));
 

@@ -11,6 +11,7 @@ const fps = 60;
 // At what frequency we send the state to the clients
 const syncPerSec = 10;
 
+const timeToStartBeforeAbort = 30000
 const disconnectTimeoutDuration = 10000
 // Duration of the countdown between the start (ms)
 const countdownDuration = 3000
@@ -53,13 +54,11 @@ class Obstacle {
   // Move up and down, boucing on the 'walls'
   update () {
     Body.translate(this.body, this.speed)
-    if (this.body.position.x < this.width / 2 || this.body.position.x > worldWidth - this.width / 2) {
+    if (this.body.position.x < this.width / 2 || this.body.position.x > worldWidth - this.width / 2)
       this.speed.x *= -1;
-    if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2) {
+    if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2)
       this.speed.y *= -1;
-    }
   }
-
 }
 
 export class GameServer {
@@ -69,6 +68,7 @@ export class GameServer {
   private IntervalUpdate: NodeJS.Timer;
   private IntervalSync: NodeJS.Timer;
   private disconnectTimeout: NodeJS.Timeout;
+  private startTimeout: NodeJS.Timeout;
   private engine!: any;
   private roomID: string;
   private players: Socket[] = [];
@@ -126,15 +126,18 @@ export class GameServer {
           Composite.add(this.engine.world, o.body)
         })
       }
-  }
+
+      // Players have a certain amount of time to start the game
+      this.startTimeout = setTimeout(() => { this.onAbortGame("did not start") }, timeToStartBeforeAbort); }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
     const idx = this.players.indexOf(socket);
+    Logger.log(`move from ${socket.data.user.username}, who is #${idx}`);
     let paddle: any;
     if (idx == 0)
-      paddle = this.paddle2;
-    else if (idx == 1)
       paddle = this.paddle1;
+    else if (idx == 1)
+      paddle = this.paddle2;
     else
       return;
 
@@ -149,18 +152,21 @@ export class GameServer {
   }
 
   onPlayerDisconnect(client: Socket) {
+    if (!this.hasStarted)
+      return;
     Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected`);
 
     // check if already disconnected
     if (client.data.isReady) {
       client.data.isReady = false;
-      this.disconnectTimeout = setTimeout(() => { this.onAbortGame() }, disconnectTimeoutDuration);
       this.onPause();
       client.to(this.roomID).emit("playerDisconnect")
       this.resetLevel();
+      if (!this.disconnectTimeout)
+        this.disconnectTimeout = setTimeout(() => { this.onAbortGame("player timeout") }, disconnectTimeoutDuration);
     }
-    if (this.players[0].disconnected && this.players[1].disconnected)
-      this.onAbortGame();
+    if (!this.players[0].data.isReady && !this.players[1].data.isReady)
+      this.onAbortGame("both players disconnected");
   }
 
   onPlayerReconnect(client: Socket) {
@@ -185,6 +191,7 @@ export class GameServer {
 
     this.server.to(this.roomID).emit("playerReconnect")
 
+    this.onPause();
     // lauch ball after countdown
     setTimeout(() => {
       Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
@@ -199,17 +206,18 @@ export class GameServer {
 
     // Check if everybody is ready
     if (!this.hasStarted && this.players[0].data.isReady && this.players[1].data.isReady) {
+      clearTimeout(this.startTimeout);
       Logger.log(`Game#${this.roomID}: Starting game !`);
       this.onStartGame();
     }
   }
 
-  private onAbortGame() {
-    Logger.log(`Game#${this.roomID} aborted`);
+  private onAbortGame(reason: string) {
+    Logger.log(`Game#${this.roomID} aborted: ${reason}`);
     this.status = "ABORTED"
 
     this.cleanupGameDataOnSockets()
-    this.server.to(this.roomID).emit("abortGame")
+    this.server.to(this.roomID).emit("abortGame", reason)
   }
 
   private onGameover(pointWon: PointWonDto) {
