@@ -119,7 +119,7 @@ export default class PongScene extends Phaser.Scene {
 
   private parseConfig(config: IGameSettings) {
     this.config = config
-    if (!config)
+    if (!config.game)
       return;
 
     const gameNumber = config ? config.game.id : 0
@@ -154,7 +154,7 @@ export default class PongScene extends Phaser.Scene {
     this.socket = gameStore.socket as Socket;
     this.resetSocketGameListener();
 
-    if (!this.config)
+    if (!this.config.game)
       return;
 
     // Now that we have the config, we can launch the UI
@@ -171,7 +171,7 @@ export default class PongScene extends Phaser.Scene {
     this.ball.setOnCollideWith(this.paddle1, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
     this.ball.setOnCollideWith(this.paddle2, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
 
-    if (this.config.game.type != 'CLASSIC') {
+    if (this.config.game?.type != 'CLASSIC') {
       this.obstacles[0] = new Obstacle(this, pong.worldWidth * 2 / 8, pong.worldHeight * 2 / 8, 'red');
       this.obstacles[1] = new Obstacle(this, pong.worldWidth * 3 / 8, pong.worldHeight * 3 / 8, 'yellow');
       this.obstacles[3] = new Obstacle(this, pong.worldWidth * 5 / 8, pong.worldHeight * 5 / 8, 'green');
@@ -197,7 +197,6 @@ export default class PongScene extends Phaser.Scene {
 
     // Send disconnect message when destroying the game
     this.events.on('destroy', () => {
-      console.log("DESTROY GAME")
       this.clearSocketGameListener();
       this.socket.emit("playerDisconnect");
     })

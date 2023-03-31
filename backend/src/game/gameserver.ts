@@ -9,7 +9,7 @@ import { GameSettingsDto } from "./dto/joinQueueData.dto";
 // At what pace the simulation is run
 const fps = 60;
 // At what frequency we send the state to the clients
-const syncPerSec = 10;
+const syncPerSec = 5;
 
 const timeToStartBeforeAbort = 30000
 const disconnectTimeoutDuration = 10000
@@ -111,28 +111,27 @@ export class GameServer {
     Composite.add(this.engine.world, [
       Bodies.rectangle(worldWidth/2, -wallThickness/2, worldWidth, wallThickness, worldOption), // upper wall
       Bodies.rectangle(worldWidth/2, worldHeight + wallThickness/2, worldWidth, wallThickness, worldOption), // lower wall
-      // Bodies.rectangle(-wall_thickness/2, worldHeight/2, wall_thickness, worldHeight, worldOption), // left wall
-      // Bodies.rectangle(worldWidth + wall_thickness/2, worldHeight/2, wall_thickness, worldHeight, worldOption), // right wall
+      // Bodies.rectangle(-wallThickness/2, worldHeight/2, wallThickness, worldHeight, worldOption), // left wall
+      // Bodies.rectangle(worldWidth + wallThickness/2, worldHeight/2, wallThickness, worldHeight, worldOption), // right wall
     ])
 
-      if (game.type != "CLASSIC") {
-        Logger.log(`Game#${this.roomID}: custom mode`);
+    if (game.type != "CLASSIC") {
 
-        // Add obstacles
-        obstacles_def.forEach((o) => {
-          this.obstacles.push(new Obstacle(o.x, o.y))
-        })
-        this.obstacles.forEach((o) => {
-          Composite.add(this.engine.world, o.body)
-        })
-      }
+      // Add obstacles
+      obstacles_def.forEach((o) => {
+        this.obstacles.push(new Obstacle(o.x, o.y))
+      })
+      this.obstacles.forEach((o) => {
+        Composite.add(this.engine.world, o.body)
+      })
+    }
 
-      // Players have a certain amount of time to start the game
-      this.startTimeout = setTimeout(() => { this.onAbortGame("did not start") }, timeToStartBeforeAbort); }
+    // Players have a certain amount of time to start the game
+    this.startTimeout = setTimeout(() => { this.onAbortGame("did not start") }, timeToStartBeforeAbort);
+  }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
     const idx = this.players.indexOf(socket);
-    Logger.log(`move from ${socket.data.user.username}, who is #${idx}`);
     let paddle: any;
     if (idx == 0)
       paddle = this.paddle1;

@@ -90,7 +90,7 @@ export class GameService {
     // Verify if the user already in queue:
     if (this.classicQueue.find((el) => el.data.user.id === user.id) ||
         this.customQueue.find((el) => el.data.user.id === user.id)) {
-      Logger.log(`${user.username}#${user.id} is already in a queue !`);
+      Logger.log(`Game: ${user.username}#${user.id} is already in a queue !`);
       return "already in a game !";
     }
 
@@ -98,7 +98,7 @@ export class GameService {
     const queue = gameSettings.type == 'CLASSIC' ? this.classicQueue : this.customQueue;
     queue.push(socket);
 
-    Logger.log(`${user.username}#${user.id} joined the ${gameSettings.type} queue`);
+    Logger.log(`Game: ${user.username}#${user.id} joined the ${gameSettings.type} queue`);
 
     // Find or create a match and create a UserGame
     this.findOrCreateMatch(gameSettings)
@@ -118,8 +118,6 @@ export class GameService {
       Logger.log(err)
     });
 
-    // Return a message indicating whether the user joined the classic or custom queue
-    let msg = gameSettings.type == 'CLASSIC' ? "Joined classic" : "Joined custom";
     return `OK`;
   }
 
@@ -128,12 +126,12 @@ export class GameService {
       return;
     const idx_classic = this.classicQueue.indexOf(socket);
     if (idx_classic >= 0) {
-      Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the classic queue`);
+      Logger.log(`Game: ${socket.data.user.username}#${socket.data.user.id} quit the classic queue`);
       this.classicQueue.splice(idx_classic, 1);
     }
     const idx_custom = this.customQueue.indexOf(socket);
     if (idx_custom >= 0) {
-      Logger.log(`${socket.data.user.username}#${socket.data.user.id} quit the custom queue`);
+      Logger.log(`Game: ${socket.data.user.username}#${socket.data.user.id} quit the custom queue`);
       this.customQueue.splice(idx_custom, 1);
     }
   }
@@ -185,7 +183,7 @@ async CreateUserGame(match: Game): Promise<UserGame> {
 }
 
 private async startGame(match: Game, players: Socket[]): Promise<void> {
-  Logger.log(`Game#${match.id}: match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+  Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
   // Emit an event to the clients to indicate that a match has been found
   const gameSettings : GameSettingsDto = {

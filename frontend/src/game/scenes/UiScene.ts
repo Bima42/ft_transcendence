@@ -61,8 +61,7 @@ export default class UiScene extends Phaser.Scene {
     this.gameSettings = config;
     this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
 
-    console.log(`config = ${JSON.stringify(this.gameSettings)}`)
-    if (!this.gameSettings) {
+    if (!this.gameSettings.game) {
       console.error("No game settings in store");
       // TODO: show error message
       // this.scene.stop('UiScene');
