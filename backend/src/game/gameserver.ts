@@ -11,35 +11,49 @@ const fps = 60;
 // At what frequency we send the state to the clients
 const syncPerSec = 10;
 // Duration of the countdown between the start (ms)
-const CountdownDuration = 3000
+const countdownDuration = 3000
 
+const worldWidth = 800;
+const worldHeight = 600;
+const wallThickness = 50;
+// Yes, the ball is a rectangle (because of Phaser on client size)
+const ballSize = {x: 22, y: 22}
 const ballMaxSpeed = 10;
-const world_width = 800;
-const world_height = 600;
-const wall_thickness = 50;
+// Distance between the left/right wall to the paddle center
+const paddleX = 20;
+const paddleSize = {x: 24, y: 104}
+// Round corner on the paddle
+const paddleChamferRadius = 12;
+const cheaterDetectionLimit = 20;
+// The minimum bouncing angle from the paddle
+// The ball will go with an angle between x and (180 - x)
+const bounceMinAngleDeg = 30;
+
 const obstacles_def = [
-  {x: 200, y: 300, color: 'red'},
-  {x: 300, y: 200, color: 'yellow'},
-  {x: 500, y: 100, color: 'green'},
-  {x: 600, y: 500, color: 'blue'},
+  {x: worldWidth * 2 / 8, y: worldHeight * 2 / 8, color: 'red'},
+  {x: worldWidth * 3 / 8, y: worldHeight * 3 / 8, color: 'yellow'},
+  {x: worldWidth * 5 / 8, y: worldHeight * 5 / 8, color: 'green'},
+  {x: worldWidth * 6 / 8, y: worldHeight * 6 / 8, color: 'blue'},
 ]
 
 class Obstacle {
   public body: any; // Matter-js body
   private maxSpeed = 2;
-  private dir = 1;
+  private dir = -1;
+  private width = 64;
+  private height = 32;
 
   constructor(x: number, y: number) {
     const worldOption = {
       isStatic: true,
     }
-    this.body = Bodies.rectangle(x, y, 64, 32, worldOption);
+    this.body = Bodies.rectangle(x, y, this.width, this.height, worldOption);
   }
 
   // Move up and down, boucing on the 'walls'
   update () {
     Body.translate(this.body, {x: 0, y: this.dir * this.maxSpeed})
-    if (this.body.position.y < 15 || this.body.position.y > 585)
+    if (this.body.position.y < this.height / 2 || this.body.position.y > worldHeight - this.height / 2)
       this.dir *= -1;
   }
 
@@ -58,6 +72,7 @@ export class GameServer {
   private maxScore: number = 5
   private obstacles = [];
   private status: GameStatus = "STARTED";
+  private isRunning = false;
 
   constructor(private server: Server,
               public game: Game,
@@ -72,7 +87,7 @@ export class GameServer {
     this.engine.gravity.y = 0;
 
 
-    this.ball = Bodies.rectangle(world_width / 2, world_height / 2, 22, 22);
+    this.ball = Bodies.rectangle(worldWidth / 2, worldHeight / 2, ballSize.x, ballSize.y);
     Body.setInertia(this.ball, Infinity);
     this.ball.friction = 0;
     this.ball.frictionAir = 0;
@@ -80,18 +95,18 @@ export class GameServer {
     this.ball.restitution = 1;
     Composite.add(this.engine.world, this.ball);
 
-    this.paddle1 = Bodies.rectangle(20, 300, 24, 104, {isStatic: true});
+    const worldOption = { isStatic: true };
+    this.paddle1 = Bodies.rectangle(paddleX, worldHeight / 2, paddleSize.x, paddleSize.y, worldOption);
     Body.setInertia(this.paddle1, Infinity);
     Composite.add(this.engine.world, this.paddle1);
-    this.paddle2 = Bodies.rectangle(780, 300, 24, 104, {isStatic: true});
+    this.paddle2 = Bodies.rectangle(worldWidth - paddleX, worldHeight / 2, paddleSize.x, paddleSize.y, worldOption);
     Body.setInertia(this.paddle2, Infinity);
     Composite.add(this.engine.world, this.paddle2);
 
     // Walls
-    const worldOption = { isStatic: true };
     Composite.add(this.engine.world, [
-      Bodies.rectangle(world_width/2, -wall_thickness/2, world_width, wall_thickness, worldOption), // upper wall
-      Bodies.rectangle(world_width/2, world_height + wall_thickness/2, world_width, wall_thickness, worldOption), // lower wall
+      Bodies.rectangle(worldWidth/2, -wallThickness/2, worldWidth, wallThickness, worldOption), // upper wall
+      Bodies.rectangle(worldWidth/2, worldHeight + wallThickness/2, worldWidth, wallThickness, worldOption), // lower wall
       // Bodies.rectangle(-wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // left wall
       // Bodies.rectangle(world_width + wall_thickness/2, world_height/2, wall_thickness, world_height, worldOption), // right wall
     ])
@@ -107,9 +122,6 @@ export class GameServer {
           Composite.add(this.engine.world, o.body)
         })
       }
-
-    // TODO: remove
-    // this.onStartGame();
   }
 
   onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
@@ -123,7 +135,7 @@ export class GameServer {
       return;
 
     // Refuse too big movements
-    if (playerMove.y - paddle.y > 20) {
+    if (playerMove.y - paddle.y > cheaterDetectionLimit) {
       Logger.log("Cheater");
       return;
     }
@@ -162,14 +174,17 @@ export class GameServer {
   }
 
   onStartGame() {
-    //
+    // If already running, dont run again
+    if (this.isRunning)
+      return;
+
     // Warn clients that we are about to start
     this.server.to(this.roomID).emit("startGame");
 
     // lauch ball after countdown
     setTimeout(() => {
       Body.setVelocity(this.ball, {x: -ballMaxSpeed, y: 0});
-    }, CountdownDuration);
+    }, countdownDuration);
 
     // Start simulation
     this.updateWorld();
@@ -192,7 +207,7 @@ export class GameServer {
 
     // Reset ball
     Body.setVelocity(this.ball, {x: 0, y: 0});
-    Body.setPosition(this.ball, {x:world_width / 2, y: world_height / 2});
+    Body.setPosition(this.ball, {x:worldWidth / 2, y: worldHeight / 2});
 
     // TODO: Reset paddles
 
@@ -229,7 +244,7 @@ export class GameServer {
     if (Collision.collides(this.ball, this.paddle2, null)) {
       this.hitPaddle(this.ball, this.paddle2)
     }
-    if (this.ball.position.x < 0 || this.ball.position.x > 800) {
+    if (this.ball.position.x < 0 || this.ball.position.x > worldWidth) {
       this.resetLevel();
     }
     this.obstacles.forEach((o) => o.update())
@@ -262,14 +277,14 @@ export class GameServer {
 
   private hitPaddle(ball: any, paddle: any) {
     // Dont apply this when already past the paddle
-    if (ball.position.x < world_width / 2 && ball.position.x < paddle.position.x + 104
-        || ball.position.x > world_width / 2 && ball.position.x > paddle.position.x)
+    if ((ball.position.x < worldWidth / 2 && ball.position.x < paddle.position.x)
+        || (ball.position.x > worldWidth / 2 && ball.position.x > paddle.position.x)) {
       return;
-    const minAngle = 30;
-    const percentage = Common.clamp((ball.position.y - paddle.position.y + 104 / 2) / 104, 0, 1)
-    var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
-    // Mirror translation for the paddle on the left
-    if (ball.position.x < 300)
+    }
+    const percentage = Common.clamp((ball.position.y - paddle.position.y + paddleSize.y / 2) / paddleSize.y, 0, 1)
+    var newAngle = 180 + bounceMinAngleDeg + (180 - 2 * bounceMinAngleDeg) * percentage;
+    // Mirror symmetry for the paddle on the left
+    if (ball.position.x < worldWidth / 2)
       newAngle *= -1;
     // convert to radian
     newAngle *= Math.PI / 180;

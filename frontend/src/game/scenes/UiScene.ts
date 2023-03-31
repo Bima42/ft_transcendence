@@ -119,6 +119,7 @@ export default class UiScene extends Phaser.Scene {
           .setStyle({ fill: '#FFF' })
           .off('pointerover')
           .off('pointerout')
+          .off('pointerdown')
         gameStore.socket.emit("playerReady");
     })
   }

@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
 import type { IPointWon } from '@/interfaces/game/IGameCommunication'
+import * as pong from "../GameConsts"
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -30,7 +31,7 @@ class Paddle extends Phaser.Physics.Matter.Image {
   public maxSpeed = 10;
 
   constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
-    super(scene.matter.world, x, y, 'assets', 'paddle' + nPlayer, {isStatic: true,chamfer: { radius: 15 }})
+    super(scene.matter.world, x, y, 'assets', 'paddle' + nPlayer, { isStatic: true })
     scene.add.existing(this);
     scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
     this.setFixedRotation();
@@ -55,7 +56,7 @@ class Obstacle extends Phaser.Physics.Matter.Image {
 
   update () {
     this.y += this.dir * this.maxSpeed;
-    if (this.y < 15 || this.y > 585)
+    if (this.y < this.height / 2 || this.y > pong.worldHeight - this.height / 2)
       this.dir *= -1;
   }
 
@@ -101,7 +102,7 @@ export default class PongScene extends Phaser.Scene {
   public scores: Array<number> = [0, 0];
   private obstacles: Obstacle[] = [];
   private socket!: Socket;
-  private canMove: boolean = false;
+  private isRunning: boolean = false;
   private uiScene!: UiScene;
 
 
@@ -113,10 +114,9 @@ export default class PongScene extends Phaser.Scene {
 
   }
 
-  private parseConfig(config: IGameSettings) {
+  private parseConfig(config: IGameSettings | null) {
 
     if (!config) {
-      console.warn('no game settings provided');
       this.config.maxScore = 3;
       this.config.type = 'CLASSIC';
       return;
@@ -155,6 +155,7 @@ export default class PongScene extends Phaser.Scene {
     this.parseConfig(gameStore.currentGame);
     this.socket = gameStore.socket as Socket;
 
+    resetSocketGameListener(this.socket);
     this.socket.on("state", (state: WorldState) => {
       this.updateWorld(state);
     });
@@ -187,21 +188,21 @@ export default class PongScene extends Phaser.Scene {
     });
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
-    this.matter.world.setBounds(0, 0, 800, 600, 32, false, false, true, true);
+    this.matter.world.setBounds(0, 0, pong.worldWidth, pong.worldHeight, 32, false, false, true, true);
 
-    this.ball = new Ball(this, 400, 300);
+    this.ball = new Ball(this, pong.worldWidth / 2, pong.worldHeight / 2);
     this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
 
-    this.paddle1 = new Paddle(this, 20, 300, 1);
-    this.paddle2 = new Paddle(this, 780, 300, 2);
+    this.paddle1 = new Paddle(this, pong.paddleX, pong.worldHeight / 2, 1);
+    this.paddle2 = new Paddle(this, pong.worldWidth - pong.paddleX, pong.worldHeight / 2, 2);
     this.ball.setOnCollideWith(this.paddle1, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
     this.ball.setOnCollideWith(this.paddle2, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
 
     if ( this.config.type != 'CLASSIC') {
-      this.obstacles[0] = new Obstacle(this, 200, 300, 'red');
-      this.obstacles[1] = new Obstacle(this, 300, 200, 'yellow');
-      this.obstacles[3] = new Obstacle(this, 500, 100, 'green');
-      this.obstacles[2] = new Obstacle(this, 600, 500, 'blue');
+      this.obstacles[0] = new Obstacle(this, pong.worldWidth * 2 / 8, pong.worldHeight * 2 / 8, 'red');
+      this.obstacles[1] = new Obstacle(this, pong.worldWidth * 3 / 8, pong.worldHeight * 3 / 8, 'yellow');
+      this.obstacles[3] = new Obstacle(this, pong.worldWidth * 5 / 8, pong.worldHeight * 5 / 8, 'green');
+      this.obstacles[2] = new Obstacle(this, pong.worldWidth * 6 / 8, pong.worldHeight * 6 / 8, 'blue');
     }
 
     //  Input events
@@ -225,7 +226,7 @@ export default class PongScene extends Phaser.Scene {
 
   private resetLevel(): void {
     this.ball.setVelocity(0);
-    this.ball.setPosition(400, 300);
+    this.ball.setPosition(pong.worldWidth / 2, pong.worldHeight / 2);
 
     // TODO: Reset paddles
 
@@ -234,7 +235,7 @@ export default class PongScene extends Phaser.Scene {
 
   // Before Countdown: not a lot to do in the game part
   private startGame() {
-    this.canMove = true;
+    this.isRunning = true;
   }
 
   hitObstacle( _data: Phaser.Types.Physics.Matter.MatterCollisionData) {
@@ -250,19 +251,17 @@ export default class PongScene extends Phaser.Scene {
     hitPaddle( data: Phaser.Types.Physics.Matter.MatterCollisionData) {
       let ball = data.bodyA.gameObject as Ball;
       let paddle = data.bodyB.gameObject as Paddle;
-      const minAngle = 30;
       const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
-      var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
+      var newAngle = 180 + pong.bounceMinAngleDeg + (180 - 2 * pong.bounceMinAngleDeg) * percentage;
       // Mirror translation for the paddle on the left
-      if (ball.x < 300)
+      if (ball.x < pong.worldWidth / 2)
         newAngle *= -1;
-      // convert to radian
-      newAngle *= Math.PI / 180;
+      newAngle = Phaser.Math.DegToRad(newAngle)
       ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
   }
 
   handleInput() {
-    if (!this.canMove)
+    if (!this.isRunning)
       return ;
 
     let moved = false;
@@ -275,7 +274,7 @@ export default class PongScene extends Phaser.Scene {
       moved = true;
     }
     if (moved) {
-      this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, 600);
+      this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, pong.worldHeight);
       this.socket.emit("move", { y: this.myPaddle.y });
     }
   }
@@ -284,7 +283,7 @@ export default class PongScene extends Phaser.Scene {
 
     this.handleInput();
 
-    if (this.canMove)
+    if (this.isRunning)
       this.obstacles.forEach((o) => o.update());
   }
 };
