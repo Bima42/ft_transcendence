@@ -20,7 +20,6 @@ onUpdated(() => {
     imgUrl.value = props.url || defaultUrl
 })
 
-
 </script>
 
 <style lang="scss">

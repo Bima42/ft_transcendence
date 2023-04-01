@@ -1,7 +1,10 @@
 <template>
     <section class="left-wrap">
         <UserAvatar type="big" :url="userStore.user?.avatar"/>
-        <input type="file" accept="image/*" @change="uploadAvatar"/>
+        <div class="avatar-upload">
+          <input type="file" accept="image/*" @change="uploadAvatar"/>
+          <button type="submit" @click="updateAvatar">Upload Avatar</button>
+        </div>
         <UsernameInput/>
         <input type="text" placeholder="Username"/>
         <div class="two-fa">
@@ -27,6 +30,7 @@ import { post } from '../../../../utils';
 const userStore = useUserStore()
 const enableTwoFa = ref(userStore.user!.twoFA)
 const qrCodeImage = ref('')
+let file: File | null = null
 
 const toggleTwoFaStatus = () => {
   userStore.updateTwoFaStatus(enableTwoFa.value)
@@ -42,11 +46,15 @@ const generateQrCode = () => {
 }
 
 async function uploadAvatar(event: Event) {
-  const file = (event.target as HTMLInputElement).files![0]
+  file = (event.target as HTMLInputElement).files![0]
+}
 
-  const formData = new FormData()
-  formData.append('avatar', file, file.name)
-  userStore.uploadAvatar(formData)
+const updateAvatar = () => {
+  if (file) {
+    const formData = new FormData()
+    formData.append('avatar', file, file.name)
+    userStore.uploadAvatar(formData)
+  }
 }
 </script>
 
