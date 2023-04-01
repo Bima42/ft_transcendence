@@ -304,15 +304,12 @@ export class ChannelService {
       include: {
         user: {
           select: {
-            username: true
+            id: true,
+            username: true,
+            avatar: true,
           }
         }
       },
-      // select: {
-      // 	content: true,
-      // 	userId: true,
-      // 	user: true
-      // }
     });
   }
 
