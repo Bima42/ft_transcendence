@@ -1,8 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
+import { User } from '@prisma/client';
 import { GameService } from './game.service';
-import { GameSettingsDto } from './dto/joinQueueData.dto';
+import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
+import { GameServer } from './gameserver'
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
 
 
 @WebSocketGateway({
@@ -17,57 +21,93 @@ import { GameSettingsDto } from './dto/joinQueueData.dto';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
+    private userSockets: { [key: string]: User } = {};
+
     @WebSocketServer()
     server: Server
 
-    constructor(private readonly gameService: GameService) { }
+    constructor(private readonly gameService: GameService,
+                private readonly authService : AuthService,
+                private readonly usersService: UsersService,
+               ) {
+    }
 
     @SubscribeMessage('move')
-    handleEvent(@MessageBody() data: string,
-        @ConnectedSocket() socket: Socket): string {
+    async handleEvent(@MessageBody() data: any,
+        @ConnectedSocket() socket: Socket) {
 
-        const msg = JSON.parse(data);
+        const gameServer = socket.data.gameServer;
+        if (!gameServer) {
+          return;
+        }
 
-        const broadcastMsg = {
-            paddle1: msg.y,
-            paddle2: msg.y,
-            ball: {
-                x: 350,
-                y: 300,
-                vx: 300,
-                vy: 300,
-            }
-        };
-        // this.server.emit("state", JSON.stringify(broadcastMsg));
-        return data; // TODO: Remove ?
+        gameServer.onPlayerMove(socket, data);
     }
 
-    handleConnection(client: any, ...args: any[]): any {
-        Logger.log(`Game: connected... id: ${client.id}`);
+    @SubscribeMessage('playerDisconnect')
+    async handlePlayerDisconnect(@ConnectedSocket() socket: Socket) {
+      this.gameService.onPlayerDisconnect(socket);
     }
 
-    handleDisconnect(client: any): any {
-        Logger.log(`Game: disconnect... id: ${client.id}`);
+    private async verifyUser(token: string) : Promise<User> {
+
+        if (!token)
+          return null;
+
+        const userId = this.authService.verifyToken(token);
+
+        return await this.usersService.findById(userId.sub);
     }
 
-  afterInit(server: Server) {
+  async handleConnection(client: any, ...args: any[]) {
+
+      const user = await this.verifyUser(client.handshake.auth.token);
+      if (!user) {
+        Logger.log("WS: client is not verified. dropped.");
+        return ;
+      }
+      this.userSockets[client.id] = user;
+
+      Logger.log(`Game: ${user.username}#${user.id} connected`);
+
+      // attach the user to the socket
+      client.data.user = user;
+
+      // client joins its own rooms, so that we send messages to all his devices
+      client.join(user.username);
+
+  }
+
+  handleDisconnect(client: any): any {
+      Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
+      this.gameService.onPlayerDisconnect(client);
+  }
+
+  async afterInit(server: Server) {
     Logger.log('WebSocket server initialized');
+    await this.gameService.init(server);
+  }
+
+  @SubscribeMessage('reconnect')
+  handleReconnect(@ConnectedSocket() client: Socket) {
+      // Try to reconnect to current game if there is one
+      this.gameService.tryToReconnect(client)
   }
 
   @SubscribeMessage('newJoinQueue')
-  handleJoinQueue(@MessageBody() joinQueueData: GameSettingsDto,
-  @ConnectedSocket() client: Socket): string {
-    // handle the classicModeQueue event emitted from the client
-    Logger.log(`Client ${client.id} joined queue`);
-
+  handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
+                  @ConnectedSocket() client: Socket): string {
     return this.gameService.joinQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')
-  handleAbortQueue(@MessageBody() payload: GameSettingsDto,
-  @ConnectedSocket() client: Socket) {
-    // handle the classicModeQueue event emitted from the client
+  handleAbortQueue(@ConnectedSocket() client: Socket) {
     return this.gameService.quitQueue(client);
+  }
+
+  @SubscribeMessage('playerReady')
+  handlePlayerIsReady(@ConnectedSocket() client: Socket) {
+      return this.gameService.playerIsReady(client);
   }
 // }
 

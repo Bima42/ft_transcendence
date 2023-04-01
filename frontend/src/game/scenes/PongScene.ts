@@ -1,220 +1,333 @@
-import 'phaser'
-import { io } from "socket.io-client"
-import type IGame from '@/interfaces/game/IGame'
+import Phaser from 'phaser'
+import { Socket } from "socket.io-client"
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
+import { useUserStore } from '@/stores/user'
+import type UiScene from './UiScene'
+import type { IPointWon } from '@/interfaces/game/IGameCommunication'
+import * as pong from "../GameConsts"
+
 
 const gameStore = useGameStore();
+const userStore = useUserStore();
 
-class Ball extends Phaser.Physics.Arcade.Image {
+class Ball extends Phaser.Physics.Matter.Image {
 
-	constructor(scene: Phaser.Scene, x: number, y: number) {
-		super(scene, x, y, 'assets', 'ball1')
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
-		this.setCollideWorldBounds(true).setBounce(1);
-		this.body.maxSpeed = 700;
-	}
+  public maxSpeed = 10;
 
-}
-
-class Paddle extends Phaser.Physics.Arcade.Image {
-
-
-	constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
-		super(scene, x, y, 'assets', 'paddle' + nPlayer)
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
-		this.setImmovable();
-        this.angle = 90;
-		this.setSize(this.height, this.width, true);
-		this.body.maxSpeed = 700;
-	}
-
-	update() {
-
-	}
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene.matter.world, x, y, 'assets', 'ball1')
+    scene.add.existing(this);
+    scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+    this.setFriction(0, 0, 0);
+    this.setBounce(1);
+  }
 
 }
 
-class Obstacle extends Phaser.Physics.Arcade.Image {
+class Paddle extends Phaser.Physics.Matter.Image {
 
-	constructor(scene: Phaser.Scene, x: number, y: number, color: string) {
-		super(scene, x, y, 'assets', color + '1')
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
-		this.body.maxSpeed = 200;
-		this.setImmovable().setVelocityY(this.body.maxSpeed).setCollideWorldBounds(true).setBounce(1)
-	}
+  private initPos: { x: number, y: number }
+  public maxSpeed = 10;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, nPlayer: number) {
+    super(scene.matter.world, x, y, 'assets', 'paddle' + nPlayer, { isStatic: true })
+    scene.add.existing(this);
+    scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+    this.setFixedRotation();
+    this.setRotation(Math.PI / 2);
+    this.setSize(this.height, this.width);
+    this.initPos = { x: x, y: y }
+  }
+
+  reset() {
+    this.x = this.initPos.x;
+    this.y = this.initPos.y;
+  }
+}
+
+class Obstacle extends Phaser.Physics.Matter.Image {
+
+  public speed = { x: 0, y: 2 };
+
+  constructor(scene: Phaser.Scene, x: number, y: number, color: string) {
+    super(scene.matter.world, x, y, 'assets', color + '1')
+    scene.add.existing(this);
+    scene.matter.body.setInertia(this.body as MatterJS.BodyType, Infinity)
+    this.setBounce(1);
+    this.setStatic(true);
+    this.setFriction(0);
+  }
+
+  update() {
+    this.x += this.speed.x;
+    this.y += this.speed.y;
+    if (this.x < this.width / 2 || this.x > pong.worldWidth - this.width / 2)
+      this.speed.x *= -1;
+    if (this.y < this.height / 2 || this.y > pong.worldHeight - this.height / 2)
+      this.speed.y *= -1;
+  }
+
+}
+
+type WorldState = {
+  ball: {
+    x: number,
+    y: number,
+    vx: number,
+    vy: number,
+  }
+  paddle1: {
+    x: number,
+    y: number,
+  }
+  paddle2: {
+    x: number,
+    y: number,
+  }
+  obstacles: {
+    x: number,
+    y: number,
+    vx: number,
+    vy: number,
+  }[]
 }
 
 export default class PongScene extends Phaser.Scene {
 
-    private ball: Ball;
-    private paddle1 : Paddle;
-    private paddle2 : Paddle;
-	private keys;
-	private scores: Array<number> = [0, 0];
+  private config!: IGameSettings;
+  private ball!: Ball;
+  private paddle1!: Paddle;
+  private paddle2!: Paddle;
+  private myPaddle!: Paddle;
+  private otherPaddle!: Paddle;
+  private keys: any;
+  public scores: Array<number> = [0, 0];
+  private obstacles: Obstacle[] = [];
+  private socket!: Socket;
+  private isRunning: boolean = false;
+  private uiScene!: UiScene;
 
-    constructor(mode: string = "custom") {
-        super({ key: 'PongScene' })
-    }
 
-    preload()
-    {
+  constructor() {
+    super({ key: 'PongScene' })
+  }
 
-    }
+  preload() {
 
-	private parseConfig(config: IGame) {
+  }
 
-    if (!config) {
-      this.maxScore = 3;
-      this.classic = true;
+  private parseConfig(config: IGameSettings) {
+    this.config = config
+    if (!config.game)
       return;
+
+    const gameNumber = config ? config.game.id : 0
+    if (this.config.game.type == 'CLASSIC') {
+      console.log(`Game #${gameNumber}: Classic game.`);
+    } else {
+      console.log(`Game #${gameNumber}: Custom game.`);
     }
-		this.maxScore = config.maxScore ?? 3;
-		this.classic = config.classic ?? true;
-	}
+  }
 
-    updateWorld(obj: object) {
-                this.paddle1.y = obj.paddle1;
-                this.paddle2.y = obj.paddle2;
-                this.ball.x = obj.ball.x;
-                this.ball.y = obj.ball.y;
-                this.ball.setVelocity(obj.ball.vx, obj.ball.vy);
-    }
+  private updateWorld(state: WorldState) {
+    this.paddle1.x = state.paddle1.x;
+    this.paddle1.y = state.paddle1.y;
+    this.paddle2.x = state.paddle2.x;
+    this.paddle2.y = state.paddle2.y;
+    this.ball.x = state.ball.x;
+    this.ball.y = state.ball.y;
+    this.ball.setVelocity(state.ball.vx, state.ball.vy);
+    let i = 0;
+    state.obstacles.forEach((o) => {
+      this.obstacles[i].x = o.x;
+      this.obstacles[i].y = o.y;
+      this.obstacles[i].speed.x = o.vx;
+      this.obstacles[i].speed.y = o.vy;
+      i++
+    })
+  }
 
-    create(config : IGame) : void
-    {
-		this.parseConfig(config);
+  create(config: IGameSettings) {
+    this.parseConfig(config)
 
-    this.socket = gameStore.socket;
-    this.socket.on("state", (msg: string) => {
-       try {
-           const obj = JSON.parse(msg);
-           this.updateWorld(obj);
-       } catch (error) {
-           // Drop malformed request from server
-       }
-    });
+    this.socket = gameStore.socket as Socket;
+    this.resetSocketGameListener();
+
+    if (!this.config.game)
+      return;
+
+    // Now that we have the config, we can launch the UI
+    this.uiScene = this.scene.get("UiScene") as UiScene;
 
     //  Enable world bounds, but disable the sides (left, right, up, down)
-    this.physics.world.setBoundsCollision(false, false, true, true);
+    this.matter.world.setBounds(0, 0, pong.worldWidth, pong.worldHeight, 32, false, false, true, true);
 
-		this.ball = new Ball(this, 400, 300);
-		this.ball.setData('uponStart', true);
+    this.ball = new Ball(this, pong.worldWidth / 2, pong.worldHeight / 2);
+    this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
 
-    this.paddle1 = new Paddle(this, 20, 300, 1);
-    this.paddle2 = new Paddle(this, 780, 300, 2);
-    this.physics.add.collider(this.ball, this.paddle1, this.hitPaddle, null, this);
-    this.physics.add.collider(this.ball, this.paddle2, this.hitPaddle, null, this);
+    this.paddle1 = new Paddle(this, pong.paddleX, pong.worldHeight / 2, 1);
+    this.paddle2 = new Paddle(this, pong.worldWidth - pong.paddleX, pong.worldHeight / 2, 2);
+    this.ball.setOnCollideWith(this.paddle1, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
+    this.ball.setOnCollideWith(this.paddle2, (_: any, data: Phaser.Types.Physics.Matter.MatterCollisionData) => this.hitPaddle(data));
 
-		this.scoreText = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "50px", color: "#00FF00" });
-		this.scores = [0, 0];
-
-		if (!this.classic)
-		{
-			this.obstacle1 = new Obstacle(this, 200, 300, 'red');;
-			this.obstacle2 = new Obstacle(this, 300, 200, 'yellow');
-			this.obstacle3 = new Obstacle(this, 600, 500,'blue');
-			this.obstacle4 = new Obstacle(this, 500, 100, 'green');
-
-			this.physics.add.collider(this.ball, this.obstacle1, this.hitObstacle, null, this);
-			this.physics.add.collider(this.ball, this.obstacle2, this.hitObstacle, null, this);
-			this.physics.add.collider(this.ball, this.obstacle3, this.hitObstacle, null, this);
-			this.physics.add.collider(this.ball, this.obstacle4, this.hitObstacle, null, this);
-		}
-
-        //  Input events
-		this.keys = this.input.keyboard.addKeys('s,w,i,k');
-
-        this.input.on('pointerup', function (pointer) {
-
-            if (this.ball.getData('uponStart'))
-            {
-                this.ball.setVelocity(-700, 0);
-                this.ball.setData('uponStart', false);
-            }
-
-        }, this);
-
+    if (this.config.game?.type != 'CLASSIC') {
+      this.obstacles[0] = new Obstacle(this, pong.worldWidth * 2 / 8, pong.worldHeight * 2 / 8, 'red');
+      this.obstacles[1] = new Obstacle(this, pong.worldWidth * 3 / 8, pong.worldHeight * 3 / 8, 'yellow');
+      this.obstacles[3] = new Obstacle(this, pong.worldWidth * 5 / 8, pong.worldHeight * 5 / 8, 'green');
+      this.obstacles[2] = new Obstacle(this, pong.worldWidth * 6 / 8, pong.worldHeight * 6 / 8, 'blue');
     }
 
-    private resetBall ()
-    {
-        this.ball.setVelocity(0);
-        this.ball.setPosition(400, 300);
-        this.ball.setData('uponStart', true);
+    //  Input events
+    this.keys = this.input.keyboard.addKeys('s,w');
+    this.input.mouse.disableContextMenu();
+
+    this.myPaddle = this.paddle1;
+    this.otherPaddle = this.paddle2;
+    // If it is the second player
+    if (this.config.player2 && this.config.player2.id == userStore.user?.id) {
+      // rotate the screen
+      this.cameras.main.setRotation(Math.PI);
+      // inverse paddles
+      this.myPaddle = this.paddle2;
+      this.otherPaddle = this.paddle1;
+      // inverse control
+      this.myPaddle.maxSpeed *= -1;
     }
 
-    private resetLevel () : void
-    {
-		if (this.ball.x < 0) {
-			this.scores[1] += 1;
-		} else {
-			this.scores[0] += 1;
-		}
-		if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore ) {
-			this.scene.start("GameoverScene");
-		}
+    // Send disconnect message when destroying the game
+    this.events.on('destroy', () => {
+      this.clearSocketGameListener();
+      this.socket.emit("playerDisconnect");
+    })
 
-        this.resetBall();
+    // Now that we are setup, send to the server that we are ready
+    setTimeout(() => { gameStore.socket.emit("reconnect") }, 500)
+
+  }
+
+  private resetLevel(): void {
+    this.ball.setVelocity(0);
+    this.ball.setPosition(pong.worldWidth / 2, pong.worldHeight / 2);
+
+    this.paddle1.reset()
+    this.paddle2.reset()
+
+    // TODO: Reset obstacles
+  }
+
+  // Before Countdown: not a lot to do in the game part
+  private startGame() {
+    this.isRunning = true;
+  }
+
+  hitObstacle(_data: Phaser.Types.Physics.Matter.MatterCollisionData) {
+    // let ball = data.bodyA.gameObject as Ball;
+    // let obstacle = data.bodyB.gameObject as Obstacle;
+    //
+    // // Make sure that the ball keeps the same speed;
+    // ball.body.speed = ball.maxSpeed;
+    // // Make sure that the obstacle keeps the same speed;
+    // obstacle.body.speed = obstacle.maxSpeed;
+  }
+
+  hitPaddle(data: Phaser.Types.Physics.Matter.MatterCollisionData) {
+    let ball = data.bodyA.gameObject as Ball;
+    let paddle = data.bodyB.gameObject as Paddle;
+    const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.height / 2) / paddle.height, 0, 1)
+    var newAngle = 180 + pong.bounceMinAngleDeg + (180 - 2 * pong.bounceMinAngleDeg) * percentage;
+    // Mirror translation for the paddle on the left
+    if (ball.x < pong.worldWidth / 2)
+      newAngle *= -1;
+    newAngle = Phaser.Math.DegToRad(newAngle)
+    ball.setVelocity(ball.maxSpeed * Math.sin(newAngle), ball.maxSpeed * Math.cos(newAngle));
+  }
+
+  handleInput() {
+    if (!this.isRunning)
+      return;
+
+    let moved = false;
+    if (this.keys.s.isDown) {
+      this.myPaddle.y += this.myPaddle.maxSpeed;
+      moved = true;
     }
-
-	hitObstacle(ball : Ball, obstacle: Obstacle) {
-		// // Make sure that the ball keeps the same speed;
-		ball.body.speed = ball.maxSpeed;
-		// // Make sure that the obstacle keeps the same speed;
-		obstacle.body.speed = obstacle.maxSpeed;
-
-        this.sound.play('thud', { volume: 0.75 })
-	}
-
-    hitPaddle(ball, paddle)
-    {
-        const minAngle = 30;
-        const percentage = Phaser.Math.Clamp((ball.y - paddle.y + paddle.width / 2) / paddle.width, 0, 1)
-        var newAngle = 180 + minAngle + (180 - 2 * minAngle) * percentage;
-		// Mirror translation for the paddle on the left
-        if (ball.x < 300)
-            newAngle *= -1;
-        // convert to radian
-        newAngle *= Math.PI / 180;
-        ball.setVelocity(ball.body.maxSpeed * Math.sin(newAngle), ball.body.maxSpeed * Math.cos(newAngle));
-
-        this.sound.play('thud', { volume: 0.75 })
+    if (this.keys.w.isDown) {
+      this.myPaddle.y -= this.myPaddle.maxSpeed;
+      moved = true;
     }
-
-    update()
-    {
-		this.scoreText.setText(this.scores[0] + " - " + this.scores[1]);
-		Phaser.Display.Align.In.Center(this.scoreText, this.add.zone(400, 30, 800, 400));
-
-        if (this.ball.x < 0 || this.ball.x > 800)
-        {
-            this.resetLevel();
-        }
-
-		this.paddle1.setVelocity(0);
-		if ( this.keys.s.isDown) {
-            this.paddle1.setVelocityY(this.paddle1.body.maxSpeed);
-            this.socket.emit("move", JSON.stringify({
-                paddle:1,
-                y: this.paddle1.y,
-            }));
-        }
-		if ( this.keys.w.isDown) {
-            this.paddle1.setVelocityY(-this.paddle1.body.maxSpeed);
-            this.socket.emit("move", JSON.stringify({
-                paddle:1,
-                y: this.paddle1.y,
-            }));
-        }
-		this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, 0, 600);
-
-		this.paddle2.setVelocity(0);
-		if ( this.keys.i.isDown) { this.paddle2.setVelocityY(-this.paddle2.body.maxSpeed); }
-		if ( this.keys.k.isDown) { this.paddle2.setVelocityY(this.paddle2.body.maxSpeed); }
-		this.paddle2.y = Phaser.Math.Clamp(this.paddle2.y, 0, 600);
+    if (moved) {
+      this.myPaddle.y = Phaser.Math.Clamp(this.myPaddle.y, 0, pong.worldHeight);
+      this.socket.emit("move", { y: this.myPaddle.y });
     }
+  }
 
+  update() {
+
+    this.handleInput();
+
+    if (this.isRunning)
+      this.obstacles.forEach((o) => o.update());
+  }
+
+  private clearSocketGameListener() {
+    this.socket.removeAllListeners("state");
+    this.socket.removeAllListeners("enemyMove");
+    this.socket.removeAllListeners("startGame");
+    this.socket.removeAllListeners("playerDisconnect");
+    this.socket.removeAllListeners("playerReconnect");
+    this.socket.removeAllListeners("abortGame");
+    this.socket.removeAllListeners("pointEnd");
+    this.socket.removeAllListeners("gameover");
+  }
+
+  private resetSocketGameListener() {
+    this.clearSocketGameListener();
+
+    this.socket.on("state", (state: WorldState) => {
+      this.updateWorld(state);
+    });
+
+    this.socket.on("enemyMove", (msg: any) => {
+      this.otherPaddle.y = msg.y ?? 0;
+    });
+
+    this.socket.on("startGame", () => {
+      this.startGame()
+      this.uiScene.startGame();
+    });
+
+    this.socket.on("playerDisconnect", () => {
+      this.uiScene.onPlayerDisconnect()
+      this.scene.pause(this)
+      this.resetLevel();
+    });
+
+    this.socket.on("playerReconnect", () => {
+      this.resetSocketGameListener()
+      this.uiScene.onPlayerReconnect()
+      this.isRunning = false;
+      this.scene.pause(this)
+      setTimeout(() => {
+        this.isRunning = true;
+        this.scene.resume(this)
+      }, pong.ReconnectBreakMs);
+    });
+
+    this.socket.on("abortGame", (reason: string) => {
+      this.uiScene.onAbortGame(reason)
+      this.scene.pause(this)
+    });
+
+    this.socket.on("pointEnd", (score: IPointWon) => {
+      this.uiScene.onPointEnd(score);
+      this.resetLevel();
+    });
+
+    this.socket.on("gameover", (score: IPointWon) => {
+      this.uiScene.onGameover(score);
+      this.scene.stop('UiScene');
+      this.scene.start("GameoverScene");
+    });
+  }
 };

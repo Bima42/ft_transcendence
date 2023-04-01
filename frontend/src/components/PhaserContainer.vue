@@ -1,28 +1,21 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import type IGame from '@/interfaces/game/IGame';
 
-let gameInstance = null
-const containerId = 'game-container'
+let gameInstance: Phaser.Game | null = null
+const containerId = 'gameContainer'
 const game = await import(/* webpackChunkName: "game" */ '@/game/game')
 
-const props = defineProps<{
-  currentGame: IGame,
-}>();
-
-onMounted(() => {
-  gameInstance = game.launch(containerId, props.currentGame);
+onMounted(async () => {
+  gameInstance = await game.launch(containerId);
 })
 
 onUnmounted(() => {
-  gameInstance.destroy(false)
+  gameInstance?.destroy(false)
 })
 </script>
 
 <template>
-    <div :id="containerId">
-        <canvas id="mygamecanvas"></canvas>
-    </div>
+    <div :id="containerId"></div>
 </template>
 
 <style scoped lang="scss">

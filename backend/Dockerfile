@@ -24,7 +24,6 @@ RUN yarn install
 # Copy the rest of the source
 COPY --chown=node:node . ./
 
-
 USER root
 RUN dos2unix entrypoint.sh \
     && chmod +x entrypoint.sh \

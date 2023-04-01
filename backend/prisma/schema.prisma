@@ -82,10 +82,12 @@ model UserGame {
   gameId Int
   user   User @relation(fields: [userId], references: [id])
   userId Int
+  score  Int @default(0)
 }
 
 model Game {
   id        Int        @id @unique @default(autoincrement())
+  type      GameType   @default(CLASSIC)
   status    GameStatus @default(SEARCHING)
   createdAt DateTime   @default(now())
   endedAt   DateTime?
@@ -124,4 +126,10 @@ enum GameStatus {
   SEARCHING
   STARTED
   ENDED
+  ABORTED
+}
+
+enum GameType {
+  CLASSIC
+  CUSTOM
 }

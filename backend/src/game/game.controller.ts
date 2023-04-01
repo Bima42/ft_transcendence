@@ -1,7 +1,25 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { GameSettingsDto } from './dto/joinQueueData.dto';
+import { GameService } from './game.service';
+import { Request, Response } from 'express'
+import { User } from '@prisma/client';
 
-@Controller()
+@ApiTags('Game')
+@Controller('game')
 export class GameController {
-  constructor() {}
+  constructor(
+    private gameService: GameService,
+  ) {}
+
+
+  @Get('current')
+  getCurrentGame(@Req() req: Request, @Res() res: Response) {
+      const gameSettings = this.gameService.getCurrentGame(req.user as User);
+      if (!gameSettings)
+        return res.status(404).send("Game not Found");
+      else
+        return res.status(200).json(gameSettings);
+  }
 
 }

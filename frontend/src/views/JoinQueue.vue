@@ -18,8 +18,8 @@ import CustomButton from '@/components/multiusage/CustomButton.vue'
 import GameSettings from '@/components/game/GameSettings.vue'
 import LoadingGame from '@/components/game/LoadingGame.vue';
 import { useGameStore } from '@/stores/game';
-import type IGame from '@/interfaces/game/IGame';
 import { useRouter } from 'vue-router'
+import type IGameSettings from '@/interfaces/game/IGameSettings';
 
 const router = useRouter()
 
@@ -32,8 +32,8 @@ function joinQueue() {
     // Joining queue !
     if (isLoading.value) {
         gameStore.socket.emit('newJoinQueue', {
-            classic: useClassicMode
-        }, (response: string) => { console.log(response)});
+            type: useClassicMode ? "CLASSIC" : "CUSTOM"
+        });
     }
     // Aborting queue
     else {
@@ -43,21 +43,16 @@ function joinQueue() {
 
 function onJoinClassic() {
     useClassicMode = true;
-    console.log("classic");
 }
 
 function onJoinCustom() {
     useClassicMode = false;
-    console.log("custom");
 }
 
 // Listen for the 'match-found' event
-gameStore.socket.on('matchFound', (match: IGame) => {
+gameStore.socket.once('matchFound', (gameSettings: IGameSettings) => {
   (document.getElementById("join_btn") as HTMLButtonElement).disabled = true;
-  gameStore.currentGame = match;
-
-  // FIXME: get this info from server
-  gameStore.currentGame.classic = useClassicMode;
+  isLoading.value = false;
 
   // Redirect the user to the game page with the opponent ID
   router.push(`game`);
@@ -66,16 +61,6 @@ gameStore.socket.on('matchFound', (match: IGame) => {
 gameStore.socket.on('connect', () => {
   console.log(`Connected to server with ID ${gameStore.socket.id}`);
 });
-
-gameStore.socket.on('matchFound', (opponentId: string) => {
-  console.log(`Match found with opponent ${opponentId}`);
-  isLoading.value = false;
-});
-
-
-
-function joinCustomModeQueue() {
-}
 
 </script>
 

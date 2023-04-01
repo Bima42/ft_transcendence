@@ -38,11 +38,10 @@ const router = createRouter({
             path: '/main',
             name: 'main',
             children: [
-                // TODO: remove from main menu
                 {
-                   path: 'game',
-                   name: 'game',
-                   component: PlayAGameView,
+                    path: 'game',
+                    name: 'game',
+                    component: PlayAGameView,
                 },
                 {
                     path: 'play',

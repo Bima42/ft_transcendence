@@ -2,7 +2,7 @@ import type IUser from '@/interfaces/user/IUser';
 
 export default interface IGame {
 	id: number
-  classic: boolean // TODO: add on serverside
+  type: GameType
 	status: GameStatus
 	createdAt: Date
 	endedAt: Date
@@ -10,3 +10,4 @@ export default interface IGame {
 }
 
 export type GameStatus = 'SEARCHING' | 'STARTED' | 'ENDED'
+export type GameType = 'CLASSIC' | 'CUSTOM'
