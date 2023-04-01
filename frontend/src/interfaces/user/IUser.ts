@@ -3,15 +3,12 @@ import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import type IFriendship from '@/interfaces/user/IFriendship';
 import type IUserGame from '@/interfaces/user/IUserGame';
 
-
 export default interface IUser {
 	id: number
 	username: string
-	twoFA: boolean
-	fortyTwoID: number
 	email: string
 	avatar: string
-  phone?: string
+	twoFA: boolean
 	status: UserStatus
 	chats: IUserChat[]
 	games: IUserGame[]

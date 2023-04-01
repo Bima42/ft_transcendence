@@ -18,7 +18,6 @@ export class TwoFaController {
 		@Body() datas: { code: string }
 	){
 		const user = req.user;
-		console.log(user);
 		try {
 			await this.twoFaService.verifyTwoFactorAuthCode(user, datas.code);
 

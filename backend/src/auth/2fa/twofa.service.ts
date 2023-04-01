@@ -22,7 +22,7 @@ export class TwoFaService {
 		if (!verified) {
 			throw new BadRequestException('Invalid code');
 		}
-		this.prismaService.user.update({
+		return this.prismaService.user.update({
 			where: {
 				id: user.id
 			},

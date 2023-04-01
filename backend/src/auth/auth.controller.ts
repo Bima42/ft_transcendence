@@ -13,6 +13,7 @@ import { UsersService } from '../users/users.service';
 import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
+import { UserDto } from '../users/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -64,7 +65,7 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user = req.user;
+    const user: UserDto = req.user;
 
     await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
     res.status(200).send(user);

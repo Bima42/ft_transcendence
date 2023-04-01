@@ -15,6 +15,7 @@ import { ChatMessageDto, NewChatMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
+import { UserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class ChannelService {
@@ -98,13 +99,13 @@ export class ChannelService {
   // Return the detailed description of the chat, except for the messages
   async getChannelDetails(user: User, chatId: number): Promise<DetailedChannelDto | NewChannelDto> {
 
-    let chat: Chat = await this.prismaService.chat.findUnique({
+    const chat: Chat = await this.prismaService.chat.findUnique({
       where: { id: +chatId },
     });
 
     // TODO TYR: When the chat is not found
 
-    let users = await this.prismaService.userChat.findMany({
+    const users = await this.prismaService.userChat.findMany({
       where: { chatId: chatId },
       select: {
         id: true,
@@ -130,7 +131,7 @@ export class ChannelService {
       return newDto;
     }
 
-    let chatDto: DetailedChannelDto = {
+    const chatDto: DetailedChannelDto = {
       id: chatId,
       name: chat.name,
       createdAt: chat.createdAt,
@@ -153,7 +154,7 @@ export class ChannelService {
   }
 
   async createChannel(user: User, newChannel: NewChannelDto): Promise<Chat> {
-    let existingChannel = await this.findByName(newChannel.name);
+    const existingChannel = await this.findByName(newChannel.name);
     if (existingChannel) {
       return existingChannel;
     }
@@ -164,7 +165,7 @@ export class ChannelService {
       newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
     }
 
-    let newChat = await this.prismaService.chat.create({
+    const newChat = await this.prismaService.chat.create({
       data: newChannel
     });
 
@@ -252,7 +253,7 @@ export class ChannelService {
     });
 
     // Return full chat (with users)
-    let users = await this.prismaService.userChat.findMany({
+    const users = await this.prismaService.userChat.findMany({
       where: { chatId: chatId },
       select: {
         id: true,
@@ -267,7 +268,7 @@ export class ChannelService {
         { userId: "desc", },
       ],
     })
-    let chatDto: DetailedChannelDto = {
+    const chatDto: DetailedChannelDto = {
       id: chatId,
       name: chat.name,
       createdAt: chat.createdAt,
@@ -301,7 +302,7 @@ export class ChannelService {
     }
 
   async getLastMessages(chatId: number, nbrMsgs: number) {
-    let chat = await this.findChannelById(chatId);
+    const chat = await this.findChannelById(chatId);
     if (!chat)
       return [];
     return this.prismaService.chatMessage.findMany({
@@ -321,14 +322,14 @@ export class ChannelService {
     });
   }
 
-  async postMessage(user: User, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
+  async postMessage(user: UserDto, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
     const chat = await this.findChannelById(chatId);
     if (!chat) {
       return Promise.reject("No chat");
     }
 
     // Check if user is allowed to post a message:
-    var chatRole = await this.findUserchatFromIds(chatId, user.id);
+    let chatRole = await this.findUserchatFromIds(chatId, user.id);
     if (!chatRole) {
       if (chat.type == "PUBLIC" && !chat.password) {
         // Add the user to public chat
@@ -386,7 +387,7 @@ export class ChannelService {
     const targetUser = await this.userService.findByName(targetUsername);
 
     // Get the current role of the target user
-    var targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
+    const targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
 
     // Cannot kick the owner
     if (targetUserChat.role == 'OWNER'){
@@ -418,7 +419,7 @@ export class ChannelService {
     const targetUser = await this.userService.findByName(targetUsername);
 
     // Get the current role of the target user
-    var targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
+    const targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
 
     if (!targetUserChat) {
       // Create the user role
@@ -460,7 +461,7 @@ export class ChannelService {
 
   updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number) : Date | null {
     if (muteDuration) {
-      let newMutedUntil = new Date();
+      const newMutedUntil = new Date();
       newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
       if (!currentMutedUntil || newMutedUntil > currentMutedUntil) {
           return newMutedUntil;
