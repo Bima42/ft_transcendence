@@ -1,17 +1,26 @@
 <template>
   <span class="avatar-container" :class="props.type">
-    <img :src="userStore.user?.avatar"/>
+    <img :src="imgUrl" alt="Oh no !"/>
   </span>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-
-const userStore = useUserStore()
+import { ref, onUpdated } from 'vue';
 
 const props = defineProps<{
-  type: String,
+  type: string,
+  url: string | null,
 }>()
+
+const defaultUrl = `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+
+let imgUrl = ref(props.url || defaultUrl)
+
+onUpdated(() => {
+    imgUrl.value = props.url || defaultUrl
+})
+
+
 </script>
 
 <style lang="scss">
@@ -38,6 +47,11 @@ const props = defineProps<{
   &.small {
     width: 50px;
     height: 50px;
+  }
+
+  &.chat {
+      width: 30px;
+      height: 30px;
   }
 
   img {

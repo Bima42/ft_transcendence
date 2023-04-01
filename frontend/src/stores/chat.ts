@@ -25,7 +25,7 @@ export const useChatStore = defineStore('chat', () => {
     });
   }
 
-  async function setCurrentChat(newChat: IChat): IChat {
+  async function setCurrentChat(newChat: IChat): Promise<IChat> {
     if (!newChat)
       newChat = this.chats[0];
     const url = 'chat/rooms/' + newChat.id;

@@ -1,6 +1,6 @@
 <template>
   <section class="message-wrapper" :class="textPosition">
-    <UserAvatar type="small"></UserAvatar>
+    <UserAvatar type="chat" :url="imgUrl"></UserAvatar>
     <p>
       {{ props.message.content }}
     </p>
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, computed} from 'vue'
+import {defineProps, ref, computed, onUpdated} from 'vue'
 import UserAvatar from "@/components/multiusage/UserAvatar.vue";
 import { useUserStore } from "@/stores/user"
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
@@ -18,10 +18,17 @@ const props = defineProps<{
   message: IChatMessage,
 }>()
 
-let text_position = props.message.userId as number;
+let imgUrl = ref(props.message.user.avatar);
+
+let text_position = ref(props.message.user.id as number);
+
+onUpdated(() => {
+    imgUrl.value = props.message.user.avatar;
+    text_position.value = props.message.user.id as number;
+})
 
 const textPosition = computed(() => {
-  return text_position === authStore.user.id ? 'right' : 'left'
+  return text_position.value === authStore.user?.id ? 'right' : 'left'
 })
 </script>
 
@@ -37,7 +44,6 @@ const textPosition = computed(() => {
     border: 1px solid pink;
     max-width: 70%;
     overflow-wrap: break-word;
-    height: 100%;
     text-align: left;
   }
 

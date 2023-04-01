@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMes
 import { User, ChatMessage } from '@prisma/client';
 import { Socket, Server } from 'socket.io'
 import { ChannelService } from './channel.service'
-import { NewMessageDto } from './dto/message.dto';
+import { NewChatMessageDto } from './dto/message.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 
@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) { }
 
     @SubscribeMessage('msg')
-    async handleEvent(@MessageBody() data: NewMessageDto,
+    async handleEvent(@MessageBody() data: NewChatMessageDto,
         @ConnectedSocket() socket: Socket) {
 
         const user : User = this.userSockets[socket.id];
