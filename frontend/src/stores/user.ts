@@ -1,10 +1,11 @@
-import { get, patch, post } from '../../utils'
+import { get, jsonHeaders, mediaHeaders, patch, post } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie';
+import {ref} from 'vue'
 
 export const useUserStore = defineStore( 'auth', () => {
-	let user = localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null
+	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
     let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
@@ -19,17 +20,17 @@ export const useUserStore = defineStore( 'auth', () => {
 		)
 			.then(response => response.json())
 			.then(json => {
-				user = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user))
+				user.value = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user.value))
 				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
 			})
 	}
 
 	const logout = function () {
-		if (!user)
+		if (!user.value)
 			return
-		get(`auth/logout/${user.id}`, 'Failed to logout').then(() => {
-			user = null
+		get(`auth/logout/${user.value.id}`, 'Failed to logout').then(() => {
+			user.value = null
 			localStorage.removeItem('localUser');
 			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
 		})
@@ -37,18 +38,23 @@ export const useUserStore = defineStore( 'auth', () => {
 
   const isLoggedIn = function () : boolean {
 		const token = getCookie(import.meta.env.VITE_JWT_COOKIE);
-    return user != null && token != null;
+    return user.value != null && token != null;
   }
 
 	const updateTwoFaStatus = function (status: boolean) {
-		if (!user)
+		if (!user.value)
 			return
 
-		patch(`users/twofa/${user.id}`, 'Failed to update user', { twoFA: status })
+		patch(
+			`users/twofa/${user.value.id}`,
+			'Failed to update user',
+			jsonHeaders,
+			{ twoFA: status }
+		)
 			.then(response => response.json())
 			.then(json => {
-				user = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user))
+				user.value = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user.value))
 			})
 	}
 
@@ -56,6 +62,7 @@ export const useUserStore = defineStore( 'auth', () => {
 		post(
 			'2fa/verify',
 			'Failed to verify 2fa code',
+			jsonHeaders,
 			{ code: code }
 		)
 			.then(response => response.json())
@@ -67,8 +74,30 @@ export const useUserStore = defineStore( 'auth', () => {
 			.catch(error => console.log(error))
 	}
 
+	const uploadAvatar = function (file: FormData) {
+		post(
+			`users/avatar/${user.value?.id}`,
+			'Failed to upload avatar',
+			mediaHeaders,
+			undefined,
+			file
+		)
+			.then(response => response.json())
+			.then(json => {
+				const datas = json as IUser
+				const avatar = datas.avatar
+				updateAvatar(avatar)
+			})
+			.catch(error => console.log(error))
+	}
+
+	const updateAvatar = function (avatar: string) {
+		user.value!.avatar = `${avatar}`
+		localStorage.setItem('localUser', JSON.stringify(user.value))
+	}
+
 	const testEndpoint = function () {
-		get(`users/id/${user?.id}`, 'Failed to get user')
+		get(`users/id/${user.value?.id}`, 'Failed to get user')
 			.then(response => response.json())
 			.then(json => console.log(json))
 	}
@@ -81,6 +110,8 @@ export const useUserStore = defineStore( 'auth', () => {
     isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
+		uploadAvatar,
+		updateAvatar,
     testEndpoint,
 	}
 })

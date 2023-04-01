@@ -95,6 +95,18 @@ export class UsersService {
     }
   }
 
+  async updateAvatar(userId: number, avatar: string): Promise<User> {
+    const avatarUrl = `${process.env.FRONTEND_URL}/api/${avatar}`
+    return this.prismaService.user.update({
+      where: {
+        id: +userId
+      },
+      data: {
+        avatar: avatarUrl
+      }
+    });
+  }
+
   async setTwoFaSecret(userId: number, secret: string): Promise<User> {
     return this.prismaService.user.update({
       where: {
