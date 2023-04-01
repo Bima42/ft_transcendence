@@ -18,7 +18,7 @@ import { ChatGateway } from './channel.gateway';
 import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
-import { NewMessageDto } from './dto/message.dto';
+import { NewChatMessageDto } from './dto/message.dto';
 import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
@@ -72,7 +72,7 @@ export class ChannelController {
   }
 
   @Post('rooms/:id/messages')
-  PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: Request, @Body() data: NewMessageDto) {
+  PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: Request, @Body() data: NewChatMessageDto) {
 	  return this.channelService.postMessage(req.user as User, id, data);
   }
 

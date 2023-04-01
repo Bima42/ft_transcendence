@@ -11,7 +11,7 @@ import {
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
-import { NewMessageDto } from './dto/message.dto';
+import { ChatMessageDto, NewChatMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
@@ -313,7 +313,7 @@ export class ChannelService {
     });
   }
 
-  async postMessage(user: User, chatId: number, data: NewMessageDto): Promise<ChatMessage> {
+  async postMessage(user: User, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
     const chat = await this.findChannelById(chatId);
     if (!chat) {
       return Promise.reject("No chat");
@@ -345,14 +345,26 @@ export class ChannelService {
         return Promise.reject("muted");
     }
 
-    const msg = await this.prismaService.chatMessage.create({
+    const msg: ChatMessage = await this.prismaService.chatMessage.create({
       data: {
         content: data.content,
         user: { connect: { id: user.id } },
         chat: { connect: { id: chatId } }
       }
     });
-    return msg;
+
+    const msgDto : ChatMessageDto = {
+      content: msg.content,
+      sentAt: msg.sentAt,
+      updatedAt: msg.updatedAt,
+      chatId: msg.chatId,
+      user: {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar
+      }
+    }
+    return msgDto;
   }
 
   async deleteUserChatRole(user: User, chatId: number, targetUsername: string) {

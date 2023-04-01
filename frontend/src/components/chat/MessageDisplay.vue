@@ -18,10 +18,10 @@ const props = defineProps<{
   message: IChatMessage,
 }>()
 
-let text_position = ref(props.message.userId as number);
+let text_position = ref(props.message.user.id as number);
 
 onUpdated(() => {
-    text_position.value = props.message.userId as number;
+    text_position.value = props.message.user.id as number;
 })
 
 const textPosition = computed(() => {
