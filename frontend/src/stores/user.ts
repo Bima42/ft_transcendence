@@ -82,9 +82,8 @@ export const useUserStore = defineStore( 'auth', () => {
 		)
 			.then(response => response.json())
 			.then(json => {
-				// const datas = json as IUser
-				// user!.avatar = datas.avatar
-				// localStorage.setItem('localUser', JSON.stringify(user))
+				user = json as IUser
+				localStorage.setItem('localUser', JSON.stringify(user))
 			})
 			.catch(error => console.log(error))
 	}

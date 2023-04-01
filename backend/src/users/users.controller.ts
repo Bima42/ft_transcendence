@@ -80,12 +80,6 @@ export class UsersController {
       return this.usersService.delete(userId);
   }
 
-  // @Get('avatar/:id')
-  // async getAvatar(@Res() res, @Param('id', ParseIntPipe) userId: number) {
-  //     const avatar = await this.usersService.getAvatar(userId);
-  //     res.sendFile(avatar, { root: '.' });
-  // }
-
   @Post('avatar/:id')
   @UseInterceptors(FileInterceptor('avatar', storage))
   async updateAvatar(
@@ -93,11 +87,10 @@ export class UsersController {
       @UploadedFile(
         new ParseFilePipeBuilder()
           .addFileTypeValidator({ fileType: 'jpeg|png|jpg' })
-          .addMaxSizeValidator({ maxSize: 10000000 })
+          .addMaxSizeValidator({ maxSize: 1000000 })
           .build()
       )  file: Express.Multer.File
   ) {
-      console.log(file);
       return this.usersService.updateAvatar(userId, file.path);
   }
 }

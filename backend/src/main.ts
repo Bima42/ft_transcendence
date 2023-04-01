@@ -26,14 +26,14 @@ async function bootstrap() {
 
   const staticAssetsPath = join(__dirname, "..", "uploads")
   app.useStaticAssets(staticAssetsPath, {
-    prefix: "/api/images/",
+    prefix: "/api/uploads/",
   })
 
   const config = new DocumentBuilder()
       .setTitle('Transcendence')
       .setDescription('Transcendence API')
       .setVersion('0.1')
-	  .addTag('Chat')
+	    .addTag('Chat')
       .build();
 
   const document = SwaggerModule.createDocument(app, config);
