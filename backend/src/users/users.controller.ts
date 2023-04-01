@@ -19,6 +19,20 @@ import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+
+const storage = {
+  storage: diskStorage({
+    destination: './uploads',
+    filename: (req: RequestWithUser, file, cb) => {
+      const newFilename = `${req.user.firstName.toLowerCase()}_${req.user.fortyTwoId}`;
+      const extension = path.parse(file.originalname).ext;
+
+      cb(null, `${newFilename}${extension}`);
+    }
+  })
+}
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -66,8 +80,14 @@ export class UsersController {
       return this.usersService.delete(userId);
   }
 
+  // @Get('avatar/:id')
+  // async getAvatar(@Res() res, @Param('id', ParseIntPipe) userId: number) {
+  //     const avatar = await this.usersService.getAvatar(userId);
+  //     res.sendFile(avatar, { root: '.' });
+  // }
+
   @Post('avatar/:id')
-  @UseInterceptors(FileInterceptor('avatar', { dest: './uploads' }))
+  @UseInterceptors(FileInterceptor('avatar', storage))
   async updateAvatar(
       @Param('id', ParseIntPipe) userId: number,
       @UploadedFile(

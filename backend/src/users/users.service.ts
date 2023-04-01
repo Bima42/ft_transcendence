@@ -95,6 +95,16 @@ export class UsersService {
     }
   }
 
+  // async getAvatar(userId: number): Promise<string> {
+  //   const user = await this.prismaService.user.findUnique({
+  //     where: {
+  //       id: +userId
+  //     }
+  //   });
+  //
+  //   return user.avatar;
+  // }
+
   async updateAvatar(userId: number, avatar: string): Promise<User> {
     return this.prismaService.user.update({
       where: {
