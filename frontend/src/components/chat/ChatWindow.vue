@@ -65,7 +65,6 @@ chatStore.$onAction((context) => {
     width: 100%;
     height: 80%;
     text-align: center;
-
 }
 
 .chat-window-wrapper {
@@ -77,6 +76,6 @@ chatStore.$onAction((context) => {
     display: flex;
     flex-direction: column-reverse;
     overflow: auto;
-    gap: 15px;
+    gap: 5px;
 }
 </style>

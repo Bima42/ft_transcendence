@@ -1,6 +1,6 @@
 <template>
   <section class="message-wrapper" :class="textPosition">
-    <UserAvatar type="small"></UserAvatar>
+    <UserAvatar type="chat"></UserAvatar>
     <p>
       {{ props.message.content }}
     </p>
@@ -41,7 +41,6 @@ const textPosition = computed(() => {
     border: 1px solid pink;
     max-width: 70%;
     overflow-wrap: break-word;
-    height: 100%;
     text-align: left;
   }
 
