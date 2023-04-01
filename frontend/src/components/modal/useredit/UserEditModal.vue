@@ -1,6 +1,6 @@
 <template>
     <section class="left-wrap">
-        <UserAvatar type="big"/>
+        <UserAvatar type="big" :url="userStore.user?.avatar"/>
         <input type="file" accept="image/*" @change="uploadAvatar"/>
         <UsernameInput/>
         <input type="text" placeholder="Username"/>
@@ -21,7 +21,7 @@ import UsernameInput from '@/components/modal/useredit/UsernameInput.vue';
 import UserAvatar from '@/components/multiusage/UserAvatar.vue';
 import UserHighestScore from '@/components/modal/useredit/UserHighestScore.vue';
 import { useUserStore } from '@/stores/user'
-import { onUpdated, ref } from 'vue'
+import { ref } from 'vue'
 import { post } from '../../../../utils';
 
 const userStore = useUserStore()

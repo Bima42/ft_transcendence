@@ -1,6 +1,6 @@
 import { IsString, IsInt } from 'class-validator'
 
-export class NewMessageDto {
+export class NewChatMessageDto {
   @IsString()
 	content: string;
 
@@ -9,4 +9,16 @@ export class NewMessageDto {
 
   @IsInt()
   chatId: number;
+}
+
+export class ChatMessageDto {
+  content: string;
+  sentAt: Date;
+  updatedAt: Date;
+  chatId: number;
+  user: {
+    id: number
+    username: string;
+    avatar: string;
+  }
 }

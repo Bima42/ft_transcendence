@@ -1,6 +1,6 @@
 <template>
     <div class="user-details-card-wrapper">
-        <UserAvatar type="small"></UserAvatar>
+        <UserAvatar type="small" :url="props.userChat.user.avatar"></UserAvatar>
         <div class="user-details-card-header">
             <p class="username">{{ userChat.user.username }}</p>
         </div>
