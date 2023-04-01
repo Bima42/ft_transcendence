@@ -1,15 +1,22 @@
 import { getCookie } from 'typescript-cookie';
 
-const headers = new Headers({
+export const jsonHeaders = new Headers({
 			'Content-Type': 'application/json',
 			'Accept': 'application/json',
 			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
 		})
 
+export const mediaHeaders = new Headers({
+			'Accept': 'application/json',
+			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+})
+
 export async function post(
 	route: string,
 	message: string,
-	json: Record<string, unknown> = {},
+	headers: Headers = jsonHeaders,
+	body?: Record<string, unknown>,
+	file?: FormData
 ): Promise<Response> {
 	const request: RequestInit = {
 		method: 'POST',
@@ -17,8 +24,10 @@ export async function post(
 		credentials: 'include',
 		headers: headers,
   }
-	if (json)
-		request.body = JSON.stringify(json)
+	if (body)
+		request.body = JSON.stringify(body)
+	else if (file)
+		request.body = file
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
@@ -29,10 +38,15 @@ export async function post(
  *
  * @param route : string, the route to fetch
  * @param message : string, the message to display if the request fails
+ * @param headers : Headers, the headers to send with the request
  *
  * @header Cookie is not printable because of httpOnly true
  */
-export async function get(route: string, message: string): Promise<Response> {
+export async function get(
+	route: string,
+	message: string,
+	headers: Headers = jsonHeaders
+): Promise<Response> {
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
 		headers: headers,
@@ -47,10 +61,15 @@ export async function get(route: string, message: string): Promise<Response> {
 *
 * @param route: the route to delete
 * @param message: string, the message to display if the request fails
+* @param headers: Headers, the headers to send with the request
 *
-  * @return
+* @return
 */
-export async function del(route: string, message: string): Promise<Response> {
+export async function del(
+	route: string,
+	message: string,
+	headers: Headers = jsonHeaders
+): Promise<Response> {
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'DELETE',
     headers: headers
@@ -65,14 +84,16 @@ export async function del(route: string, message: string): Promise<Response> {
 *
 * @param route: the route to delete
 * @param message: string, the message to display if the request fails
-* @param json: the json to send in the body
+* @param headers: Headers, the headers to send with the request
+* @param body: the datas to send in the request body
 *
-  * @return
+* @return
 */
 export async function put(
 	route: string,
 	message: string,
-	json: Record<string, unknown> = {},
+	headers: Headers = jsonHeaders,
+	body?: Record<string, unknown>,
 ): Promise<Response> {
 	const request: RequestInit = {
 		method: 'PUT',
@@ -80,8 +101,8 @@ export async function put(
 		credentials: 'include',
 		headers: headers,
   }
-	if (json)
-		request.body = JSON.stringify(json)
+	if (body)
+		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
@@ -91,7 +112,8 @@ export async function put(
 export async function patch(
 	route: string,
 	message: string,
-	json: Record<string, unknown>
+	headers: Headers = jsonHeaders,
+	json?: Record<string, unknown>
 ): Promise<Response> {
 	const request: RequestInit = {
 		method: 'PATCH',

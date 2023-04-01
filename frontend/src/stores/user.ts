@@ -1,4 +1,4 @@
-import { get, patch, post } from '../../utils'
+import { get, jsonHeaders, mediaHeaders, patch, post } from '../../utils'
 import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie';
@@ -44,7 +44,12 @@ export const useUserStore = defineStore( 'auth', () => {
 		if (!user)
 			return
 
-		patch(`users/twofa/${user.id}`, 'Failed to update user', { twoFA: status })
+		patch(
+			`users/twofa/${user.id}`,
+			'Failed to update user',
+			jsonHeaders,
+			{ twoFA: status }
+		)
 			.then(response => response.json())
 			.then(json => {
 				user = json as IUser
@@ -56,6 +61,7 @@ export const useUserStore = defineStore( 'auth', () => {
 		post(
 			'2fa/verify',
 			'Failed to verify 2fa code',
+			jsonHeaders,
 			{ code: code }
 		)
 			.then(response => response.json())
@@ -68,24 +74,25 @@ export const useUserStore = defineStore( 'auth', () => {
 	}
 
 	const uploadAvatar = function (file: FormData) {
-		fetch(
-			`https://${import.meta.env.VITE_BACKEND_URL}/users/avatar/${user?.id}`,
-			{
-				method: 'POST',
-				mode: 'cors',
-				credentials: 'include',
-				headers: {
-					'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`,
-				},
-				body: file
-			},
+		post(
+			`users/avatar/${user?.id}`,
+			'Failed to upload avatar',
+			mediaHeaders,
+			undefined,
+			file
 		)
 			.then(response => response.json())
 			.then(json => {
-				user = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user))
+				const datas = json as IUser
+				const avatar = datas.avatar
+				updateAvatar(avatar)
 			})
 			.catch(error => console.log(error))
+	}
+
+	const updateAvatar = function (avatar: string) {
+		user!.avatar = avatar
+		localStorage.setItem('localUser', JSON.stringify(user))
 	}
 
 	const testEndpoint = function () {
@@ -103,6 +110,7 @@ export const useUserStore = defineStore( 'auth', () => {
 		updateTwoFaStatus,
 		verifyTwoFaCode,
 		uploadAvatar,
+		updateAvatar,
     testEndpoint,
 	}
 })
