@@ -1,6 +1,6 @@
 <template>
   <section class="message-wrapper" :class="textPosition">
-    <UserAvatar type="chat"></UserAvatar>
+    <UserAvatar type="chat" :url="imgUrl"></UserAvatar>
     <p>
       {{ props.message.content }}
     </p>
@@ -18,9 +18,12 @@ const props = defineProps<{
   message: IChatMessage,
 }>()
 
+let imgUrl = ref(props.message.user.avatar);
+
 let text_position = ref(props.message.user.id as number);
 
 onUpdated(() => {
+    imgUrl.value = props.message.user.avatar;
     text_position.value = props.message.user.id as number;
 })
 

@@ -1,17 +1,17 @@
 <template>
   <span class="avatar-container" :class="props.type">
-    <img :src="userStore.user?.avatar"/>
+    <img :src="imgUrl" alt="Oh no !"/>
   </span>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-
-const userStore = useUserStore()
-
 const props = defineProps<{
-  type: String,
+  type: string,
+  url: string | null,
 }>()
+
+let imgUrl = props.url || `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+
 </script>
 
 <style lang="scss">

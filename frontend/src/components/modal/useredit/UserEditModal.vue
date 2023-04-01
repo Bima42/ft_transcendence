@@ -1,6 +1,6 @@
 <template>
     <section class="left-wrap">
-        <UserAvatar type="big"/>
+        <UserAvatar type="big" :url="userStore.user?.avatar"/>
         <UsernameInput/>
         <input type="text" placeholder="Username"/>
         <div class="two-fa">

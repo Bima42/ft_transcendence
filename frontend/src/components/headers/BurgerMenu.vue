@@ -1,6 +1,6 @@
 <template>
     <div class="header-wrapper">
-        <UserAvatar type="small"></UserAvatar>
+        <UserAvatar type="small" :url="userStore.user?.avatar"></UserAvatar>
         <!--    TODO: Use user avatar here-->
         <input id="menu-toggle" type="checkbox"/>
         <label for="menu-toggle">
