@@ -5,12 +5,21 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onUpdated } from 'vue';
+
 const props = defineProps<{
   type: string,
   url: string | null,
 }>()
 
-let imgUrl = props.url || `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+const defaultUrl = `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+
+let imgUrl = ref(props.url || defaultUrl)
+
+onUpdated(() => {
+    imgUrl.value = props.url || defaultUrl
+})
+
 
 </script>
 
