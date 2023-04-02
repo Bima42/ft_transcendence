@@ -7,6 +7,7 @@ import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { GameServer } from './gameserver'
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { UserDto } from '../users/dto/user.dto';
 
 
 @WebSocketGateway({
@@ -21,7 +22,7 @@ import { UsersService } from 'src/users/users.service';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
-    private userSockets: { [key: string]: User } = {};
+    private userSockets: { [key: string]: UserDto } = {};
 
     @WebSocketServer()
     server: Server
@@ -49,7 +50,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       this.gameService.onPlayerDisconnect(socket);
     }
 
-    private async verifyUser(token: string) : Promise<User> {
+    private async verifyUser(token: string) : Promise<UserDto> {
 
         if (!token)
           return null;

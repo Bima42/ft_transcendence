@@ -6,6 +6,7 @@ import { ChannelService } from './channel.service'
 import { NewChatMessageDto } from './dto/message.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { UserDto } from '../users/dto/user.dto';
 
 @WebSocketGateway({
     path: "/api/socket.io",
@@ -19,7 +20,7 @@ import { UsersService } from 'src/users/users.service';
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
-    private userSockets: { [key: string]: User } = {};
+    private userSockets: { [key: string]: UserDto } = {};
 
     @WebSocketServer()
     server: Server
@@ -34,7 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async handleEvent(@MessageBody() data: NewChatMessageDto,
         @ConnectedSocket() socket: Socket) {
 
-        const user : User = this.userSockets[socket.id];
+        const user = this.userSockets[socket.id];
         Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
         const msg = await this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
@@ -52,7 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           return msg;
     }
 
-    private async verifyUser(token: string) : Promise<User> {
+    private async verifyUser(token: string) : Promise<UserDto> {
 
         if (!token)
           return null;
@@ -80,7 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(client: any): any {
 
-        const user : User = this.userSockets[client.id];
+        const user = this.userSockets[client.id];
         Logger.log(`Chat: ${user.username}#${user.id} disconnected`);
         delete this.userSockets[client.id];
 

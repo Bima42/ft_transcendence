@@ -1,6 +1,8 @@
 import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
+import { UserDto } from './dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 @Injectable()
 export class UsersService {
@@ -8,7 +10,7 @@ export class UsersService {
       private readonly prismaService: PrismaService
   ) {}
 
-  async create(data: User): Promise<User> {
+  async create(data: User): Promise<UserDto> {
     const user = await this.prismaService.user.create({
       data: data
     });
@@ -20,7 +22,7 @@ export class UsersService {
     return user;
   }
 
-  async findById(userId: number) {
+  async findById(userId: number): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: +userId
@@ -46,18 +48,18 @@ export class UsersService {
     return user;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDto[]> {
     const users = await this.prismaService.user.findMany();
 
     if (!users) {
       throw new BadRequestException('No users found');
     }
 
-    return users;
+    return users.map(user => toUserDto(user));
   }
 
-  async updateStatus(userId: number, status: UserStatus): Promise<User> {
-    return this.prismaService.user.update({
+  async updateStatus(userId: number, status: UserStatus): Promise<UserDto> {
+    const user = await this.prismaService.user.update({
       where: {
         id: +userId
       },
@@ -65,39 +67,24 @@ export class UsersService {
         status: status
       }
     });
+
+    return toUserDto(user);
   }
 
-  async updateData(userId: number, data: User): Promise<User> {
-    return  this.prismaService.user.update({
+  async updateData(userId: number, data: UserDto): Promise<UserDto> {
+    const user = await this.prismaService.user.update({
       where: {
         id: +userId
       },
       data: data
     });
+
+    return toUserDto(user);
   }
 
-  async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<User> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: +userId
-      }
-    })
-
-    if (user.twoFA !== enableTwoFA) {
-      return this.prismaService.user.update({
-        where: {
-          id: +userId
-        },
-        data: {
-          twoFA: { set: enableTwoFA }
-        }
-      });
-    }
-  }
-
-  async updateAvatar(userId: number, avatar: string): Promise<User> {
+  async updateAvatar(userId: number, avatar: string): Promise<UserDto> {
     const avatarUrl = `${process.env.FRONTEND_URL}/api/${avatar}`
-    return this.prismaService.user.update({
+    const user = await this.prismaService.user.update({
       where: {
         id: +userId
       },
@@ -105,9 +92,11 @@ export class UsersService {
         avatar: avatarUrl
       }
     });
+
+    return toUserDto(user);
   }
 
-  async setTwoFaSecret(userId: number, secret: string): Promise<User> {
+  async setTwoFaSecret(userId: number, secret: string): Promise<UserDto> {
     return this.prismaService.user.update({
       where: {
         id: +userId
@@ -118,7 +107,7 @@ export class UsersService {
     });
   }
 
-  async delete(userId: number): Promise<User> {
+  async delete(userId: number): Promise<UserDto> {
      return this.prismaService.user.delete({
        where: {
         id: +userId

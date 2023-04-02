@@ -125,6 +125,6 @@ export class AuthService {
 
 	async logout(res: Response) {
 		res.clearCookie(process.env.JWT_COOKIE);
-		return res.status(200).send('Sign out success');
+		res.status(200).send('Sign out success');
 	}
 }
