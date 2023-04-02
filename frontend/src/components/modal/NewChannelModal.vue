@@ -24,7 +24,7 @@ import {ref} from 'vue'
 import {useModalStore} from '@/stores/modal';
 import {useChatStore} from '@/stores/chat';
 import CustomButton from '@/components/multiusage/CustomButton.vue'
-import { jsonHeaders, post } from '../../../utils'
+import {jsonHeaders, post} from '../../../utils'
 import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
