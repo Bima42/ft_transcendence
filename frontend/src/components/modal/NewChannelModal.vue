@@ -24,7 +24,7 @@ import {ref} from 'vue'
 import {useModalStore} from '@/stores/modal';
 import {useChatStore} from '@/stores/chat';
 import CustomButton from '@/components/multiusage/CustomButton.vue'
-import {post} from '../../../utils'
+import { jsonHeaders, post } from '../../../utils'
 import type IChat from '@/interfaces/chat/IChat'
 
 const modalStore = useModalStore()
@@ -51,7 +51,7 @@ async function onCreateNewChannel(e: Event) {
         newChat.password = chatPassword.value;
 
     // TODO: catch error ?
-    await post('chat/rooms', 'Cannot create channel', newChat)
+    await post('chat/rooms', 'Cannot create channel', jsonHeaders, newChat)
         .then((response) => response.json())
         .then(json => {
             modalStore.resetState();

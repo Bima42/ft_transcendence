@@ -1,12 +1,9 @@
 import {
-  Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
-  Post,
   Req,
-  Res,
+  Res
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -14,6 +11,7 @@ import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { UserDto } from '../users/dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 @Controller('auth')
 export class AuthController {
@@ -65,7 +63,7 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user: UserDto = req.user;
+    const user: UserDto = toUserDto(req.user);
 
     await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
     res.status(200).send(user);
@@ -78,6 +76,5 @@ export class AuthController {
   ) {
     await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
     await this.authService.logout(res);
-    res.status(302).redirect(`${process.env.FRONTEND_URL}/`);
   }
 }
