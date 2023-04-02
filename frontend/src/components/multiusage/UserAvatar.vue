@@ -12,7 +12,7 @@ const props = defineProps<{
   url: string | null,
 }>()
 
-const defaultUrl = `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+const defaultUrl = `https://${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
 
 let imgUrl = ref(props.url || defaultUrl)
 
