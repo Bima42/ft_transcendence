@@ -168,22 +168,23 @@ export class GameServer {
       this.onAbortGame("both players disconnected");
   }
 
-  onPlayerReconnect(client: Socket) {
+  onPlayerReconnect(newClient: Socket) {
     if (!this.hasStarted) {
       this.sendStateToClients()
       return;
     }
 
-    Logger.log(`Game#${this.roomID}: ${client.data.user.username} reconnected`);
+    Logger.log(`Game#${this.roomID}: ${newClient.data.user.username} reconnected`);
     clearTimeout(this.disconnectTimeout)
 
     // Socket shenanigans
-    client.join(this.roomID);
-    this.updateGameDataOnSockets();
-    client.data.isReady = true;
+    newClient.join(this.roomID);
+    newClient.data.isReady = true;
+    newClient.data.game = this.game;
+    newClient.data.gameServer = this;
     this.players.forEach((el, idx) => {
-      if (el.data.user.id == client.data.user.id && el.disconnected) {
-        this.players[idx] = client;
+      if (el.data.user.id == newClient.data.user.id && el.disconnected) {
+        this.players[idx] = newClient;
       }
     });
     this.sendStateToClients();
@@ -357,13 +358,6 @@ export class GameServer {
       x: ballMaxSpeed * Math.sin(newAngle),
       y: ballMaxSpeed * Math.cos(newAngle)
     });
-  }
-
-  private updateGameDataOnSockets() {
-    this.players.forEach((s) => {
-      s.data.game = this.game;
-      s.data.gameServer = this;
-    })
   }
 
   private cleanupGameDataOnSockets() {
