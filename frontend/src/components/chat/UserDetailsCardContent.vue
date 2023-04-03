@@ -6,7 +6,7 @@
         </div>
         <div class="user-details-card-content">
             <CustomButton styles="fat">Add friend</CustomButton>
-            <CustomButton styles="fat">Send a private message</CustomButton>
+            <CustomButton styles="fat" @click="onSendPrivateMessage">Send a private message</CustomButton>
             <CustomButton styles="fat">...</CustomButton>
         </div>
     </div>
@@ -14,9 +14,16 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
+import {useChatStore } from '@/stores/chat'
 import UserAvatar from '@/components/multiusage/UserAvatar.vue'
 import CustomButton from "@/components/multiusage/CustomButton.vue";
 import type IUserChat from '@/interfaces/user/IUserChat';
+
+const chatStore = useChatStore();
+
+function onSendPrivateMessage() {
+  chatStore.setCurrentChatToWhisper(props.userChat.user)
+}
 
 const props = defineProps<{
     userChat: IUserChat

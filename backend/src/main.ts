@@ -10,7 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Use ValidationPipe to validate all inputs
-  app.useGlobalPipes(new ValidationPipe());
+  // Whitelist: strips the request from unasked fields
+  app.useGlobalPipes(new ValidationPipe(/* { whitelist: true } */));
 
   // Use cookie parser middleware
   app.use(cookieParser());

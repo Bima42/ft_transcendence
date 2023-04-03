@@ -1,5 +1,16 @@
 import { IsString, IsInt } from 'class-validator'
 
+export class NewWhisperMessageDto {
+  @IsString()
+  content: string
+
+  @IsInt()
+  senderId: number
+
+  @IsInt()
+  receiverId: number
+}
+
 export class NewChatMessageDto {
   @IsString()
 	content: string;

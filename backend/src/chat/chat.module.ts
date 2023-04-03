@@ -7,10 +7,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { UsersMiddleware } from '../users/middlewares/users.middleware';
 import { AuthModule } from 'src/auth/auth.module';
+import { MessageService } from './messages.service';
 
 @Module({
   imports: [UsersModule, AuthModule],
-  providers: [PrismaService, ChannelService, ChatGateway],
+  providers: [PrismaService, MessageService, ChannelService, ChatGateway],
   controllers: [ChannelController],
   exports: [ChannelService],
 })

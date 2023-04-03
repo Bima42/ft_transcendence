@@ -39,13 +39,8 @@ async function onCreateNewChannel(e: Event) {
 
     // TODO: check that both passwords are the same
     const newChat: IChat = {
-        id: undefined,
         type: (chatType.value == 'PRIVATE' ? 'PRIVATE' : 'PUBLIC'),
         name: chatName.value,
-        createdAt: undefined,
-        updatedAt: undefined,
-        messages: undefined,
-        users: undefined
     };
     if( chatPassword.value )
         newChat.password = chatPassword.value;

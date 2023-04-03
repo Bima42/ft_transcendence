@@ -21,14 +21,17 @@ import TypeBox from "@/components/chat/TypeBox.vue";
 import ChatWindow from "@/components/chat/ChatWindow.vue";
 import { onMounted } from 'vue';
 import { useChatStore } from '@/stores/chat';
+import { useUserStore } from '@/stores/user';
 
 const chatStore = useChatStore();
+const userStore = useUserStore();
 
 onMounted(async () => {
     // Load the first chat by default
-    await chatStore.refreshChatList();
-    if (chatStore.chats.length > 0) {
-        chatStore.setCurrentChat(chatStore.chats[0]);
+    await chatStore.refreshGroupChatList();
+    await chatStore.refreshWhisperChatList(userStore.user);
+    if (chatStore.groupChats.length > 0) {
+        chatStore.setCurrentChat(chatStore.groupChats[0]);
     }
 });
 </script>

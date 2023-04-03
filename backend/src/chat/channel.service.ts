@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
-import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
+import { UserChat, Chat, ChatType, ChatMessage, User } from '@prisma/client';
 import { ChatMessageDto, NewChatMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
@@ -24,75 +24,103 @@ export class ChannelService {
   ) {
   }
 
-  async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
-    let channels: Chat[] = [];
-    if (whispers) {
-      channels = await this.prismaService.chat.findMany({
-        where: {
-          // Whispers and user is in
-          type: { equals: 'WHISPER' },
+  async getWhisperChatsForUser(user: User): Promise<Array<Chat>> {
+    return await this.prismaService.chat.findMany({
+      where: {
+        // Whispers and user is in
+        type: { equals: 'WHISPER' },
+        users: {
+          some: {
+            userId: { equals: user.id },
+          },
+        },
+      },
+      include: {
+        users: {
+          include: { user: true },
+        }
+      },
+    });
+  }
+
+  async getGroupChatsForUser(user: User): Promise<Array<Chat>> {
+    const channels = await this.prismaService.chat.findMany({
+      where: {
+        // Exclude all channel where the user is banned
+        NOT: {
           users: {
             some: {
               userId: { equals: user.id },
+              role: { equals: 'BANNED' },
             },
           },
         },
-      });
-    } else { // Retrieve community channels where the user is allowed, which is:
-      channels = await this.prismaService.chat.findMany({
-        where: {
-          // Exclude all channel where the user is banned
-          NOT: {
+        OR: [
+          // Public channels
+          {
+            type: { equals: 'PUBLIC' },
+          },
+          // Private channels, where user exists and is not banned
+          {
+            type: { equals: 'PRIVATE' },
             users: {
               some: {
                 userId: { equals: user.id },
-                role: { equals: 'BANNED' },
               },
             },
           },
-          OR: [
-            // Public channels
-            {
-              type: { equals: 'PUBLIC' },
-            },
-            // Private channels, where user exists and is not banned
-            {
-              type: { equals: 'PRIVATE' },
-              users: {
-                some: {
-                  userId: { equals: user.id },
-                },
-              },
-            },
 
-            ],
-        },
-        orderBy: { id: "asc" },
-      });
-    }
-
-    if (!channels) {
-      throw new BadRequestException('No channel found');
-    }
-
+        ],
+      },
+      orderBy: { id: "asc" },
+    });
     if (channels.length == 0) {
-      const general :NewChannelDto = {
-          name: "General",
-          type: 'PUBLIC',
+      const general = await this.generateGeneralChat()
+      if (general)
+        channels.push(general);
+    }
+    return channels;
+  }
+
+  async createWhisperChat(user1Id: number, user2Id: number): Promise<Chat> {
+    // Create Chat
+    const chat = await this.prismaService.chat.create({
+      data: {
+        type: "WHISPER",
+        name: "whisper",
+        users: {
+          create: [
+            {
+              userId: user1Id,
+              role: "MEMBER",
+            },
+            {
+              userId: user2Id,
+              role: "MEMBER",
+            },
+          ],
+        },
+      },
+    });
+    return chat;
+  }
+
+  async generateGeneralChat(): Promise<Chat> {
+    try {
+      const general: NewChannelDto = {
+        name: "General",
+        type: 'PUBLIC',
       }
       // Create the default chat
-      Logger.log("Generate the general chat");
       const generalChannel = await this.prismaService.chat.upsert({
         where: { id: 1 },
         create: general,
         update: general,
       })
-      if (generalChannel) {
-        channels.push(generalChannel);
-      }
+      return generalChannel;
+    } catch (e) {
+      Logger.error(e);
     }
-
-    return channels;
   }
 
   // Return the detailed description of the chat, except for the messages
@@ -123,7 +151,7 @@ export class ChannelService {
     // Check that the user has access to the detailed chat
     const found = (users as UserChat[]).find((el: UserChat) => (el.userId == user.id && el.role != 'BANNED'));
     if (!found && !(chat.type == "PUBLIC" && !chat.password)) {
-      const newDto : NewChannelDto = {
+      const newDto: NewChannelDto = {
         name: chat.name,
         type: chat.type,
       };
@@ -183,7 +211,7 @@ export class ChannelService {
   async updateChannel(user: User, chatId: number, newChannel: NewChannelDto) {
     // Get the current role of the request user
     const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
-    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+    if (!reqUserChat || reqUserChat.role != 'OWNER') {
       throw new ForbiddenException('Not authorized to update Channel');
     }
 
@@ -204,7 +232,7 @@ export class ChannelService {
 
     // Get the current role of the request user
     const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
-    if (!reqUserChat || reqUserChat.role != 'OWNER'){
+    if (!reqUserChat || reqUserChat.role != 'OWNER') {
       throw new ForbiddenException('Not authorized to delete Channel');
     }
 
@@ -229,7 +257,7 @@ export class ChannelService {
   }
 
   async joinChannel(user: User, chatId: number, newData: NewChannelDto): Promise<DetailedChannelDto | NewChannelDto> {
-    const chat : Chat = await this.findChannelById(chatId);
+    const chat: Chat = await this.findChannelById(chatId);
 
 
     // Cannot join private chat, must be added by an admin
@@ -277,103 +305,29 @@ export class ChannelService {
     return chatDto;
   }
 
-    async leaveChannel(user: User, chatId: number) {
+  async leaveChannel(user: User, chatId: number) {
 
-      Logger.log(`${user.username}#${user.id} wants to leave channel ${chatId}`);
-      // Get the current role of the request user
-      const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
-      if (!reqUserChat || reqUserChat.role == 'BANNED'){
-        throw new ForbiddenException('Not authorized to leave Channel');
-      }
-
-      // Check if the user is the OWNER before passing the role to another user
-      if (reqUserChat.role === 'OWNER') {
-        // Pass the OWNER role to the next user
-        await this.passOwnerRole(chatId, user.id);
-      }
-
-      // delete userRole
-      await this.prismaService.userChat.delete({
-        where: { id: reqUserChat.id }
-      });
-
-      this.deleteChatIfEmpty(chatId);
+    Logger.log(`${user.username}#${user.id} wants to leave channel ${chatId}`);
+    // Get the current role of the request user
+    const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+    if (!reqUserChat || reqUserChat.role == 'BANNED') {
+      throw new ForbiddenException('Not authorized to leave Channel');
     }
 
-  async getLastMessages(chatId: number, nbrMsgs: number) {
-    let chat = await this.findChannelById(chatId);
-    if (!chat)
-      return [];
-    return this.prismaService.chatMessage.findMany({
-      skip: 0,
-      take: nbrMsgs,
-      where: { chatId: chatId },
-      orderBy: { id: "desc" },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            avatar: true,
-          }
-        }
-      },
-    });
-  }
-
-  async postMessage(user: User, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
-    const chat = await this.findChannelById(chatId);
-    if (!chat) {
-      return Promise.reject("No chat");
+    // Check if the user is the OWNER before passing the role to another user
+    if (reqUserChat.role === 'OWNER') {
+      // Pass the OWNER role to the next user
+      await this.passOwnerRole(chatId, user.id);
     }
 
-    // Check if user is allowed to post a message:
-    var chatRole = await this.findUserchatFromIds(chatId, user.id);
-    if (!chatRole) {
-      if (chat.type == "PUBLIC" && !chat.password) {
-        // Add the user to public chat
-        chatRole = await this.prismaService.userChat.create({
-          data: {
-            chatId: chat.id,
-            userId: user.id,
-          }
-        })
-      } else {
-        // Not a member of a private chat
-        Logger.log("User is a stranger from chat");
-        return Promise.reject("stranger");
-      }
-    }
-
-    // Banned from chat
-    if (chatRole.role == "BANNED")
-      return Promise.reject("banned");
-    // Muted
-    if (chatRole.mutedUntil && (chatRole.mutedUntil as Date).getTime() > Date.now()) {
-        return Promise.reject("muted");
-    }
-
-    const msg: ChatMessage = await this.prismaService.chatMessage.create({
-      data: {
-        content: data.content,
-        user: { connect: { id: user.id } },
-        chat: { connect: { id: chatId } }
-      }
+    // delete userRole
+    await this.prismaService.userChat.delete({
+      where: { id: reqUserChat.id }
     });
 
-    const msgDto : ChatMessageDto = {
-      content: msg.content,
-      sentAt: msg.sentAt,
-      updatedAt: msg.updatedAt,
-      chatId: msg.chatId,
-      user: {
-        id: user.id,
-        username: user.username,
-        avatar: user.avatar
-      }
-    }
-    return msgDto;
+    this.deleteChatIfEmpty(chatId);
   }
+
 
   async deleteUserChatRole(user: User, chatId: number, targetUsername: string) {
     // Check current user permissions
@@ -389,7 +343,7 @@ export class ChannelService {
     var targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
 
     // Cannot kick the owner
-    if (targetUserChat.role == 'OWNER'){
+    if (targetUserChat.role == 'OWNER') {
       throw new ForbiddenException('Not authorized to kick');
     }
 
@@ -458,12 +412,12 @@ export class ChannelService {
     return HttpStatus.OK;
   }
 
-  updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number) : Date | null {
+  updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number): Date | null {
     if (muteDuration) {
       let newMutedUntil = new Date();
       newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
       if (!currentMutedUntil || newMutedUntil > currentMutedUntil) {
-          return newMutedUntil;
+        return newMutedUntil;
       } else {
         return currentMutedUntil;
       }
@@ -474,21 +428,21 @@ export class ChannelService {
       return null;
 
     return currentMutedUntil;
-}
+  }
 
-  async findUserchatFromIds(chatIdd: number, userIdd: number) : Promise<UserChat | null> {
-    const userchat = await this.prismaService.userChat.findFirst ({
-          where: {
-              chatId: chatIdd,
-              userId: userIdd,
-          },
-        });
+  async findUserchatFromIds(chatIdd: number, userIdd: number): Promise<UserChat | null> {
+    const userchat = await this.prismaService.userChat.findFirst({
+      where: {
+        chatId: chatIdd,
+        userId: userIdd,
+      },
+    });
     return userchat;
   }
 
   async deleteChatIfEmpty(chatId: number): Promise<void> {
 
-    const chat = await this.prismaService.chat.findUnique ({
+    const chat = await this.prismaService.chat.findUnique({
       where: { id: chatId },
       include: { users: true },
     });
