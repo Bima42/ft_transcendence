@@ -7,13 +7,27 @@ import ScoreBoardView from '@/views/ScoreBoardView.vue'
 import CommunityView from '@/views/CommunityView.vue'
 import TableView from '@/components/table/TheTable.vue'
 import JoinQueueView from '@/views/JoinQueue.vue'
-import redirectHandler from '@/components/redirectHandler.vue';
+import redirectHandler from '@/components/redirectHandler.vue'
+// V2 HERE
+import LoginViewV2 from '@/views/v2/LoginViewV2.vue'
+import IndexView2 from '@/views/v2/IndexViewV2.vue'
+// --------------------
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
+        {
+            path: '/2',
+            name: 'landing page',
+            component: LoginViewV2,
+        },
+        {
+            path: '/index2',
+            name: 'index2',
+            component: IndexView2,
+        },
         {
             path: '/',
             name: 'home',
