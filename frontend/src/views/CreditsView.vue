@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import GitHubCard from '@/components/GitHubCard.vue';
+import { ref } from 'vue'
+import GitHubCard from '@/components/GitHubCard.vue'
 
 const creators = ref(
     [

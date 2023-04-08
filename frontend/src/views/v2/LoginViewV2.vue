@@ -24,7 +24,7 @@ async function login() {
 
 <style scoped lang="scss">
 .login-wrapper {
-    grid-area: $main;
+    grid-area: $bigmain;
     display: flex;
     justify-content: center;
     align-items: center;

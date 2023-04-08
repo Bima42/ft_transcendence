@@ -1,14 +1,22 @@
 <template>
     <section class="UI-grid">
-<!--        <template v-if="route.name !== 'home'">-->
-<!--            <HeaderPack></HeaderPack>-->
-<!--            <MainMenu></MainMenu>-->
-<!--        </template>-->
-        <CreditLink></CreditLink>
+<!--                <template v-if="route.name !== 'home'">-->
+<!--                    <HeaderPack></HeaderPack>-->
+<!--                    <MainMenu></MainMenu>-->
+<!--                </template>-->
+        <template v-if="route.name !== 'landing page'">
+            <Sidebar />
+            <HeaderLogo />
+        </template>
         <TheModal v-if="modalStore.show">
             <Component :is="modalStore.component"/>
         </TheModal>
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+            <Transition>
+                <component :is="Component"/>
+            </Transition>
+        </router-view>
+        <CreditLink></CreditLink>
     </section>
 </template>
 
@@ -17,15 +25,27 @@ import {useRoute} from 'vue-router'
 
 import HeaderPack from '@/components/headers/HeaderPack.vue'
 import CreditLink from '@/components/footers/CreditLink.vue'
+import Sidebar from '@/components/v2/UI/Sidebar.vue'
 import MainMenu from '@/components/MainMenu.vue'
 import TheModal from '@/components/modal/TheModal.vue'
-import {useModalStore} from '@/stores/modal'
+import { useModalStore } from '@/stores/modal'
+import HeaderLogo from '@/components/v2/HeaderLogo.vue';
 
 const route = useRoute()
 const modalStore = useModalStore()
 </script>
 
 <style lang="scss">
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
+
 #app {
     display: flex;
     width: 100vw;
