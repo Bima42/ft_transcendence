@@ -11,6 +11,7 @@ import redirectHandler from '@/components/redirectHandler.vue'
 // V2 HERE
 import LoginViewV2 from '@/views/v2/LoginViewV2.vue'
 import IndexView2 from '@/views/v2/IndexViewV2.vue'
+import SettingsView from '@/views/v2/SettingsView.vue';
 // --------------------
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
@@ -27,6 +28,11 @@ const router = createRouter({
             path: '/index2',
             name: 'index2',
             component: IndexView2,
+        },
+        {
+            path: '/settings',
+            name: 'settings',
+            component: SettingsView,
         },
         {
             path: '/',

@@ -3,21 +3,37 @@
         <button @click="toggleSidebar">
             <font-awesome-icon icon="fa-bars"/>
         </button>
-        <div :class="['sidebar_menu', isActive ? 'active' : '']">
-            <font-awesome-icon icon="fa-user"/>
-            <font-awesome-icon icon="fa-arrow-right-from-bracket" class="exit"/>
+        <div :class="['sidebar_menu', isActive ? 'active' : '']" @click="handleClick">
+            <font-awesome-icon icon="fa-user" id="user" />
+            <font-awesome-icon icon="fa-arrow-right-from-bracket" class="exit" id="logout" />
         </div>
     </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
-
-const props = defineProps<{}>()
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 const isActive = ref(false)
+const userStore = useUserStore()
+const router = useRouter()
+
 const toggleSidebar = () => {
     isActive.value = !isActive.value
+}
+
+const handleClick = (e: Event) => {
+    if (!e.target)
+        return
+    const target = e.target as HTMLElement
+
+    if (target.id === 'logout') {
+        userStore.logout()
+    }
+    if (target.id === 'user') {
+        router.push('/settings')
+    }
 }
 </script>
 
