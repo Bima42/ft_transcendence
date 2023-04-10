@@ -1,8 +1,10 @@
 <template>
     <div class="userinput-wrapper">
         <template v-if="editing">
-            <span>{{ userValue }}</span>
-            <font-awesome-icon @click="startEditing" icon="fa-pencil" />
+            <h4>{{ userValue }}</h4>
+            <ButtonCustom @click="startEditing" :style="'small'">
+                <font-awesome-icon icon="fa-pencil" />
+            </ButtonCustom>
         </template>
         <template v-else>
             <input v-model="userValue" @keydown.enter="save" />
@@ -14,6 +16,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
 
 const editing = ref(true);
 
@@ -36,10 +39,22 @@ const cancel = () => {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
+
+    input {
+        border: none;
+        border-bottom: 1px solid black;
+        background: transparent;
+        outline: none;
+        text-align: center;
+        color: white;
+        padding: 1px 6px;
+        width: auto;
+        max-width: 70%;
+    }
 
     .fa-pencil {
-        color: $yellow;
+        color: $quaternary;
         &:hover {
             cursor: pointer;
             filter: hue-rotate(180deg);

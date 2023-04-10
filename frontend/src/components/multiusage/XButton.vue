@@ -15,7 +15,7 @@ const props = defineProps<{
 <style lang="scss" scoped>
 button {
     border: none;
-    background-color: $yellow;
+    background-color: $tertiary;
     border-radius: 50%;
     transition: all 200ms ease-in-out;
     display: flex;

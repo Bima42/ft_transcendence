@@ -1,17 +1,31 @@
 <template>
     <section class="settings_wrapper">
-        <div class="left_side">
-            <UserPicture :url="userStore.user?.avatar"/>
-        </div>
-        <div class="right_side">
-        </div>
+        <section class="profile_wrap">
+            <div class="user_avatar_wrap">
+                <UserPicture
+                    :url="userStore.user?.avatar"
+                    :type="'big'"
+                />
+                <UploadAvatarButtons/>
+            </div>
+            <div class="user_credentials">
+                <UserCredentialsSettings/>
+            </div>
+        </section>
+        <section class="scores_wrap">
+            <UserHighestScore/>
+        </section>
     </section>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { useUserStore } from '@/stores/user'
-import UserPicture from '@/components/v2/UserPicture.vue'
+import UserPicture from '@/components/v2/avatar/UserPicture.vue'
+import UserHighestScore from '@/components/v2/user/UserHighestScore.vue'
+import UploadAvatarButtons from '@/components/v2/avatar/UploadAvatarButtons.vue'
+import UserCredentialsSettings from '@/components/v2/user/UserCredentialsSettings.vue'
+
 const userStore = useUserStore()
 
 const props = defineProps<{}>()
@@ -24,18 +38,43 @@ const props = defineProps<{}>()
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
+    flex-direction: column;
+    padding: 5px;
 
-    .left_side {
+    .profile_wrap {
+        flex: 1;
         width: 100%;
-        height: 100%;
-        background: red;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+
+        .user_credentials {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 50%;
+        }
     }
 
-    .right_side {
+    .user_avatar_wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        width: 50%;
+    }
+
+    .scores_wrap {
+        flex: 1;
         width: 100%;
-        height: 100%;
-        background: blue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        gap: 20px;
     }
 }
 </style>

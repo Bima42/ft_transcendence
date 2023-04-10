@@ -29,15 +29,15 @@ function exitClick(e: Event) {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 100px;
-  overflow: auto;
+  padding: 50px;
+  overflow: hidden;
   z-index: 9;
 
   .main-box {
     position: relative;
     border-radius: 8px;
     box-shadow: 8px 16px 32px 0 rgba(31, 31, 31, 0.08);
-    background-color: $light-gray;
+    background-color: $background;
     display: flex;
     flex-direction: row;
     justify-content: center;

@@ -3,9 +3,10 @@
         <button @click="toggleSidebar">
             <font-awesome-icon icon="fa-bars"/>
         </button>
-        <div :class="['sidebar_menu', isActive ? 'active' : '']" @click="handleClick">
-            <font-awesome-icon icon="fa-user" id="user" />
-            <font-awesome-icon icon="fa-arrow-right-from-bracket" class="exit" id="logout" />
+        <div :class="['sidebar_menu', isActive ? 'active' : '']">
+            <div v-for="element in sidebarElement" :id="element.id" @click="handleClick(element.route)">
+                <font-awesome-icon :icon="element.icon" :id="element.id"/>
+            </div>
         </div>
     </section>
 </template>
@@ -19,21 +20,36 @@ const isActive = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
+const sidebarElement = ref({
+    chat: {
+        icon: 'fa-comments',
+        id: 'chat',
+        route: '/chat'
+    },
+    user: {
+        icon: 'fa-user',
+        id: 'user',
+        route: '/settings'
+    },
+    logout: {
+        icon: 'fa-arrow-right-from-bracket',
+        id: 'logout',
+        route: 'LOGOUT'
+    }
+})
+
 const toggleSidebar = () => {
     isActive.value = !isActive.value
 }
 
-const handleClick = (e: Event) => {
-    if (!e.target)
+const handleClick = (route: string) => {
+    if (!route)
         return
-    const target = e.target as HTMLElement
-
-    if (target.id === 'logout') {
+    toggleSidebar()
+    if (route === 'LOGOUT')
         userStore.logout()
-    }
-    if (target.id === 'user') {
-        router.push('/settings')
-    }
+    else
+        router.push(route)
 }
 </script>
 
@@ -79,11 +95,14 @@ const handleClick = (e: Event) => {
         padding: 20px 0 20px 0;
         transition: transform 0.5s ease-in-out;
         transform: translateX(100%);
+        cursor: pointer;
+        z-index: 200;
 
         svg {
             color: $tertiary;
-            font-size: 20px;
-            &.exit {
+            font-size: 30px;
+
+            &[id='logout'] {
                 color: red;
             }
         }

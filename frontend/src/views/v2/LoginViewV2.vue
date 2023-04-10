@@ -1,16 +1,16 @@
 <template>
     <section class="login-wrapper">
         <img src="@/assets/img/logo_name.svg" alt="logo" class="logo">
-        <ButtonLoading :loading="loading" :click="login">
+        <ButtonCustom :loading="loading" :click="login" :style="'login'">
             Login with 42
-        </ButtonLoading>
+        </ButtonCustom>
     </section>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user';
-import ButtonLoading from '@/components/v2/buttons/ButtonLoading.vue'
+import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue'
 
 const loading = ref(false)
 

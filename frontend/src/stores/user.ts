@@ -1,16 +1,17 @@
-import { get, jsonHeaders, mediaHeaders, patch, post } from '../../utils'
-import { defineStore } from 'pinia'
+import {get, jsonHeaders, mediaHeaders, patch, post} from '../../utils'
+import {defineStore} from 'pinia'
 import type IUser from '../interfaces/user/IUser'
-import { getCookie } from 'typescript-cookie';
+import {getCookie} from 'typescript-cookie';
 import {ref} from 'vue'
+import type {Ref} from 'vue'
 
-export const useUserStore = defineStore( 'auth', () => {
+export const useUserStore = defineStore('auth', () => {
 	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
-    let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
-    redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
-    redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
+		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
+		redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
+		redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
 		window.open(redirect, '_self')
 	}
 	const login = function () {
@@ -36,10 +37,10 @@ export const useUserStore = defineStore( 'auth', () => {
 		})
 	}
 
-  const isLoggedIn = function () : boolean {
+	const isLoggedIn = function (): boolean {
 		const token = getCookie(import.meta.env.VITE_JWT_COOKIE);
-    return user.value != null && token != null;
-  }
+		return user.value != null && token != null;
+	}
 
 	const updateTwoFaStatus = function (status: boolean) {
 		if (!user.value)
@@ -49,7 +50,7 @@ export const useUserStore = defineStore( 'auth', () => {
 			`users/twofa/${user.value.id}`,
 			'Failed to update user',
 			jsonHeaders,
-			{ twoFA: status }
+			{twoFA: status}
 		)
 			.then(response => response.json())
 			.then(json => {
@@ -63,7 +64,7 @@ export const useUserStore = defineStore( 'auth', () => {
 			'2fa/verify',
 			'Failed to verify 2fa code',
 			jsonHeaders,
-			{ code: code }
+			{code: code}
 		)
 			.then(response => response.json())
 			.then(json => {
@@ -74,7 +75,8 @@ export const useUserStore = defineStore( 'auth', () => {
 			.catch(error => console.log(error))
 	}
 
-	const uploadAvatar = function (file: FormData) {
+	const uploadAvatar = function (file: FormData, loading: Ref) {
+		loading.value = true
 		post(
 			`users/avatar/${user.value?.id}`,
 			'Failed to upload avatar',
@@ -87,8 +89,12 @@ export const useUserStore = defineStore( 'auth', () => {
 				const datas = json as IUser
 				const avatar = datas.avatar
 				updateAvatar(avatar)
+				loading.value = false
 			})
-			.catch(error => console.log(error))
+			.catch(error => {
+				console.log(error)
+				loading.value = false
+			})
 	}
 
 	const updateAvatar = function (avatar: string) {
@@ -103,15 +109,15 @@ export const useUserStore = defineStore( 'auth', () => {
 	}
 
 	return {
-    user,
-    redirect,
-    login,
-    logout,
-    isLoggedIn,
+		user,
+		redirect,
+		login,
+		logout,
+		isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
 		uploadAvatar,
 		updateAvatar,
-    testEndpoint,
+		testEndpoint,
 	}
 })
