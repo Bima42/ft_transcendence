@@ -1,0 +1,110 @@
+<template>
+    <section class="community_wrapper">
+        <section class="community_header">
+            <font-awesome-icon v-if="chatIsOpen" icon="fa-chevron-left" @click="toggleChat('BACK')"/>
+            <h2>Chats</h2>
+        </section>
+        <div class="community_content">
+            <template :class="[chatIsOpen ? 'hidden' : 'shown mtl']">
+                <ChatList
+                    :toggleChat="toggleChat"
+                />
+            </template>
+            <template :class="[chatIsOpen ? 'shown rtm' : 'hidden']">
+                <ChatElements
+                    :chatId="currentlyOpenChat"
+                />
+            </template>
+        </div>
+    </section>
+</template>
+
+<script setup lang="ts">
+import {defineProps, ref} from 'vue'
+import ChatList from '@/components/v2/chat/ChatList.vue'
+import ChatElements from '@/components/v2/chat/ChatElements.vue'
+
+const props = defineProps<{}>()
+
+const chatIsOpen = ref(false)
+const currentlyOpenChat = ref('' as string)
+
+const toggleChat = (id: string) => {
+    if (id === 'BACK') {
+        chatIsOpen.value = !chatIsOpen.value
+        currentlyOpenChat.value = ''
+        return
+    }
+    currentlyOpenChat.value = id
+    chatIsOpen.value = !chatIsOpen.value
+}
+</script>
+
+<style scoped lang="scss">
+.community_wrapper {
+    grid-area: $gigamain;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+
+    .community_header {
+        border-bottom: 1px solid $tertiary;
+        border-top: 1px solid $tertiary;
+        padding: 10px;
+        width: 100%;
+        text-align: center;
+        position: sticky;
+
+        svg {
+            height: 50%;
+            position: absolute;
+            left: 10px;
+            top: calc(50% - 10px);
+        }
+    }
+
+    .community_content {
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+.shown {
+    display: block;
+    &.mtl {
+        animation: fadeInMTL 0.2s ease-in-out;
+    }
+    &.rtm {
+        animation: fadeInRTM 0.2s ease-in-out;
+    }
+}
+
+// ANIMATION CORNER
+@keyframes fadeInMTL {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRTM {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+</style>

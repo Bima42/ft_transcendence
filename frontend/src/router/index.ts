@@ -12,6 +12,7 @@ import redirectHandler from '@/components/redirectHandler.vue'
 import LoginViewV2 from '@/views/v2/LoginViewV2.vue'
 import IndexView2 from '@/views/v2/IndexViewV2.vue'
 import SettingsView from '@/views/v2/SettingsView.vue';
+import CommunityViewV2 from '@/views/v2/CommunityViewV2.vue';
 // --------------------
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
@@ -50,11 +51,6 @@ const router = createRouter({
             component: CreditsView,
         },
         {
-            path: '/table',
-            name: 'table',
-            component: TableView,
-        },
-        {
             path: '/main',
             name: 'main',
             children: [
@@ -80,6 +76,12 @@ const router = createRouter({
                     name: 'community',
                     component: CommunityView,
                     longName: 'Community',
+                },
+                {
+                    path: 'community2',
+                    name: 'community2',
+                    component: CommunityViewV2,
+                    longName: 'Community2',
                 },
             ]
         },

@@ -1,7 +1,7 @@
 <template>
     <section class="highscore-wrap">
-        <h1>Your highest score:</h1>
-        <h2>1'000'000</h2>
+        <h2>Your highest score:</h2>
+        <h3>1'000'000</h3>
     </section>
 </template>
 
@@ -18,14 +18,6 @@ const props = defineProps<{}>()
     align-items: center;
     gap: 20px;
     height: 100%;
-
-    h1 {
-        font-size: 32px;
-    }
-
-    h2 {
-        font-size: 24px;
-    }
 
     svg {
         max-height: 100px;
