@@ -1,5 +1,5 @@
 <template>
-    <button @click="toggleHelpBox"><font-awesome-icon icon="fa-solid fa-question" /></button>
+    <button @click="toggleHelpBoxModal"><font-awesome-icon icon="fa-solid fa-question" /></button>
     <div class="helpbox-tooltip" v-show="helpBox">
         <h1>List of commands:</h1>
         <ChatCommand v-for="(commandList, name) in allCommands" :list="commandList">{{ name }}</ChatCommand>
@@ -8,13 +8,17 @@
 
 <script setup lang="ts">
 import { defineProps, ref } from 'vue'
-import ChatCommand from '@/components/chat/chatcommands/ChatCommand.vue';
+import ChatCommand from '@/components/chat/chatcommands/ChatCommand.vue'
+import { useModalStore } from '@/stores/modal'
+import TheModal from '@/components/modal/TheModal.vue';
+
+const modalStore = useModalStore()
 
 const props = defineProps<{}>()
 
 const helpBox = ref(false);
-function toggleHelpBox() {
-    helpBox.value = !helpBox.value;
+function toggleHelpBoxModal() {
+    modalStore.loadAndDisplay(TheModal, ChatCommand, { list: allCommands.value })
 }
 
 const allCommands = ref({
@@ -71,7 +75,8 @@ const allCommands = ref({
 <style scoped lang="scss">
 button {
     border: none;
-    background-color: $yellow;
+    background-color: $tertiary;
+    color: $secondary;
     border-radius: 50%;
     transition: all 200ms ease-in-out;
     display: flex;

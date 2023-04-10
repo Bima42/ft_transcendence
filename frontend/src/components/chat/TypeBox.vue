@@ -1,19 +1,23 @@
 <template>
     <div class="chat-input-container">
         <input v-model="msgContent" type="text" placeholder="Type a message..." v-on:keyup.enter="sendMessage">
-        <CustomButton @click="sendMessage"><font-awesome-icon icon="fa-solid fa-paper-plane" /></CustomButton>
+        <ButtonCustom
+            @click="sendMessage"
+            :style="'small'"
+        >
+            <font-awesome-icon icon="fa-solid fa-paper-plane" /></ButtonCustom>
         <ChatCommandHelper/>
     </div>
 </template>
 
 <script setup lang="ts">
-import CustomButton from '@/components/multiusage/CustomButton.vue';
 import { put } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
 import { useUserStore } from '@/stores/user';
 import ChatCommandHelper from '@/components/chat/chatcommands/ChatCommandHelper.vue';
 import type IChatAction from '@/interfaces/chat/IChatAction';
+import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
@@ -111,7 +115,7 @@ async function sendMessage() {
     input {
         flex: 1;
         height: 30px;
-        border: 1px solid yellow;
+        border: 1px solid $tertiary;
         background-color: rgb(49, 49, 47);
         border-radius: 5px;
         padding: 0 10px;

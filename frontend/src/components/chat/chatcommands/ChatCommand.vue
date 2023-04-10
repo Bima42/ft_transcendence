@@ -1,50 +1,48 @@
 <template>
-    <div class="dropdown-wrapper" :class="{active: toggled}" @click="dropMenu">
-        <slot></slot>
-        <font-awesome-icon icon="fa-solid fa-chevron-left"/>
-    </div>
-    <div v-for="command in props.list" v-show="toggled">
-        <h2>{{ command.command }}<br>
-            {{ command.description }}</h2>
-    </div>
+    <section class="command_wrapper">
+        <div class="list_pack" v-for="(commandList, name) in allCommands">
+            <div class="dropdown-wrapper" @click="dropMenu">
+                <h3>{{ name }}</h3>
+            </div>
+            <div v-for="command in commandList">
+                <h2>{{ command.command }}<br>
+                    {{ command.description }}</h2><br>
+            </div>
+        </div>
+    </section>
 </template>
 
 <script setup lang="ts">
 import {defineProps, ref} from 'vue'
+import {useModalStore} from '@/stores/modal'
 
-const props = defineProps<{
-    list: object
-}>()
+const modalStore = useModalStore()
 
+const props = defineProps<{}>()
 const toggled = ref(false);
 
+const allCommands = modalStore.data.list as object
 function dropMenu() {
     toggled.value = !toggled.value;
 }
 </script>
 
 <style scoped lang="scss">
-.dropdown-wrapper {
+.command_wrapper {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    font-size: 18px;
-    font-weight: 600;
-    gap: 5px;
+    flex-direction: row;
+    gap: 10px;
 
-    &:hover {
-        cursor: pointer;
-    }
+    .dropdown-wrapper {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 600;
+        gap: 5px;
 
-    svg {
-        height: 10pt;
-        transition: all 100ms ease-in-out;
-        transform: rotate(0deg);
-    }
-
-    &.active {
-        svg {
-            transform: rotate(-90deg);
+        &:hover {
+            cursor: pointer;
         }
     }
 }

@@ -10,10 +10,11 @@
                     :toggleChat="toggleChat"
                 />
             </template>
-            <template :class="[chatIsOpen ? 'shown rtm' : 'hidden']">
+            <template :class="['chat_wrap', chatIsOpen ? 'shown rtm' : 'hidden']">
                 <ChatElements
                     :chatId="currentlyOpenChat"
                 />
+                <TypeBox/>
             </template>
         </div>
     </section>
@@ -23,6 +24,7 @@
 import {defineProps, ref} from 'vue'
 import ChatList from '@/components/v2/chat/ChatList.vue'
 import ChatElements from '@/components/v2/chat/ChatElements.vue'
+import TypeBox from '@/components/chat/TypeBox.vue';
 
 const props = defineProps<{}>()
 
@@ -35,7 +37,7 @@ const toggleChat = (id: string) => {
         currentlyOpenChat.value = ''
         return
     }
-    currentlyOpenChat.value = id
+    currentlyOpenChat.value = id as string
     chatIsOpen.value = !chatIsOpen.value
 }
 </script>
@@ -87,6 +89,14 @@ const toggleChat = (id: string) => {
     &.rtm {
         animation: fadeInRTM 0.2s ease-in-out;
     }
+}
+
+.chat_wrap {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 // ANIMATION CORNER

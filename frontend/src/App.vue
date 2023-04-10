@@ -16,7 +16,7 @@
                 <component :is="Component"/>
             </Transition>
         </router-view>
-        <CreditLink></CreditLink>
+        <CreditLink v-if="route.name !== 'community2'"></CreditLink>
     </section>
 </template>
 

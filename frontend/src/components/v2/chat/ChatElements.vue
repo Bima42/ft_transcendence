@@ -1,6 +1,6 @@
 <template>
     <div class="chat_element" v-for="x in 20">
-        <h3>Chat {{ x }}</h3>
+        <h3>Message {{ x }}</h3>
     </div>
 </template>
 
@@ -21,5 +21,9 @@ const chatId = ref(props.chatId)
 </script>
 
 <style scoped lang="scss">
+.chat_element {
+    display: flex;
+    flex-direction: row-reverse;
+}
 
 </style>
