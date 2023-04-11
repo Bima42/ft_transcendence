@@ -1,9 +1,9 @@
-import {get, jsonHeaders, mediaHeaders, patch, post} from '../../utils'
-import {defineStore} from 'pinia'
+import { get, jsonHeaders, mediaHeaders, patch, post } from '../../utils'
+import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
-import {getCookie} from 'typescript-cookie';
-import {ref} from 'vue'
-import type {Ref} from 'vue'
+import { getCookie } from 'typescript-cookie'
+import { ref } from 'vue'
+import type { Ref } from 'vue'
 
 export const useUserStore = defineStore('auth', () => {
 	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)

@@ -1,7 +1,7 @@
 <template>
     <section class="community_wrapper">
         <section class="community_header">
-            <font-awesome-icon v-if="chatIsOpen" icon="fa-chevron-left" @click="toggleChat('BACK')"/>
+            <font-awesome-icon v-if="chatIsOpen" icon="fa-chevron-left" @click="toggleChat(-1)"/>
             <h2>Chats</h2>
         </section>
         <div class="community_content">
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, ref} from 'vue'
+import { defineProps, ref } from 'vue'
 import ChatList from '@/components/v2/chat/ChatList.vue'
 import ChatElements from '@/components/v2/chat/ChatElements.vue'
 import TypeBox from '@/components/chat/TypeBox.vue';
@@ -29,15 +29,15 @@ import TypeBox from '@/components/chat/TypeBox.vue';
 const props = defineProps<{}>()
 
 const chatIsOpen = ref(false)
-const currentlyOpenChat = ref('' as string)
+const currentlyOpenChat = ref(0 as number)
 
-const toggleChat = (id: string) => {
-    if (id === 'BACK') {
+const toggleChat = (id: number) => {
+    if (id === -1) {
         chatIsOpen.value = !chatIsOpen.value
-        currentlyOpenChat.value = ''
+        currentlyOpenChat.value = -1
         return
     }
-    currentlyOpenChat.value = id as string
+    currentlyOpenChat.value = id
     chatIsOpen.value = !chatIsOpen.value
 }
 </script>
@@ -97,6 +97,10 @@ const toggleChat = (id: string) => {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+
+    &.hidden {
+        display: none;
+    }
 }
 
 // ANIMATION CORNER

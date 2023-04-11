@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue'
 
 const loading = ref(false)

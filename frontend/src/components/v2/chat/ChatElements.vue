@@ -9,12 +9,12 @@
  * @description This component purpose is to get the clicked chat ID and display the message according to the chat ID
  * received from the parent
  *
- * @param {String} chatId - This is the chat ID that is received from the parent
+ * @param {number} chatId - This is the chat ID that is received from the parent
  */
 import { defineProps, ref } from 'vue'
 
 const props = defineProps<{
-    chatId: string
+    chatId: number
 }>()
 
 const chatId = ref(props.chatId)
@@ -23,7 +23,7 @@ const chatId = ref(props.chatId)
 <style scoped lang="scss">
 .chat_element {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: column-reverse;
 }
 
 </style>
