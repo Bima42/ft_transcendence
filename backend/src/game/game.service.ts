@@ -5,7 +5,7 @@ import { Game } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
-import {EndGamePlayer} from "./dto/game.dto";
+import { EndGamePlayer } from './dto/game.dto';
 
 
 @Injectable()
@@ -92,6 +92,13 @@ export class GameService {
     })
   }
 
+  /**
+   * @brief Update the elo of the players
+   *
+   * This function could be updated later to be more generic
+   *   - K-factor : 32 by default, could be changed depending on the user's elo
+   *   - Scale Factor : 400 by default, based on satisfying human perception of ratings
+   */
   updateUserElo(player1: EndGamePlayer, player2: EndGamePlayer) {
     const k = 32;
 
