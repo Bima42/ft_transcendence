@@ -19,5 +19,13 @@ export class UserDto {
     twoFA: boolean;
 
     @IsEnum(UserStatus)
-    status: UserStatus
+    status: UserStatus;
+}
+
+export class PlayerStatsDto {
+    username: string;
+    playedGames: number;
+    wonGames: number;
+    winRate: number;
+    elo: number;
 }

@@ -62,11 +62,13 @@ export class GameService {
         //TODO : Players should be UserGame and not User, and so update the elo function to use UserGame
         const player1 = {
           datas: players[0],
-          score: scores[0]
+          score: scores[0],
+          win: scores[0] > scores[1] ? 1 : 0
         }
         const player2 = {
           datas: players[1],
-          score: scores[1]
+          score: scores[1],
+          win: scores[1] > scores[0] ? 1 : 0
         }
 
         // Update win field for each player
@@ -76,7 +78,7 @@ export class GameService {
             gameId: serv.game.id
           },
           data: {
-            win: player1.score > player2.score ? 1 : 0,
+            win: player1.win
           }
         });
         this.prismaService.userGame.updateMany({
@@ -85,7 +87,7 @@ export class GameService {
             gameId: serv.game.id
           },
           data: {
-            win: player2.score > player1.score ? 1 : 0,
+            win: player2.win
           }
         });
 
@@ -125,11 +127,8 @@ export class GameService {
     const probability1 = 1 / (1 + Math.pow(10, (player2.datas.elo - player1.datas.elo) / 400));
     const probability2 = 1 / (1 + Math.pow(10, (player1.datas.elo - player2.datas.elo) / 400));
 
-    const player1Win = player1.score > player2.score ? 1 : 0;
-    const player2Win = player2.score > player1.score ? 1 : 0;
-
-    const newRating1 = player1.datas.elo + k * (player1Win - probability1);
-    const newRating2 = player2.datas.elo + k * (player2Win - probability2);
+    const newRating1 = player1.datas.elo + k * (player1.win - probability1);
+    const newRating2 = player2.datas.elo + k * (player2.win - probability2);
 
     this.prismaService.user.update({
       where: {

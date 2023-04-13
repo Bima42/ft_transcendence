@@ -18,7 +18,7 @@ import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { UserDto } from './dto/user.dto';
+import { PlayerStatsDto, UserDto } from './dto/user.dto';
 
 const storage = {
   storage: diskStorage({
@@ -83,13 +83,28 @@ export class UsersController {
       return this.usersService.updateAvatar(userId, file.path);
   }
 
-  @Get('games/:id')
+  @Get('stats/games/:id')
   async getGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
       return this.usersService.getPlayedGamesByUserId(userId);
   }
 
-  @Get('games/win/:id')
-  async getWinGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getWinGamesByUserId(userId);
+  @Get('stats/games/win/:id')
+  async getWonGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getWonGamesByUserId(userId);
+  }
+
+  @Get('stats/games/winrate/:id')
+  async getWinRateByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getWinRateByUserId(userId);
+  }
+
+  @Get('stats/games/elo/:id')
+  async getEloByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getEloByUserId(userId);
+  }
+
+  @Get('stats/:id')
+  async getStatsByUserId(@Param('id', ParseIntPipe) userId: number): Promise<PlayerStatsDto> {
+    return this.usersService.getStatsByUserId(userId);
   }
 }

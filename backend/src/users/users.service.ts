@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
-import { UserDto } from './dto/user.dto';
+import { PlayerStatsDto, UserDto } from './dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 
 @Injectable()
@@ -125,7 +125,7 @@ export class UsersService {
     return playedGames.then((games) => games.length);
   }
 
-  async getWinGamesByUserId(userId: number) {
+  async getWonGamesByUserId(userId: number) {
     const winGames = this.prismaService.userGame.findMany({
       where: {
         userId: userId,
@@ -134,5 +134,45 @@ export class UsersService {
     });
 
     return winGames.then((games) => games.length);
+  }
+
+  async getWinRateByUserId(userId: number) {
+    const playedGames = await this.getPlayedGamesByUserId(userId);
+    const winGames = await this.getWonGamesByUserId(userId);
+    return winGames / playedGames * 100;
+  }
+
+  async getEloByUserId(userId: number) {
+    const { elo } = await this.prismaService.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        elo: true
+      }
+    });
+    return elo;
+  }
+
+  async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
+    const { username } = await this.prismaService.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        username: true
+      }
+    });
+    const playedGames = await this.getPlayedGamesByUserId(userId);
+    const wonGames = await this.getWonGamesByUserId(userId);
+    const winRate = await this.getWinRateByUserId(userId);
+    const elo = await this.getEloByUserId(userId);
+    return {
+      username: username,
+      playedGames: playedGames,
+      wonGames: wonGames,
+      winRate: winRate,
+      elo: elo
+    }
   }
 }

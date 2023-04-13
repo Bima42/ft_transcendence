@@ -45,4 +45,5 @@ export class EndGamePlayer {
   datas: User
   @IsNumber()
   score: number
+  win: number
 }
