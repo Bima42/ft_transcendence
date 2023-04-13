@@ -82,4 +82,14 @@ export class UsersController {
   ) {
       return this.usersService.updateAvatar(userId, file.path);
   }
+
+  @Get('games/:id')
+  async getGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getPlayedGamesByUserId(userId);
+  }
+
+  @Get('games/win/:id')
+  async getWinGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getWinGamesByUserId(userId);
+  }
 }
