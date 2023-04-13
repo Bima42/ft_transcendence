@@ -22,6 +22,7 @@ model User {
   firstName          String?
   lastName           String?
   phone              String?
+  elo                Int           @default(800)
   status             UserStatus    @default(OFFLINE)
   chats              UserChat[]
   games              UserGame[]

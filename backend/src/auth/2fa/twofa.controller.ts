@@ -28,7 +28,7 @@ export class TwoFaController {
 	){
 		const user = req.user;
 		try {
-			await this.twoFaService.verifyTwoFactorAuthCode(user, datas.code);
+			this.twoFaService.verifyTwoFactorAuthCode(user, datas.code);
 
 			if (req.cookies[process.env.JWT_COOKIE])
 				res.clearCookie(process.env.JWT_COOKIE);

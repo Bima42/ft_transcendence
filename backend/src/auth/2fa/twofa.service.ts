@@ -36,7 +36,7 @@ export class TwoFaService {
 		return toUserDto(user);
 	}
 
-	async verifyTwoFactorAuthCode(user: User, code: string) {
+	verifyTwoFactorAuthCode(user: User, code: string) {
 		const verified = speakeasy.totp.verify({
 			secret: user.twoFASecret,
 			encoding: 'base32',
@@ -45,14 +45,7 @@ export class TwoFaService {
 		if (!verified) {
 			throw new BadRequestException('Invalid code');
 		}
-		return this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				twoFAAuthenticated: true
-			},
-		});
+		return true;
 	}
 
 	async generateTwoFactorAuthSecret(user: User) {
