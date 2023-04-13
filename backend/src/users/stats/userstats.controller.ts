@@ -5,8 +5,8 @@ import { PlayerStatsDto } from '../dto/user.dto';
 import { UserStatsService } from './userstats.service';
 
 @Controller('user/stats')
-@UseGuards(JwtAuthGuard)
 @ApiTags('user/stats')
+@UseGuards(JwtAuthGuard)
 export class UserStatsController {
 	constructor(
 		private readonly userStatsService: UserStatsService

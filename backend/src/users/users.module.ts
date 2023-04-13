@@ -10,6 +10,8 @@ import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
 import { UserStatsController } from './stats/userstats.controller';
 import { UserStatsService } from './stats/userstats.service';
+import { FriendsController } from './friends/friends.controller';
+import { FriendsService } from './friends/friends.service';
 
 /**
  * Users module
@@ -27,10 +29,11 @@ import { UserStatsService } from './stats/userstats.service';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [UsersController, UserStatsController],
+  controllers: [UsersController, UserStatsController, FriendsController],
   providers: [
     UsersService,
     UserStatsService,
+    FriendsService,
     PrismaService,
     UsersMiddleware,
     AuthService,

@@ -32,9 +32,9 @@ const storage = {
   })
 }
 
-@Controller('user')
+@Controller('users')
+@ApiTags('users')
 @UseGuards(JwtAuthGuard)
-@ApiTags('user')
 export class UsersController {
   constructor(
       private readonly usersService: UsersService
