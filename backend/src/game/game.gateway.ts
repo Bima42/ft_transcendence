@@ -47,10 +47,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     @SubscribeMessage('playerDisconnect')
     async handlePlayerDisconnect(@ConnectedSocket() socket: Socket) {
-      this.gameService.onPlayerDisconnect(socket);
+      await this.gameService.onPlayerDisconnect(socket);
     }
 
-    private async verifyUser(token: string) : Promise<UserDto> {
+    private async verifyUser(token: string) : Promise<User> {
 
         if (!token)
           return null;
@@ -112,4 +112,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 // }
 
-};
+}
