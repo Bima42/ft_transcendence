@@ -129,7 +129,7 @@ export class UsersService {
     const winGames = this.prismaService.userGame.findMany({
       where: {
         userId: userId,
-        score: 1
+        win: 1
       }
     });
 
