@@ -114,4 +114,25 @@ export class UsersService {
        }
      });
   }
+
+  async getPlayedGamesByUserId(userId: number) {
+    const playedGames = this.prismaService.userGame.findMany({
+      where: {
+        userId: userId
+      }
+    });
+
+    return playedGames.then((games) => games.length);
+  }
+
+  async getWinGamesByUserId(userId: number) {
+    const winGames = this.prismaService.userGame.findMany({
+      where: {
+        userId: userId,
+        score: 1
+      }
+    });
+
+    return winGames.then((games) => games.length);
+  }
 }
