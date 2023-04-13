@@ -76,7 +76,7 @@ export const useUserStore = defineStore( 'auth', () => {
 
 	const uploadAvatar = function (file: FormData) {
 		post(
-			`users/avatar/${user.value?.id}`,
+			`user/avatar/${user.value?.id}`,
 			'Failed to upload avatar',
 			mediaHeaders,
 			undefined,

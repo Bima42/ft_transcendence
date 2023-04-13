@@ -8,6 +8,8 @@ import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
+import { UserStatsController } from './stats/userstats.controller';
+import { UserStatsService } from './stats/userstats.service';
 
 /**
  * Users module
@@ -25,9 +27,10 @@ import * as process from 'process';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, UserStatsController],
   providers: [
     UsersService,
+    UserStatsService,
     PrismaService,
     UsersMiddleware,
     AuthService,

@@ -32,9 +32,9 @@ const storage = {
   })
 }
 
-@Controller('users')
+@Controller('user')
 @UseGuards(JwtAuthGuard)
-@ApiTags('users')
+@ApiTags('user')
 export class UsersController {
   constructor(
       private readonly usersService: UsersService
@@ -83,28 +83,4 @@ export class UsersController {
       return this.usersService.updateAvatar(userId, file.path);
   }
 
-  @Get('stats/games/:id')
-  async getGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getPlayedGamesByUserId(userId);
-  }
-
-  @Get('stats/games/win/:id')
-  async getWonGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getWonGamesByUserId(userId);
-  }
-
-  @Get('stats/games/winrate/:id')
-  async getWinRateByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getWinRateByUserId(userId);
-  }
-
-  @Get('stats/games/elo/:id')
-  async getEloByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getEloByUserId(userId);
-  }
-
-  @Get('stats/:id')
-  async getStatsByUserId(@Param('id', ParseIntPipe) userId: number): Promise<PlayerStatsDto> {
-    return this.usersService.getStatsByUserId(userId);
-  }
 }
