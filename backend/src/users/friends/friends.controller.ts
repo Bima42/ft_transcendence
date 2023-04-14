@@ -46,4 +46,14 @@ export class FriendsController {
 	async getAllPendingFriends(req: RequestWithUser) {
 		return this.friendsService.getAllPendingFriends(req.user.id);
 	}
+
+	@Post('block/:username')
+	async blockUser(username: string, req: RequestWithUser) {
+		return this.friendsService.blockUser(req.user.id, username);
+	}
+
+	@Post('unblock/:username')
+	async unblockUser(username: string, req: RequestWithUser) {
+		return this.friendsService.unblockUser(req.user.id, username);
+	}
 }

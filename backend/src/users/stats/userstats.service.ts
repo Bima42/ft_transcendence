@@ -9,24 +9,20 @@ export class UserStatsService {
 	) {}
 
 	async getPlayedGamesByUserId(userId: number) {
-		const playedGames = this.prismaService.userGame.findMany({
+		return this.prismaService.userGame.count({
 			where: {
 				userId: userId
 			}
 		});
-
-		return playedGames.then((games) => games.length);
 	}
 
 	async getWonGamesByUserId(userId: number) {
-		const winGames = this.prismaService.userGame.findMany({
+		return this.prismaService.userGame.count({
 			where: {
 				userId: userId,
 				win: 1
 			}
 		});
-
-		return winGames.then((games) => games.length);
 	}
 
 	async getWinRateByUserId(userId: number) {

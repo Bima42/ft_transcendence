@@ -108,4 +108,48 @@ export class FriendsService {
 			},
 		});
 	}
+
+	async blockUser(userId: number, username: string) {
+		const blockedUser = await this.usersService.findByName(username);
+
+		// Update the blockedUser blockers list
+		this.prismaService.user.update({
+			where: { id: blockedUser.id },
+			data: {
+				blockers: {
+					connect: [{ id: userId }]
+				}
+			}
+		});
+
+		return this.prismaService.user.update({
+			where: { id: userId },
+			data: {
+				blocked: {
+					connect: [{ id: blockedUser.id }] }
+			}
+		});
+	}
+
+	async unblockUser(userId: number, username: string) {
+		const blockedUser = await this.usersService.findByName(username);
+
+		// Update the blockedUser blockers list
+		this.prismaService.user.update({
+			where: { id: blockedUser.id },
+			data: {
+				blockers: {
+					disconnect: [{ id: userId }]
+				}
+			}
+		});
+
+		return this.prismaService.user.update({
+			where: { id: userId },
+			data: {
+				blocked: {
+					disconnect: [{ id: blockedUser.id }] }
+			}
+		});
+	}
 }
