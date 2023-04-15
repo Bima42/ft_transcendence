@@ -2,11 +2,23 @@
     <section class="community_wrapper">
         <section class="community_header">
             <font-awesome-icon v-if="chatIsOpen" icon="fa-chevron-left" @click="toggleChat(-1)"/>
-            <h2>Chats</h2>
+            <h2
+                v-if="!chatIsOpen"
+                v-for="chat in chatListsSources"
+                :key="chat.id"
+                @click="selectChatList(chat.id)"
+                :class="[selectedChatList === chat.id ? '' : 'not_selected']"
+            >
+                {{ chat.name }}
+            </h2>
+            <h2 v-else>
+                ROOM ID {{ currentlyOpenChat }}
+            </h2>
         </section>
         <div class="community_content">
             <template :class="[chatIsOpen ? 'hidden' : 'shown mtl']">
                 <ChatList
+                    :selectedChatList="selectedChatList"
                     :toggleChat="toggleChat"
                 />
             </template>
@@ -29,8 +41,22 @@ import TypeBox from '@/components/chat/TypeBox.vue';
 const props = defineProps<{}>()
 
 const chatIsOpen = ref(false)
-const currentlyOpenChat = ref(0 as number)
+const currentlyOpenChat = ref(0)
+const selectedChatList = ref('public')
 
+const chatListsSources = ref({
+    chat1: {
+        name: 'Chat Rooms',
+        id: 'public',
+    },
+    chat2: {
+        name: 'Whispers',
+        id: 'private',
+    },
+})
+const selectChatList = (chatID: string) => {
+    selectedChatList.value = chatID
+}
 const toggleChat = (id: number) => {
     if (id === -1) {
         chatIsOpen.value = !chatIsOpen.value
@@ -61,6 +87,14 @@ const toggleChat = (id: number) => {
         width: 100%;
         text-align: center;
         position: sticky;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        color: $quaternary;
+
+        .not_selected {
+            color: $secondary;
+        }
 
         svg {
             height: 50%;
