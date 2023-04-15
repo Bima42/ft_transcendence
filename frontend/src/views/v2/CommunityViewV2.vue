@@ -96,6 +96,7 @@ const toggleChat = (id: number, name: string) => {
         color: $quaternary;
 
         .not_selected {
+            transition: color 0.2s ease-in-out;
             color: $secondary;
         }
 
