@@ -1,6 +1,6 @@
 <template>
     <div class="content_element" v-for="chatRoom in currentChatList" :id="chatRoom.id"
-         @click="toggleChat(chatRoom.id)">
+         @click="toggleChat(chatRoom.id, chatRoom.name)">
         <h1>Chats {{ chatRoom.name }}</h1>
         <font-awesome-icon icon="fa-chevron-right"/>
     </div>
@@ -36,8 +36,8 @@ const getCurrentList = () => {
         return []
 }
 
-const toggleChat = (id: number) => {
-    props.toggleChat(id)
+const toggleChat = (id: number, name: string) => {
+    props.toggleChat(id, name)
 }
 
 let currentChatName = chatStore.currentChat ? ref(chatStore.currentChat.name) : ref("Chat name");

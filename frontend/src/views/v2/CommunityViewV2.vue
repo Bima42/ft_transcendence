@@ -12,7 +12,7 @@
                 {{ chat.name }}
             </h2>
             <h2 v-else>
-                ROOM ID {{ currentlyOpenChat }}
+                {{ currentChatName }}
             </h2>
         </section>
         <div class="community_content">
@@ -43,6 +43,7 @@ const props = defineProps<{}>()
 const chatIsOpen = ref(false)
 const currentlyOpenChat = ref(0)
 const selectedChatList = ref('public')
+const currentChatName = ref('')
 
 const chatListsSources = ref({
     chat1: {
@@ -57,12 +58,14 @@ const chatListsSources = ref({
 const selectChatList = (chatID: string) => {
     selectedChatList.value = chatID
 }
-const toggleChat = (id: number) => {
+const toggleChat = (id: number, name: string) => {
     if (id === -1) {
         chatIsOpen.value = !chatIsOpen.value
         currentlyOpenChat.value = -1
+        currentChatName.value = ''
         return
     }
+    currentChatName.value = name
     currentlyOpenChat.value = id
     chatIsOpen.value = !chatIsOpen.value
 }
