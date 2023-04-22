@@ -34,6 +34,13 @@ async function bootstrap() {
       .setDescription('Transcendence API')
       .setVersion('0.1')
 	    .addTag('Chat')
+      .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+        'JWT')
       .build();
 
   const document = SwaggerModule.createDocument(app, config);

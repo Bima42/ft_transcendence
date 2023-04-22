@@ -1,5 +1,5 @@
 import { Controller, Get, Req, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GameSettingsDto } from './dto/joinQueueData.dto';
 import { GameService } from './game.service';
 import { Request, Response } from 'express'
@@ -7,6 +7,7 @@ import { User } from '@prisma/client';
 
 @ApiTags('Game')
 @Controller('game')
+@ApiBearerAuth('JWT')
 export class GameController {
   constructor(
     private gameService: GameService,

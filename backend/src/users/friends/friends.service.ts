@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { FriendshipStatus } from '@prisma/client';
+import { toUserDto } from '../../shared/mapper/user.mapper';
 
 @Injectable()
 export class FriendsService {
@@ -10,8 +11,35 @@ export class FriendsService {
 		private readonly usersService: UsersService
 	) {}
 
+	/*************************************************************************
+	 *                                                                       *
+	 *                               FRIENDS                                 *
+	 *                                                                       *
+	 *************************************************************************/
+
+	async isFriend(userId: number, friendId: number) {
+		const friendship = await this.prismaService.friendship.findFirst({
+			where: {
+				OR: [
+					{
+						userId: userId,
+						friendId: friendId,
+					},
+					{
+						userId: friendId,
+						friendId: userId,
+					},
+				],
+				status: FriendshipStatus.ACCEPTED
+			}
+		});
+		return !!friendship;
+	}
+
 	async addFriend(userId: number, friendName: string) {
 		const friend = await this.usersService.findByName(friendName);
+		if (await this.isFriend(userId, friend.id))
+			throw new BadRequestException('User is already a friend or has a pending request');
 		return this.prismaService.friendship.create({
 			data: {
 				user: {
@@ -30,23 +58,14 @@ export class FriendsService {
 
 	async removeFriend(userId: number, friendName: string) {
 		const friend = await this.usersService.findByName(friendName);
+		if (!await this.isFriend(userId, friend.id))
+			throw new BadRequestException('User is not a friend or has a pending request');
 		return this.prismaService.friendship.delete({
 			where: {
 				userId_friendId: {
 					userId: userId,
 					friendId: friend.id
 				}
-			}
-		});
-	}
-
-	async isFriend(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
-		return this.prismaService.friendship.findFirst({
-			where: {
-				userId: userId || friend.id,
-				friendId: friend.id || userId,
-				status: FriendshipStatus.ACCEPTED
 			}
 		});
 	}
@@ -90,27 +109,75 @@ export class FriendsService {
 	}
 
 	async getAllFriends(userId: number) {
-		return this.prismaService.user.findMany({
+		return this.prismaService.friendship.findMany({
 			where: {
-				friends: {
-					some: { userId: userId, status: FriendshipStatus.ACCEPTED },
-				},
+				OR: [
+					{
+						userId: userId,
+						status: FriendshipStatus.ACCEPTED
+					},
+					{
+						friendId: userId,
+						status: FriendshipStatus.ACCEPTED
+					}
+				]
 			},
 		});
 	}
 
-	async getAllPendingFriends(userId: number) {
-		return this.prismaService.user.findMany({
+	async getAllWaitingRequests(userId: number) {
+		return this.prismaService.friendship.findMany({
 			where: {
-				friends: {
-					some: { userId: userId, status: FriendshipStatus.PENDING },
-				},
+				userId: userId,
+				status: FriendshipStatus.PENDING
 			},
 		});
 	}
 
-	async blockUser(userId: number, username: string) {
-		const blockedUser = await this.usersService.findByName(username);
+	async getAllPendingRequests(userId: number) {
+		return this.prismaService.friendship.findMany({
+			where: {
+				friendId: userId,
+				status: FriendshipStatus.PENDING
+			},
+		});
+	}
+
+
+	/*************************************************************************
+	 *                                                                       *
+	 *                             BLOCKED                                   *
+	 *                                                                       *
+	 *************************************************************************/
+
+	async isBlocked(userId: number, blockedUsername: string) {
+		const blockedUser = await this.usersService.findByName(blockedUsername);
+
+		// Find the blockedUser in the blocked list of the user
+		const blocked = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			select: {
+				blocked: {
+					where: { id: blockedUser.id }
+				}
+			}
+		});
+
+		// Find if the user got the blockedUser in the blockers list
+		const blockedBy = await this.prismaService.user.findUnique({
+			where: { id: blockedUser.id },
+			select: {
+				blockers: {
+					where: { id: userId }
+				}
+			}
+		});
+
+		return blocked.blocked.length > 0 || blockedBy.blockers.length > 0;
+	}
+
+	async blockUser(userId: number, blockedUsername: string) {
+		const blockedUser = await this.usersService.findByName(blockedUsername);
 
 		// Update the blockedUser blockers list
 		this.prismaService.user.update({
@@ -151,5 +218,21 @@ export class FriendsService {
 					disconnect: [{ id: blockedUser.id }] }
 			}
 		});
+	}
+
+	async getAllBlockedUsers(userId: number) {
+		const users = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			select: { blocked: true }
+		});
+		return users.blocked.map(toUserDto);
+	}
+
+	async getAllBlockers(userId: number) {
+		const users = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			select: { blockers: true }
+		});
+		return users.blockers.map(toUserDto);
 	}
 }

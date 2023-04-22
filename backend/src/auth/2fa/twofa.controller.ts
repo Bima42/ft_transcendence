@@ -4,8 +4,10 @@ import { RequestWithUser } from '../../interfaces/request-with-user.interface';
 import { Response } from 'express';
 import { TwoFaService } from './twofa.service';
 import { UserDto } from '../../users/dto/user.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('2fa')
+@ApiBearerAuth('JWT')
 export class TwoFaController {
 	constructor(
 		private readonly authService: AuthService,

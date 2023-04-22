@@ -43,7 +43,7 @@ export class UsersService {
       }
     });
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }

@@ -12,13 +12,13 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { PlayerStatsDto, UserDto } from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
 
 const storage = {
   storage: diskStorage({
@@ -33,7 +33,8 @@ const storage = {
 }
 
 @Controller('users')
-@ApiTags('users')
+@ApiTags('Users')
+@ApiBearerAuth('JWT')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(

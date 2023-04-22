@@ -30,10 +30,10 @@ model User {
   games    UserGame[]
   messages ChatMessage[]
 
-  friendRequest Friendship[] @relation(name: "requester")
-  friends       Friendship[] @relation(name: "receiver")
-  blockers      User[]       @relation(name: "blocked")
-  blocked       User[]       @relation(name: "blocked")
+  friendshipAsked    Friendship[] @relation(name: "requester")
+  friendshipReceived Friendship[] @relation(name: "receiver")
+  blockers           User[]       @relation(name: "blocked")
+  blocked            User[]       @relation(name: "blocked")
 }
 
 model Friendship {
