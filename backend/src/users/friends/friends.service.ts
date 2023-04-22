@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { FriendshipStatus } from '@prisma/client';
-import { toBlockedDto, toFriendDto } from '../../shared/mapper/user.mapper';
+import { toBlockedDto, toFriendDto, toUserDto } from '../../shared/mapper/user.mapper';
 
 @Injectable()
 export class FriendsService {
@@ -188,8 +188,12 @@ export class FriendsService {
 	async blockUser(userId: number, blockedUsername: string) {
 		const blockedUser = await this.usersService.findByName(blockedUsername);
 
+		// Check if the user is already blocked
+		if (await this.isBlocked(userId, blockedUsername))
+			throw new BadRequestException('User is already blocked');
+
 		// Update the blockedUser blockers list
-		this.prismaService.user.update({
+		await this.prismaService.user.update({
 			where: { id: blockedUser.id },
 			data: {
 				blockers: {
@@ -198,20 +202,30 @@ export class FriendsService {
 			}
 		});
 
-		return this.prismaService.user.update({
+		// Update the user blocked list
+		await this.prismaService.user.update({
 			where: { id: userId },
 			data: {
 				blocked: {
 					connect: [{ id: blockedUser.id }] }
 			}
 		});
+
+		if (!await this.isBlocked(userId, blockedUsername))
+			throw new InternalServerErrorException('Blocking failed');
+
+		return true;
 	}
 
-	async unblockUser(userId: number, username: string) {
-		const blockedUser = await this.usersService.findByName(username);
+	async unblockUser(userId: number, blockedUsername: string) {
+		const blockedUser = await this.usersService.findByName(blockedUsername);
+
+		// Check if the user is not blocked
+		if (!await this.isBlocked(userId, blockedUsername))
+			throw new BadRequestException('User is not blocked');
 
 		// Update the blockedUser blockers list
-		this.prismaService.user.update({
+		await this.prismaService.user.update({
 			where: { id: blockedUser.id },
 			data: {
 				blockers: {
@@ -220,13 +234,19 @@ export class FriendsService {
 			}
 		});
 
-		return this.prismaService.user.update({
+		// Update the user blocked list
+		await this.prismaService.user.update({
 			where: { id: userId },
 			data: {
 				blocked: {
 					disconnect: [{ id: blockedUser.id }] }
 			}
 		});
+
+		if (await this.isBlocked(userId, blockedUsername))
+			throw new InternalServerErrorException('Unblocking failed');
+
+		return true;
 	}
 
 	async getAllBlockedUsers(userId: number) {
