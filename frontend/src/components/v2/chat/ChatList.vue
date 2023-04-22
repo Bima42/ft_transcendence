@@ -1,6 +1,6 @@
 <template>
     <div class="content_element" v-for="chatRoom in currentChatList" :id="chatRoom.id"
-         @click="toggleChat(chatRoom.id, chatRoom.name)">
+         @click="toggleChat(chatRoom.id)">
         <h1>Chats {{ chatRoom.name }}</h1>
         <font-awesome-icon icon="fa-chevron-right"/>
     </div>
@@ -12,68 +12,47 @@
  *
  * @param {Function} toggleChat - This function is used to send the clicked chat id to the parent
  */
-import { defineProps, ref, onMounted, onUpdated } from 'vue'
-import { get } from '../../../../utils'
+import { defineProps, ref, onMounted, watch } from 'vue'
 import { useChatStore } from '@/stores/chat'
+import type IChat from '@/interfaces/chat/IChat'
 
-const publicChatList = ref([]);
-const privateChatList = ref([]);
 const error = ref(null);
 const chatStore = useChatStore();
-const currentChatList = ref([])
+const currentChatList = ref<IChat[]>()
+let publicChatList = await chatStore.retrievePublicChats();
+let privateChatList = await chatStore.retrieveWhispers();
 
 const props = defineProps<{
-    toggleChat: (id: number) => void
     selectedChatList: string
 }>()
 
-const getCurrentList = () => {
+const getCurrentList = (): IChat[] => {
     if (props.selectedChatList === 'public')
-        return publicChatList.value
+        return publicChatList
     else if (props.selectedChatList === 'private')
-        return privateChatList.value
+        return privateChatList
     else
         return []
 }
 
-const toggleChat = (id: number, name: string) => {
-    props.toggleChat(id, name)
+const toggleChat = (id: number) => {
+    const castedId = id.toString()
+    if (!chatStore.setCurrentChat(castedId)) {
+        console.error('Chat not found') //TODO: set variable and display error message
+        return
+    }
 }
 
-let currentChatName = chatStore.currentChat ? ref(chatStore.currentChat.name) : ref("Chat name");
-
-chatStore.$subscribe((mutation, state) => {
-    if (chatStore.currentChat)
-        currentChatName.value = chatStore.currentChat.name;
-})
-
-async function retrievePublicChats() {
-    await get('chat/rooms', 'Failed to retrieve chat list')
-        .then((res) => res.json())
-        .then((json) => {
-            publicChatList.value = json;
-        })
-        .catch((err) => (error.value = err));
-
-}
-
-onUpdated(() => {
+watch(props, () => {
     currentChatList.value = getCurrentList()
 })
 
 // Call it when loading the page
 onMounted(async () => {
-    await retrievePublicChats();
-    retrieveWhispers();
+    publicChatList = await chatStore.retrievePublicChats()
+    privateChatList = await chatStore.retrieveWhispers()
     currentChatList.value = getCurrentList()
 });
-
-function retrieveWhispers() {
-    get('chat/rooms?whispers=true', 'Failed to retrieve whispers list')
-        .then((res) => res.json())
-        .then((json) => (privateChatList.value = json))
-        .catch((err) => (error.value = err));
-}
 </script>
 
 <style scoped lang="scss">

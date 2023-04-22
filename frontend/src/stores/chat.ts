@@ -1,17 +1,22 @@
 import { ref } from 'vue'
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 import type IChat from '@/interfaces/chat/IChat'
-import { io, Socket } from "socket.io-client"
-import { getCookie } from 'typescript-cookie';
+import { io, Socket } from 'socket.io-client'
+import { getCookie } from 'typescript-cookie'
 import { get } from '../../utils'
+import type { Ref } from 'vue'
 
 interface IChatStore {
     socket: any;
-    currentChat: any;
-    chats: any;
+    currentChat: Ref<IChat | null>;
+    chats: Ref<IChat[]>;
+    isChatOpen: Ref<Boolean>;
     sendMessage: (msg: any) => void;
-    setCurrentChat: (newChat: IChat) => Promise<IChat | null>;
-    refreshChatList: () => Promise<IChat[]>;
+    setCurrentChat: (chatId: string) => Promise<boolean>;
+    retrievePublicChats: () => Promise<IChat[]>;
+    retrieveWhispers: () => Promise<IChat[]>;
+    getMessages: () => void;
+    resetState: () => void;
 }
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
@@ -21,6 +26,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
   }));
   const currentChat = ref<IChat | null>(null);
   const chats = ref<IChat[]>([]);
+  const isChatOpen = ref<boolean>(false);
 
   const sendMessage = function(this: IChatStore, msg: any): void {
     this.socket.emit("msg", msg, (answer: any) => {
@@ -30,29 +36,68 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
     });
   }
 
-  const setCurrentChat = async function(this: IChatStore, newChat: IChat): Promise<IChat | null> {
-    if (!newChat)
-      newChat = this.chats[0];
-    const url = 'chat/rooms/' + newChat.id;
-    await get(url, 'Cannot load channel')
-        .then((res) => res.json())
-        .then((newChannel) => {
-            this.currentChat = newChannel;
-        })
-        .catch((err) => console.log(err));
-    return this.currentChat;
+  const setCurrentChat = async function(chatId: string): Promise<boolean> {
+      if (!chatId) {
+          return false
+      }
+      const url = 'chat/rooms/' + chatId;
+      await get(url, 'Cannot load channel')
+          .then((res) => res.json())
+          .then((newChannel) => {
+              currentChat.value = newChannel;
+          })
+          .catch((err) => console.log(err));
+      return true
   }
 
-  const refreshChatList = async function (this: IChatStore): Promise<IChat[]> {
-    const url = 'chat/rooms/';
-    await get(url, 'Cannot load channel list')
-        .then((res) => res.json())
-        .then((newList) => {
-            this.chats = newList;
-        })
-        .catch((err) => console.log(err));
-    return this.chats;
+    const getMessages = async function () {
+        if (!currentChat.value) return
+        isChatOpen.value = true;
+        const url = 'chat/rooms/' + currentChat.value.id + "/messages";
+        currentChat.value.messages = await get(url, 'Failed to get messages')
+            .then((res) => res.json())
+            .catch((err) => {
+                console.error(err)
+            });
+    }
+  const retrievePublicChats = async function (): Promise<IChat[]> {
+      let chats: IChat[] = [];
+      await get('chat/rooms', 'Cannot load public channels')
+          .then((res) => res.json())
+          .then((chatList: IChat[]) => {
+              chats = chatList
+          })
+          .catch((err) => console.log('ChatStore error: ', err));
+      return chats;
   }
 
-  return { socket, currentChat, chats, sendMessage, setCurrentChat, refreshChatList }
+  const retrieveWhispers = async function (): Promise<IChat[]> {
+      let chats: IChat[] = [];
+        await get('chat/rooms?whispers=true', 'Failed to retrieve whispers list')
+            .then((res) => res.json())
+            .then((chatList: IChat[]) => (
+                chats = chatList
+            ))
+            .catch((err) => (console.log('ChatStore error: ', err)));
+        return chats;
+  }
+
+  const resetState = () => {
+    currentChat.value = null;
+    isChatOpen.value = false;
+    chats.value = [];
+  }
+
+  return {
+      socket,
+      currentChat,
+      chats,
+      isChatOpen,
+      sendMessage,
+      setCurrentChat,
+      getMessages,
+      retrievePublicChats,
+      retrieveWhispers,
+      resetState
+  }
 })

@@ -1,7 +1,7 @@
 <template>
-    <div class="message_wrap" :class="[fromOther ? 'left' : 'right']">
-        <div class="sender" v-show="fromOther">
-            Sender
+    <div class="message_wrap" :class="side">
+        <div class="sender" v-show="side === 'left'">
+            {{ props.userName }}
         </div>
         <div class="content">
             <slot></slot>
@@ -13,13 +13,18 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { defineProps, computed, ref } from 'vue'
 
 const props = defineProps<{
-    fromOther: boolean
+    fromUser: number
+    userIs: number
+    userName: string
 }>()
 
-const fromOther = ref(props.fromOther)
+let side = ref(computed(() => {
+    return props.fromUser === props.userIs ? 'right' : 'left'
+}))
+
 </script>
 
 <style scoped lang="scss">

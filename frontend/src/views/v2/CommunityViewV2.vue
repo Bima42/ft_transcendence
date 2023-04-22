@@ -1,9 +1,9 @@
 <template>
     <section class="community_wrapper">
         <section class="community_header">
-            <font-awesome-icon v-if="chatIsOpen" icon="fa-chevron-left" @click="toggleChat(-1)"/>
+            <font-awesome-icon v-if="chatStore.isChatOpen" icon="fa-chevron-left" @click="resetChat"/>
             <h2
-                v-if="!chatIsOpen"
+                v-if="!chatStore.isChatOpen"
                 v-for="chat in chatListsSources"
                 :key="chat.id"
                 @click="selectChatList(chat.id)"
@@ -12,20 +12,21 @@
                 {{ chat.name }}
             </h2>
             <h2 v-else>
-                {{ currentChatName }}
+                {{ chatStore.currentChat.name }}
             </h2>
         </section>
         <div class="community_content">
-            <template :class="[chatIsOpen ? 'hidden' : 'shown mtl']">
-                <ChatList
-                    :selectedChatList="selectedChatList"
-                    :toggleChat="toggleChat"
-                />
+            <template :class="[chatStore.isChatOpen ? 'hidden' : 'shown mtl']">
+                <Suspense>
+                    <ChatList
+                        :selectedChatList="selectedChatList"
+                    />
+                </Suspense>
             </template>
-            <template :class="['chat_wrap', chatIsOpen ? 'shown rtm' : 'hidden']">
-                <ChatElements
-                    :chatId="currentlyOpenChat"
-                />
+            <template :class="['chat_wrap', chatStore.isChatOpen ? 'shown rtm' : 'hidden']">
+                <Suspense>
+                    <ChatElements/>
+                </Suspense>
                 <TypeBox/>
             </template>
         </div>
@@ -36,14 +37,13 @@
 import { defineProps, ref } from 'vue'
 import ChatList from '@/components/v2/chat/ChatList.vue'
 import ChatElements from '@/components/v2/chat/ChatElements.vue'
-import TypeBox from '@/components/chat/TypeBox.vue';
+import TypeBox from '@/components/chat/TypeBox.vue'
+import { useChatStore } from '@/stores/chat'
 
 const props = defineProps<{}>()
 
-const chatIsOpen = ref(false)
-const currentlyOpenChat = ref(0)
 const selectedChatList = ref('public')
-const currentChatName = ref('')
+const chatStore = useChatStore()
 
 const chatListsSources = ref({
     chat1: {
@@ -58,16 +58,8 @@ const chatListsSources = ref({
 const selectChatList = (chatID: string) => {
     selectedChatList.value = chatID
 }
-const toggleChat = (id: number, name: string) => {
-    if (id === -1) {
-        chatIsOpen.value = !chatIsOpen.value
-        currentlyOpenChat.value = -1
-        currentChatName.value = ''
-        return
-    }
-    currentChatName.value = name
-    currentlyOpenChat.value = id
-    chatIsOpen.value = !chatIsOpen.value
+const resetChat = () => {
+    chatStore.resetState()
 }
 </script>
 
@@ -121,9 +113,11 @@ const toggleChat = (id: number, name: string) => {
 
 .shown {
     display: block;
+
     &.mtl {
         animation: fadeInMTL 0.2s ease-in-out;
     }
+
     &.rtm {
         animation: fadeInRTM 0.2s ease-in-out;
     }

@@ -1,13 +1,14 @@
 <template>
     <div class="chat_element">
         <ChatMessage
-            v-for="x in 20"
-            :key="x"
-            :fromOther="x % 2 === 0"
+            v-if="chatStore.isChatOpen"
+            v-for="message in chatStore.currentChat.messages"
+            :key="message.id"
+            :fromUser="message.user.id"
+            :userIs="currentUser"
+            :userName="message.user.username"
         >
-            Message number kshjdbfjkh sdfbgkhjdsfbgkj sfdhbgikuj sbjksbg jkhsbg kjsdbfg kjsbdkj gbsdkjgb skhjgb kblkasdjflkajslfkjsdl
-            kfjlksd jflksdj flsjlf jlalfjlsdhfgjklsdhg jklshdgkjl sdjkg hsdkjlgh sjkdhg jksdhg kjsdhg kjsdhhkjgbsdjlhg i\shdgf ljksdg lhjk\sdkfg
-            hb\sldkhgkj;\sdfgi\uskdhg k;j\shdgjik h {{ x }}
+            {{ message.content }}
         </ChatMessage>
     </div>
 </template>
@@ -19,14 +20,23 @@
  *
  * @param {number} chatId - This is the chat ID that is received from the parent
  */
-import { defineProps, ref } from 'vue'
-import ChatMessage from '@/components/v2/chat/ChatMessage.vue';
+import { onMounted } from 'vue'
+import { useChatStore } from '@/stores/chat'
+import ChatMessage from '@/components/v2/chat/ChatMessage.vue'
+import { useUserStore } from '@/stores/user'
 
-const props = defineProps<{
-    chatId: number
-}>()
+const userStore = useUserStore()
+const chatStore = useChatStore()
+const currentUser = userStore.user?.id
 
-const chatId = ref(props.chatId)
+onMounted(async () => {
+    await chatStore.getMessages()
+})
+
+chatStore.$subscribe((mutation, state) => {
+    if (chatStore.currentChat)
+        chatStore.getMessages()
+})
 </script>
 
 <style scoped lang="scss">
