@@ -22,6 +22,33 @@ export class UserDto {
     status: UserStatus;
 }
 
+export class FriendDto {
+    @IsNotEmpty()
+    id: number;
+
+    @IsNotEmpty()
+    username: string;
+
+    firstName: string;
+    lastName: string;
+
+    @IsString()
+    @IsNotEmpty()
+    avatar: string;
+}
+
+export class BlockedDto {
+    @IsNotEmpty()
+    id: number;
+
+    @IsNotEmpty()
+    username: string;
+
+    @IsString()
+    @IsNotEmpty()
+    avatar: string;
+}
+
 export class PlayerStatsDto {
     username: string;
     playedGames: number;

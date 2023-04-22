@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { FriendshipStatus } from '@prisma/client';
-import { toUserDto } from '../../shared/mapper/user.mapper';
+import { toBlockedDto, toFriendDto } from '../../shared/mapper/user.mapper';
 
 @Injectable()
 export class FriendsService {
@@ -109,20 +109,29 @@ export class FriendsService {
 	}
 
 	async getAllFriends(userId: number) {
-		return this.prismaService.friendship.findMany({
+		const friendships = await this.prismaService.friendship.findMany({
 			where: {
 				OR: [
 					{
 						userId: userId,
-						status: FriendshipStatus.ACCEPTED
 					},
 					{
 						friendId: userId,
-						status: FriendshipStatus.ACCEPTED
 					}
-				]
+				],
+				status: FriendshipStatus.ACCEPTED
 			},
 		});
+
+		// Map the friendships to users
+		const friends = [];
+		for (const friendship of friendships) {
+			const id = friendship.userId === userId ? friendship.friendId : friendship.userId;
+			const user = await this.usersService.findById(id);
+			friends.push(toFriendDto(user));
+		}
+
+		return friends;
 	}
 
 	async getAllWaitingRequests(userId: number) {
@@ -225,7 +234,7 @@ export class FriendsService {
 			where: { id: userId },
 			select: { blocked: true }
 		});
-		return users.blocked.map(toUserDto);
+		return users.blocked.map(toBlockedDto);
 	}
 
 	async getAllBlockers(userId: number) {
@@ -233,6 +242,6 @@ export class FriendsService {
 			where: { id: userId },
 			select: { blockers: true }
 		});
-		return users.blockers.map(toUserDto);
+		return users.blockers.map(toBlockedDto);
 	}
 }
