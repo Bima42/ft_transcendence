@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { UserDto } from './dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 const storage = {
   storage: diskStorage({
@@ -54,7 +55,8 @@ export class UsersController {
    */
   @Get('id/:id')
   async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<UserDto> {
-    return this.usersService.findById(userId);
+    const user = await this.usersService.findById(userId);
+    return toUserDto(user);
   }
 
   @Patch('id/:id')

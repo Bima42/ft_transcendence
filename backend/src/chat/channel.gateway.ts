@@ -7,6 +7,7 @@ import { NewChatMessageDto } from './dto/message.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 @WebSocketGateway({
     path: "/api/socket.io",
@@ -59,8 +60,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           return null;
 
         const userId = this.authService.verifyToken(token);
+        const user = await this.usersService.findById(userId.sub);
 
-        return await this.usersService.findById(userId.sub);
+        return toUserDto(user);
 
     }
 
