@@ -53,7 +53,7 @@ export class UsersController {
    * @param userId
    */
   @Get('id/:id')
-  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<User> {
+  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<UserDto> {
     return this.usersService.findById(userId);
   }
 

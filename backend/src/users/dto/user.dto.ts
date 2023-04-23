@@ -20,6 +20,12 @@ export class UserDto {
 
     @IsEnum(UserStatus)
     status: UserStatus;
+
+    fortyTwoId?: number;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    elo: number;
 }
 
 export class FriendDto {

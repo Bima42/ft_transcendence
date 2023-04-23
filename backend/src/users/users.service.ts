@@ -22,7 +22,7 @@ export class UsersService {
     return user;
   }
 
-  async findById(userId: number): Promise<User> {
+  async findById(userId: number): Promise<UserDto> {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: +userId
@@ -33,10 +33,10 @@ export class UsersService {
         throw new NotFoundException('User not found');
     }
 
-    return user;
+    return toUserDto(user);
   }
 
-  async findByName(username: string) {
+  async findByName(username: string): Promise<UserDto> {
     const user = await this.prismaService.user.findUnique({
       where: {
         username: username,
@@ -45,7 +45,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    return toUserDto(user);
   }
 
   async findAll(): Promise<UserDto[]> {
