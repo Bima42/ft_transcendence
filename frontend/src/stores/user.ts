@@ -115,6 +115,5 @@ export const useUserStore = defineStore('auth', () => {
 		verifyTwoFaCode,
 		uploadAvatar,
 		updateAvatar,
-		testEndpoint,
 	}
 })
