@@ -47,7 +47,7 @@ export const useUserStore = defineStore('auth', () => {
 			return
 
 		patch(
-			`users/twofa/${user.value.id}`,
+			`2fa/${user.value.id}`,
 			'Failed to update user',
 			jsonHeaders,
 			{twoFA: status}
@@ -98,14 +98,11 @@ export const useUserStore = defineStore('auth', () => {
 	}
 
 	const updateAvatar = function (avatar: string) {
-		user.value!.avatar = `${avatar}`
-		localStorage.setItem('localUser', JSON.stringify(user.value))
-	}
+		// This cache key is used to force the browser to reload the image without changing the url
+		const cacheKey = new Date().getTime()
 
-	const testEndpoint = function () {
-		get(`users/id/${user.value?.id}`, 'Failed to get user')
-			.then(response => response.json())
-			.then(json => console.log(json))
+		user.value!.avatar = `${avatar}?${cacheKey}`
+		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
 
 	return {

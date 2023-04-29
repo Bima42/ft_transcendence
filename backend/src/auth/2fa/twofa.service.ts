@@ -5,6 +5,8 @@ import { User } from '@prisma/client';
 import { Response } from 'express';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
+import { UserDto } from '../../users/dto/user.dto';
+import { toUserDto } from '../../shared/mapper/user.mapper';
 
 @Injectable()
 export class TwoFaService {
@@ -13,7 +15,28 @@ export class TwoFaService {
 		private readonly usersService: UsersService
 	) {}
 
-	async verifyTwoFactorAuthCode(user: User, code: string) {
+	async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<UserDto> {
+		let user = await this.prismaService.user.findUnique({
+			where: {
+				id: +userId
+			}
+		})
+
+		if (user.twoFA !== enableTwoFA) {
+			user = await this.prismaService.user.update({
+				where: {
+					id: +userId
+				},
+				data: {
+					twoFA: { set: enableTwoFA }
+				}
+			});
+		}
+
+		return toUserDto(user);
+	}
+
+	verifyTwoFactorAuthCode(user: User, code: string) {
 		const verified = speakeasy.totp.verify({
 			secret: user.twoFASecret,
 			encoding: 'base32',
@@ -22,14 +45,7 @@ export class TwoFaService {
 		if (!verified) {
 			throw new BadRequestException('Invalid code');
 		}
-		this.prismaService.user.update({
-			where: {
-				id: user.id
-			},
-			data: {
-				twoFAAuthenticated: true
-			},
-		});
+		return true;
 	}
 
 	async generateTwoFactorAuthSecret(user: User) {

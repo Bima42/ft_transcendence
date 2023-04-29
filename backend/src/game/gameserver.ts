@@ -1,4 +1,4 @@
-import { Engine, Bodies, Common, Collision, Body, Render, Runner, Composite, Events, World } from "matter-js";
+import { Engine, Bodies, Common, Collision, Body, Composite } from "matter-js";
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
@@ -62,18 +62,18 @@ class Obstacle {
 }
 
 export class GameServer {
-  private ball: any;
-  private paddle1: any;
-  private paddle2: any;
+  private readonly ball: any;
+  private readonly paddle1: any;
+  private readonly paddle2: any;
   private IntervalUpdate: NodeJS.Timer;
   private IntervalSync: NodeJS.Timer;
   private disconnectTimeout: NodeJS.Timeout;
-  private startTimeout: NodeJS.Timeout;
-  private engine!: any;
-  private roomID: string;
-  private players: Socket[] = [];
+  private readonly startTimeout: NodeJS.Timeout;
+  private readonly engine!: any;
+  private readonly roomID: string;
+  private readonly players: Socket[] = [];
   private scores: Array<number> = [0, 0];
-  private maxScore: number = 5
+  private maxScore = 5
   private obstacles: Obstacle[] = [];
   private status: GameStatus = "STARTED";
   private hasStarted = false;
@@ -168,22 +168,23 @@ export class GameServer {
       this.onAbortGame("both players disconnected");
   }
 
-  onPlayerReconnect(client: Socket) {
+  onPlayerReconnect(newClient: Socket) {
     if (!this.hasStarted) {
       this.sendStateToClients()
       return;
     }
 
-    Logger.log(`Game#${this.roomID}: ${client.data.user.username} reconnected`);
+    Logger.log(`Game#${this.roomID}: ${newClient.data.user.username} reconnected`);
     clearTimeout(this.disconnectTimeout)
 
     // Socket shenanigans
-    client.join(this.roomID);
-    this.updateGameDataOnSockets();
-    client.data.isReady = true;
+    newClient.join(this.roomID);
+    newClient.data.isReady = true;
+    newClient.data.game = this.game;
+    newClient.data.gameServer = this;
     this.players.forEach((el, idx) => {
-      if (el.data.user.id == client.data.user.id && el.disconnected) {
-        this.players[idx] = client;
+      if (el.data.user.id == newClient.data.user.id && el.disconnected) {
+        this.players[idx] = newClient;
       }
     });
     this.sendStateToClients();
@@ -219,11 +220,11 @@ export class GameServer {
     this.server.to(this.roomID).emit("abortGame", reason)
   }
 
-  private onGameover(pointWon: PointWonDto) {
-      Logger.log(`Game#${this.roomID}: Gameover`);
-      this.status = "ENDED"
-      this.cleanupGameDataOnSockets()
-      this.server.to(this.roomID).emit("gameover", pointWon)
+  private onGameOver(pointWon: PointWonDto) {
+    Logger.log(`Game#${this.roomID}: Gameover`);
+    this.status = "ENDED"
+    this.cleanupGameDataOnSockets()
+    this.server.to(this.roomID).emit("gameover", pointWon)
   }
 
   onStartGame() {
@@ -255,7 +256,7 @@ export class GameServer {
       score2: this.scores[1],
     }
     if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
-      this.onGameover(pointWon);
+      this.onGameOver(pointWon);
     } else {
       this.server.to(this.roomID).emit("pointEnd", pointWon)
     }
@@ -341,13 +342,13 @@ export class GameServer {
   }
 
   private hitPaddle(ball: any, paddle: any) {
-    // Dont apply this when already past the paddle
+    // Don't apply this when already past the paddle
     if ((ball.position.x < worldWidth / 2 && ball.position.x < paddle.position.x)
         || (ball.position.x > worldWidth / 2 && ball.position.x > paddle.position.x)) {
       return;
     }
     const percentage = Common.clamp((ball.position.y - paddle.position.y + paddleSize.y / 2) / paddleSize.y, 0, 1)
-    var newAngle = 180 + bounceMinAngleDeg + (180 - 2 * bounceMinAngleDeg) * percentage;
+    let newAngle = 180 + bounceMinAngleDeg + (180 - 2 * bounceMinAngleDeg) * percentage;
     // Mirror symmetry for the paddle on the left
     if (ball.position.x < worldWidth / 2)
       newAngle *= -1;
@@ -357,13 +358,6 @@ export class GameServer {
       x: ballMaxSpeed * Math.sin(newAngle),
       y: ballMaxSpeed * Math.cos(newAngle)
     });
-  }
-
-  private updateGameDataOnSockets() {
-    this.players.forEach((s) => {
-      s.data.game = this.game;
-      s.data.gameServer = this;
-    })
   }
 
   private cleanupGameDataOnSockets() {
@@ -378,7 +372,7 @@ export class GameServer {
   }
 
   getPlayers(): User[] {
-    let players = [];
+    const players = [];
     players.push(this.players[0].data.user);
     players.push(this.players[1].data.user);
     return players;
@@ -396,4 +390,4 @@ export class GameServer {
       player2: users[1],
     };
   }
-};
+}

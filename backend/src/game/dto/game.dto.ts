@@ -1,4 +1,5 @@
 import { IsNumber, IsPositive } from 'class-validator'
+import { User } from '@prisma/client';
 
 // What the client send when he moves its paddle
 export class PlayerMoveDto {
@@ -38,4 +39,10 @@ export class WorldStateDto {
     vx: number
     vy: number
   }[]
+}
+
+export class EndGamePlayer {
+  datas: User
+  @IsNumber()
+  score: number
 }

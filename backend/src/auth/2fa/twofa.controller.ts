@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Patch, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { RequestWithUser } from '../../interfaces/request-with-user.interface';
 import { Response } from 'express';
 import { TwoFaService } from './twofa.service';
+import { UserDto } from '../../users/dto/user.dto';
 
 @Controller('2fa')
 export class TwoFaController {
@@ -11,6 +12,14 @@ export class TwoFaController {
 		private readonly twoFaService: TwoFaService
 	) {}
 
+	@Patch(':id')
+	async updateUserTwoFa(
+		@Param('id', ParseIntPipe) userId: number,
+		@Body() datas: any
+	): Promise<UserDto> {
+		return this.twoFaService.updateTwoFaStatus(userId, datas.twoFA);
+	}
+
 	@Post('verify')
 	async verify2fa(
 		@Req() req: RequestWithUser,
@@ -18,9 +27,8 @@ export class TwoFaController {
 		@Body() datas: { code: string }
 	){
 		const user = req.user;
-		console.log(user);
 		try {
-			await this.twoFaService.verifyTwoFactorAuthCode(user, datas.code);
+			this.twoFaService.verifyTwoFactorAuthCode(user, datas.code);
 
 			if (req.cookies[process.env.JWT_COOKIE])
 				res.clearCookie(process.env.JWT_COOKIE);

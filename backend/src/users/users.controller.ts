@@ -6,13 +6,10 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
-  Res,
   UseGuards,
   ParseIntPipe,
   UseInterceptors, UploadedFile, ParseFilePipeBuilder
 } from '@nestjs/common';
-import { Response } from 'express';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
@@ -21,6 +18,7 @@ import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { UserDto } from './dto/user.dto';
 
 const storage = {
   storage: diskStorage({
@@ -43,9 +41,8 @@ export class UsersController {
   ) {}
 
   @Get('all')
-  async getAllUsers(@Req() req: RequestWithUser, @Res() res: Response) {
-    const users = await this.usersService.findAll();
-    res.status(200).send({ users });
+  async getAllUsers(): Promise<UserDto[]> {
+    return await this.usersService.findAll();
   }
 
   /**
@@ -55,23 +52,15 @@ export class UsersController {
    * @param userId
    */
   @Get('id/:id')
-  async getUserById(@Param('id', ParseIntPipe) userId: number) {
+  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<User> {
     return this.usersService.findById(userId);
-  }
-
-  @Patch('twofa/:id')
-  async updateUserTwoFa(
-      @Param('id', ParseIntPipe) userId: number,
-      @Body() datas: any
-  ) {
-    return this.usersService.updateTwoFaStatus(userId, datas.twoFA);
   }
 
   @Patch('id/:id')
   async updateUser(
         @Param('id', ParseIntPipe) userId: number,
         @Body() data: User
-  ): Promise<User> {
+  ): Promise<UserDto> {
       return this.usersService.updateData(userId, data);
   }
 
@@ -92,5 +81,15 @@ export class UsersController {
       )  file: Express.Multer.File
   ) {
       return this.usersService.updateAvatar(userId, file.path);
+  }
+
+  @Get('games/:id')
+  async getGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getPlayedGamesByUserId(userId);
+  }
+
+  @Get('games/win/:id')
+  async getWinGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
+      return this.usersService.getWinGamesByUserId(userId);
   }
 }

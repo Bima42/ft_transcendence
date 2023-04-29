@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "elo" INTEGER NOT NULL DEFAULT 800;

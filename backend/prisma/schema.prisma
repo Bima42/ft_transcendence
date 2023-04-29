@@ -13,15 +13,16 @@ datasource db {
 model User {
   id                 Int           @id @unique @default(autoincrement())
   twoFA              Boolean       @default(false)
-  twoFAAuthenticated Boolean?      @default(false)
+  twoFAAuthenticated Boolean       @default(false)
   twoFASecret        String?
   fortyTwoId         Int?
   username           String        @unique @db.VarChar(255)
   email              String        @unique
-  avatar             String?
+  avatar             String        @default("./uploads/default.png")
   firstName          String?
   lastName           String?
   phone              String?
+  elo                Int           @default(800)
   status             UserStatus    @default(OFFLINE)
   chats              UserChat[]
   games              UserGame[]
@@ -82,7 +83,7 @@ model UserGame {
   gameId Int
   user   User @relation(fields: [userId], references: [id])
   userId Int
-  score  Int @default(0)
+  score  Int  @default(0)
 }
 
 model Game {
