@@ -12,13 +12,14 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
-	faComments, faChevronRight
+	faComments, faChevronRight, faGamepad
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
-	faComments, faChevronRight)
+	faComments, faChevronRight, faGamepad
+)
 
 createApp(App)
 	.component('font-awesome-icon', FontAwesomeIcon)

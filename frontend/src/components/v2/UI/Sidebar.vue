@@ -12,15 +12,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
+import {ref} from 'vue'
+import {useUserStore} from '@/stores/user'
+import {useRouter} from 'vue-router'
 
 const isActive = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
 const sidebarElement = ref({
+    game: {
+        icon: 'fa-gamepad',
+        id: 'game',
+        route: '/main/game'
+    },
     chat: {
         icon: 'fa-comments',
         id: 'chat',
