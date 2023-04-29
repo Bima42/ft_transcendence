@@ -9,9 +9,17 @@ import '@/assets/main.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import { faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import {
+	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
+	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
+	faComments, faChevronRight, faGamepad
+} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft)
+library.add(
+	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
+	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
+	faComments, faChevronRight, faGamepad
+)
 
 createApp(App)
 	.component('font-awesome-icon', FontAwesomeIcon)

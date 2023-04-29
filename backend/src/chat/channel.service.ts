@@ -92,7 +92,6 @@ export class ChannelService {
         channels.push(generalChannel);
       }
     }
-
     return channels;
   }
 
