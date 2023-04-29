@@ -1,6 +1,6 @@
 <template>
     <div class="message_wrap" :class="side">
-        <div class="sender" v-show="side === 'left'">
+        <div class="sender" @click="toggleUserActions(props.userName)" v-show="side === 'left'">
             {{ props.userName }}
         </div>
         <div class="content">
@@ -14,6 +14,9 @@
 
 <script setup lang="ts">
 import { defineProps, computed, ref } from 'vue'
+import { useModalStore } from '@/stores/modal'
+import TheModal from '@/components/modal/TheModal.vue'
+import UserActions from '@/components/chat/UserActions.vue'
 
 const props = defineProps<{
     fromUser: number
@@ -21,9 +24,15 @@ const props = defineProps<{
     userName: string
 }>()
 
+const modalStore = useModalStore()
+
 let side = ref(computed(() => {
     return props.fromUser === props.userIs ? 'right' : 'left'
 }))
+
+const toggleUserActions = (user: string) => {
+    modalStore.loadAndDisplay(TheModal, UserActions, { user: user })
+}
 
 </script>
 

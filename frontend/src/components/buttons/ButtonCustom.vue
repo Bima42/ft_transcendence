@@ -75,6 +75,14 @@ button {
         }
     }
 
+    &.big {
+        padding: 10px;
+        img {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
     &:disabled {
         filter: brightness(0.5);
         cursor: not-allowed;

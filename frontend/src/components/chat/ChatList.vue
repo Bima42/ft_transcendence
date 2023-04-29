@@ -1,7 +1,7 @@
 <template>
     <div class="content_element" v-for="chatRoom in currentChatList" :id="chatRoom.id"
          @click="toggleChat(chatRoom.id)">
-        <h1>Chats {{ chatRoom.name }}</h1>
+        <h1>{{ chatRoom.name }}</h1>
         <font-awesome-icon icon="fa-chevron-right"/>
     </div>
 </template>
