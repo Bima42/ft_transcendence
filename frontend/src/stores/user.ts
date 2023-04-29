@@ -116,4 +116,4 @@ export const useUserStore = defineStore('user', () => {
 		uploadAvatar,
 		updateAvatar,
 	}
-})
+});
