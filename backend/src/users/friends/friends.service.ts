@@ -135,21 +135,39 @@ export class FriendsService {
 	}
 
 	async getAllWaitingRequests(userId: number) {
-		return this.prismaService.friendship.findMany({
+		const requests = await this.prismaService.friendship.findMany({
 			where: {
 				userId: userId,
 				status: FriendshipStatus.PENDING
 			},
 		});
+
+		const waitingRequests = [];
+		for (const request of requests) {
+			const id = request.userId === userId ? request.friendId : request.userId;
+			const user = await this.usersService.findById(id);
+			waitingRequests.push(toUserDto(user));
+		}
+
+		return waitingRequests;
 	}
 
 	async getAllPendingRequests(userId: number) {
-		return this.prismaService.friendship.findMany({
+		const requests = await this.prismaService.friendship.findMany({
 			where: {
 				friendId: userId,
 				status: FriendshipStatus.PENDING
 			},
 		});
+
+		const pendingRequests = [];
+		for (const request of requests) {
+			const id = request.userId === userId ? request.friendId : request.userId;
+			const user = await this.usersService.findById(id);
+			pendingRequests.push(toUserDto(user));
+		}
+
+		return pendingRequests;
 	}
 
 

@@ -23,7 +23,7 @@ export class FriendsController {
 
 	@Post('add/:friendName')
 	@ApiProperty({ type: String })
-	async addFriend(@Param('friendName') friendName: string,@Req() req: RequestWithUser) {
+	async addFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
 		return await this.friendsService.addFriend(req.user.id, friendName);
 	}
 

@@ -4,7 +4,7 @@ import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie';
 import {ref} from 'vue'
 
-export const useUserStore = defineStore( 'auth', () => {
+export const useUserStore = defineStore( 'user', () => {
 	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
