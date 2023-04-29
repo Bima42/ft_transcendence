@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { UsersService } from '../users.service';
 import { Response, NextFunction } from 'express';
 import { AuthService } from '../../auth/auth.service';
@@ -21,13 +21,12 @@ export class UsersMiddleware implements NestMiddleware {
 		try {
 			const verifiedToken = this.authService.verifyToken(token);
 			const user = await this.usersService.findById(verifiedToken.sub);
-			if (user) {
-				req.user = user;
-			}
-			else {
+			if (!user) {
 				res.clearCookie(process.env.JWT_COOKIE);
 				res.status(401).send('Unauthorized, user not found');
+				return;
 			}
+			req.user = user;
 			next();
 		} catch (e) {
 			res.clearCookie(process.env.JWT_COOKIE);

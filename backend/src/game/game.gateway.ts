@@ -1,10 +1,8 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
-import { User } from '@prisma/client';
 import { GameService } from './game.service';
-import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
-import { GameServer } from './gameserver'
+import { JoinQueueDto } from './dto/joinQueueData.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -52,14 +50,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     }
 
     private async verifyUser(token: string) : Promise<UserDto> {
+      if (!token)
+        return null;
 
-        if (!token)
-          return null;
-
-        const userId = this.authService.verifyToken(token);
-        const user = await this.usersService.findById(userId.sub);
-
+      try {
+        const verifiedToken = this.authService.verifyToken(token);
+        const user = await this.usersService.findById(verifiedToken.sub);
         return toUserDto(user);
+      } catch (err) {
+        throw new UnauthorizedException("Invalid token");
+      }
     }
 
   async handleConnection(client: any, ...args: any[]) {
