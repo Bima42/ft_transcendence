@@ -1,5 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PlayerStatsDto } from '../dto/user.dto';
 import { UserStatsService } from './userstats.service';
@@ -7,7 +6,6 @@ import { UserStatsService } from './userstats.service';
 @Controller('users/stats')
 @ApiTags('users/stats')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard)
 export class UserStatsController {
 	constructor(
 		private readonly userStatsService: UserStatsService

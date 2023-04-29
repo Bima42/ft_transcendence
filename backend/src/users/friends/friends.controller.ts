@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { FriendsService } from './friends.service';
 import { RequestWithUser } from '../../interfaces/request-with-user.interface';
@@ -8,7 +7,6 @@ import { UsersService } from '../users.service';
 @Controller('friends')
 @ApiTags('Friends')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard)
 export class FriendsController {
 	constructor(
 		private readonly friendsService: FriendsService,

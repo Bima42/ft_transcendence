@@ -28,8 +28,10 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const logout = function () {
-		if (!user.value)
+		if (!user.value) {
+			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
 			return
+		}
 		get(`auth/logout/${user.value.id}`, 'Failed to logout').then(() => {
 			user.value = null
 			localStorage.removeItem('localUser');

@@ -4,7 +4,6 @@ import { UsersController } from './users.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersMiddleware } from './middlewares/users.middleware';
 import { AuthService } from '../auth/auth.service';
-import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
@@ -37,7 +36,6 @@ import { FriendsService } from './friends/friends.service';
     PrismaService,
     UsersMiddleware,
     AuthService,
-    JwtStrategy
   ],
   exports: [UsersService, UsersMiddleware, AuthService],
 })
