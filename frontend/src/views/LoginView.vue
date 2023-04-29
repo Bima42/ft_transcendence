@@ -1,58 +1,66 @@
 <template>
-  <section class="login-wrapper">
-    <img alt="42 logo" style="width: 200px; height: 200px" src="@/assets/logo.png">
-    <div class="buttons-container">
-      <LoginButton styles="fat">Login with 42</LoginButton>
-      <CustomButton styles="fat" @click="loginAsBob">Login as bob</CustomButton>
-    </div>
-  </section>
+    <section class="login-wrapper">
+        <img src="@/assets/img/logo_name.svg" alt="logo" class="logo">
+        <ButtonCustom :loading="loading" :click="login" :style="'login'">
+            Login with 42
+        </ButtonCustom>
+    </section>
 </template>
 
 <script setup lang="ts">
-import {useRouter} from 'vue-router'
-import LoginButton from "@/components/LoginButton.vue";
-import CustomButton from '@/components/multiusage/CustomButton.vue'
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
-async function loginAsBob() {
-  const redirect = "https://localhost:4443/api/auth/bob"
-  window.open(redirect, '_self')
+const loading = ref(false)
+
+const userStore = useUserStore()
+
+async function login() {
+    loading.value = true;
+    userStore.redirect()
 }
-
-const router = useRouter()
 </script>
 
 <style scoped lang="scss">
-$button-gap: 10px;
 .login-wrapper {
-  grid-area: $main;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  form {
+    grid-area: $bigmain;
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-direction: column;
-  }
+    width: 90%;
+    height: 100%;
+    gap: 40px;
+    animation: appear 1s cubic-bezier(.25, .46, .45, .94) forwards;
+
+    img {
+        animation: slide-top 1s cubic-bezier(.25, .46, .45, .94) forwards;
+    }
+
+    @keyframes slide-top {
+        0% {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        50% {
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 100%;
+        }
+    }
+    @keyframes appear {
+        0% {
+            opacity: 0;
+        }
+        50% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 100%;
+        }
+    }
 }
-
-.buttons-container {
-  margin-top: $button-gap;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: center;
-  gap: 10px;
-  width: 20vw;
-
-  button {
-    width: calc(50% - $button-gap / 2);
-    height: 4vh;
-  }
-}
-
 </style>

@@ -29,7 +29,7 @@ const sidebarElement = ref({
     chat: {
         icon: 'fa-comments',
         id: 'chat',
-        route: '/main/community2'
+        route: '/main/community'
     },
     user: {
         icon: 'fa-user',

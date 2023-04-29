@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import UsernameInput from '@/components/v2/user/UsernameInput.vue';
+import UsernameInput from '@/components/user/UsernameInput.vue';
 import UserAvatar from '@/components/multiusage/UserAvatar.vue';
-import UserHighestScore from '@/components/v2/user/UserHighestScore.vue';
+import UserHighestScore from '@/components/user/UserHighestScore.vue';
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import { post } from '../../../../utils';

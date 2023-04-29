@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { defineProps, ref } from 'vue'
-import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const loading = ref(false)
 const props = defineProps<{}>()

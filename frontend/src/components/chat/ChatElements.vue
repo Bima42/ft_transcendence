@@ -22,7 +22,7 @@
  */
 import { onMounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
-import ChatMessage from '@/components/v2/chat/ChatMessage.vue'
+import ChatMessage from '@/components/chat/ChatMessage.vue'
 import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()

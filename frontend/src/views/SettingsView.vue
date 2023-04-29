@@ -21,10 +21,10 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { useUserStore } from '@/stores/user'
-import UserPicture from '@/components/v2/avatar/UserPicture.vue'
-import UserHighestScore from '@/components/v2/user/UserHighestScore.vue'
-import UploadAvatarButtons from '@/components/v2/avatar/UploadAvatarButtons.vue'
-import UserCredentialsSettings from '@/components/v2/user/UserCredentialsSettings.vue'
+import UserPicture from '@/components/avatar/UserPicture.vue'
+import UserHighestScore from '@/components/user/UserHighestScore.vue'
+import UploadAvatarButtons from '@/components/avatar/UploadAvatarButtons.vue'
+import UserCredentialsSettings from '@/components/user/UserCredentialsSettings.vue'
 
 const userStore = useUserStore()
 

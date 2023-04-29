@@ -17,11 +17,10 @@ import {defineProps, ref} from 'vue'
 import {useModalStore} from '@/stores/modal'
 
 const modalStore = useModalStore()
-
 const props = defineProps<{}>()
 const toggled = ref(false);
-
 const allCommands = modalStore.data.list as object
+
 function dropMenu() {
     toggled.value = !toggled.value;
 }
@@ -51,5 +50,4 @@ h2 {
     font-size: 10pt;
     font-weight: 400;
 }
-
 </style>

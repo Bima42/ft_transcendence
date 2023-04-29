@@ -21,8 +21,8 @@
 <script setup lang="ts">
 import {useUserStore} from '@/stores/user'
 import {defineProps, ref} from 'vue'
-import {post} from '../../../../utils'
-import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
+import {post} from '../../../utils'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const props = defineProps<{}>()
 const userStore = useUserStore()

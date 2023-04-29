@@ -1,9 +1,5 @@
 <template>
     <section class="UI-grid">
-<!--                <template v-if="route.name !== 'home'">-->
-<!--                    <HeaderPack></HeaderPack>-->
-<!--                    <MainMenu></MainMenu>-->
-<!--                </template>-->
         <template v-if="route.name !== 'landing page'">
             <Sidebar />
             <HeaderLogo />
@@ -16,20 +12,18 @@
                 <component :is="Component"/>
             </Transition>
         </router-view>
-        <CreditLink v-if="route.name !== 'community2'"></CreditLink>
+        <CreditLink v-if="route.name !== 'community'"></CreditLink>
     </section>
 </template>
 
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
 
-import HeaderPack from '@/components/headers/HeaderPack.vue'
 import CreditLink from '@/components/footers/CreditLink.vue'
-import Sidebar from '@/components/v2/UI/Sidebar.vue'
-import MainMenu from '@/components/MainMenu.vue'
+import Sidebar from '@/components/UI/Sidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
-import HeaderLogo from '@/components/v2/HeaderLogo.vue';
+import HeaderLogo from '@/components/HeaderLogo.vue';
 
 const route = useRoute()
 const modalStore = useModalStore()

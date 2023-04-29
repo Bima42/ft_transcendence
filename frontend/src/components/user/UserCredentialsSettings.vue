@@ -17,11 +17,11 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { useModalStore } from '@/stores/modal'
-import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue'
-import UsernameInput from '@/components/v2/user/UsernameInput.vue'
-import TwoFaInputs from '@/components/v2/user/TwoFaInputs.vue'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import UsernameInput from '@/components/user/UsernameInput.vue'
+import TwoFaInputs from '@/components/user/TwoFaInputs.vue'
 import Modal from '@/components/modal/TheModal.vue'
-import ChangePasswordInputs from '@/components/v2/user/ChangePasswordInputs.vue'
+import ChangePasswordInputs from '@/components/user/ChangePasswordInputs.vue'
 
 
 const props = defineProps<{}>()

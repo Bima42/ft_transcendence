@@ -12,13 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import {put} from '../../../utils';
-import {ref} from 'vue'
-import {useChatStore} from '@/stores/chat';
-import {useUserStore} from '@/stores/user';
-import ChatCommandHelper from '@/components/chat/chatcommands/ChatCommandHelper.vue';
+import { put } from '../../../utils';
+import { ref } from 'vue'
+import { useChatStore } from '@/stores/chat';
+import { useUserStore } from '@/stores/user';
+import ChatCommandHelper from '@/components/chat/ChatCommandHelper.vue';
 import type IChatAction from '@/interfaces/chat/IChatAction';
-import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const msgContent = ref('');
 const chatStore = useChatStore();
@@ -27,12 +27,10 @@ const userStore = useUserStore();
 async function executeCommand(cmd: string[]) {
     if (!chatStore.currentChat)
         return;
-
     const commandsList = [
         // owner commands
         'deleteChannel',  // Delete the current channel
         'setPassword',    // Set the password to join a protected channel
-
         // admin commands
         'add',            // add a user to the channel
         'kick',           // kick a user from the channel
@@ -40,13 +38,11 @@ async function executeCommand(cmd: string[]) {
         'mute',           // mute the user for a while
         'promote',        // make a user channel administrator
         'demote',         // make a user a simple user
-
         // user commands
         'leave',           // Leave the current channel
         'addFriend',       // Add another user to its friends
         'invite',          // Invite another user to play !
     ];
-
     const cmdName = cmd[0].slice(1);
     let url = `chat/rooms/${chatStore.currentChat.id}/user`;
     let action: IChatAction;
@@ -66,7 +62,6 @@ async function executeCommand(cmd: string[]) {
             await put(url, `cannot ${cmdName} user`, action)
                 .catch(err => console.error(err))
             break;
-
         case 'leave':
             url = `chat/rooms/${chatStore.currentChat.id}/leave`;
             await put(url, `cannot leave channel`, {})

@@ -1,5 +1,7 @@
 <template>
-    <button @click="toggleHelpBoxModal"><font-awesome-icon icon="fa-solid fa-question" /></button>
+    <button @click="toggleHelpBoxModal">
+        <font-awesome-icon icon="fa-solid fa-question"/>
+    </button>
     <div class="helpbox-tooltip" v-show="helpBox">
         <h1>List of commands:</h1>
         <ChatCommand v-for="(commandList, name) in allCommands" :list="commandList">{{ name }}</ChatCommand>
@@ -7,67 +9,66 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
-import ChatCommand from '@/components/chat/chatcommands/ChatCommand.vue'
-import { useModalStore } from '@/stores/modal'
+import {defineProps, ref} from 'vue'
+import ChatCommand from '@/components/chat/ChatCommand.vue'
+import {useModalStore} from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue';
 
 const modalStore = useModalStore()
-
 const props = defineProps<{}>()
-
 const helpBox = ref(false);
+
 function toggleHelpBoxModal() {
-    modalStore.loadAndDisplay(TheModal, ChatCommand, { list: allCommands.value })
+    modalStore.loadAndDisplay(TheModal, ChatCommand, {list: allCommands.value})
 }
 
 const allCommands = ref({
-    "Owner": [
+    'Owner': [
         {
-            "command": "/deleteChannel",
-            "description": "Delete the current channel"
+            'command': '/deleteChannel',
+            'description': 'Delete the current channel'
         },
         {
-            "command": "/setPassword",
-            "description": "Set the password to join a protected channel"
+            'command': '/setPassword',
+            'description': 'Set the password to join a protected channel'
         }],
-    "Admin": [
+    'Admin': [
         {
-            "command": "/add",
-            "description": "Adds a user to the channel"
+            'command': '/add',
+            'description': 'Adds a user to the channel'
         },
         {
-            "command": "/kick",
-            "description": "Kick a user from the channel"
+            'command': '/kick',
+            'description': 'Kick a user from the channel'
         },
         {
-            "command": "/ban",
-            "description": "Ban a user from the channel"
+            'command': '/ban',
+            'description': 'Ban a user from the channel'
         },
         {
-            "command": "/mute",
-            "description": "Mute the user for a while"
+            'command': '/mute',
+            'description': 'Mute the user for a while'
         },
         {
-            "command": "/promote",
-            "description": "Promote a user to administrator"
+            'command': '/promote',
+            'description': 'Promote a user to administrator'
         },
         {
-            "command": "/demote",
-            "description": "Demotes an admin to user"
+            'command': '/demote',
+            'description': 'Demotes an admin to user'
         }],
-    "User": [
+    'User': [
         {
-            "command": "/leave",
-            "description": "Leave the current channel"
+            'command': '/leave',
+            'description': 'Leave the current channel'
         },
         {
-            "command": "/addFriend",
-            "description": "Add another user to its friends"
+            'command': '/addFriend',
+            'description': 'Add another user to its friends'
         },
         {
-            "command": "/invite",
-            "description": "Invite another user to play !"
+            'command': '/invite',
+            'description': 'Invite another user to play !'
         }]
 });
 </script>
@@ -100,7 +101,6 @@ button {
     padding: 5px;
     color: black;
     z-index: 100;
-
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -111,5 +111,4 @@ button {
         font-size: 20px;
     }
 }
-
 </style>

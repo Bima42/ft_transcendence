@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import XButton from '@/components/multiusage/XButton.vue'
+import XButton from '@/components/buttons/XButton.vue'
 import { useModalStore } from '@/stores/modal'
 
 const modalStore = useModalStore()

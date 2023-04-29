@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import ButtonCustom from '@/components/v2/buttons/ButtonCustom.vue';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const editing = ref(true);
 
