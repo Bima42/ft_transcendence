@@ -1,13 +1,11 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import IndexView from '@/views/IndexView.vue'
-import LoginView from '@/views/LoginView.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 import CreditsView from '@/views/CreditsView.vue'
 import PlayAGameView from '@/views/PlayAGameView.vue'
-import ScoreBoardView from '@/views/ScoreBoardView.vue'
-import CommunityView from '@/views/CommunityView.vue'
-import TableView from '@/components/table/TheTable.vue'
-import JoinQueueView from '@/views/JoinQueue.vue'
-import redirectHandler from '@/components/redirectHandler.vue';
+import redirectHandler from '@/components/redirectHandler.vue'
+import LoginView from '@/views/LoginView.vue'
+import IndexView from '@/views/IndexView.vue'
+import SettingsView from '@/views/SettingsView.vue';
+import CommunityView from '@/views/CommunityView.vue';
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
 
@@ -16,23 +14,23 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'home',
+            name: 'landing page',
             component: LoginView,
         },
         {
             path: '/index',
-            name: 'index',
+            name: 'index2',
             component: IndexView,
+        },
+        {
+            path: '/settings',
+            name: 'settings',
+            component: SettingsView,
         },
         {
             path: '/credits',
             name: 'credits',
             component: CreditsView,
-        },
-        {
-            path: '/table',
-            name: 'table',
-            component: TableView,
         },
         {
             path: '/main',
@@ -42,18 +40,6 @@ const router = createRouter({
                     path: 'game',
                     name: 'game',
                     component: PlayAGameView,
-                },
-                {
-                    path: 'play',
-                    name: 'play',
-                    component: JoinQueueView,
-                    longName: 'Join queue',
-                },
-                {
-                    path: 'score',
-                    name: 'score',
-                    component: ScoreBoardView,
-                    longName: 'Scoreboard',
                 },
                 {
                     path: 'community',
