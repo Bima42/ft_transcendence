@@ -4,9 +4,8 @@
             v-if="chatStore.isChatOpen"
             v-for="message in chatStore.currentChat.messages"
             :key="message.id"
-            :fromUser="message.user.id"
+            :sender="message.user"
             :userIs="currentUser"
-            :userName="message.user.username"
         >
             {{ message.content }}
         </ChatMessage>

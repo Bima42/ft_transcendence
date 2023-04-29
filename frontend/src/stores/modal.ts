@@ -17,6 +17,12 @@ export const useModalStore = defineStore('modal', () => {
         data.value = {}
     }
 
+    const resetStateKeepData = function () {
+        show.value = false
+        type.value = {}
+        component.value = {}
+    }
+
     const loadAndDisplay = function (newType: Component, newComponent: Component, newData: any) {
         type.value = newType;
         component.value = newComponent;
@@ -34,6 +40,7 @@ export const useModalStore = defineStore('modal', () => {
         component,
         data,
         resetState,
+        resetStateKeepData,
         loadAndDisplay,
         toggleModal,
     }

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import UsernameInput from '@/components/user/UsernameInput.vue';
-import UserAvatar from '@/components/multiusage/UserAvatar.vue';
+import UserAvatar from '@/components/avatar/UserAvatar.vue';
 import UserHighestScore from '@/components/user/UserHighestScore.vue';
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
