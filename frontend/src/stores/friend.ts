@@ -113,9 +113,9 @@ export const useFriendStore = defineStore( 'friend', () => {
 	 *                                                                       *
 	 *************************************************************************/
 
-		const blockUser = function(friendName: string) {
+		const blockUser = function(username: string) {
 			post(
-				`friends/block/${friendName}`,
+				`friends/block/${username}`,
 				'Failed to block user',
 				jsonHeaders,
 			)
@@ -125,9 +125,9 @@ export const useFriendStore = defineStore( 'friend', () => {
 				});
 		}
 
-		const unblockUser = function(friendName: string) {
+		const unblockUser = function(username: string) {
 			post(
-				`friends/unblock/${friendName}`,
+				`friends/unblock/${username}`,
 				'Failed to unblock user',
 				jsonHeaders,
 			)
@@ -161,9 +161,9 @@ export const useFriendStore = defineStore( 'friend', () => {
 				});
 		}
 
-		const isBlocked = function(friendName: string) {
+		const isBlocked = function(username: string) {
 			get(
-				`friends/isBlocked/${friendName}`,
+				`friends/isBlocked/${username}`,
 				'Failed to check if blocked',
 				jsonHeaders,
 			)
