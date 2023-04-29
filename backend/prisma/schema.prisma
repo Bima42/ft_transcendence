@@ -11,27 +11,29 @@ datasource db {
 }
 
 model User {
-  id                 Int           @id @unique @default(autoincrement())
-  twoFA              Boolean       @default(false)
-  twoFAAuthenticated Boolean       @default(false)
+  id                 Int        @id @unique @default(autoincrement())
+  twoFA              Boolean    @default(false)
+  twoFAAuthenticated Boolean    @default(false)
   twoFASecret        String?
   fortyTwoId         Int?
-  username           String        @unique @db.VarChar(255)
-  email              String        @unique
-  avatar             String        @default("./uploads/default.png")
+  username           String     @unique @db.VarChar(255)
+  email              String     @unique
+  avatar             String     @default("./uploads/default.png")
   firstName          String?
   lastName           String?
   phone              String?
-  elo                Int           @default(800)
-  status             UserStatus    @default(OFFLINE)
-  chats              UserChat[]
-  games              UserGame[]
-  messages           ChatMessage[]
+  status             UserStatus @default(OFFLINE)
 
-  friendRequest Friendship[] @relation(name: "requester")
-  friends       Friendship[] @relation(name: "receiver")
-  blockers      User[]       @relation(name: "blocked")
-  blocked       User[]       @relation(name: "blocked")
+  elo Int @default(800)
+
+  chats    UserChat[]
+  games    UserGame[]
+  messages ChatMessage[]
+
+  friendshipAsked    Friendship[] @relation(name: "requester")
+  friendshipReceived Friendship[] @relation(name: "receiver")
+  blockers           User[]       @relation(name: "blocked")
+  blocked            User[]       @relation(name: "blocked")
 }
 
 model Friendship {
@@ -84,6 +86,7 @@ model UserGame {
   user   User @relation(fields: [userId], references: [id])
   userId Int
   score  Int  @default(0)
+  win    Int  @default(0)
 }
 
 model Game {

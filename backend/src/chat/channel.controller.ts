@@ -17,13 +17,14 @@ import { ChannelService } from './channel.service';
 import { ChatGateway } from './channel.gateway';
 import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { NewChatMessageDto } from './dto/message.dto';
 import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
 @ApiTags('Chat')
 @Controller('chat')
+@ApiBearerAuth('JWT')
 export class ChannelController {
   constructor(
     private channelService: ChannelService,

@@ -8,6 +8,10 @@ import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
+import { UserStatsController } from './stats/userstats.controller';
+import { UserStatsService } from './stats/userstats.service';
+import { FriendsController } from './friends/friends.controller';
+import { FriendsService } from './friends/friends.service';
 
 /**
  * Users module
@@ -25,9 +29,11 @@ import * as process from 'process';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, UserStatsController, FriendsController],
   providers: [
     UsersService,
+    UserStatsService,
+    FriendsService,
     PrismaService,
     UsersMiddleware,
     AuthService,
@@ -39,6 +45,6 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UsersMiddleware)
-      .forRoutes(UsersController);
+      .forRoutes(UsersController, FriendsController);
   }
 }

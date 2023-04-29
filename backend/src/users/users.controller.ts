@@ -12,13 +12,14 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { UserDto } from './dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 const storage = {
   storage: diskStorage({
@@ -33,8 +34,9 @@ const storage = {
 }
 
 @Controller('users')
+@ApiTags('Users')
+@ApiBearerAuth('JWT')
 @UseGuards(JwtAuthGuard)
-@ApiTags('users')
 export class UsersController {
   constructor(
       private readonly usersService: UsersService
@@ -52,8 +54,9 @@ export class UsersController {
    * @param userId
    */
   @Get('id/:id')
-  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<User> {
-    return this.usersService.findById(userId);
+  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<UserDto> {
+    const user = await this.usersService.findById(userId);
+    return toUserDto(user);
   }
 
   @Patch('id/:id')
@@ -83,13 +86,4 @@ export class UsersController {
       return this.usersService.updateAvatar(userId, file.path);
   }
 
-  @Get('games/:id')
-  async getGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getPlayedGamesByUserId(userId);
-  }
-
-  @Get('games/win/:id')
-  async getWinGamesByUserId(@Param('id', ParseIntPipe) userId: number) {
-      return this.usersService.getWinGamesByUserId(userId);
-  }
 }

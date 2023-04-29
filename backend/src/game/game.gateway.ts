@@ -8,6 +8,7 @@ import { GameServer } from './gameserver'
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 
 @WebSocketGateway({
@@ -50,14 +51,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       await this.gameService.onPlayerDisconnect(socket);
     }
 
-    private async verifyUser(token: string) : Promise<User> {
+    private async verifyUser(token: string) : Promise<UserDto> {
 
         if (!token)
           return null;
 
         const userId = this.authService.verifyToken(token);
+        const user = await this.usersService.findById(userId.sub);
 
-        return await this.usersService.findById(userId.sub);
+        return toUserDto(user);
     }
 
   async handleConnection(client: any, ...args: any[]) {

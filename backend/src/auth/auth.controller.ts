@@ -12,6 +12,7 @@ import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -70,6 +71,7 @@ export class AuthController {
   }
 
   @Get('logout/:id')
+  @ApiBearerAuth('JWT')
   async logout(
     @Res({ passthrough: true }) res,
     @Param() params: { id: number }

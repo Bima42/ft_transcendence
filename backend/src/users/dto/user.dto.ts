@@ -19,5 +19,46 @@ export class UserDto {
     twoFA: boolean;
 
     @IsEnum(UserStatus)
-    status: UserStatus
+    status: UserStatus;
+
+    fortyTwoId?: number;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    elo: number;
+}
+
+export class FriendDto {
+    @IsNotEmpty()
+    id: number;
+
+    @IsNotEmpty()
+    username: string;
+
+    firstName: string;
+    lastName: string;
+
+    @IsString()
+    @IsNotEmpty()
+    avatar: string;
+}
+
+export class BlockedDto {
+    @IsNotEmpty()
+    id: number;
+
+    @IsNotEmpty()
+    username: string;
+
+    @IsString()
+    @IsNotEmpty()
+    avatar: string;
+}
+
+export class PlayerStatsDto {
+    username: string;
+    playedGames: number;
+    wonGames: number;
+    winRate: number;
+    elo: number;
 }

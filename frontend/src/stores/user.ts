@@ -5,7 +5,7 @@ import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 
-export const useUserStore = defineStore('auth', () => {
+export const useUserStore = defineStore('user', () => {
 	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
@@ -116,4 +116,4 @@ export const useUserStore = defineStore('auth', () => {
 		uploadAvatar,
 		updateAvatar,
 	}
-})
+});
