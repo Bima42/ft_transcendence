@@ -19,6 +19,8 @@ import PhaserContainer from '@/components/PhaserContainer.vue'
 
 <style scoped lang="scss">
 .gamePong {
-  grid-area: $main;
+  grid-area: $gigamain;
+  width: 100%;
+  height: 100%;
 }
 </style>
