@@ -7,17 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseInterceptors, UploadedFile, ParseFilePipeBuilder
+  UseInterceptors, UploadedFile, ParseFilePipeBuilder, Req
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { Request } from 'express'
 import * as path from 'path';
-import { UserDto } from './dto/user.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
+import { UpdateUserDto, UserDto } from './dto/user.dto';
+import { User } from '@prisma/client';
+
 
 const storage = {
   storage: diskStorage({
@@ -63,10 +65,11 @@ export class UsersController {
    */
   @Patch('id/:id')
   async updateUser(
-        @Param('id', ParseIntPipe) userId: number,
-        @Body() data: User
+        @Req() req: Request,
+        @Param('id', ParseIntPipe) targetId: number,
+        @Body() data: UpdateUserDto
   ): Promise<UserDto> {
-      return this.usersService.updateData(userId, data);
+      return this.usersService.updateData(req.user as User, targetId, data);
   }
 
   @Delete('id/:id')

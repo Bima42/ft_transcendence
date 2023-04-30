@@ -1,5 +1,36 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class UpdateUserDto {
+
+  @IsOptional()
+  @Matches(/[a-zA-Z0-9_-]{2,20}/)
+  @ApiProperty({ required: false })
+  username?: string
+
+  @IsOptional()
+  @IsEmail()
+  @ApiProperty({ required: false })
+  email?: string
+
+  @IsOptional()
+  @MinLength(1)
+  @MaxLength(60)
+  @ApiProperty({ required: false })
+  firstName?: string
+
+  @IsOptional()
+  @MinLength(1)
+  @MaxLength(60)
+  @ApiProperty({ required: false })
+  lastName?: string
+
+  @IsOptional()
+  @IsPhoneNumber()
+  @ApiProperty({ required: false })
+  phone?: string
+}
 
 export class UserDto {
     @IsNotEmpty()
