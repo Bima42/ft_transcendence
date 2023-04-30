@@ -5,6 +5,7 @@ import { Logger } from "@nestjs/common";
 import { Game, GameStatus, User } from '@prisma/client';
 import { PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
 import { GameSettingsDto } from "./dto/joinQueueData.dto";
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 // At what pace the simulation is run
 const fps = 60;
@@ -386,8 +387,8 @@ export class GameServer {
     const users = this.getPlayers();
     return {
       game: this.game,
-      player1: users[0],
-      player2: users[1],
+      player1: toUserDto(users[0]),
+      player2: toUserDto(users[1]),
     };
   }
 }
