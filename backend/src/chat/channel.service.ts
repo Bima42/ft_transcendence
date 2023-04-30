@@ -16,6 +16,7 @@ import { DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
+import { toUserDto } from 'src/shared/mapper/user.mapper';
 
 @Injectable()
 export class ChannelService {
@@ -130,12 +131,19 @@ export class ChannelService {
       return newDto;
     }
 
+    const usersChatDto = users.map((el) => { return {
+      userId: el.userId,
+      chatId: el.chatId,
+      role: el.role,
+      mutedUntil: el.mutedUntil,
+      user: toUserDto(el.user)
+    }})
     const chatDto: DetailedChannelDto = {
       id: chatId,
       name: chat.name,
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt,
-      users: users,
+      users: usersChatDto,
     }
     return chatDto;
   }
@@ -251,30 +259,7 @@ export class ChannelService {
       }
     });
 
-    // Return full chat (with users)
-    const users = await this.prismaService.userChat.findMany({
-      where: { chatId: chatId },
-      select: {
-        id: true,
-        userId: true,
-        user: true,
-        chatId: true,
-        role: true,
-        mutedUntil: true
-      },
-      orderBy: [
-        { role: "asc", },
-        { userId: "desc", },
-      ],
-    })
-    const chatDto: DetailedChannelDto = {
-      id: chatId,
-      name: chat.name,
-      createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt,
-      users: users,
-    }
-    return chatDto;
+    return this.getChannelDetails(user, chatId);
   }
 
     async leaveChannel(user: User, chatId: number) {
