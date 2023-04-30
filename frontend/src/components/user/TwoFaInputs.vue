@@ -1,9 +1,11 @@
 <template>
     <section class="two_fa_wrap">
-        <div class="input_wrap">
-            <h3>Enable 2FA</h3>
-            <input type="checkbox" id="enableTwoFa" v-model="enableTwoFa" @click="toggleTwoFaStatus"/>
-        </div>
+        <ButtonCustom
+            @click.once="toggleTwoFaStatus"
+            :style="'small'"
+        >
+            Enable 2FA
+        </ButtonCustom>
         <ButtonCustom
             @click.once="generateQrCode"
             :style="'small'"
@@ -19,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import {useUserStore} from '@/stores/user'
-import {defineProps, ref} from 'vue'
-import {post} from '../../../utils'
+import { useUserStore } from '@/stores/user'
+import { defineProps, ref } from 'vue'
+import { post } from '../../../utils'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const props = defineProps<{}>()
@@ -31,10 +33,10 @@ const enableTwoFa = ref(false)
 const qrCodeImage = ref('')
 const toggleTwoFaStatus = () => {
     enableTwoFa.value = !enableTwoFa.value
+    userStore.updateTwoFaStatus(enableTwoFa.value)
 }
 
 const generateQrCode = () => {
-    userStore.updateTwoFaStatus(enableTwoFa.value)
     post('2fa/generate', 'Impossible to generate QR code: Please try again later')
         .then(response => response.json())
         .then(data => {
@@ -53,20 +55,6 @@ const generateQrCode = () => {
     gap: 20px;
     padding: 0 30px;
 
-    .input_wrap {
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-        gap: 20px;
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            color: $tertiary;
-        }
-    }
-
-
     .qr_code_wrap {
         display: flex;
         align-items: center;
@@ -77,6 +65,5 @@ const generateQrCode = () => {
         border-radius: 20px;
         color: $tertiary;
     }
-
 }
 </style>
