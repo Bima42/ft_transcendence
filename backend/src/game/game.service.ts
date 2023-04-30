@@ -6,6 +6,7 @@ import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
 import { EndGamePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
+import { toUserDto } from 'src/shared/mapper/user.mapper';
 
 
 @Injectable()
@@ -219,6 +220,10 @@ export class GameService {
 
   private async startGame(match: Game, players: Socket[]): Promise<void> {
     Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+
+    // Update user informations
+    players[0].data.user = toUserDto(await this.prismaService.user.findUnique(players[0].data.user.id))
+    players[1].data.user = toUserDto(await this.prismaService.user.findUnique(players[1].data.user.id))
 
     // Emit an event to the clients to indicate that a match has been found
     const gameSettings : GameSettingsDto = {
