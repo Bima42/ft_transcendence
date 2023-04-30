@@ -53,3 +53,7 @@ export class EndGamePlayer {
   userGame: UserGame
 }
 
+export class InvitePlayer {
+  gameType: GameType
+  userId: number
+}

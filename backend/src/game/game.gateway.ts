@@ -7,6 +7,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
+import { InvitePlayer } from './dto/game.dto';
 
 
 @WebSocketGateway({
@@ -111,6 +112,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('playerReady')
   handlePlayerIsReady(@ConnectedSocket() client: Socket) {
       return this.gameService.playerIsReady(client);
+  }
+
+  @SubscribeMessage('invitePlayer')
+  inviteSomebodyToPlay(@MessageBody() inviteSettings: InvitePlayer,
+    @ConnectedSocket() client: Socket) {
+      return this.gameService.inviteSomebodyToPlay(client, inviteSettings);
   }
 // }
 

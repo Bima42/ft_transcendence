@@ -5,7 +5,7 @@ import { Game, GameStatus, GameType } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
-import { EndGamePlayer } from './dto/game.dto';
+import { EndGamePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
 
 
 @Injectable()
@@ -178,6 +178,15 @@ export class GameService {
     });
   }
 
+  async createMatch(type: GameType , status: GameStatus): Promise<Game> {
+    return await this.prismaService.game.create({
+        data: {
+            type: type,
+            status: status
+        }
+    });
+  }
+
   //   This function finds an available game with status 'SEARCHING' and returns it.
   // If no game is found, it creates a new game with status 'SEARCHING' and returns it.
   async findOrCreateMatch(gameSettings: JoinQueueDto): Promise<Game> {
@@ -189,18 +198,11 @@ export class GameService {
         },
     });
 
-    // If an available game is found, return it
     if (availableGame) {
-        return availableGame;
+      return availableGame;
+    } else {
+      return await this.createMatch(gameSettings.type, 'SEARCHING')
     }
-
-    // If no available game is found, create a new game with status 'SEARCHING' and return it
-    return this.prismaService.game.create({
-        data: {
-            type: gameSettings.type,
-            status: 'SEARCHING'
-        }
-    });
   }
 
   // This function creates a new UserGame associated with the provided match object and returns it.
@@ -283,6 +285,40 @@ export class GameService {
       return null;
     }
     return currentServer.toGameSettingsDto();
+  }
+
+  async inviteSomebodyToPlay(client: Socket, inviteSettings: InviteSettings) {
+    Logger.log(`Invited to play: ${JSON.stringify(inviteSettings)}`)
+    // cannot invite if already in a game
+    if (this.getCurrentGame(client.data.user))
+      return ;
+
+    const game = await this.prismaService.game.findFirst({
+      where: {
+        users: { some: { userId: client.data.user.id }},
+        status: { in: ['SEARCHING', 'INVITING', 'STARTED']}
+      }
+    })
+    if (game) {
+      Logger.log(`Invite: already in a game`)
+      return ;
+    }
+
+    const otherUser = await this.prismaService.user.findUnique({
+      where: { id: inviteSettings.userId }
+    })
+    if (!otherUser) {
+      Logger.log(`Invite: cannot find other user`)
+      return ;
+    }
+
+    const newGame = await this.createMatch(inviteSettings.gameType, 'INVITING')
+    const settings: GameSettingsDto = {
+      player1: client.data.user,
+      player2: otherUser,
+      game: newGame,
+    }
+    this.server.to(otherUser.username).emit("gameInvitation", settings)
   }
 
 }
