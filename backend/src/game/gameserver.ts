@@ -3,7 +3,7 @@ import { Engine, Bodies, Common, Collision, Body, Composite } from "matter-js";
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { Game, GameStatus, User, UserGame } from '@prisma/client';
-import { EndGamePlayer, PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
+import { EndGamePlayer, GameoverDto, PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
 import { GameSettingsDto } from "./dto/joinQueueData.dto";
 import { toUserDto } from '../shared/mapper/user.mapper';
 import { UserDto } from "src/users/dto/user.dto";
@@ -221,12 +221,16 @@ export class GameServer {
     this.server.to(this.roomID).emit("abortGame", reason)
   }
 
-  private onGameOver(pointWon: PointWonDto) {
+  private onGameOver() {
     Logger.log(`Game#${this.roomID}: Gameover`);
-    // FIXME: send gameoverData
-    this.server.to(this.roomID).emit("gameover", pointWon)
     this.players[0].data.userGame.win = this.scores[0] > this.scores[1] ? 1 : 0
     this.players[1].data.userGame.win = this.scores[1] > this.scores[0] ? 1 : 0
+    const gameoverData : GameoverDto = {
+      winnerId: this.players[0].data.userGame.win ? this.players[0].data.user.id : this.players[1].data.user.id,
+      score1: this.scores[0],
+      score2: this.scores[1],
+    }
+    this.server.to(this.roomID).emit("gameover", gameoverData);
     this.status = "ENDED"
   }
 
@@ -259,7 +263,7 @@ export class GameServer {
       score2: this.scores[1],
     }
     if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
-      this.onGameOver(pointWon);
+      this.onGameOver();
     } else {
       this.server.to(this.roomID).emit("pointEnd", pointWon)
     }

@@ -16,6 +16,12 @@ export class PointWonDto {
     score2: number
 }
 
+export class GameoverDto {
+    winnerId: number
+    score1: number
+    score2: number
+}
+
 /**
 * @brief What the server send on every sync
 */
