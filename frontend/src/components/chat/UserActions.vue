@@ -1,6 +1,6 @@
 <template>
     <section class="user_actions">
-        <h2>{{ modalStore.data.user.username }}</h2>
+        <h2>{{ modalStore.data.username }}</h2>
         <ButtonCustom :style="'big'" :click="toggleNewModal">
             View profile
         </ButtonCustom>

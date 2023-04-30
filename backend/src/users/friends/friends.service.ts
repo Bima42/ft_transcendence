@@ -60,14 +60,22 @@ export class FriendsService {
 		const friend = await this.usersService.findByName(friendName);
 		if (!await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is not a friend or has a pending request');
-		return this.prismaService.friendship.delete({
+		const removed = await this.prismaService.friendship.deleteMany({
 			where: {
-				userId_friendId: {
-					userId: userId,
-					friendId: friend.id
-				}
+				OR: [
+					{
+						userId: userId,
+						friendId: friend.id,
+					},
+					{
+						userId: friend.id,
+						friendId: userId,
+					},
+				],
 			}
 		});
+
+		return removed.count > 0;
 	}
 
 	/**
@@ -152,6 +160,18 @@ export class FriendsService {
 		return waitingRequests;
 	}
 
+	async isWaitingRequest(userId: number, friendName: string) {
+		const friend = await this.usersService.findByName(friendName);
+		const friendship = await this.prismaService.friendship.findFirst({
+			where: {
+				userId: userId,
+				friendId: friend.id,
+				status: FriendshipStatus.PENDING
+			}
+		});
+		return !!friendship;
+	}
+
 	async getAllPendingRequests(userId: number) {
 		const requests = await this.prismaService.friendship.findMany({
 			where: {
@@ -168,6 +188,18 @@ export class FriendsService {
 		}
 
 		return pendingRequests;
+	}
+
+	async isPendingRequest(userId: number, friendName: string) {
+		const friend = await this.usersService.findByName(friendName);
+		const friendship = await this.prismaService.friendship.findFirst({
+			where: {
+				userId: friend.id,
+				friendId: userId,
+				status: FriendshipStatus.PENDING
+			}
+		});
+		return !!friendship;
 	}
 
 
@@ -281,5 +313,19 @@ export class FriendsService {
 			select: { blockers: true }
 		});
 		return users.blockers.map(toBlockedDto);
+	}
+
+	async canUnblock(userId: number, blockedUsername: string) {
+		const blockedUser = await this.usersService.findByName(blockedUsername);
+		// Need to check if the blockedUser is in the blocked list of the user
+		const blocked = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			select: {
+				blocked: {
+					where: { id: blockedUser.id }
+				}
+			}
+		});
+		return blocked.blocked.length > 0;
 	}
 }

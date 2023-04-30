@@ -60,9 +60,21 @@ export class FriendsController {
 		return this.friendsService.getAllWaitingRequests(req.user.id);
 	}
 
+	@Get('isWaiting/:username')
+	@ApiProperty({ type: String })
+	async isWaiting(@Param('username') username: string, @Req() req: RequestWithUser) {
+		return this.friendsService.isWaitingRequest(req.user.id, username);
+	}
+
 	@Get('pending')
 	async getAllPendingRequests(@Req() req: RequestWithUser) {
 		return this.friendsService.getAllPendingRequests(req.user.id);
+	}
+
+	@Get('isPending/:username')
+	@ApiProperty({ type: String })
+	async isPending(@Param('username') username: string, @Req() req: RequestWithUser) {
+		return this.friendsService.isPendingRequest(req.user.id, username);
 	}
 
 
@@ -98,5 +110,11 @@ export class FriendsController {
 	@Get('blockers')
 	async getAllBlockers(@Req() req: RequestWithUser) {
 		return this.friendsService.getAllBlockers(req.user.id);
+	}
+
+	@Get('can/unblock/:username')
+	@ApiProperty({ type: String })
+	async canUnblock(@Param('username') username: string, @Req() req: RequestWithUser) {
+		return this.friendsService.canUnblock(req.user.id, username);
 	}
 }
