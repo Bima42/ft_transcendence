@@ -44,6 +44,11 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
+  @Get('id/:id')
+  async getUser( @Param('id', ParseIntPipe) userId: number) : Promise<UserDto> {
+    return toUserDto(await this.usersService.findById(userId));
+  }
+
   /**
    * ParseIntPipe : protection to ensures that a method handler parameter is converted to a JavaScript integer
    * (or throws an exception if the conversion fails).
