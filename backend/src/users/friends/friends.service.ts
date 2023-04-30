@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { FriendshipStatus } from '@prisma/client';
 import { toBlockedDto, toFriendDto, toUserDto } from '../../shared/mapper/user.mapper';
+import { FriendDto, UserDto } from '../dto/user.dto';
 
 @Injectable()
 export class FriendsService {
@@ -129,10 +130,14 @@ export class FriendsService {
 				],
 				status: FriendshipStatus.ACCEPTED
 			},
+			select: {
+				userId: true,
+				friendId: true
+			}
 		});
 
 		// Map the friendships to users
-		const friends = [];
+		const friends: FriendDto[] = [];
 		for (const friendship of friendships) {
 			const id = friendship.userId === userId ? friendship.friendId : friendship.userId;
 			const user = await this.usersService.findById(id);
@@ -148,9 +153,13 @@ export class FriendsService {
 				userId: userId,
 				status: FriendshipStatus.PENDING
 			},
+			select: {
+				userId: true,
+				friendId: true
+			}
 		});
 
-		const waitingRequests = [];
+		const waitingRequests: UserDto[] = [];
 		for (const request of requests) {
 			const id = request.userId === userId ? request.friendId : request.userId;
 			const user = await this.usersService.findById(id);
@@ -178,9 +187,13 @@ export class FriendsService {
 				friendId: userId,
 				status: FriendshipStatus.PENDING
 			},
+			select: {
+				userId: true,
+				friendId: true
+			}
 		});
 
-		const pendingRequests = [];
+		const pendingRequests: UserDto[] = [];
 		for (const request of requests) {
 			const id = request.userId === userId ? request.friendId : request.userId;
 			const user = await this.usersService.findById(id);

@@ -17,7 +17,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { UserDto } from './dto/user.dto';
-import { toUserDto } from '../shared/mapper/user.mapper';
 
 const storage = {
   storage: diskStorage({
