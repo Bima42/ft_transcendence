@@ -1,7 +1,7 @@
 <template>
     <section class="index-wrapper">
         <h2>Welcome to pong</h2>
-        <router-link to="/game">
+        <router-link to="/main/game">
             Start playing
         </router-link>
         <router-link to="/main/community">
