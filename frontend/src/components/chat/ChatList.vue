@@ -60,6 +60,7 @@ onMounted(async () => {
 
 onUnmounted(async () => {
   chatStore.socket.off('msg')
+  chatStore.resetState()
 })
 </script>
 
