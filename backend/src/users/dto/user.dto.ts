@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateUserDto {
 
   @IsOptional()
-  @Matches(/[a-zA-Z0-9_-]{2,20}/)
+  @Matches(/^[a-zA-Z0-9_-]{2,20}$/)
   @ApiProperty({ required: false })
   username?: string
 
