@@ -16,17 +16,25 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import { jsonHeaders, patch } from '../../../utils';
+import type IUserUpdate from '@/interfaces/user/IUserUpdate'
 
+const userStore = useUserStore()
 const editing = ref(true);
 
-const userValue = ref('mamamCItaxX')
+const userValue = ref(userStore.user?.username)
 const startEditing = () => {
     editing.value = !editing.value;
 };
 
 const save = () => {
     editing.value = !editing.value;
+    if (!userValue)
+      return
+    const infos: IUserUpdate = { username: userValue.value as string }
+    userStore.updateInfos(infos)
 };
 
 const cancel = () => {

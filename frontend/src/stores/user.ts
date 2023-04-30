@@ -4,6 +4,7 @@ import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
+import type IUserUpdate from '../interfaces/user/IUserUpdate'
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
@@ -77,6 +78,15 @@ export const useUserStore = defineStore('user', () => {
 			.catch(error => console.log(error))
 	}
 
+  const updateInfos = function (infos: IUserUpdate) {
+    patch(`users/id/${user.value?.id}`, "cannot update username", jsonHeaders, infos)
+    .then((res) => res.json())
+    .then((newUser) => {
+      user.value = newUser
+    })
+    .catch((e) => console.error(e))
+  }
+
 	const uploadAvatar = function (file: FormData, loading: Ref) {
 		loading.value = true
 		post(
@@ -115,6 +125,7 @@ export const useUserStore = defineStore('user', () => {
 		isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
+    updateInfos,
 		uploadAvatar,
 		updateAvatar
 	}
