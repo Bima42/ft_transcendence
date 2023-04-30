@@ -2,10 +2,10 @@
     <section class="two_fa_wrap">
         <div class="input_wrap">
             <h3>Enable 2FA</h3>
-            <input type="checkbox" id="enableTwoFa" v-model="enableTwoFa" @change="toggleTwoFaStatus"/>
+            <input type="checkbox" id="enableTwoFa" v-model="enableTwoFa" @click="toggleTwoFaStatus"/>
         </div>
         <ButtonCustom
-            :click="generateQrCode"
+            @click.once="generateQrCode"
             :style="'small'"
             :disabled="!enableTwoFa"
         >
@@ -27,13 +27,14 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 const props = defineProps<{}>()
 const userStore = useUserStore()
 
-const enableTwoFa = ref(userStore.user!.twoFA)
+const enableTwoFa = ref(false)
 const qrCodeImage = ref('')
 const toggleTwoFaStatus = () => {
-    userStore.updateTwoFaStatus(enableTwoFa.value)
+    enableTwoFa.value = !enableTwoFa.value
 }
 
 const generateQrCode = () => {
+    userStore.updateTwoFaStatus(enableTwoFa.value)
     post('2fa/generate', 'Impossible to generate QR code: Please try again later')
         .then(response => response.json())
         .then(data => {
@@ -50,6 +51,7 @@ const generateQrCode = () => {
     align-items: center;
     justify-content: center;
     gap: 20px;
+    padding: 0 30px;
 
     .input_wrap {
         display: flex;
