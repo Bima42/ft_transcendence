@@ -16,7 +16,7 @@ export class ChatMessageDto {
   sentAt: Date;
   updatedAt: Date;
   chatId: number;
-  user: {
+  author: {
     id: number
     username: string;
     avatar: string;

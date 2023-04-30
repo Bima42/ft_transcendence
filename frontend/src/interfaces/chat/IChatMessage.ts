@@ -6,6 +6,10 @@ export default interface IChatMessage {
 	content: string
 	sentAt?: Date
 	updatedAt?: Date
-	user: IUser
+	author: {
+    id: number,
+    username: string,
+    avatar: string,
+  }
 	chatId: number
 }

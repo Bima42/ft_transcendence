@@ -366,7 +366,7 @@ export class ChannelService {
       sentAt: msg.sentAt,
       updatedAt: msg.updatedAt,
       chatId: msg.chatId,
-      user: {
+      author: {
         id: user.id,
         username: user.username,
         avatar: user.avatar
