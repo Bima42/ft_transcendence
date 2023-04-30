@@ -4,7 +4,7 @@ import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
-import type { IPointWon } from '@/interfaces/game/IGameCommunication'
+import type { IGameoverData, IPointWon } from '@/interfaces/game/IGameCommunication'
 import * as pong from "../GameConsts"
 
 
@@ -324,10 +324,10 @@ export default class PongScene extends Phaser.Scene {
       this.resetLevel();
     });
 
-    this.socket.on("gameover", (score: IPointWon) => {
-      this.uiScene.onGameover(score);
+    this.socket.on("gameover", (gameoverData: IGameoverData) => {
+      this.uiScene.onGameover(gameoverData);
       this.scene.stop('UiScene');
-      this.scene.start("GameoverScene");
+      this.scene.start("GameoverScene", gameoverData);
     });
   }
 };

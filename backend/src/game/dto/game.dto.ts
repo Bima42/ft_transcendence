@@ -1,5 +1,6 @@
 import { IsNumber, IsPositive } from 'class-validator'
-import { User } from '@prisma/client';
+import { GameType, UserGame } from '@prisma/client';
+import { UserDto } from 'src/users/dto/user.dto';
 
 // What the client send when he moves its paddle
 export class PlayerMoveDto {
@@ -12,6 +13,12 @@ export class PointWonDto {
     @IsPositive()
     score1: number
     @IsPositive()
+    score2: number
+}
+
+export class GameoverDto {
+    winnerId: number
+    score1: number
     score2: number
 }
 
@@ -42,8 +49,11 @@ export class WorldStateDto {
 }
 
 export class EndGamePlayer {
-  datas: User
-  @IsNumber()
-  score: number
-  win: number
+  user: UserDto
+  userGame: UserGame
+}
+
+export class InvitePlayer {
+  gameType: GameType
+  userId: number
 }

@@ -25,8 +25,6 @@ async function launch(containerId: any) {
       return undefined
     })
 
-    console.log(`settings = ${settings}`);
-
   const config = {
     type: Phaser.AUTO,
     scale: { // See doc here: https://newdocs.phaser.io/docs/3.55.2/Phaser.Scale.ScaleManager

@@ -10,6 +10,13 @@ export interface IPointWon {
     score2: number
 }
 
+// What the server send when the game is over
+export interface IGameoverData {
+    winnerId: number
+    score1: number
+    score2: number
+}
+
 // What the server send on every sync
 export interface IWorldState {
   ball: {

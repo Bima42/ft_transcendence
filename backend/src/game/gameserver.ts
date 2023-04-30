@@ -2,9 +2,11 @@ import { Engine, Bodies, Common, Collision, Body, Composite } from "matter-js";
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
-import { Game, GameStatus, User } from '@prisma/client';
-import { PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
+import { Game, GameStatus, User, UserGame } from '@prisma/client';
+import { EndGamePlayer, GameoverDto, PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
 import { GameSettingsDto } from "./dto/joinQueueData.dto";
+import { toUserDto } from '../shared/mapper/user.mapper';
+import { UserDto } from "src/users/dto/user.dto";
 
 // At what pace the simulation is run
 const fps = 60;
@@ -216,15 +218,20 @@ export class GameServer {
     Logger.log(`Game#${this.roomID} aborted: ${reason}`);
     this.status = "ABORTED"
 
-    this.cleanupGameDataOnSockets()
     this.server.to(this.roomID).emit("abortGame", reason)
   }
 
-  private onGameOver(pointWon: PointWonDto) {
+  private onGameOver() {
     Logger.log(`Game#${this.roomID}: Gameover`);
+    this.players[0].data.userGame.win = this.scores[0] > this.scores[1] ? 1 : 0
+    this.players[1].data.userGame.win = this.scores[1] > this.scores[0] ? 1 : 0
+    const gameoverData : GameoverDto = {
+      winnerId: this.players[0].data.userGame.win ? this.players[0].data.user.id : this.players[1].data.user.id,
+      score1: this.scores[0],
+      score2: this.scores[1],
+    }
+    this.server.to(this.roomID).emit("gameover", gameoverData);
     this.status = "ENDED"
-    this.cleanupGameDataOnSockets()
-    this.server.to(this.roomID).emit("gameover", pointWon)
   }
 
   onStartGame() {
@@ -256,7 +263,7 @@ export class GameServer {
       score2: this.scores[1],
     }
     if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
-      this.onGameOver(pointWon);
+      this.onGameOver();
     } else {
       this.server.to(this.roomID).emit("pointEnd", pointWon)
     }
@@ -360,7 +367,7 @@ export class GameServer {
     });
   }
 
-  private cleanupGameDataOnSockets() {
+  cleanupGameDataOnSockets() {
     this.players.forEach((s) => {
       s.data.game = null;
       s.data.gameServer = null;
@@ -371,11 +378,22 @@ export class GameServer {
     return this.status;
   }
 
-  getPlayers(): User[] {
-    const players = [];
-    players.push(this.players[0].data.user);
-    players.push(this.players[1].data.user);
-    return players;
+  getUsers(): UserDto[] {
+    return [toUserDto(this.players[0].data.user), toUserDto(this.players[1].data.user)]
+  }
+
+  getEndPlayers(): EndGamePlayer[] {
+    const users = this.getUsers();
+    return [
+      {
+        user: users[0],
+        userGame: this.players[0].data.userGame,
+      },
+      {
+        user: users[0],
+        userGame: this.players[1].data.userGame,
+      },
+    ]
   }
 
   getScore(): Array<number> {
@@ -383,7 +401,7 @@ export class GameServer {
   }
 
   toGameSettingsDto(): GameSettingsDto {
-    const users = this.getPlayers();
+    const users = this.getUsers();
     return {
       game: this.game,
       player1: users[0],
