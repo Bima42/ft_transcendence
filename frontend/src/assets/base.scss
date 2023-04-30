@@ -79,3 +79,32 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Karla', sans-serif;
   font-weight: 700;
 }
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.green {
+  background-color: green;
+}
+
+.red {
+  background-color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+.shown {
+  display: block;
+}
+
+.element_line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+}

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { get, jsonHeaders, patch, post } from '../../utils';
 import type IFriendship from '@/interfaces/user/IFriendship';
+import type IFriend from '@/interfaces/user/IFriend';
+import type IUser from '@/interfaces/user/IUser';
 
 export const useFriendStore = defineStore( 'friend', () => {
 
@@ -49,7 +51,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 			return data.status === 'DECLINED';
 		}
 
-		const getAllFriends = async () => {
+		const getAllFriends = async (): Promise<IFriend[]> => {
 			const response = await get(
 				'friends/all',
 				'Failed to get all friends',
@@ -79,16 +81,13 @@ export const useFriendStore = defineStore( 'friend', () => {
 			return await response.json();
 		}
 
-		const getAllPendingRequests = function() {
-			get(
+		const getAllPendingRequests = async (): Promise<IUser[]> => {
+			const response = await get(
 				'friends/pending',
 				'Failed to get all pending requests',
 				jsonHeaders,
 			)
-				.then(response => response.json())
-				.then(json => {
-					return json;
-				});
+			return await response.json();
 		}
 
 		const isFriend = async (friendName: string): Promise<boolean> => {
@@ -166,6 +165,15 @@ export const useFriendStore = defineStore( 'friend', () => {
 			return await response.json();
 	}
 
+	const getUserInfos = async (username: string): Promise<IUser> => {
+		const response = await get(
+			`users/${username}`,
+			'Failed to get user infos',
+		)
+		const json = await response.json()
+		return json as IUser
+	}
+
 		return {
 			addFriend,
 			removeFriend,
@@ -182,5 +190,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 			getAllBlockers,
 			isBlocked,
 			canUnblock,
+			getUserInfos
 		}
 });

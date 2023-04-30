@@ -8,6 +8,7 @@ import SettingsView from '@/views/SettingsView.vue';
 import CommunityView from '@/views/CommunityView.vue';
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
+import FriendsView from '@/views/FriendsView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +20,7 @@ const router = createRouter({
         },
         {
             path: '/index',
-            name: 'index2',
+            name: 'index',
             component: IndexView,
         },
         {
@@ -47,6 +48,11 @@ const router = createRouter({
                     component: CommunityView,
                     longName: 'Community',
                 },
+                {
+                    path: 'friends',
+                    name: 'friends',
+                    component: FriendsView,
+                }
             ]
         },
         {

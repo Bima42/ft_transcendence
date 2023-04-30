@@ -38,6 +38,11 @@ export class UsersController {
       private readonly usersService: UsersService
   ) {}
 
+  @Get(':username')
+  async getUserByUsername(@Param('username') username: string): Promise<UserDto> {
+    return await this.usersService.findByName(username);
+  }
+
   @Get('all')
   async getAllUsers(): Promise<UserDto[]> {
     return await this.usersService.findAll();

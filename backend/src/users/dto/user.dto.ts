@@ -41,6 +41,7 @@ export class FriendDto {
     @IsString()
     @IsNotEmpty()
     avatar: string;
+    status: UserStatus;
 }
 
 export class BlockedDto {

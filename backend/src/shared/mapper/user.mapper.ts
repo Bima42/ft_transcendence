@@ -20,13 +20,14 @@ export const toUserDto = (data: User): UserDto => {
 }
 
 export const toFriendDto = (data: User | UserDto): FriendDto => {
-	const { id, username, firstName, lastName, avatar } = data;
+	const { id, username, firstName, lastName, avatar, status } = data;
 	const friendDto: FriendDto = {
 		id,
 		username,
 		firstName,
 		lastName,
-		avatar
+		avatar,
+		status
 	};
 	return friendDto;
 }
