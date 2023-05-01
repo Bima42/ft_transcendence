@@ -1,5 +1,6 @@
 <template>
     <section class="sidebar_wrap">
+        <span v-if="isActive" class="background" @click="outsideClickHandle"></span>
         <button @click="toggleSidebar">
             <font-awesome-icon icon="fa-bars"/>
         </button>
@@ -12,9 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import {useUserStore} from '@/stores/user'
-import {useRouter} from 'vue-router'
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 const isActive = ref(false)
 const userStore = useUserStore()
@@ -61,6 +62,10 @@ const handleClick = (route: string) => {
     else
         router.push(route)
 }
+
+const outsideClickHandle = () => {
+    isActive.value = false
+}
 </script>
 
 <style scoped lang="scss">
@@ -74,6 +79,16 @@ const handleClick = (route: string) => {
     height: 100%;
     gap: 10px;
     overflow: hidden;
+
+    .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 8;
+        background-color: transparent;
+    }
 
     button {
         position: absolute;
@@ -111,6 +126,7 @@ const handleClick = (route: string) => {
         svg {
             color: $tertiary;
             font-size: 30px;
+            z-index: 9;
 
             &[id='logout'] {
                 color: red;
