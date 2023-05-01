@@ -1,8 +1,15 @@
 <template>
     <section class="index-wrapper">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-            magna aliqua. Enim facilisis gravida neque convallis a. Lorem ipsum dolor sit amet consectetur adipiscing elit.
-            Cras fermentum odio eu feugiat pretium nibh. Volutpat sed cras ornare arcu dui.</p>
+        <h2>Welcome to pong</h2>
+        <router-link to="/main/game">
+            Start playing
+        </router-link>
+        <router-link to="/main/community">
+            Start Chatting
+        </router-link>
+        <router-link to="/settings">
+            Settings
+        </router-link>
     </section>
 </template>
 
@@ -13,9 +20,20 @@ const props = defineProps<{}>()
 </script>
 
 <style scoped lang="scss">
+a {
+    color: $quaternary;
+    text-decoration: none;
+
+    &:hover {
+        color: $quaternary;
+        text-decoration: none;
+    }
+}
+
 .index-wrapper {
     grid-area: $bigmain;
     display: flex;
+    gap: 20px;
     justify-content: center;
     align-items: center;
     flex-direction: column;
