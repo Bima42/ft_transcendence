@@ -11,16 +11,8 @@
       </h2>
     </section>
     <div class="friends_content">
-      <template :class="[selectedList === 'Friends' ? 'shown' : 'hidden']">
-        <Suspense>
-          <FriendList/>
-        </Suspense>
-      </template>
-      <template :class="[selectedList === 'Requests' ? 'shown' : 'hidden']">
-      <Suspense>
-        <RequestList/>
-      </Suspense>
-    </template>
+      <FriendList v-if="selectedList === 'Friends'"/>
+      <RequestList v-else/>
     </div>
   </section>
 </template>

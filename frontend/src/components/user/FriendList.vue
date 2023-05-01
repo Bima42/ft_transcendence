@@ -12,11 +12,17 @@ import { useFriendStore } from '@/stores/friend';
 import TheModal from '@/components/modal/TheModal.vue';
 import UserActions from '@/components/chat/UserActions.vue';
 import { useModalStore } from '@/stores/modal';
+import { onMounted, ref } from 'vue';
+import type IFriend from '@/interfaces/user/IFriend';
 
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 
-const friendList = await friendStore.getAllFriends()
+const friendList = ref<IFriend[]>([])
+
+onMounted( async () => {
+  friendList.value = await friendStore.getAllFriends()
+})
 
 const showUserProfile = async (username: string) => {
   const user = await friendStore.getUserInfos(username)
@@ -29,6 +35,7 @@ const showUserProfile = async (username: string) => {
   border-bottom: 1px solid $tertiary;
   border-top: 1px solid $tertiary;
   background-color: $secondary;
+  padding: 15px;
   
   &:hover {
     cursor: pointer;
