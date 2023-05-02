@@ -32,6 +32,11 @@ const sidebarElement = ref({
       id: 'friends',
       route: '/main/friends'
     },
+    chat: {
+      icon: 'fa-comments',
+      id: 'chat',
+      route: '/main/community'
+    },
     leaderboard: {
         icon: 'fa-ranking-star',
         id: 'leaderboard',
@@ -41,11 +46,6 @@ const sidebarElement = ref({
         icon: 'fa-gamepad',
         id: 'game',
         route: '/main/game'
-    },
-    chat: {
-        icon: 'fa-comments',
-        id: 'chat',
-        route: '/main/community'
     },
     logout: {
         icon: 'fa-arrow-right-from-bracket',
