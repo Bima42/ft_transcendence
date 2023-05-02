@@ -32,10 +32,6 @@ onMounted(async () => {
     await chatStore.getMessages()
 })
 
-chatStore.$subscribe((mutation, state) => {
-    if (chatStore.currentChat)
-        chatStore.getMessages()
-})
 </script>
 
 <style scoped lang="scss">
