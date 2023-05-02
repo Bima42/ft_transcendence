@@ -17,7 +17,7 @@ const props = defineProps<{
     type: string
 }>()
 
-const defaultUrl = `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
+const defaultUrl = `https://${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
 
 const imgUrl = ref(props.url || defaultUrl)
 
