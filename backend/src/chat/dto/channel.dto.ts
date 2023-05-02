@@ -1,5 +1,6 @@
 import { IsString, IsDefined, Matches, IsNotEmpty, IsEnum, IsOptional, IsNumber, IsAlpha, IsIn, IsPositive } from 'class-validator';
-import { ChatType } from '@prisma/client';
+import { ChatType, UserChatRole } from '@prisma/client';
+import { UserDto } from 'src/users/dto/user.dto';
 
 
 export class NewChannelDto {
@@ -19,7 +20,13 @@ export class DetailedChannelDto {
 	name: string;
 	createdAt: Date;
 	updatedAt: Date;
-	users: any; // FIXME TYR: Should be a Dto ?
+	users: {
+    userId: number
+    chatId: number,
+    role: UserChatRole,
+    mutedUntil: Date,
+    user: UserDto,
+  }[];
 
 }
 
