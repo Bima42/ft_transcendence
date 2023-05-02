@@ -6,6 +6,7 @@ import { getCookie } from 'typescript-cookie'
 import { get } from '../../utils'
 import type IChatStore from '@/interfaces/chat/IChatStore'
 import type ISendMessage from '@/interfaces/chat/ISendMessage'
+import type IChatMessage from '@/interfaces/chat/IChatMessage'
 
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
@@ -26,6 +27,12 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		});
 	}
 
+  const onNewMessage = function (msg: IChatMessage) : void {
+    if (!currentChat || msg.chatId != currentChat.value?.id)
+      return
+    currentChat.value.messages.unshift(msg);
+  }
+
 	const setCurrentChat = async function (chatId: string): Promise<boolean> {
 		if (!chatId) {
 			return false
@@ -35,11 +42,13 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			.then((res) => res.json())
 			.then((newChannel) => {
 				currentChat.value = newChannel;
+        getMessages()
 			})
 			.catch((err) => console.log(err));
 		return true
 	}
 
+  // Get the message history
 	const getMessages = async function () {
 		if (!currentChat.value) return
 		isChatOpen.value = true;
@@ -83,6 +92,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		currentChat,
 		chats,
 		isChatOpen,
+    onNewMessage,
 		sendMessage,
 		setCurrentChat,
 		getMessages,

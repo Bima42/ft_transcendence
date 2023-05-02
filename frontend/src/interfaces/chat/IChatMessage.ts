@@ -7,5 +7,5 @@ export default interface IChatMessage {
 	sentAt?: Date
 	updatedAt?: Date
 	user: IUser
-	chat: IChat
+	chatId: number
 }

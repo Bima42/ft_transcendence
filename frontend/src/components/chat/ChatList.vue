@@ -12,9 +12,10 @@
  *
  * @param {Function} toggleChat - This function is used to send the clicked chat id to the parent
  */
-import { defineProps, ref, onMounted, watch } from 'vue'
+import { defineProps, ref, onMounted, watch, onUnmounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import type IChat from '@/interfaces/chat/IChat'
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
 
 const error = ref(null);
 const chatStore = useChatStore();
@@ -52,7 +53,14 @@ onMounted(async () => {
     publicChatList = await chatStore.retrievePublicChats()
     privateChatList = await chatStore.retrieveWhispers()
     currentChatList.value = getCurrentList()
-});
+    chatStore.socket.on('msg', (data: IChatMessage) => {
+      chatStore.onNewMessage(data)
+  })
+})
+
+onUnmounted(async () => {
+  chatStore.socket.off('msg')
+})
 </script>
 
 <style scoped lang="scss">
