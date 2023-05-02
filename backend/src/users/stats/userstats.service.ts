@@ -28,6 +28,8 @@ export class UserStatsService {
 	async getWinRateByUserId(userId: number) {
 		const playedGames = await this.getPlayedGamesByUserId(userId);
 		const winGames = await this.getWonGamesByUserId(userId);
+		if (playedGames === 0 || winGames === 0)
+			return 0;
 		return winGames / playedGames * 100;
 	}
 
@@ -63,5 +65,18 @@ export class UserStatsService {
 			winRate: winRate,
 			elo: elo
 		}
+	}
+
+	async getAllStatsForAllUsers(): Promise<PlayerStatsDto[]> {
+		const users = await this.prismaService.user.findMany();
+		const stats = [];
+		for (const user of users) {
+			const userStats = await this.getStatsByUserId(user.id);
+			delete userStats.wonGames;
+			stats.push(userStats);
+		}
+		stats.sort((a, b) => b.elo - a.elo);
+
+		return stats;
 	}
 }

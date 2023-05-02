@@ -22,6 +22,21 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const sidebarElement = ref({
+    user: {
+      icon: 'fa-user',
+      id: 'user',
+      route: '/settings'
+    },
+    friends: {
+      icon: 'fa-user-friends',
+      id: 'friends',
+      route: '/main/friends'
+    },
+    leaderboard: {
+        icon: 'fa-ranking-star',
+        id: 'leaderboard',
+        route: '/main/leaderboard'
+    },
     game: {
         icon: 'fa-gamepad',
         id: 'game',
@@ -31,16 +46,6 @@ const sidebarElement = ref({
         icon: 'fa-comments',
         id: 'chat',
         route: '/main/community'
-    },
-    user: {
-        icon: 'fa-user',
-        id: 'user',
-        route: '/settings'
-    },
-    friends: {
-        icon: 'fa-user-friends',
-        id: 'friends',
-        route: '/main/friends'
     },
     logout: {
         icon: 'fa-arrow-right-from-bracket',

@@ -31,6 +31,11 @@ export class UserStatsController {
 		return this.userStatsService.getEloByUserId(userId);
 	}
 
+	@Get('leaderboard')
+	async getLeaderboard(): Promise<PlayerStatsDto[]> {
+		return this.userStatsService.getAllStatsForAllUsers();
+	}
+
 	@Get(':id')
 	async getStatsByUserId(@Param('id', ParseIntPipe) userId: number): Promise<PlayerStatsDto> {
 		return this.userStatsService.getStatsByUserId(userId);

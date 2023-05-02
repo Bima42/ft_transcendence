@@ -1,6 +1,6 @@
 <template>
-  <section class="friends_wrapper">
-    <section class="friends_header">
+  <section class="view_wrapper">
+    <section class="view_header">
       <h2
           v-for="source in friendListsSources"
           :key="source.id"
@@ -40,28 +40,7 @@ const selectList = (listID: string) => {
 </script>
 
 <style scoped lang="scss">
-.friends_wrapper {
-  grid-area: $gigamain;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-
-  .friends_header {
-    border-bottom: 1px solid $tertiary;
-    border-top: 1px solid $tertiary;
-    padding: 10px;
-    width: 100%;
-    text-align: center;
-    position: sticky;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    color: $quaternary;
+.view_wrapper {
 
     h2:hover {
       cursor: pointer;
@@ -85,6 +64,5 @@ const selectList = (listID: string) => {
     height: 100%;
     width: 100%;
     overflow: auto;
-  }
 }
 </style>
