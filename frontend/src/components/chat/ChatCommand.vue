@@ -19,7 +19,7 @@ import {useModalStore} from '@/stores/modal'
 const modalStore = useModalStore()
 const props = defineProps<{}>()
 const toggled = ref(false);
-const allCommands = modalStore.data.list as object
+const allCommands = modalStore.data.list
 
 function dropMenu() {
     toggled.value = !toggled.value;

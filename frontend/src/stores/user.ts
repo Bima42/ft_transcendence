@@ -116,6 +116,6 @@ export const useUserStore = defineStore('user', () => {
 		updateTwoFaStatus,
 		verifyTwoFaCode,
 		uploadAvatar,
-		updateAvatar,
+		updateAvatar
 	}
 });

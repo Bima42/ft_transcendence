@@ -20,10 +20,10 @@
 import {useRoute} from 'vue-router'
 
 import CreditLink from '@/components/footers/CreditLink.vue'
-import Sidebar from '@/components/UI/Sidebar.vue'
+import Sidebar from '@/components/template/Sidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
-import HeaderLogo from '@/components/HeaderLogo.vue';
+import HeaderLogo from '@/components/template/HeaderLogo.vue';
 
 const route = useRoute()
 const modalStore = useModalStore()

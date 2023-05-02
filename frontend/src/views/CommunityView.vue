@@ -112,10 +112,6 @@ const resetChat = () => {
     }
 }
 
-.hidden {
-    display: none;
-}
-
 .shown {
     display: block;
 

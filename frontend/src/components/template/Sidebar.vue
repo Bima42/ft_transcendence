@@ -37,6 +37,11 @@ const sidebarElement = ref({
         id: 'user',
         route: '/settings'
     },
+    friends: {
+        icon: 'fa-user-friends',
+        id: 'friends',
+        route: '/main/friends'
+    },
     logout: {
         icon: 'fa-arrow-right-from-bracket',
         id: 'logout',

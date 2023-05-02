@@ -1,14 +1,14 @@
 <template>
     <section class="user_information_modal">
         <section class="user_data">
-            <UserAvatar :type="'small'" :url="modalStore.data.user.avatar"></UserAvatar>
+            <UserPicture :type="'small'" :url="modalStore.data.user.avatar"></UserPicture>
             <section class="data">
                 <h2>{{ modalStore.data.user.username }}</h2>
                 <section class="button_wrap">
-                    <ButtonCustom :style="'small'" :click="checkIfFriend">
+                    <ButtonCustom :style="'small'" :click="addOrRemoveFriend" :disabled="isRequestSent">
                         {{ isFriend ? 'Remove friend' : 'Add friend' }}
                     </ButtonCustom>
-                    <ButtonCustom :style="'small'" :click="checkIfBlocked">
+                    <ButtonCustom :style="'small'" :click="blockOrUnblockUser">
                         {{ isBlocked ? 'Unblock' : 'Block' }}
                     </ButtonCustom>
                     <ButtonCustom :style="'small'">
@@ -26,28 +26,44 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 import { useModalStore } from '@/stores/modal'
-import UserAvatar from '@/components/avatar/UserAvatar.vue';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import UserPicture from '@/components/avatar/UserPicture.vue';
+import { useFriendStore } from '@/stores/friend';
 
 const modalStore = useModalStore()
+const friendStore = useFriendStore()
 
 const props = defineProps<{}>()
 const isBlocked = ref(false)
 const isFriend = ref(false)
 
-const checkIfBlocked = () => {
-    // check if user is blocked
-    // store it into isBlocked.data
-    isBlocked.value = !isBlocked.value
+const isRequestSent = ref(false)
+const canUnblock = ref(false)
+
+const blockOrUnblockUser = async () => {
+    if (isBlocked.value && canUnblock.value) {
+      isBlocked.value = !(await friendStore.unblockUser(modalStore.data.user.username))
+    } else {
+      isBlocked.value = await friendStore.blockUser(modalStore.data.user.username)
+    }
 }
 
-const checkIfFriend = () => {
-    // check if user is friend
-    // store it into isFriend.data
-    isFriend.value = !isFriend.value
+const addOrRemoveFriend = async() => {
+  if (isFriend.value) {
+    isFriend.value = !(await friendStore.removeFriend(modalStore.data.user.username))
+  } else {
+    isRequestSent.value = await friendStore.addFriend(modalStore.data.user.username)
+  }
 }
+
+onMounted(async () => {
+  isFriend.value = await friendStore.isFriend(modalStore.data.user.username)
+  isRequestSent.value = await friendStore.isWaitingRequest(modalStore.data.user.username)
+  isBlocked.value = await friendStore.isBlocked(modalStore.data.user.username)
+  canUnblock.value = await friendStore.canUnblock(modalStore.data.user.username)
+})
 </script>
 
 <style scoped lang="scss">
