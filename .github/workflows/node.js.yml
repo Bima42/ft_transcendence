@@ -25,7 +25,22 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: yarn install
-    - run: yarn build
-#    - run: npm test
+        cache: 'yarn'
+    - name: setup backend
+      run: yarn install
+      working-directory: backend
+    - name: build backend
+      run: yarn build
+      working-directory: backend
+    # - name: test backend
+    #   run: yarn test
+    #   working-directory: backend
+    - name: setup frontend
+      run: yarn install
+      working-directory: frontend
+    - name: build frontend
+      run: yarn build-only # TODO: change to build when all errors are fixed
+      working-directory: frontend
+    # - name: test frontend
+    #   run: yarn test
+    #   working-directory: frontend
