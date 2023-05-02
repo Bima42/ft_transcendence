@@ -4,9 +4,10 @@ import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
+import type IUserUpdate from '../interfaces/user/IUserUpdate'
 
 export const useUserStore = defineStore('user', () => {
-	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
 		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
@@ -77,6 +78,18 @@ export const useUserStore = defineStore('user', () => {
 			.catch(error => console.log(error))
 	}
 
+  const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
+    await patch(`users/id/${user.value?.id}`, "cannot update username", jsonHeaders, infos)
+    .then((res) => res.json())
+    .then((newUser: IUser) => {
+      user.value = newUser
+      localStorage.setItem('localUser', JSON.stringify(user.value))
+    })
+    .catch((e) => alert(e))
+
+    return user.value
+  }
+
 	const uploadAvatar = function (file: FormData, loading: Ref) {
 		loading.value = true
 		post(
@@ -115,7 +128,8 @@ export const useUserStore = defineStore('user', () => {
 		isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
+    updateInfos,
 		uploadAvatar,
-		updateAvatar
+		updateAvatar,
 	}
 });

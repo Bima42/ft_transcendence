@@ -16,17 +16,26 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import type IUserUpdate from '@/interfaces/user/IUserUpdate'
 
+const userStore = useUserStore()
 const editing = ref(true);
 
-const userValue = ref('mamamCItaxX')
+const userValue = ref(userStore.user?.username)
 const startEditing = () => {
     editing.value = !editing.value;
 };
 
-const save = () => {
+const save = async () => {
     editing.value = !editing.value;
+    if (!userValue.value)
+      return
+    // TODO: Check locally if the username is compliant
+    const infos: IUserUpdate = { username: userValue.value }
+    const newUser = await userStore.updateInfos(infos)
+    userValue.value = newUser.username
 };
 
 const cancel = () => {

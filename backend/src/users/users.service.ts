@@ -1,7 +1,7 @@
-import { BadRequestException, NotFoundException, Injectable } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
-import { UserDto } from './dto/user.dto';
+import { UpdateUserDto, UserDto } from './dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 
 @Injectable()
@@ -71,15 +71,18 @@ export class UsersService {
     return toUserDto(user);
   }
 
-  async updateData(userId: number, data: UserDto): Promise<UserDto> {
-    const user = await this.prismaService.user.update({
+  async updateData(user: User, userId: number, data: UpdateUserDto): Promise<UserDto> {
+    if (user.id != userId)
+      throw new ForbiddenException("Unauthorize to modify other user");
+
+    const targetUser = await this.prismaService.user.update({
       where: {
         id: +userId
       },
       data: data
     });
 
-    return toUserDto(user);
+    return toUserDto(targetUser);
   }
 
   async updateAvatar(userId: number, avatar: string): Promise<UserDto> {
