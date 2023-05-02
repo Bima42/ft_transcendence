@@ -117,12 +117,17 @@ export async function patch(
 ): Promise<Response> {
 	const request: RequestInit = {
 		method: 'PATCH',
+		mode: 'cors',
+		credentials: 'include',
 		headers: headers,
 	}
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${JSON.stringify(response.body)}`)
+	if (!response.ok){
+    // return Promise.reject(response)
+    const text = await response.text()
+		throw new Error(`${message} (status ${response.status}): ${text}`)
+  }
 	return response
 }

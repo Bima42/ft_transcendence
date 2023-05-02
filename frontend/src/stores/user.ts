@@ -7,7 +7,7 @@ import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
 
 export const useUserStore = defineStore('user', () => {
-	const user = ref(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
 	const redirect = function () {
 		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
@@ -78,13 +78,16 @@ export const useUserStore = defineStore('user', () => {
 			.catch(error => console.log(error))
 	}
 
-  const updateInfos = function (infos: IUserUpdate) {
-    patch(`users/id/${user.value?.id}`, "cannot update username", jsonHeaders, infos)
+  const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
+    await patch(`users/id/${user.value?.id}`, "cannot update username", jsonHeaders, infos)
     .then((res) => res.json())
-    .then((newUser) => {
+    .then((newUser: IUser) => {
       user.value = newUser
+      localStorage.setItem('localUser', JSON.stringify(user.value))
     })
-    .catch((e) => console.error(e))
+    .catch((e) => alert(e))
+
+    return user.value
   }
 
 	const uploadAvatar = function (file: FormData, loading: Ref) {
@@ -127,6 +130,6 @@ export const useUserStore = defineStore('user', () => {
 		verifyTwoFaCode,
     updateInfos,
 		uploadAvatar,
-		updateAvatar
+		updateAvatar,
 	}
 });

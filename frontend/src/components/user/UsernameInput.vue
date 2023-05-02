@@ -18,7 +18,6 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
-import { jsonHeaders, patch } from '../../../utils';
 import type IUserUpdate from '@/interfaces/user/IUserUpdate'
 
 const userStore = useUserStore()
@@ -29,12 +28,14 @@ const startEditing = () => {
     editing.value = !editing.value;
 };
 
-const save = () => {
+const save = async () => {
     editing.value = !editing.value;
-    if (!userValue)
+    if (!userValue.value)
       return
-    const infos: IUserUpdate = { username: userValue.value as string }
-    userStore.updateInfos(infos)
+    // TODO: Check locally if the username is compliant
+    const infos: IUserUpdate = { username: userValue.value }
+    const newUser = await userStore.updateInfos(infos)
+    userValue.value = newUser.username
 };
 
 const cancel = () => {
