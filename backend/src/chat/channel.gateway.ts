@@ -1,6 +1,5 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
-import { User, ChatMessage } from '@prisma/client';
 import { Socket, Server } from 'socket.io'
 import { ChannelService } from './channel.service'
 import { NewChatMessageDto } from './dto/message.dto';
@@ -55,15 +54,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     private async verifyUser(token: string) : Promise<UserDto> {
+      if (!token)
+        return null;
 
-        if (!token)
-          return null;
-
-        const userId = this.authService.verifyToken(token);
-        const user = await this.usersService.findById(userId.sub);
-
+      try {
+        const verifiedToken = this.authService.verifyToken(token);
+        const user = await this.usersService.findById(verifiedToken.sub);
         return toUserDto(user);
-
+      } catch (err) {
+        throw new UnauthorizedException("Invalid token");
+      }
     }
 
     async handleConnection(client: any, ...args: any[]) {

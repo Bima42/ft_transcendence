@@ -87,6 +87,10 @@ const resetChat = () => {
         gap: 20px;
         color: $quaternary;
 
+        h2:hover {
+            cursor: pointer;
+        }
+
         .not_selected {
             transition: color 0.2s ease-in-out;
             color: $secondary;
@@ -97,6 +101,7 @@ const resetChat = () => {
             position: absolute;
             left: 10px;
             top: calc(50% - 10px);
+            cursor: pointer;
         }
     }
 

@@ -19,8 +19,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-    .containerId {
-   width:500px; /* or whatever width you want. */
-   max-width:500px;
+    #gameContainer {
+   width:100%; /* or whatever width you want. */
     }
 </style>

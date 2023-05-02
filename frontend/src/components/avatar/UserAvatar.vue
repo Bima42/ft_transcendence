@@ -1,6 +1,6 @@
 <template>
   <span class="avatar-container" :class="props.type">
-    <img :src="imgUrl" alt="Oh no !"/>
+    <img :src="imgUrl" alt="user avatar"/>
   </span>
 </template>
 
@@ -19,7 +19,6 @@ let imgUrl = ref(props.url || defaultUrl)
 onUpdated(() => {
     imgUrl.value = props.url || defaultUrl
 })
-
 </script>
 
 <style lang="scss">
@@ -27,9 +26,9 @@ onUpdated(() => {
   display: block;
   content: "";
   border-radius: 50%;
-  background-color: $yellow;
+  background-color: $tertiary;
   overflow: hidden;
-  border: 2px solid $yellow;
+  border: 2px solid $tertiary;
   box-sizing: content-box;
 
   &.big {

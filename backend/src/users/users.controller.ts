@@ -6,14 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   ParseIntPipe,
   UseInterceptors, UploadedFile, ParseFilePipeBuilder
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -36,7 +34,6 @@ const storage = {
 @Controller('users')
 @ApiTags('Users')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(
       private readonly usersService: UsersService
@@ -47,18 +44,18 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
+  @Get('id/:id')
+  async getUser( @Param('id', ParseIntPipe) userId: number) : Promise<UserDto> {
+    return toUserDto(await this.usersService.findById(userId));
+  }
+
   /**
    * ParseIntPipe : protection to ensures that a method handler parameter is converted to a JavaScript integer
    * (or throws an exception if the conversion fails).
    *
    * @param userId
+   * @param data: User
    */
-  @Get('id/:id')
-  async getUserById(@Param('id', ParseIntPipe) userId: number): Promise<UserDto> {
-    const user = await this.usersService.findById(userId);
-    return toUserDto(user);
-  }
-
   @Patch('id/:id')
   async updateUser(
         @Param('id', ParseIntPipe) userId: number,

@@ -4,7 +4,7 @@ import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type IUser from '@/interfaces/user/IUser';
-import type { IPointWon } from '@/interfaces/game/IGameCommunication';
+import type { IGameoverData, IPointWon } from '@/interfaces/game/IGameCommunication';
 import * as pong from "../GameConsts"
 
 const gameStore = useGameStore();
@@ -144,7 +144,7 @@ export default class UiScene extends Phaser.Scene {
     this.startGame();
   }
 
-  onGameover(_score: IPointWon) {
+  onGameover(_gameoverData: IGameoverData) {
     // Nothing to do, as we switch to GameoverScene
   }
 

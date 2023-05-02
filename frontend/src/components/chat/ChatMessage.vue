@@ -1,7 +1,7 @@
 <template>
     <div class="message_wrap" :class="side">
-        <div class="sender" v-show="side === 'left'">
-            {{ props.userName }}
+        <div class="sender" @click="toggleUserActions(props.sender)" v-show="side === 'left'">
+            {{ props.sender.username }}
         </div>
         <div class="content">
             <slot></slot>
@@ -14,16 +14,25 @@
 
 <script setup lang="ts">
 import { defineProps, computed, ref } from 'vue'
+import { useModalStore } from '@/stores/modal'
+import TheModal from '@/components/modal/TheModal.vue'
+import UserActions from '@/components/chat/UserActions.vue'
+import type IUser from '@/interfaces/user/IUser'
 
 const props = defineProps<{
-    fromUser: number
+    sender: IUser
     userIs: number
-    userName: string
 }>()
 
+const modalStore = useModalStore()
+
 let side = ref(computed(() => {
-    return props.fromUser === props.userIs ? 'right' : 'left'
+    return props.sender.id === props.userIs ? 'right' : 'left'
 }))
+
+const toggleUserActions = (user: IUser) => {
+    modalStore.loadAndDisplay(TheModal, UserActions, { user: user })
+}
 
 </script>
 
