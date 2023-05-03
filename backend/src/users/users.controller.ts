@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseInterceptors, UploadedFile, ParseFilePipeBuilder, Req
+  UseInterceptors, UploadedFile, ParseFilePipeBuilder, Req, Logger
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -41,14 +41,14 @@ export class UsersController {
       private readonly usersService: UsersService
   ) {}
 
-  @Get(':username')
-  async getUserByUsername(@Param('username') username: string): Promise<UserDto> {
-    return await this.usersService.findByName(username);
-  }
-
   @Get('all')
   async getAllUsers(): Promise<UserDto[]> {
     return await this.usersService.findAll();
+  }
+
+  @Get(':username')
+  async getUserByUsername(@Param('username') username: string): Promise<UserDto> {
+    return await this.usersService.findByName(username);
   }
 
   @Get('id/:id')
@@ -63,24 +63,23 @@ export class UsersController {
    * @param userId
    * @param data: User
    */
-  @Patch('id/:id')
+  @Patch('me')
   async updateUser(
         @Req() req: Request,
-        @Param('id', ParseIntPipe) targetId: number,
         @Body() data: UpdateUserDto
   ): Promise<UserDto> {
-      return this.usersService.updateData(req.user as User, targetId, data);
+      return this.usersService.updateData(req.user as User, data);
   }
 
-  @Delete('id/:id')
+  @Delete('me')
   async deleteUser(@Param('id', ParseIntPipe) userId: number) {
       return this.usersService.delete(userId);
   }
 
-  @Post('avatar/:id')
+  @Post('avatar')
   @UseInterceptors(FileInterceptor('avatar', storage))
   async updateAvatar(
-      @Param('id', ParseIntPipe) userId: number,
+      @Req() req: Request,
       @UploadedFile(
         new ParseFilePipeBuilder()
           .addFileTypeValidator({ fileType: 'jpeg|png|jpg' })
@@ -88,7 +87,8 @@ export class UsersController {
           .build()
       )  file: Express.Multer.File
   ) {
-      return this.usersService.updateAvatar(userId, file.path);
+      const avatarUrl = `${process.env.FRONTEND_URL}/api/${file.path}`
+      return this.usersService.updateData(req.user as User, {avatar:avatarUrl});
   }
 
 }
