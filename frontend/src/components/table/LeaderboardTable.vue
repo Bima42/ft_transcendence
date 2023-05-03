@@ -3,7 +3,9 @@
     <table>
       <thead>
         <tr>
-          <th v-for="(header, index) in props.headers" :key="index">{{ header.name }}</th>
+          <th v-for="(header, index) in props.headers" :key="index" @click="props.sortDatas(header.name)">
+            {{ header.name }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -28,9 +30,12 @@ const props = defineProps<{
   data: object[],
   headers: object,
   rowsPerPage?: number,
+  sortDatas?: (header: string) => void
 }>()
 const currentPage = ref(1);
 const rowsPerPage = props.rowsPerPage ?? 5;
+
+console.log(props.data)
 
 const totalPages = computed(() => {
   return Math.ceil(props.data.length / rowsPerPage)
@@ -50,6 +55,7 @@ const tableDataPaginated = computed(() => {
   const end = start + rowsPerPage;
   return props.data.slice(start, end);
 });
+
 </script>
 
 <style scoped lang="scss">
@@ -101,6 +107,7 @@ const tableDataPaginated = computed(() => {
     }
 
     tbody tr:last-of-type {
+      border-bottom: 1px solid $tertiary;
     }
   }
 }
