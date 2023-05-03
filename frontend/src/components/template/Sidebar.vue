@@ -25,7 +25,7 @@ const sidebarElement = ref({
     user: {
       icon: 'fa-user',
       id: 'user',
-      route: '/settings'
+      route: '/profile'
     },
     friends: {
       icon: 'fa-user-friends',

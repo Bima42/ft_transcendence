@@ -5,13 +5,15 @@ import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
-import type PlayerStatsDto from '@/interfaces/user/IUserStats';
-import type IPlayerStatsDto from '@/interfaces/user/IUserStats';
-import type IPlayerStats from '@/interfaces/user/IUserStats';
 import type IUserStats from '@/interfaces/user/IUserStats';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+
+	const resetState = function () {
+		user.value = null
+		localStorage.removeItem('localUser');
+	}
 
 	const redirect = function () {
 		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
@@ -123,6 +125,15 @@ export const useUserStore = defineStore('user', () => {
 		user.value!.avatar = `${avatar}?${cacheKey}`
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
+
+	const getUserStats = async (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
+		const stats = await get(
+			`users/stats/${user_id}`,
+			'Failed to get user stats',
+			jsonHeaders,
+		)
+		return stats.json()
+	}
 	
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
 		const response = await get(
@@ -135,6 +146,7 @@ export const useUserStore = defineStore('user', () => {
 
 	return {
 		user,
+		resetState,
 		redirect,
 		login,
 		logout,
@@ -144,6 +156,7 @@ export const useUserStore = defineStore('user', () => {
     updateInfos,
 		uploadAvatar,
 		updateAvatar,
+		getUserStats,
 		getLeaderboard
 	}
 });

@@ -13,22 +13,28 @@
             </div>
         </section>
         <section class="scores_wrap">
-            <UserHighestScore/>
+          <p v-for="stat in userStats" v-bind:key="stat.id">
+            {{ stat }}
+          </p>
         </section>
     </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import UserPicture from '@/components/avatar/UserPicture.vue'
-import UserHighestScore from '@/components/user/UserHighestScore.vue'
 import UploadAvatarButtons from '@/components/avatar/UploadAvatarButtons.vue'
 import UserCredentialsSettings from '@/components/user/UserCredentialsSettings.vue'
+import type IUserStats from '@/interfaces/user/IUserStats';
 
 const userStore = useUserStore()
 
-const props = defineProps<{}>()
+const userStats = ref<IUserStats | null>(null)
+
+onMounted(async () => {
+    userStats.value = await userStore.getUserStats()
+})
 </script>
 
 <style scoped lang="scss">
