@@ -5,6 +5,10 @@ import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
+import type PlayerStatsDto from '@/interfaces/user/IUserStats';
+import type IPlayerStatsDto from '@/interfaces/user/IUserStats';
+import type IPlayerStats from '@/interfaces/user/IUserStats';
+import type IUserStats from '@/interfaces/user/IUserStats';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
@@ -119,6 +123,15 @@ export const useUserStore = defineStore('user', () => {
 		user.value!.avatar = `${avatar}?${cacheKey}`
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
+	
+	const getLeaderboard = async (): Promise<IUserStats[]> => {
+		const response = await get(
+			'users/stats/leaderboard',
+			'Failed to get leaderboard datas',
+			jsonHeaders,
+		)
+		return response.json()
+	}
 
 	return {
 		user,
@@ -131,5 +144,6 @@ export const useUserStore = defineStore('user', () => {
     updateInfos,
 		uploadAvatar,
 		updateAvatar,
+		getLeaderboard
 	}
 });

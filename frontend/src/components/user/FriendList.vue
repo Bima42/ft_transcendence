@@ -32,9 +32,6 @@ const showUserProfile = async (username: string) => {
 
 <style scoped lang="scss">
 .element_line {
-  border-bottom: 1px solid $tertiary;
-  border-top: 1px solid $tertiary;
-  background-color: $secondary;
   padding: 15px;
   
   &:hover {

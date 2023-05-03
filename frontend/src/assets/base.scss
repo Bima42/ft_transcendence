@@ -1,3 +1,6 @@
+@import "theme/_grid.scss";
+@import "theme/_theme.scss";
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
@@ -102,9 +105,37 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
+.view_wrapper {
+  grid-area: $gigamain;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  .view_header {
+    border-bottom: 1px solid $tertiary;
+    border-top: 1px solid $tertiary;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    position: sticky;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    color: $quaternary;
+  }
+}
+
 .element_line {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 30px;
+  border-bottom: 1px solid $tertiary;
+  border-top: 1px solid $tertiary;
+  background-color: $secondary;
 }
