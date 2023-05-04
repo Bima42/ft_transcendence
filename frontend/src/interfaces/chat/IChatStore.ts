@@ -1,6 +1,6 @@
 import type IChat from '@/interfaces/chat/IChat'
 import type { Ref } from 'vue'
-import type { UserChatRole } from '../user/IUserChat';
+import type { UserChatRoleEnum } from '../user/IUserChat';
 import type IChatMessage from './IChatMessage';
 
 export default interface IChatStore {
@@ -13,7 +13,7 @@ export default interface IChatStore {
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<IChat[]>;
 	retrieveWhispers: () => Promise<IChat[]>;
-  getRoleFromUserId: (userId: number) => Promise<UserChatRole | null>;
+  getRoleFromUserId: (userId: number) => Promise<UserChatRoleEnum>;
 	getMessages: () => void;
 	resetState: () => void;
 }

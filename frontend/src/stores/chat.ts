@@ -7,7 +7,7 @@ import { get } from '../../utils'
 import type IChatStore from '@/interfaces/chat/IChatStore'
 import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
-import type { UserChatRole } from '@/interfaces/user/IUserChat'
+import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
 
 
@@ -50,12 +50,22 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
     return true
   }
 
-  const getRoleFromUserId = function(userId: number): UserChatRole | null {
-    let role: UserChatRole | null = null;
+  const getRoleFromUserId = function(userId: number): UserChatRoleEnum {
     const myUserRole = currentChat.value?.users.find((el: IUserChat) => el.user.id == userId)
-    if (myUserRole)
-      role = myUserRole.role
-    return role;
+    if (!myUserRole)
+      return UserChatRoleEnum.Unknown
+    switch (myUserRole.role) {
+      case "ADMIN":
+        return UserChatRoleEnum.Admin
+      case "OWNER":
+        return UserChatRoleEnum.Owner
+      case "MEMBER":
+        return UserChatRoleEnum.Member
+      case "BANNED":
+        return UserChatRoleEnum.Banned
+      default:
+        return UserChatRoleEnum.Unknown
+    }
   }
 
   // Get the message history
