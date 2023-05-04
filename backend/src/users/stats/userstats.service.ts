@@ -62,6 +62,22 @@ export class UserStatsService {
 		return totalScore / playedGames;
 	}
 
+	async getEloHistoryByUserId(userId: number): Promise<number[]> {
+		const games = await this.prismaService.userGame.findMany({
+			where: {
+				userId: userId
+			},
+			select: {
+				elo: true
+			}
+		});
+		const eloHistory = [];
+		for (const game of games) {
+			eloHistory.push(game.elo);
+		}
+		return eloHistory;
+	}
+
 	async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
 		const { username } = await this.prismaService.user.findUnique({
 			where: {
@@ -76,13 +92,15 @@ export class UserStatsService {
 		const winRate = await this.getWinRateByUserId(userId);
 		const elo = await this.getEloByUserId(userId);
 		const averageScore = await this.getAverageScoreByUserId(userId);
+		const eloHistory = await this.getEloHistoricByUserId(userId);
 		return {
 			username: username,
 			playedGames: playedGames,
 			wonGames: wonGames,
 			winRate: winRate,
 			elo: elo,
-			averageScore: averageScore
+			eloHistory: eloHistory,
+			averageScore: averageScore,
 		}
 	}
 

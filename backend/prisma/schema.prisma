@@ -87,6 +87,7 @@ model UserGame {
   userId Int
   score  Int  @default(0)
   win    Int  @default(0)
+  elo    Int  @default(0)
 }
 
 model Game {

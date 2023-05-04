@@ -93,5 +93,6 @@ export class PlayerStatsDto {
     wonGames: number;
     winRate: number;
     elo: number;
+    eloHistory: number[];
     averageScore: number;
 }
