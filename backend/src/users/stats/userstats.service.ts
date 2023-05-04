@@ -92,7 +92,7 @@ export class UserStatsService {
 		const winRate = await this.getWinRateByUserId(userId);
 		const elo = await this.getEloByUserId(userId);
 		const averageScore = await this.getAverageScoreByUserId(userId);
-		const eloHistory = await this.getEloHistoricByUserId(userId);
+		const eloHistory = await this.getEloHistoryByUserId(userId);
 		return {
 			username: username,
 			playedGames: playedGames,

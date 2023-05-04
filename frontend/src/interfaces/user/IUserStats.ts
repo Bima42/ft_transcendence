@@ -4,4 +4,6 @@ export default interface IUserStats {
 	wonGames: number;
 	winRate: number;
 	elo: number;
+	eloHistory: number[];
+	averageScore: number;
 }

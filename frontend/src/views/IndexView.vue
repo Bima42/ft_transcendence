@@ -7,8 +7,8 @@
         <router-link to="/main/community">
             Start Chatting
         </router-link>
-        <router-link to="/settings">
-            Settings
+        <router-link to="/profile">
+            Profile
         </router-link>
     </section>
 </template>

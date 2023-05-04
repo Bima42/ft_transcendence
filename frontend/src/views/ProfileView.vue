@@ -13,26 +13,25 @@
             </div>
         </section>
         <section class="scores_wrap">
-          <UserStats :userStats="userStats"/>
+          <UserStats v-if="userStats" :userStats="userStats"/>
         </section>
     </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import UserPicture from '@/components/avatar/UserPicture.vue'
 import UploadAvatarButtons from '@/components/avatar/UploadAvatarButtons.vue'
 import UserCredentialsSettings from '@/components/user/UserCredentialsSettings.vue'
-import type IUserStats from '@/interfaces/user/IUserStats';
 import UserStats from '@/components/user/UserStats.vue';
+import type IUserStats from '@/interfaces/user/IUserStats';
+import { ref } from 'vue';
 
 const userStore = useUserStore()
 
 const userStats = ref<IUserStats | null>(null)
-
-onMounted(async () => {
-    userStats.value = await userStore.getUserStats()
+userStore.getUserStats().then((stats) => {
+    userStats.value = stats
 })
 </script>
 
