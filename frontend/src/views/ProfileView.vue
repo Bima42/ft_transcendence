@@ -13,9 +13,7 @@
             </div>
         </section>
         <section class="scores_wrap">
-          <p v-for="stat in userStats" v-bind:key="stat.id">
-            {{ stat }}
-          </p>
+          <UserStats :userStats="userStats"/>
         </section>
     </section>
 </template>
@@ -27,6 +25,7 @@ import UserPicture from '@/components/avatar/UserPicture.vue'
 import UploadAvatarButtons from '@/components/avatar/UploadAvatarButtons.vue'
 import UserCredentialsSettings from '@/components/user/UserCredentialsSettings.vue'
 import type IUserStats from '@/interfaces/user/IUserStats';
+import UserStats from '@/components/user/UserStats.vue';
 
 const userStore = useUserStore()
 
