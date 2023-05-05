@@ -1,11 +1,11 @@
 <template>
     <section class="user_actions">
-        <h2>{{ modalStore.data.username }}</h2>
+        <h2>{{ modalStore.data.user.username }}</h2>
         <ButtonCustom :style="'big'" :click="toggleNewModal">
             View profile
         </ButtonCustom>
         <section class="chat_actions_buttons">
-            <template v-if="userRole === role.admin">
+            <template v-if="userRole >= UserChatRoleEnum.Admin">
                 <h4>Admin actions</h4>
                 <section class="button_wrap">
                     <ButtonCustom :style="'small'">
@@ -25,44 +25,45 @@
                     </ButtonCustom>
                 </section>
             </template>
-            <template v-if="userRole <= role.user">
-                <section class="button_wrap">
-                    <ButtonCustom :style="'small'" :click="addOrRemoveFriend" :disabled="isRequestSent">
-                      {{ isFriend ? 'Remove friend' : isRequestSent ? 'Request pending ...' : 'Add friend' }}
-                    </ButtonCustom>
-                    <ButtonCustom :style="'small'" :click="blockOrUnblockUser">
-                      {{ isBlocked ? 'Unblock' : 'Block' }}
-                    </ButtonCustom>
-                </section>
-            </template>
+        </section>
+        <section class="chat_actions_buttons">
+            <section class="button_wrap">
+                <ButtonCustom :style="'small'" :click="addOrRemoveFriend" :disabled="isRequestSent">
+                  {{ isFriend ? 'Remove friend' : isRequestSent ? 'Request pending ...' : 'Add friend' }}
+                </ButtonCustom>
+                <ButtonCustom :style="'small'" :click="blockOrUnblockUser">
+                  {{ isBlocked ? 'Unblock' : 'Block' }}
+                </ButtonCustom>
+            </section>
         </section>
     </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useFriendStore } from '@/stores/friend';
-
-enum role { admin = 0, user = 1 }
+import { useChatStore } from '@/stores/chat'
+import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
+import { useUserStore } from '@/stores/user'
 
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
+const chatStore = useChatStore()
+const userStore = useUserStore()
 
-const props = defineProps<{}>()
 const isBlocked = ref(false)
 const isFriend = ref(false)
 const canUnblock = ref(false)
 const isRequestSent = ref(false)
 
-// WE NEED A FUNCTION TO CATCH THE ROLE OF A USER TO DISPLAY WHAT HE CAN AND CANNOT DO
-// onMounted(async () => {
-//     await userRole = chatStore.getRole()
-// })
-const userRole = role.user
+let userRole = ref(UserChatRoleEnum.Unknown)
+ onMounted(async () => {
+     userRole.value = await chatStore.getRoleFromUserId(userStore.user?.id ?? 0)
+ })
 
 const toggleNewModal = () => {
     modalStore.resetStateKeepData()

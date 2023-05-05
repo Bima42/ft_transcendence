@@ -8,7 +8,7 @@ export const useModalStore = defineStore('modal', () => {
     const show = ref(false)
     const type: Ref<{}> & { "[ShallowRefMarker]"?: true } = shallowRef({})
     const component: Ref<{}> & { "[ShallowRefMarker]"?: true } = shallowRef({})
-    const data = ref({})
+    const data = ref<any>({})
 
     const resetState = function () {
         show.value = false

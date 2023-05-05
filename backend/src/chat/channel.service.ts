@@ -17,6 +17,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
+import { toMessageDto } from 'src/shared/mapper/message.mapper';
 
 @Injectable()
 export class ChannelService {
@@ -285,25 +286,20 @@ export class ChannelService {
       this.deleteChatIfEmpty(chatId);
     }
 
-  async getLastMessages(chatId: number, nbrMsgs: number) {
+  async getLastMessages(chatId: number, nbrMsgs: number) : Promise<ChatMessageDto[]> {
     const chat = await this.findChannelById(chatId);
     if (!chat)
       return [];
-    return this.prismaService.chatMessage.findMany({
+    const msgs = await this.prismaService.chatMessage.findMany({
       skip: 0,
       take: nbrMsgs,
       where: { chatId: chatId },
       orderBy: { id: "desc" },
       include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            avatar: true,
-          }
-        }
+        user: true
       },
     });
+    return msgs.map((msg) => toMessageDto(msg, msg.user))
   }
 
   async postMessage(user: UserDto, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
@@ -346,18 +342,7 @@ export class ChannelService {
       }
     });
 
-    const msgDto : ChatMessageDto = {
-      content: msg.content,
-      sentAt: msg.sentAt,
-      updatedAt: msg.updatedAt,
-      chatId: msg.chatId,
-      author: {
-        id: user.id,
-        username: user.username,
-        avatar: user.avatar
-      }
-    }
-    return msgDto;
+    return toMessageDto(msg, user);
   }
 
   async deleteUserChatRole(user: User, chatId: number, targetUsername: string) {

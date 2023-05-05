@@ -2,9 +2,9 @@
     <div class="chat_element">
         <ChatMessage
             v-if="chatStore.isChatOpen"
-            v-for="message in chatStore.currentChat.messages"
+            v-for="message in chatStore.currentChat?.messages"
             :key="message.id"
-            :sender="message.user"
+            :author="message.author"
             :userIs="currentUser"
         >
             {{ message.content }}
