@@ -19,7 +19,7 @@ import { Request } from 'express'
 import { Chat, ChatMessage, UserChatRole, User } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { NewChatMessageDto } from './dto/message.dto';
-import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 
 @ApiTags('Chat')
@@ -38,12 +38,12 @@ export class ChannelController {
   }
 
   @Post('rooms')
-  async createNewChannel(@Req() req: Request, @Body() data: NewChannelDto) : Promise<Chat> {
+  async createNewChannel(@Req() req: Request, @Body() data: NewChannelDto) : Promise<DetailedChannelDto> {
 	  return this.channelService.createChannel(req.user as User, data)
   }
 
   @Get('rooms/:id')
-  async getOneChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto | NewChannelDto> {
+  async getOneChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) : Promise<DetailedChannelDto> {
 	  return this.channelService.getChannelDetails(req.user as User, id);
   }
 
@@ -57,14 +57,14 @@ export class ChannelController {
     return this.channelService.deleteChannel(req.user as User, id);
   }
 
-  @Put('rooms/:id/join')
-  async joinChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-    return this.channelService.joinChannel(req.user as User, id, data);
+  @Put('rooms/join')
+  async joinChannel(@Req() req: Request, @Body() data: JoinChannelDto) {
+    return this.channelService.joinChannel(req.user as User, data);
   }
 
-  @Put('rooms/:id/leave')
-  async leaveChannel(@Req() req: Request, @Param('id', new ParseIntPipe()) id: number) {
-    return this.channelService.leaveChannel(req.user as User, id);
+  @Put('rooms/leave')
+  async leaveChannel(@Req() req: Request, @Body() data: JoinChannelDto) {
+    return this.channelService.leaveChannel(req.user as User, data);
   }
 
   @Get('rooms/:id/messages')

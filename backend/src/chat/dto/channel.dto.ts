@@ -11,8 +11,15 @@ export class NewChannelDto {
   type: ChatType;
 
   @IsOptional()
-  @IsNotEmpty()
   password?: string;
+}
+
+export class JoinChannelDto {
+  @IsNumber()
+  chatId: number
+
+  @IsOptional()
+  password?: string
 }
 
 export class DetailedChannelDto {
