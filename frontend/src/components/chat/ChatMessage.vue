@@ -1,7 +1,7 @@
 <template>
     <div class="message_wrap" :class="side">
-        <div class="sender" @click="toggleUserActions(props.sender)" v-show="side === 'left'">
-            {{ props.sender.username }}
+        <div class="author" @click="toggleUserActions(props.author)" v-show="side === 'left'">
+            {{ props.author.username }}
         </div>
         <div class="content">
             <slot></slot>
@@ -17,20 +17,23 @@ import { defineProps, computed, ref } from 'vue'
 import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import UserActions from '@/components/chat/UserActions.vue'
-import type IUser from '@/interfaces/user/IUser'
+import type { IAuthor } from '@/interfaces/chat/IChatMessage'
+import { get } from '../../../utils'
 
 const props = defineProps<{
-    sender: IUser
-    userIs: number
+    author: IAuthor
+    userIs: number | undefined
 }>()
 
 const modalStore = useModalStore()
 
 let side = ref(computed(() => {
-    return props.sender.id === props.userIs ? 'right' : 'left'
+    return props.author.id === props.userIs ? 'right' : 'left'
 }))
 
-const toggleUserActions = (user: IUser) => {
+const toggleUserActions = async (author: IAuthor) => {
+    const user = await get(`users/id/${author.id}`, "Cannot get user details")
+       .then((res) => res.json())
     modalStore.loadAndDisplay(TheModal, UserActions, { user: user })
 }
 
@@ -57,7 +60,7 @@ const toggleUserActions = (user: IUser) => {
         background-color: $transparent-tertiary;
     }
 
-    .sender {
+    .author {
         font-weight: bold;
         &:hover {
             cursor: pointer;
