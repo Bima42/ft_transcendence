@@ -18,7 +18,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	async isFriend(userId: number, friendId: number) {
+	async isFriend(userId: number, friendId: number) : Promise<boolean> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
