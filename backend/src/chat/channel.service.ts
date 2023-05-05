@@ -2,15 +2,13 @@ import {
   BadRequestException,
   NotFoundException,
   ForbiddenException,
-  HttpCode,
-  HttpException,
   HttpStatus,
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { Prisma, UserChatRole } from '@prisma/client'
+import { UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
-import { UserChat, Chat, ChatType, ChatMessage, User} from '@prisma/client';
+import { UserChat, Chat, ChatMessage, User} from '@prisma/client';
 import { ChatMessageDto, NewChatMessageDto } from './dto/message.dto';
 import { DetailedChannelDto, JoinChannelDto, NewChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
@@ -165,11 +163,13 @@ export class ChannelService {
     return chat
   }
 
-  async createChannel(user: User, newChannel: NewChannelDto): Promise<Chat> {
-    const existingChannel = await this.findByName(newChannel.name);
-    if (existingChannel) {
-      return existingChannel;
-    }
+  async createChannel(user: User, newChannel: NewChannelDto): Promise<DetailedChannelDto> {
+    try {
+      const existingChannel = await this.findByName(newChannel.name);
+      if (existingChannel) {
+        return this.getChannelDetails(user, existingChannel.id);
+      }
+    } catch (e){}
 
     if (newChannel.password) {
       const saltRounds = 10;
@@ -180,7 +180,7 @@ export class ChannelService {
       data: newChannel
     });
 
-    // Cfeate owner role for user
+    // Create owner role for user
     await this.prismaService.userChat.create({
       data: {
         role: "OWNER",
@@ -189,7 +189,7 @@ export class ChannelService {
       }
     });
     Logger.log(`${user.username}#${user.id} created a new chat ${newChat.type} : ${newChat.name}#${newChat.id}`);
-    return newChat;
+    return this.getChannelDetails(user, newChat.id);
   }
 
   async updateChannel(user: User, chatId: number, newChannel: NewChannelDto) {
