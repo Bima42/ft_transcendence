@@ -198,6 +198,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const changeChatName = async function (newName: string): Promise<boolean> {
 		await post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
 			.then(() => {
+				setCurrentChat(currentChat.value!.id.toString())
 				updateStore()
 				return true
 			}).catch((err) => {

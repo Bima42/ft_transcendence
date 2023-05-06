@@ -25,7 +25,6 @@
 import { ref } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useChatStore } from '@/stores/chat'
-import ErrorBox from '@/components/error/ErrorBox.vue';
 
 const chatStore = useChatStore()
 const newName = ref('')
