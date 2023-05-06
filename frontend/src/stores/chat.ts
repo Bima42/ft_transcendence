@@ -1,13 +1,13 @@
-import {ref} from 'vue'
-import {defineStore} from 'pinia'
+import { ref } from 'vue'
+import { defineStore } from 'pinia'
 import type IChat from '@/interfaces/chat/IChat'
-import {io, Socket} from 'socket.io-client'
-import {getCookie} from 'typescript-cookie'
-import {get} from '../../utils'
+import { io, Socket } from 'socket.io-client'
+import { getCookie } from 'typescript-cookie'
+import { get, jsonHeaders, post, put } from '../../utils'
 import type IChatStore from '@/interfaces/chat/IChatStore'
 import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
-import {UserChatRoleEnum} from '@/interfaces/user/IUserChat'
+import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
 
 
@@ -19,6 +19,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const currentChat = ref<IChat | null>(null);
 	const chats = ref<IChat[]>([]);
 	const isChatOpen = ref<boolean>(false);
+	const publicChatList = ref<IChat[]>([]);
+	const whisperChatList = ref<IChat[]>([]);
+	const subscribedChannelsList = ref<IChat[]>([]);
+	const notSubscribedChannelsList = ref<IChat[]>([]);
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
 		if (!currentChat) return
@@ -44,6 +48,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			.then((res) => res.json())
 			.then((newChannel) => {
 				currentChat.value = newChannel;
+				isChatOpen.value = true;
 				getMessages()
 			})
 			.catch((err) => console.log(err));
@@ -79,26 +84,36 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 				console.error(err)
 			});
 	}
-	const retrievePublicChats = async function (): Promise<IChat[]> {
-		let chats: IChat[] = [];
-		await get('chat/rooms', 'Cannot load public channels')
+	const retrievePublicChats = async function (): Promise<boolean> {
+		await get('chat/rooms/public', 'Cannot load public channels')
 			.then((res) => res.json())
 			.then((chatList: IChat[]) => {
-				chats = chatList
+				publicChatList.value = chatList
 			})
-			.catch((err) => console.log('ChatStore error: ', err));
-		return chats;
+			.catch((err) => {
+				console.log('ChatStore error: ', err)
+				return false
+			})
+			.finally(() => {
+				return true
+			});
+		return false
 	}
 
-	const retrieveWhispers = async function (): Promise<IChat[]> {
-		let chats: IChat[] = [];
-		await get('chat/rooms?whispers=true', 'Failed to retrieve whispers list')
+	const retrieveWhispers = async function (): Promise<boolean> {
+		await get('chat/rooms/whispers', 'Failed to retrieve whispers list')
 			.then((res) => res.json())
 			.then((chatList: IChat[]) => (
-				chats = chatList
+				whisperChatList.value = chatList
 			))
-			.catch((err) => (console.log('ChatStore error: ', err)));
-		return chats;
+			.catch((err) => {
+				console.log('ChatStore error: ', err)
+				return false
+			})
+			.finally(() => {
+				return true
+			});
+		return false
 	}
 
 	const resetState = () => {
@@ -107,11 +122,95 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		chats.value = [];
 	}
 
+	const createChannel = async function (name: string, type: string, password?: string): Promise<boolean> {
+		await post('chat/rooms', 'Failed to create channel', jsonHeaders, {name, type, password})
+			.then((res) => res.json())
+			.catch((err) => {
+				console.log(err)
+				return false
+			})
+			.finally(() => {
+				return true
+			})
+		return false
+	}
+
+	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
+		await put('chat/rooms/' + chat.id + '/join', 'Failed to join channel', jsonHeaders, {
+			name: chat.name,
+			type: chat.type,
+			password: password
+		})
+			.then((res) => res.json())
+			.catch((err) => {
+				console.log(err)
+				return false
+			})
+			.finally(() => {
+				return true
+			})
+		return false
+	}
+
+	const leaveChannel = async function (chatId: string): Promise<boolean> {
+		await put('chat/rooms/' + chatId + '/leave', 'Failed to leave channel', jsonHeaders)
+			.then((res) => res.json())
+			.catch((err) => {
+				console.log(err)
+				return false
+			})
+			.finally(() => {
+				return true
+			})
+		return false
+	}
+
+	const subscribedChannels = async function (): Promise<boolean> {
+		await get('chat/rooms/subscribed', 'Failed to get subscribed channels')
+			.then((res) => res.json())
+			.then((chatList: IChat[]) => {
+				subscribedChannelsList.value = chatList
+			})
+			.catch((err) => {
+				console.log('ChatStore error: ', err)
+				return false
+			})
+			.finally(() => {
+				return true
+			});
+		return false
+	}
+
+	const getListOfNotSubscribedChannels = async function () {
+		if (!subscribedChannelsList.value.length) {
+			await subscribedChannels()
+		}
+		if (!publicChatList.value.length) {
+			await retrievePublicChats()
+		}
+		notSubscribedChannelsList.value = publicChatList.value.filter((channel) => {
+			return !subscribedChannelsList.value.find((subscribedChannel) => {
+				return channel.id === subscribedChannel.id
+			})
+		})
+	}
+
+	const updateStore = async function () {
+		await retrievePublicChats()
+		await retrieveWhispers()
+		await subscribedChannels()
+		await getListOfNotSubscribedChannels()
+	}
+
 	return {
 		socket,
 		currentChat,
 		chats,
 		isChatOpen,
+		publicChatList,
+		whisperChatList,
+		subscribedChannelsList,
+		notSubscribedChannelsList,
 		onNewMessage,
 		sendMessage,
 		setCurrentChat,
@@ -119,6 +218,12 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		getMessages,
 		retrievePublicChats,
 		retrieveWhispers,
-		resetState
+		resetState,
+		createChannel,
+		joinChannel,
+		leaveChannel,
+		subscribedChannels,
+		getListOfNotSubscribedChannels,
+		updateStore
 	}
 })

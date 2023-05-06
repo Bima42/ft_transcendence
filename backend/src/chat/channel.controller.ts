@@ -7,14 +7,18 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
-	Req
+	Req,
+	HttpException,
+	HttpStatus,
+	Logger
 } from '@nestjs/common';
 import {ChannelService} from './channel.service';
 import {ChatGateway} from './channel.gateway';
-import {UserChatRole} from '@prisma/client';
+import {Chat, ChatMessage, UserChatRole} from '@prisma/client';
 import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import {NewChatMessageDto} from './dto/message.dto';
 import {UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto} from './dto/channel.dto';
+import {length} from 'class-validator';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @ApiTags('Chat')
@@ -27,10 +31,19 @@ export class ChannelController {
 	) {
 	}
 
-	@Get('rooms')
-	getAllChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
-		const whispers: boolean = (req.query.whispers ? JSON.parse(req.query.whispers as string) : false);
-		return this.channelService.getAllChannelsForUser(req.user, whispers);
+	@Get('rooms/public')
+	async getPublicChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
+		return this.channelService.getPublicChannels(req.user);
+	}
+
+	@Get('rooms/whispers')
+	async getWhisperChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
+		return this.channelService.getWhisperChannels(req.user);
+	}
+
+	@Get('rooms/subscribed')
+	async getSubscribedChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
+		return this.channelService.getSubscribedChannels(req.user);
 	}
 
 	@Post('rooms')
@@ -73,6 +86,11 @@ export class ChannelController {
 		return this.channelService.postMessage(req.user, id, data);
 	}
 
+	@Get('rooms/subscriptions')
+	GetSubscriptions(@Req() req: RequestWithUser) {
+		return this.channelService.getSubscribedChannels(req.user);
+	}
+
 	@Put('rooms/:id/user')
 	async UpsertUserChat(@Req() req: RequestWithUser, @Body() action: UserchatAction, @Param('id', new ParseIntPipe()) chatId: number) {
 		const user = req.user;
@@ -100,4 +118,12 @@ export class ChannelController {
 		const userchat = await this.channelService.getChannelDetails(user, chatId);
 		this.channelGateway.server.emit('updateChannelList', userchat);
 	}
+
+	// @Put('rooms/edit-channel')
+	// async editChannel(@Req() req: RequestWithUser, @Body() data: {id: number, newName: string}) {
+	// 	return this.channelService.changeChatName(data.id, data.newName);
+	// }
+
+
+
 }

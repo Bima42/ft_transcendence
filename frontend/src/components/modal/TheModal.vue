@@ -45,6 +45,7 @@ function exitClick(e: Event) {
         flex-direction: row;
         justify-content: center;
         padding: 60px;
+        border: 2px solid $tertiary;
         @media (max-width: 768px) {
             padding: 20px;
         }
@@ -55,6 +56,9 @@ function exitClick(e: Event) {
         z-index: 10;
         top: 20px;
         right: 20px;
+        @media (max-width: 768px) {
+            display: none; //TODO: not sure :/
+        }
     }
 }
 </style>

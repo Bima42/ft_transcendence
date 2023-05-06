@@ -73,6 +73,10 @@ button {
         }
     }
 
+    &.circular {
+        border-radius: 50%;
+    }
+
     &.big {
         padding: 10px;
         img {

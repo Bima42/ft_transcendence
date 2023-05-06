@@ -11,7 +11,7 @@
             >
                 {{ chat.name }}
             </h2>
-            <h2 v-else>
+            <h2 @click="toggleEditChatModal" v-else>
                 {{ chatStore.currentChat.name }}
             </h2>
         </section>
@@ -30,20 +30,33 @@
                 <TypeBox/>
             </template>
         </div>
+        <ButtonCustom class="new_chat_button"
+                      :style="'big circular'"
+                      v-if="!chatStore.isChatOpen"
+                      :click="toggleAddChatModal"
+        >
+            <font-awesome-icon icon="fa-plus"/>
+        </ButtonCustom>
     </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import ChatList from '@/components/chat/ChatList.vue'
 import ChatElements from '@/components/chat/ChatElements.vue'
 import TypeBox from '@/components/chat/TypeBox.vue'
 import { useChatStore } from '@/stores/chat'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import { useModalStore } from '@/stores/modal'
+import TheModal from '@/components/modal/TheModal.vue'
+import SelectChannelActionModal from '@/components/modal/SelectChannelActionModal.vue';
+import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
 
 const props = defineProps<{}>()
 
 const selectedChatList = ref('public')
 const chatStore = useChatStore()
+const modalStore = useModalStore()
 
 const chatListsSources = ref({
     chat1: {
@@ -55,11 +68,20 @@ const chatListsSources = ref({
         id: 'private',
     },
 })
+
 const selectChatList = (chatID: string) => {
     selectedChatList.value = chatID
 }
 const resetChat = () => {
     chatStore.resetState()
+}
+
+const toggleAddChatModal = () => {
+    modalStore.loadAndDisplay(TheModal, SelectChannelActionModal, {})
+}
+
+const toggleEditChatModal = () => {
+    modalStore.loadAndDisplay(TheModal, EditChatModal, {})
 }
 </script>
 
@@ -109,6 +131,13 @@ const resetChat = () => {
         height: 100%;
         width: 100%;
         overflow: auto;
+    }
+
+    .new_chat_button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1;
     }
 }
 
