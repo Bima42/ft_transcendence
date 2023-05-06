@@ -158,6 +158,7 @@ export class ChannelService {
 			newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
 		}
 
+		console.log(newChannel)
 		const newChat = await this.prismaService.chat.create({
 			data: newChannel
 		});

@@ -123,7 +123,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const createChannel = async function (name: string, type: string, password?: string): Promise<boolean> {
-		await post('chat/rooms', 'Failed to create channel', jsonHeaders, {name, type, password})
+		if (password == ''){
+			password = undefined
+		}
+		await post('chat/rooms', 'Failed to create channel', jsonHeaders, { name, type, password })
 			.then((res) => res.json())
 			.catch((err) => {
 				console.log(err)

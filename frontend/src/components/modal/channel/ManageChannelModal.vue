@@ -8,7 +8,7 @@
                     <input v-if="edit" type="text" v-model="newName" :placeholder="chatStore.currentChat.name"/>
                     <h4 v-else>{{ chatStore.currentChat.name }}</h4>
                 </div>
-                <div class="channel_info">
+                <div class="channel_info" v-if="chatStore.currentChat.password.length > 0">
                     <h3>Channel Password:</h3>
                     <input v-if="edit" type="text" v-model="newPassword" placeholder="Channel Password" onsubmit=""/>
                     <h4 v-else>********</h4>
