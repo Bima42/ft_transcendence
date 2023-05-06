@@ -515,4 +515,14 @@ export class ChannelService {
 			data: {role: 'OWNER'},
 		});
 	}
+
+	async changeChatName(chatId: number, newName: string): Promise<void> {
+		if (!newName) {
+			throw new BadRequestException('New name cannot be empty');
+		}
+		await this.prismaService.chat.update({
+			where: {id: chatId},
+			data: {name: newName},
+		});
+	}
 }

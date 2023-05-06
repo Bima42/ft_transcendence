@@ -195,6 +195,18 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		})
 	}
 
+	const changeChatName = async function (newName: string): Promise<boolean> {
+		await post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
+			.then(() => {
+				updateStore()
+				return true
+			}).catch((err) => {
+				console.log(err)
+				return false
+			})
+		return false
+	}
+
 	const updateStore = async function () {
 		await retrievePublicChats()
 		await retrieveWhispers()
@@ -224,6 +236,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		leaveChannel,
 		subscribedChannels,
 		getListOfNotSubscribedChannels,
+		changeChatName,
 		updateStore
 	}
 })

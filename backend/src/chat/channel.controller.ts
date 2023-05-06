@@ -119,11 +119,9 @@ export class ChannelController {
 		this.channelGateway.server.emit('updateChannelList', userchat);
 	}
 
-	// @Put('rooms/edit-channel')
-	// async editChannel(@Req() req: RequestWithUser, @Body() data: {id: number, newName: string}) {
-	// 	return this.channelService.changeChatName(data.id, data.newName);
-	// }
-
-
-
+	@Post('rooms/editChannelName')
+	@ApiBody({required: true})
+	async changeChatName(@Body() data: { id: number, newName: string }) {
+		return this.channelService.changeChatName(data.id, data.newName);
+	}
 }

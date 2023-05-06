@@ -1,8 +1,7 @@
 <template>
     <section class="manage_channel_wrap">
         <h2>Edit Channel</h2>
-        <form @submit="handleSubmit">
-
+        <form @submit="submitForm">
             <div class="channel_infos">
                 <div class="channel_info">
                     <h3>Channel Name:</h3>
@@ -15,20 +14,18 @@
                     <h4 v-else>********</h4>
                 </div>
                 <ButtonCustom :style="'big'" @click="submitForm" :loading="loading">
-                    <h2>{{ edit ? 'save' : 'edit' }}</h2>
+                    <h4>{{ edit ? 'Save' : 'Edit' }}</h4>
                 </ButtonCustom>
             </div>
         </form>
-
-
     </section>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
-import {useChatStore} from '@/stores/chat'
-import PhaserContainer from '@/components/PhaserContainer.vue';
+import { useChatStore } from '@/stores/chat'
+import ErrorBox from '@/components/error/ErrorBox.vue';
 
 const chatStore = useChatStore()
 const newName = ref('')
@@ -36,14 +33,13 @@ const newPassword = ref('')
 
 const edit = ref(false)
 const loading = ref(false)
-
-const handleSubmit = () => {
-    console.log(newPassword, newName)
-}
-
-const submitForm = (e: Event) => {
+const submitForm = async (e: Event) => {
     e.preventDefault()
     if (edit.value) {
+        if (newName.value === '') {
+            return
+        }
+        await chatStore.changeChatName(newName.value)
         loading.value = true
         loading.value = false
     }

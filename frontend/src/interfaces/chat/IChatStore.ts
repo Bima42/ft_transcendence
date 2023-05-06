@@ -1,6 +1,5 @@
 import type IChat from '@/interfaces/chat/IChat'
 import type { Ref } from 'vue'
-import type { NewChannelDto } from '@/interfaces/chat/NewChannelDto';
 import type { UserChatRoleEnum } from '../user/IUserChat';
 import type IChatMessage from './IChatMessage';
 
@@ -26,5 +25,6 @@ export default interface IChatStore {
 	leaveChannel: (chatId: string) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;
 	getListOfNotSubscribedChannels: () => void;
+	changeChatName: (newName: string) => Promise<boolean>;
 	updateStore: () => Promise<void>;
 }
