@@ -13,6 +13,7 @@ export default interface IChatStore {
 	whisperChatList: Ref<IChat[]>;
 	subscribedChannelsList: Ref<IChat[]>;
 	notSubscribedChannelsList: Ref<IChat[]>;
+	isChannelPasswordProtected: Ref<boolean>;
 	sendMessage: (msg: any) => void;
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<IChat[]>;
@@ -26,5 +27,6 @@ export default interface IChatStore {
 	subscribedChannels: () => Promise<boolean>;
 	getListOfNotSubscribedChannels: () => void;
 	changeChatName: (newName: string) => Promise<boolean>;
+	currentChatPasswordProtected: (id: string) => Promise<boolean>;
 	updateStore: () => Promise<void>;
 }

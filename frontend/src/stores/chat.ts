@@ -23,6 +23,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const whisperChatList = ref<IChat[]>([]);
 	const subscribedChannelsList = ref<IChat[]>([]);
 	const notSubscribedChannelsList = ref<IChat[]>([]);
+	const isChannelPasswordProtected = ref<boolean>(false);
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
 		if (!currentChat) return
@@ -52,6 +53,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 				getMessages()
 			})
 			.catch((err) => console.log(err));
+		await currentChatPasswordProtected()
 		return true
 	}
 
@@ -211,6 +213,15 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return false
 	}
 
+	const currentChatPasswordProtected = async function (): Promise<void> {
+		const response = await get(
+			'chat/rooms/' + currentChat.value?.id + '/isPasswordProtected',
+			'Failed to get password protection status',
+			jsonHeaders
+		)
+		isChannelPasswordProtected.value = await response.json()
+	}
+
 	const updateStore = async function () {
 		await retrievePublicChats()
 		await retrieveWhispers()
@@ -227,6 +238,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		whisperChatList,
 		subscribedChannelsList,
 		notSubscribedChannelsList,
+		isChannelPasswordProtected,
 		onNewMessage,
 		sendMessage,
 		setCurrentChat,
@@ -241,6 +253,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		subscribedChannels,
 		getListOfNotSubscribedChannels,
 		changeChatName,
+		currentChatPasswordProtected,
 		updateStore
 	}
 })

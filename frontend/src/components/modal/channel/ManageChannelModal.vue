@@ -8,9 +8,9 @@
                     <input v-if="edit" type="text" v-model="newName" :placeholder="chatStore.currentChat.name"/>
                     <h4 v-else>{{ chatStore.currentChat.name }}</h4>
                 </div>
-                <div class="channel_info" v-if="chatStore.currentChat.password.length > 0">
+                <div class="channel_info" v-if="chatStore.isChannelPasswordProtected">
                     <h3>Channel Password:</h3>
-                    <input v-if="edit" type="text" v-model="newPassword" placeholder="Channel Password" onsubmit=""/>
+                    <input v-if="edit" type="text" v-model="newPassword" placeholder="Channel Password"/>
                     <h4 v-else>********</h4>
                 </div>
                 <ButtonCustom :style="'big'" @click="submitForm" :loading="loading">
@@ -38,8 +38,8 @@ const submitForm = async (e: Event) => {
         if (newName.value === '') {
             return
         }
-        await chatStore.changeChatName(newName.value)
         loading.value = true
+        await chatStore.changeChatName(newName.value)
         loading.value = false
     }
     edit.value = !edit.value

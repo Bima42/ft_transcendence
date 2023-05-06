@@ -526,4 +526,14 @@ export class ChannelService {
 			data: {name: newName},
 		});
 	}
+
+	async isPasswordProtected(chatId: number): Promise<boolean> {
+		const chat = await this.prismaService.chat.findUnique({
+			where: {id: chatId},
+		});
+		if (!chat) {
+			throw new NotFoundException(`Chat not found`);
+		}
+		return chat.password != null;
+	}
 }

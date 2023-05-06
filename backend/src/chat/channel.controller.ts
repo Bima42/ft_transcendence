@@ -124,4 +124,9 @@ export class ChannelController {
 	async changeChatName(@Body() data: { id: number, newName: string }) {
 		return this.channelService.changeChatName(data.id, data.newName);
 	}
+
+	@Get('rooms/:id/isPasswordProtected')
+	async isPasswordProtected(@Param('id', new ParseIntPipe()) id: number) {
+		return this.channelService.isPasswordProtected(id);
+	}
 }

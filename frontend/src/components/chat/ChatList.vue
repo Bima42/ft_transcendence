@@ -25,9 +25,10 @@ const props = defineProps<{
     selectedChatList: string
 }>()
 
-const toggleChat = (id: number) => {
+const toggleChat = async (id: number) => {
     const castedId = id.toString()
-    if (!chatStore.setCurrentChat(castedId)) {
+    const response = chatStore.setCurrentChat(castedId)
+    if (!response) {
         console.error('Chat not found') //TODO: set variable and display error message
         return
     }
