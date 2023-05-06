@@ -30,7 +30,9 @@ const channelName = ref('')
 const channelType = ref('')
 
 const handleNewChannelSubmit = async (e: Event) => {
+    e.preventDefault()
     await chatStore.createChannel(channelName.value, channelType.value, password.value)
+    chatStore.updateStore()
     modalStore.resetState()
 }
 </script>
