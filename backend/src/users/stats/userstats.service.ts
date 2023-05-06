@@ -62,20 +62,36 @@ export class UserStatsService {
 		return totalScore / playedGames;
 	}
 
-	async getEloHistoryByUserId(userId: number): Promise<number[]> {
+	async getEloHistoryByUserId(userId: number) {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
 				userId: userId
 			},
 			select: {
-				elo: true
+				elo: true,
+				game: {
+					select: {
+						createdAt: true
+					}
+				}
 			}
 		});
-		const eloHistory = [];
+		const eloHistory: number[] = [];
+		const dateHistory: Date[] = [];
 		for (const game of games) {
 			eloHistory.push(game.elo);
+			dateHistory.push(game.game.createdAt);
 		}
-		return eloHistory;
+
+		if (eloHistory.length > 50)
+			eloHistory.splice(0, eloHistory.length - 20);
+		if (dateHistory.length > eloHistory.length)
+			dateHistory.splice(0, dateHistory.length - eloHistory.length);
+
+		return {
+			eloHistory: eloHistory,
+			dateHistory: dateHistory
+		}
 	}
 
 	async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
@@ -92,15 +108,13 @@ export class UserStatsService {
 		const winRate = await this.getWinRateByUserId(userId);
 		const elo = await this.getEloByUserId(userId);
 		const averageScore = await this.getAverageScoreByUserId(userId);
-		const eloHistory = await this.getEloHistoryByUserId(userId);
 		return {
 			username: username,
 			playedGames: playedGames,
 			wonGames: wonGames,
 			winRate: winRate,
-			elo: elo,
-			eloHistory: eloHistory,
 			averageScore: averageScore,
+			elo: elo,
 		}
 	}
 
@@ -115,5 +129,16 @@ export class UserStatsService {
 		stats.sort((a, b) => b.elo - a.elo);
 
 		return stats;
+	}
+
+	async getHighestElo(): Promise<number> {
+		const users = await this.prismaService.user.findMany();
+		let highestElo = 0;
+		for (const user of users) {
+			const elo = await this.getEloByUserId(user.id);
+			if (elo > highestElo)
+				highestElo = elo;
+		}
+		return highestElo;
 	}
 }

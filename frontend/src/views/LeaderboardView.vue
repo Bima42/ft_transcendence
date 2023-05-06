@@ -36,7 +36,12 @@ const sortDatas = (header: string) => {
     datas.value.sort((a, b) => {
       return b.playedGames - a.playedGames
     })
-  } else if (header == 'Elo') {
+  } else if(header == 'Average Score') {
+      datas.value.sort((a, b) => {
+        return b.averageScore - a.averageScore
+      })
+  }
+  else if (header == 'Elo') {
     datas.value.sort((a, b) => {
       return b.elo - a.elo
     })
@@ -47,11 +52,14 @@ const tableHeaders = {
   user: {
     name: 'Username'
   },
+  games: {
+    name: 'Games'
+  },
   winrate: {
     name: 'Winrate'
   },
-  games: {
-    name: 'Games'
+  averageScore: {
+    name: 'Average Score'
   },
   elo: {
     name: 'Elo'

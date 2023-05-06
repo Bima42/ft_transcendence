@@ -40,4 +40,14 @@ export class UserStatsController {
 	async getStatsByUserId(@Param('id', ParseIntPipe) userId: number): Promise<PlayerStatsDto> {
 		return this.userStatsService.getStatsByUserId(userId);
 	}
+
+	@Get('elo/history/:id')
+	async getEloHistoryByUserId(@Param('id', ParseIntPipe) userId: number) {
+		return this.userStatsService.getEloHistoryByUserId(userId);
+	}
+
+	@Get('elo/highest')
+	async getHighestElo(): Promise<number> {
+		return this.userStatsService.getHighestElo();
+	}
 }

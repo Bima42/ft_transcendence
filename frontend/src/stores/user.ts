@@ -96,8 +96,7 @@ export const useUserStore = defineStore('user', () => {
     return user.value
   }
 
-	const uploadAvatar = function (file: FormData, loading: Ref) {
-		loading.value = true
+	const uploadAvatar = function (file: FormData) {
 		post(
 			`users/avatar/${user.value?.id}`,
 			'Failed to upload avatar',
@@ -110,11 +109,9 @@ export const useUserStore = defineStore('user', () => {
 				const datas = json as IUser
 				const avatar = datas.avatar
 				updateAvatar(avatar)
-				loading.value = false
 			})
 			.catch(error => {
 				console.log(error)
-				loading.value = false
 			})
 	}
 
@@ -144,6 +141,24 @@ export const useUserStore = defineStore('user', () => {
 		return response.json()
 	}
 
+	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
+		const response = await get(
+			`users/stats/elo/history/${user_id}`,
+			'Failed to get elo history',
+			jsonHeaders,
+		)
+		return response.json()
+	}
+
+	const getHighestElo = async () => {
+		const response = await get(
+			`users/stats/elo/highest`,
+			'Failed to get highest elo',
+			jsonHeaders,
+		)
+		return response.json()
+	}
+
 	return {
 		user,
 		resetState,
@@ -153,10 +168,12 @@ export const useUserStore = defineStore('user', () => {
 		isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
-    updateInfos,
+		updateInfos,
 		uploadAvatar,
 		updateAvatar,
 		getUserStats,
-		getLeaderboard
+		getLeaderboard,
+		getEloHistory,
+		getHighestElo
 	}
 });

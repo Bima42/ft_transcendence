@@ -1,80 +1,56 @@
 <template>
   <div class="stats">
-    <Doughnut :data="doughnutData" :options="doughnutOptions" />
-<!--    <Line :data="lineData" :options="lineOptions" />-->
+    <LineChart v-if="userHistory" :userEloHistory="userHistory" />
   </div>
-
 </template>
 
 <script setup lang="ts">
+import LineChart from '@/components/charts/LineChart.vue';
+import { useUserStore } from '@/stores/user';
+import { ref } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title
-} from 'chart.js'
-import { Doughnut, Line } from 'vue-chartjs'
+import type IEloHistory from '@/interfaces/user/IEloHistory';
 
-const props = defineProps<{
-  userStats: IUserStats
-}>()
+const userStore = useUserStore()
 
-ChartJS.register(ArcElement, Tooltip, Legend)
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-)
+const userStats = ref<IUserStats | null>(null)
+const userHistory = ref<IEloHistory | null>(null)
 
-const lostGames = props.userStats.playedGames - props.userStats.wonGames
+userStore.getUserStats().then((stats) => {
+  userStats.value = stats
+})
 
-const doughnutData = {
-  labels: ['Games Lost', 'Games Won'],
-  datasets: [
-    {
-      backgroundColor: ['#393E46', '#00ADB5'],
-      data: [lostGames, props.userStats.wonGames]
-    }
-  ]
-}
+userStore.getEloHistory().then((history) => {
+  history.dateHistory = Object.values(history.dateHistory).map(dateString => {
+    const date = new Date(dateString as string);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  });
+  userHistory.value = history
+})
 
-const doughnutOptions = {
-  responsive: true,
-  maintainAspectRatio: false
-}
-
-// const lineData = {
-//   labels: ['April', 'May', 'June', 'July'],
-//   datasets: [
-//     {
-//       label: 'Elo Progression',
-//       backgroundColor: '#00ADB5',
-//       data: props.userStats.eloHistory
-//     }
-//   ]
-// }
-//
-// const lineOptions = {
-//   responsive: true,
-//   maintainAspectRatio: false
-// }
 </script>
 
 <style scoped lang="scss">
 .stats {
   display: flex;
-  flex-direction: column;
-  max-width: 90vw;
-  max-height: 40vh;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+
+  .chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
+    box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
+    border-radius: 10px;
+    padding: 20px;
+  }
 }
 </style>

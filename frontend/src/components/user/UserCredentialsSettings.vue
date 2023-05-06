@@ -1,11 +1,18 @@
 <template>
-    <UsernameInput/>
-    <ButtonCustom
-        @click="openModal('TwoFA')"
-        :style="'small'"
-    >
-        {{ userStore.user?.twoFA ? 'Deactivate TwoFA' : 'Activate TwoFA' }}
-    </ButtonCustom>
+	<section class="user_credentials">
+		<UsernameInput/>
+		<ButtonCustom
+			:style="'small adapt'"
+		>
+			{{ 'Settings' }}
+		</ButtonCustom>
+		<ButtonCustom
+			@click="openModal('TwoFA')"
+			:style="'small adapt'"
+		>
+			{{ 'Two FA' }}
+		</ButtonCustom>
+	</section>
 </template>
 
 <script setup lang="ts">
@@ -35,5 +42,11 @@ const openModal = (modalName: string) => {
 </script>
 
 <style scoped lang="scss">
-
+.user_credentials {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 15px;
+}
 </style>

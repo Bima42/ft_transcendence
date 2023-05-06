@@ -45,7 +45,8 @@ const modalStore = useModalStore()
     width: 100vw;
     height: 100vh;
     font-weight: normal;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     .UI-grid {
         display: grid;

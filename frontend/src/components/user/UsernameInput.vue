@@ -1,7 +1,7 @@
 <template>
     <div class="userinput-wrapper">
         <template v-if="editing">
-            <h4>{{ userValue }}</h4>
+            <h3>{{ userValue }}</h3>
             <ButtonCustom @click="startEditing" :style="'small'">
                 <font-awesome-icon icon="fa-pencil" />
             </ButtonCustom>
@@ -48,7 +48,7 @@ const cancel = () => {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
 
     input {
         border: none;

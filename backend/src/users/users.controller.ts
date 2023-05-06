@@ -90,5 +90,4 @@ export class UsersController {
   ) {
       return this.usersService.updateAvatar(userId, file.path);
   }
-
 }

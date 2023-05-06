@@ -1,38 +1,54 @@
 <template>
     <section class="settings_wrapper">
         <section class="profile_wrap">
-            <div class="user_avatar_wrap">
-                <UserPicture
-                    :url="userStore.user?.avatar"
-                    :type="'big'"
-                />
-                <UploadAvatarButtons/>
-            </div>
-            <div class="user_credentials">
-                <UserCredentialsSettings/>
-            </div>
+			<div class="user_settings">
+				<UserPicture :url="userStore.user?.avatar" :type="'big'"/>
+				<UserCredentialsSettings/>
+			</div>
+			<div class="user_progression_bar">
+				<ProgressionsBar :stats="winRateStat" :text="winRateText"/>
+				<ProgressionsBar :stats="eloStat" :text="eloText"/>
+			</div>
         </section>
         <section class="scores_wrap">
-          <UserStats v-if="userStats" :userStats="userStats"/>
+          <UserStats/>
         </section>
     </section>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user'
 import UserPicture from '@/components/avatar/UserPicture.vue'
-import UploadAvatarButtons from '@/components/avatar/UploadAvatarButtons.vue'
 import UserCredentialsSettings from '@/components/user/UserCredentialsSettings.vue'
 import UserStats from '@/components/user/UserStats.vue';
-import type IUserStats from '@/interfaces/user/IUserStats';
+import { useUserStore } from '@/stores/user';
+import ProgressionsBar from '@/components/charts/ProgressBars.vue';
 import { ref } from 'vue';
+import type IUserStats from '@/interfaces/user/IUserStats';
 
 const userStore = useUserStore()
-
 const userStats = ref<IUserStats | null>(null)
-userStore.getUserStats().then((stats) => {
-    userStats.value = stats
+const winRateStat = ref<number | null>(null)
+const winRateText = ref<string | null>(null)
+
+const highestElo = ref<number | null>(null)
+const eloStat = ref<number | null>(null)
+const eloText = ref<string | null>(null)
+
+userStore.getHighestElo().then((elo) => {
+	highestElo.value = elo
 })
+
+userStore.getUserStats().then((stats) => {
+	userStats.value = stats
+	winRateStat.value = stats.winRate
+	winRateText.value = `${stats.winRate}%`
+	eloText.value = `${stats.elo} Points`
+
+	if (highestElo.value === null) return
+	eloStat.value = stats.elo * 100 / highestElo.value
+	console.log(eloStat.value)
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -45,6 +61,7 @@ userStore.getUserStats().then((stats) => {
     justify-content: space-evenly;
     flex-direction: column;
     padding: 5px;
+    gap: 20px;
 
     .profile_wrap {
         flex: 1;
@@ -52,23 +69,19 @@ userStore.getUserStats().then((stats) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-direction: row;
 
-        .user_credentials {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 50%;
-        }
-    }
+		.user_settings, .user_progression_bar {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 20px;
+			width: 50%;
+		}
 
-    .user_avatar_wrap {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        gap: 10px;
-        width: 50%;
+		.user_progression_bar {
+			flex-wrap: wrap;
+			justify-content: space-evenly;
+		}
     }
 
     .scores_wrap {
@@ -78,7 +91,6 @@ userStore.getUserStats().then((stats) => {
         align-items: center;
         justify-content: center;
         flex-direction: row;
-        gap: 20px;
     }
 }
 </style>
