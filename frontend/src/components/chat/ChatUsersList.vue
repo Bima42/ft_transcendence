@@ -9,6 +9,9 @@
             >
                 {{ user.user.username }}
             </li>
+            <li v-if="userList.length === 1">
+                You are alone in this channel
+            </li>
         </ul>
     </section>
 </template>
