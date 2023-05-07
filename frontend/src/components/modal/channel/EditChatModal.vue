@@ -1,5 +1,6 @@
 <template>
     <div class="option_wrap">
+        <h2>Select the actions you wish to perform</h2>
         <ButtonCustom :style="'big'" :click="() => handleClick('manageChannelUsers')">
             <h1>manage channel users</h1>
         </ButtonCustom>
@@ -40,6 +41,7 @@ const handleClick = (option: string) => {
     justify-content: center;
     gap: 10px;
     font-weight: bold;
+    text-align: center;
 
     &:hover {
         cursor: pointer;

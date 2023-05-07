@@ -4,8 +4,10 @@
             <li
                 class="user"
                 v-for="user in userList"
+                :key="user.user.id"
+                :id="user.user.id"
                 v-show="userStore.user.id !== user.user.id"
-                @click="setSelectedUser(user.user)"
+                @click="handleClick(user.user)"
             >
                 {{ user.user.username }}
             </li>
@@ -17,7 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import {useUserStore} from '@/stores/user'
+import { useUserStore } from '@/stores/user'
+import type IUser from '@/interfaces/user/IUser';
 
 const userStore = useUserStore()
 
@@ -25,6 +28,19 @@ const props = defineProps<{
     userList: any,
     setSelectedUser: (user: any) => void
 }>()
+
+const handleClick = (user: IUser) => {
+    let newSelection = document.getElementById(user.id.toString()) as HTMLElement
+    let oldSelection = document.getElementsByClassName('selected_user')[0] as HTMLElement
+    console.log(newSelection, oldSelection)
+    if (oldSelection) {
+        oldSelection.classList.remove('selected_user')
+    }
+    if (newSelection) {
+        newSelection.classList.add('selected_user')
+    }
+    props.setSelectedUser(user)
+}
 </script>
 
 <style scoped lang="scss">
@@ -53,6 +69,10 @@ const props = defineProps<{
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+
+            &.selected_user {
+                background: $tertiary;
+            }
         }
     }
 }

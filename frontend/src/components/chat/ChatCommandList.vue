@@ -2,9 +2,11 @@
     <section class="list_container">
         <ul class="commands">
             <li
-                v-for="command in commands"
+                v-for="(command, x) in commands"
                 class="command"
-                @click="setSelectedCommand(command.command)"
+                :key="x"
+                :id="command.command"
+                @click="handleClick(command.command)"
             >
                 {{ command.command }}
             </li>
@@ -18,6 +20,19 @@ import {ref} from 'vue'
 const props = defineProps<{
     setSelectedCommand: (command: string) => void
 }>()
+
+const handleClick = (command: string) => {
+    let newSelection = document.getElementById(command) as HTMLElement
+    let oldSelection = document.getElementsByClassName('selected_command')[0] as HTMLElement
+    console.log(newSelection, oldSelection)
+    if (oldSelection) {
+        oldSelection.classList.remove('selected_command')
+    }
+    if (newSelection) {
+        newSelection.classList.add('selected_command')
+    }
+    props.setSelectedCommand(command)
+}
 
 const commands = ref(
     [{
@@ -70,6 +85,10 @@ const commands = ref(
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+
+            &.selected_command {
+                background: $tertiary;
+            }
         }
     }
 }
