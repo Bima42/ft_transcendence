@@ -1,5 +1,6 @@
 <template>
     <section class="user_information_modal">
+		<hr>
         <section class="user_data">
             <UserPicture :type="'small'" :url="modalStore.data.user.avatar"></UserPicture>
             <section class="data">
@@ -7,13 +8,12 @@
                 <section class="button_wrap">
                     <UserInteractions :invitePlay="true"/>
                 </section>
+				<ButtonCustom :style="'small'" @click="goToDetailedProfile(modalStore.data.user.id)">
+					View Detailed Profile
+				</ButtonCustom>
             </section>
         </section>
         <hr>
-        <section class="user_score">
-            <h4>Score</h4>
-            <h4>Some big numbers whew</h4>
-        </section>
     </section>
 </template>
 
@@ -21,8 +21,15 @@
 import { useModalStore } from '@/stores/modal'
 import UserPicture from '@/components/avatar/UserPicture.vue';
 import UserInteractions from '@/components/user/UserInteractions.vue';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 const modalStore = useModalStore()
+
+const goToDetailedProfile = (id: string) => {
+	router.push({ name: 'profile', params: { id } });
+}
 
 </script>
 

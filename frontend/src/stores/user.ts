@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
-import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
 import type IUserStats from '@/interfaces/user/IUserStats';
 import type IMatchHistory from '@/interfaces/user/IMatchHistory';
@@ -169,6 +168,14 @@ export const useUserStore = defineStore('user', () => {
 		return response.json()
 	}
 
+	const getUserInfos = (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
+		return get(
+			`users/id/${user_id}`,
+			'Failed to get user infos',
+			jsonHeaders,
+		).then(response => response.json())
+	}
+
 	return {
 		user,
 		resetState,
@@ -185,6 +192,7 @@ export const useUserStore = defineStore('user', () => {
 		getLeaderboard,
 		getEloHistory,
 		getHighestElo,
-		getMatchHistory
+		getMatchHistory,
+		getUserInfos
 	}
 });

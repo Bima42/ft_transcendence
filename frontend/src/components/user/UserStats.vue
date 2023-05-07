@@ -1,6 +1,9 @@
 <template>
 	<LineChart v-if="userEloHistory" :userEloHistory="userEloHistory" />
-	<Table v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" />
+	<div class="match_history score_card">
+		<h2>Match History</h2>
+		<Table v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" />
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -51,5 +54,16 @@ const tableHeaders = {
 </script>
 
 <style scoped lang="scss">
+.match_history {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: $small_gap;
 
+	h3 {
+		font-size: 20px;
+	}
+}
 </style>

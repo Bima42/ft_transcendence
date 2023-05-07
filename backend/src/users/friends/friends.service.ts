@@ -37,6 +37,8 @@ export class FriendsService {
 				status: true
 			}
 		});
+		if (!friendship)
+			return false;
 		return friendship.status === FriendshipStatus.CANCELED;
 	}
 
@@ -66,7 +68,7 @@ export class FriendsService {
 
 		// If the friendship was canceled, we just update the status to pending
 		if (await this._isFriendshipCanceled(userId, friendName)) {
-			return this.prismaService.friendship.updateMany({
+			await this.prismaService.friendship.updateMany({
 				where: {
 					OR: [
 						{
@@ -81,6 +83,21 @@ export class FriendsService {
 				},
 				data: {
 					status: FriendshipStatus.PENDING
+				}
+			});
+
+			return this.prismaService.friendship.findFirst({
+				where: {
+					OR: [
+						{
+							userId: userId,
+							friendId: friend.id,
+						},
+						{
+							userId: friend.id,
+							friendId: userId,
+						}
+					],
 				}
 			});
 		}
@@ -127,7 +144,7 @@ export class FriendsService {
 		const friend = await this.usersService.findByName(friendName);
 		if (!await this.isWaitingRequest(userId, friend))
 			throw new BadRequestException('There is no request to cancel');
-		const updated = await this.prismaService.friendship.update({
+		return this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
 					userId: userId,
@@ -138,8 +155,6 @@ export class FriendsService {
 				status: FriendshipStatus.CANCELED
 			}
 		});
-
-		return updated.status === FriendshipStatus.CANCELED;
 	}
 
 	/**
