@@ -21,13 +21,8 @@ const props = defineProps<{
     type: string
 }>()
 
-<<<<<<< HEAD
 const userStore = useUserStore()
-const defaultUrl = `${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
-=======
 const defaultUrl = `https://${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
-
->>>>>>> dev
 const imgUrl = ref(props.url || defaultUrl)
 
 const handleImageChange = (event: Event) => {

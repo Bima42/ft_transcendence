@@ -4,7 +4,7 @@
 			<div class="user_settings">
 				<UserPicture :url="user?.avatar" :type="'big'"/>
 				<div class="buttons_wrap">
-					<h2>{{ user?.username }}</h2>
+					<h2 v-if="!isSelf">{{ user?.username }}</h2>
 					<UserCredentialsSettings v-if="isSelf" />
 					<UserInteractions v-else :invitePlay="true" :targetUser="user" />
 				</div>
