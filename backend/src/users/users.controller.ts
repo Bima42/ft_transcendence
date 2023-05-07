@@ -14,11 +14,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Request } from 'express'
 import * as path from 'path';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 import { UpdateUserDto, UserDto } from './dto/user.dto';
-import { User } from '@prisma/client';
 
 
 const storage = {
@@ -60,16 +58,17 @@ export class UsersController {
    * ParseIntPipe : protection to ensures that a method handler parameter is converted to a JavaScript integer
    * (or throws an exception if the conversion fails).
    *
-   * @param userId
+   * @param req: RequestWithUser
+   * @param targetId: number
    * @param data: User
    */
   @Patch('id/:id')
   async updateUser(
-        @Req() req: Request,
+        @Req() req: RequestWithUser,
         @Param('id', ParseIntPipe) targetId: number,
         @Body() data: UpdateUserDto
   ): Promise<UserDto> {
-      return this.usersService.updateData(req.user as User, targetId, data);
+      return this.usersService.updateData(req.user, targetId, data);
   }
 
   @Delete('id/:id')

@@ -31,8 +31,6 @@ const userStore = useUserStore()
     width: 90%;
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-evenly;
     flex-direction: column;
     padding: 5px;
     gap: $medium_gap;
@@ -43,11 +41,13 @@ const userStore = useUserStore()
         display: flex;
         align-items: center;
         justify-content: center;
+		gap: $small_gap;
 
 		.user_settings, .user_progression_bar {
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			flex-wrap: wrap;
 			gap: $medium_gap;
 			width: 50%;
 		}

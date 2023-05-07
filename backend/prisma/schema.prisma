@@ -103,7 +103,7 @@ enum FriendshipStatus {
   PENDING
   ACCEPTED
   DECLINED
-  BLOCKED
+  CANCELED
 }
 
 enum UserStatus {
