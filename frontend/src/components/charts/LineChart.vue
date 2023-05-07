@@ -17,6 +17,7 @@ import {
 } from 'chart.js';
 import { Line } from 'vue-chartjs'
 import type IEloHistory from '@/interfaces/user/IEloHistory';
+import { watch } from 'vue';
 
 const props = defineProps<{
   userEloHistory: IEloHistory
@@ -32,51 +33,57 @@ ChartJS.register(
     Legend
 )
 
+let data = {}
+let options = {}
 
-const data = {
-  labels: props.userEloHistory.dateHistory,
-  datasets: [
-    {
-      backgroundColor: '#00ADB5',
-      borderColor: '#00ADB5',
-      pointRadius: 4,
-      data: props.userEloHistory.eloHistory
-    }
-  ]
-}
+function loadStuff() {
+	data = {
+		labels: props.userEloHistory.dateHistory,
+		datasets: [
+			{
+				backgroundColor: '#00ADB5',
+				borderColor: '#00ADB5',
+				pointRadius: 4,
+				data: props.userEloHistory.eloHistory
+			}
+		]
+	}
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      ticks: {
-        color: '#EEEEEE'
-      }
-    },
-    y: {
-      grid: {
-        display: false
-      },
-      ticks: {
-        color: '#EEEEEE'
-      }
-    }
-  },
-  plugins: {
-    title: {
-      display: true,
-      text: 'Elo Progression',
-      color: '#EEEEEE',
-      font: {
-        size: 20,
-      },
-    },
-    legend: {
-      display: false
-    }
-  }
+	options = {
+		responsive: true,
+		maintainAspectRatio: false,
+		scales: {
+			x: {
+				ticks: {
+					color: '#EEEEEE'
+				}
+			},
+			y: {
+				grid: {
+					display: false
+				},
+				ticks: {
+					color: '#EEEEEE'
+				}
+			}
+		},
+		plugins: {
+			title: {
+				display: true,
+				text: 'Elo Progression',
+				color: '#EEEEEE',
+				font: {
+					size: 20,
+				},
+			},
+			legend: {
+				display: false
+			}
+		}
+	}
 }
+loadStuff()
+watch(() => props.userEloHistory, () => loadStuff())
 </script>
 
 <style scoped lang="scss">

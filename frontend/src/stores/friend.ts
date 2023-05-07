@@ -58,7 +58,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 				jsonHeaders,
 			)
 			const data = await response.json() as IFriendship;
-			console.log(data);
 			return data.status === 'CANCELED';
 		}
 

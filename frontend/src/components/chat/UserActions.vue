@@ -7,7 +7,7 @@
 		<section class="chat_actions_buttons">
 			<template v-if="userRole === role.admin">
 				<h4>Admin actions</h4>
-				<section class="button_wrap">
+				<section class="buttons_wrap">
 					<ButtonCustom :style="'small'">
 						kick
 					</ButtonCustom>
@@ -104,7 +104,7 @@ onMounted(() => {
 		gap: $small_gap;
 		flex-wrap: wrap;
 
-		.button_wrap {
+		.buttons_wrap {
 			display: flex;
 			justify-content: center;
 			flex-direction: row;

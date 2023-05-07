@@ -1,17 +1,20 @@
 <template>
-    <section class="profile_wrapper">
+    <section v-if="user" class="profile_wrapper">
         <section class="profile_wrap">
-			<div v-if="user" class="user_settings">
+			<div class="user_settings">
 				<UserPicture :url="user?.avatar" :type="'big'"/>
-				<UserCredentialsSettings v-if="isSelf" />
-				<UserInteractions v-else :invitePlay="true" :targetUser="user" />
+				<div class="buttons_wrap">
+					<h2>{{ user?.username }}</h2>
+					<UserCredentialsSettings v-if="isSelf" />
+					<UserInteractions v-else :invitePlay="true" :targetUser="user" />
+				</div>
 			</div>
 			<div class="user_progression_bar score_card">
-				<UserStatsResume/>
+				<UserStatsResume :targetUser="user"/>
 			</div>
         </section>
         <section class="scores_wrap">
-          <UserStats />
+          <UserStats :targetUser="user" />
         </section>
     </section>
 </template>
@@ -60,6 +63,13 @@ loadUser()
     flex-direction: column;
     padding: 5px;
     gap: $medium_gap;
+
+	.buttons_wrap {
+		display: flex;
+		gap: $small_gap;
+		flex-direction: column;
+		justify-content: center;
+	}
 
     .profile_wrap {
         flex: 1;

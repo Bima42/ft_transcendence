@@ -1,15 +1,13 @@
 <template>
-	<section class="button_wrap">
-		<ButtonCustom :style="'small'" :click="addOrRemoveFriend">
-			{{ isFriend ? 'Remove friend' : isRequestSent ? 'Cancel request' : 'Add friend' }}
-		</ButtonCustom>
-		<ButtonCustom :style="'small'" :click="blockOrUnblockUser">
-			{{ isBlocked ? 'Unblock' : 'Block' }}
-		</ButtonCustom>
-		<ButtonCustom v-if="props.invitePlay" :style="'small'">
-			Invite to play
-		</ButtonCustom>
-	</section>
+	<ButtonCustom :style="'small'" :click="addOrRemoveFriend">
+		{{ isFriend ? 'Remove friend' : isRequestSent ? 'Cancel request' : 'Add friend' }}
+	</ButtonCustom>
+	<ButtonCustom :style="'small'" :click="blockOrUnblockUser">
+		{{ isBlocked ? 'Unblock' : 'Block' }}
+	</ButtonCustom>
+	<ButtonCustom v-if="props.invitePlay" :style="'small'">
+		Invite to play
+	</ButtonCustom>
 </template>
 
 <script setup lang="ts">

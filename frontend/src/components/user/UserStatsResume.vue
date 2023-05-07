@@ -11,32 +11,44 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ProgressBars from '@/components/charts/ProgressBars.vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
+import type IUser from '@/interfaces/user/IUser';
+
+const props = defineProps<{
+	targetUser: IUser,
+}>()
 
 const userStore = useUserStore()
+
 const userStats = ref<IUserStats | null>(null)
+
 const winRateStat = ref<number | null>(null)
 const winRateText = ref<string | null>(null)
-
-const highestElo = ref<number | null>(null)
 const eloStat = ref<number | null>(null)
 const eloText = ref<string | null>(null)
 
-userStore.getHighestElo().then((elo) => {
-	highestElo.value = elo
-})
+const highestElo = ref<number | null>(null)
 
-userStore.getUserStats().then((stats) => {
-	userStats.value = stats
-	winRateStat.value = stats.winRate
-	winRateText.value = `${stats.winRate}%`
-	eloText.value = `${stats.elo} Points`
+function loadStuffAndShit() {
+	userStore.getHighestElo().then((elo) => {
+		highestElo.value = elo
+	})
 
-	if (highestElo.value === null) return
-	eloStat.value = stats.elo * 100 / highestElo.value
-})
+	userStore.getUserStats(props.targetUser.id).then((stats) => {
+		userStats.value = stats
+		winRateStat.value = stats.winRate
+		winRateText.value = `${stats.winRate}%`
+		eloText.value = `${stats.elo} Points`
+
+		if (highestElo.value === null) return
+		eloStat.value = stats.elo * 100 / highestElo.value
+	})
+}
+
+loadStuffAndShit()
+watch(() => props.targetUser, () => loadStuffAndShit())
 </script>
 
 <style scoped lang="scss">

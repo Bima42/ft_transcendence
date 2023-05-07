@@ -5,9 +5,9 @@
             <UserPicture :type="'small'" :url="modalStore.data.user.avatar"></UserPicture>
             <section class="data">
                 <h2>{{ modalStore.data.user.username }}</h2>
-                <section class="button_wrap">
-                    <UserInteractions :invitePlay="true"/>
-                </section>
+				<section class="buttons_wrap">
+					<UserInteractions :invitePlay="true"/>
+				</section>
 				<ButtonCustom :style="'small'" @click="goToDetailedProfile(modalStore.data.user.id)">
 					View Detailed Profile
 				</ButtonCustom>
@@ -29,6 +29,7 @@ const modalStore = useModalStore()
 
 const goToDetailedProfile = (id: string) => {
 	router.push({ name: 'profile', params: { id } });
+	modalStore.toggleModal()
 }
 
 </script>
@@ -60,7 +61,7 @@ const goToDetailedProfile = (id: string) => {
             justify-content: center;
             align-items: flex-start;
 
-            .button_wrap {
+            .buttons_wrap {
                 display: flex;
                 flex-direction: row;
                 justify-content: flex-start;

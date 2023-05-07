@@ -9,32 +9,38 @@
 <script setup lang="ts">
 import LineChart from '@/components/charts/LineChart.vue';
 import { useUserStore } from '@/stores/user';
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
 import type IEloHistory from '@/interfaces/user/IEloHistory';
 import type IMatchHistory from '@/interfaces/user/IMatchHistory';
 import Table from '@/components/table/Table.vue';
+import type IUser from '@/interfaces/user/IUser';
 
+const props = defineProps<{
+	targetUser: IUser,
+}>()
 const userStore = useUserStore()
 
 const userStats = ref<IUserStats | null>(null)
 const userEloHistory = ref<IEloHistory | null>(null)
 const userMatchHistory = ref<IMatchHistory[] | null>(null)
 
-onMounted(() => {
-	userStore.getUserStats().then((stats) => {
+function loadStuffAndShit() {
+	userStore.getUserStats(props.targetUser.id).then((stats) => {
 		userStats.value = stats
 	})
 
-	userStore.getEloHistory().then((history) => {
+	userStore.getEloHistory(props.targetUser.id).then((history) => {
 		userEloHistory.value = history
 	})
 
-	userStore.getMatchHistory().then((history) => {
+	userStore.getMatchHistory(props.targetUser.id).then((history) => {
 		userMatchHistory.value = history
 	})
+}
 
-})
+loadStuffAndShit()
+watch(() => props.targetUser, () => loadStuffAndShit())
 
 const tableHeaders = {
 	opponent: {
