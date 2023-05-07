@@ -12,14 +12,28 @@
             <TakeActionOnUser
                 v-else
                 :selectedUser="selectedUser"
+                :setAction="setAction"
             />
+            <section v-if="selectedAction === 'mute'">
+                <form>
+                    <label for="muteTime">Mute time (minutes) </label>
+                    <input
+                        v-model="muteTime"
+                        type="number"
+                        required
+                        :min="1"
+                        :max="999"
+                        pattern="[1-9][0-9]{0,2}"
+                    />
+                </form>
+            </section>
         </section>
         <section class="footer_buttons">
             <ButtonCustom :style="'big'" @click="handleBack">
                 Back
             </ButtonCustom>
-            <ButtonCustom :style="'big'" v-if="selectedUser" @click="toggleTakeActionView">
-                Take action on {{ selectedUser.username }}
+            <ButtonCustom :style="'big'" v-if="selectedUser" @click="takeAction">
+                {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.username }}
             </ButtonCustom>
         </section>
     </section>
@@ -28,11 +42,11 @@
 <script setup lang="ts">
 import TheModal from '@/components/modal/TheModal.vue'
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
-import { useModalStore } from '@/stores/modal'
-import { useChatStore } from '@/stores/chat'
+import {useModalStore} from '@/stores/modal'
+import {useChatStore} from '@/stores/chat'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
 import type IUser from '@/interfaces/user/IUser';
 
@@ -41,21 +55,47 @@ const chatStore = useChatStore()
 
 const selectedUser = ref<IUser>()
 const takeActionView = ref(false)
+const selectedAction = ref<string | null>(null)
+const muteTime = ref(1)
+
+const resetVariables = () => {
+    selectedUser.value = undefined
+    takeActionView.value = false
+    selectedAction.value = null
+    muteTime.value = 1
+}
 const handleBack = () => {
     if (takeActionView.value) {
-        takeActionView.value = false
-        selectedUser.value = undefined
+        resetVariables()
         return
     }
     modalStore.loadAndDisplay(TheModal, EditChatModal, {})
 }
 
-const toggleTakeActionView = () => {
+const takeAction = () => {
+    if (takeActionView.value && selectedAction.value && selectedUser.value) {
+        if (selectedAction.value === 'mute' && (muteTime.value <= 0 || muteTime.value > 999)) {
+            //TODO: error !
+            return
+        }
+        // do the action selected CARE IF MUTE ! USE MUTE TIME REF
+        // then we reset the values
+        console.log(selectedAction.value, 'on', selectedUser.value.username,'for', muteTime.value)
+        resetVariables()
+        return
+    }
     takeActionView.value = !takeActionView.value
 }
 
 const setSelectedUser = (user: IUser) => {
     selectedUser.value = user
+}
+
+const setAction = (action: string) => {
+    if (!selectedUser.value) {
+        return
+    }
+    selectedAction.value = action
 }
 </script>
 
@@ -80,6 +120,7 @@ const setSelectedUser = (user: IUser) => {
         align-items: center;
         justify-content: center;
         width: 100%;
+        gap: 10px;
     }
 
     .footer_buttons {
