@@ -2,7 +2,7 @@
 	<div class="stat_circle">
 		<div class="outer">
 			<div class="inner">
-				<div class="value">{{props.text}}</div>
+				<span class="value">{{props.text}}</span>
 			</div>
 		</div>
 		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="160px" height="160px">
@@ -74,8 +74,9 @@ const strokeDashoffset = computed(() => {
 	}
 
 	.value {
-		font-size: 1.5rem;
-		font-weight: 600;
+		font-family: 'Karla', sans-serif;
+		font-size: 20px;
+		font-weight: 700;
 	}
 
 	circle {
