@@ -13,19 +13,28 @@
                     <input v-if="edit" type="text" v-model="newPassword" placeholder="Channel Password"/>
                     <h4 v-else>********</h4>
                 </div>
-                <ButtonCustom :style="'big'" @click="submitForm" :loading="loading">
-                    <h4>{{ edit ? 'Save' : 'Edit' }}</h4>
-                </ButtonCustom>
+                <section class="footer_buttons">
+                    <ButtonCustom :style="'big'" @click="handleBack">
+                        Back
+                    </ButtonCustom>
+                    <ButtonCustom :style="'big'" @click="submitForm" :loading="loading">
+                        {{ edit ? 'Save' : 'Edit' }}
+                    </ButtonCustom>
+                </section>
             </div>
         </form>
     </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import {ref} from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
-import { useChatStore } from '@/stores/chat'
+import {useChatStore} from '@/stores/chat'
+import {useModalStore} from '@/stores/modal'
+import TheModal from '@/components/modal/TheModal.vue';
+import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
 
+const modalStore = useModalStore()
 const chatStore = useChatStore()
 const newName = ref('')
 const newPassword = ref('')
@@ -43,6 +52,10 @@ const submitForm = async (e: Event) => {
         loading.value = false
     }
     edit.value = !edit.value
+}
+
+const handleBack = () => {
+    modalStore.loadAndDisplay(TheModal, EditChatModal, {})
 }
 </script>
 
@@ -80,5 +93,14 @@ const submitForm = async (e: Event) => {
     h3 {
         text-decoration: underline;
     }
+
+    .footer_buttons {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
 }
 </style>
