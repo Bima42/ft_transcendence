@@ -1,5 +1,5 @@
 <template>
-  <div class="line_chart chart">
+  <div class="line_chart score_card">
     <Line :data="data" :options="options"/>
   </div>
 </template>
@@ -81,7 +81,7 @@ const options = {
 
 <style scoped lang="scss">
 .line_chart {
-	min-width: 30%;
-	min-height: 30%;
+	width: 100%;
+	min-height: 50%;
 }
 </style>

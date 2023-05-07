@@ -97,7 +97,7 @@ onMounted(async () => {
 .user_actions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: $small_gap;
     justify-content: center;
     align-items: center;
 
@@ -105,7 +105,7 @@ onMounted(async () => {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        gap: 10px;
+        gap: $small_gap;
         flex-wrap: wrap;
 
         .button_wrap {

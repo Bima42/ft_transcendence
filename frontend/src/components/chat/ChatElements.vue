@@ -41,7 +41,7 @@ onMounted(async () => {
     height: 100%;
     flex-direction: column-reverse;
     overflow-y: scroll;
-    gap: 10px;
+    gap: $small_gap;
     padding: 15px;
 }
 </style>

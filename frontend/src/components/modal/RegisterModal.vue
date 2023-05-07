@@ -71,7 +71,7 @@ form {
   max-width: 400px;
   padding: 0 20px;
   box-sizing: border-box;
-  gap: 20px;
+  gap: $medium_gap;
 
   h1 {
     font-size: 2rem;

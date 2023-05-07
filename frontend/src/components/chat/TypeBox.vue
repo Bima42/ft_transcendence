@@ -94,7 +94,7 @@ async function sendMessage() {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 10px;
+    gap: $small_gap;
     padding-left: 10px;
     position: relative;
 

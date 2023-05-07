@@ -70,7 +70,7 @@ onMounted(async () => {
 .user_information_modal {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: $medium_gap;
     justify-content: center;
 
     hr {
@@ -82,14 +82,14 @@ onMounted(async () => {
     .user_data {
         display: flex;
         flex-direction: row;
-        gap: 10px;
+        gap: $small_gap;
         justify-content: center;
         align-items: center;
 
         .data {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: $small_gap;
             justify-content: center;
             align-items: flex-start;
 
@@ -105,7 +105,7 @@ onMounted(async () => {
     .user_score {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: $small_gap;
         justify-content: center;
         align-items: center;
     }

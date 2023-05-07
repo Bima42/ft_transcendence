@@ -70,7 +70,7 @@ const tableDataPaginated = computed(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: $medium_gap;
   }
   table {
     width: 100%;

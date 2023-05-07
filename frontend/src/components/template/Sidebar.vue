@@ -82,7 +82,7 @@ const outsideClickHandle = () => {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    gap: 10px;
+    gap: $small_gap;
     overflow: hidden;
 
     .background {
@@ -117,7 +117,7 @@ const outsideClickHandle = () => {
         flex-direction: column;
         width: 100%;
         max-width: 60px;
-        gap: 20px;
+        gap: $medium_gap;
         background-color: $secondary;
         border: 1px solid $tertiary;
         border-right: 0;

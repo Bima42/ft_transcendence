@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
 import type IUserStats from '@/interfaces/user/IUserStats';
+import type IMatchHistory from '@/interfaces/user/IMatchHistory';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
@@ -159,6 +160,15 @@ export const useUserStore = defineStore('user', () => {
 		return response.json()
 	}
 
+	const getMatchHistory = async (user_id: number | undefined = user.value?.id): Promise<IMatchHistory[]> => {
+		const response = await get(
+			`users/stats/matchHistory/${user_id}`,
+			'Failed to get match history',
+			jsonHeaders,
+		)
+		return response.json()
+	}
+
 	return {
 		user,
 		resetState,
@@ -174,6 +184,7 @@ export const useUserStore = defineStore('user', () => {
 		getUserStats,
 		getLeaderboard,
 		getEloHistory,
-		getHighestElo
+		getHighestElo,
+		getMatchHistory
 	}
 });

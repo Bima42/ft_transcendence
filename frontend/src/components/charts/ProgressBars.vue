@@ -26,11 +26,12 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-	stats: number
-	text: string
+	stats: number | null,
+	text: string | null
 }>()
 
 const percentage = computed(() => {
+	if (props.stats === null) return 0
 	return Math.round(props.stats)
 })
 

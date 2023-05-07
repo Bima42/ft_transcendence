@@ -5,12 +5,12 @@
         Leaderboard
       </h2>
     </section>
-    <LeaderboardTable :headers="tableHeaders" :data="datas" :sortDatas="sortDatas"/>
+    <Table :headers="tableHeaders" :data="datas" :sortDatas="sortDatas"/>
   </section>
 </template>
 
 <script setup lang="ts">
-import LeaderboardTable from '@/components/table/LeaderboardTable.vue'
+import Table from '@/components/table/Table.vue'
 import { useUserStore } from '@/stores/user';
 import { onMounted, ref } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
@@ -18,9 +18,10 @@ import type IUserStats from '@/interfaces/user/IUserStats';
 const userStore = useUserStore()
 
 const datas = ref<IUserStats[]>([])
-
-onMounted(async () => {
-  datas.value = await userStore.getLeaderboard()
+onMounted( () => {
+	userStore.getLeaderboard().then((leaderboard) => {
+		datas.value = leaderboard
+	})
 })
 
 const sortDatas = (header: string) => {
@@ -63,7 +64,7 @@ const tableHeaders = {
   },
   elo: {
     name: 'Elo'
-  },
+  }
 }
 </script>
 

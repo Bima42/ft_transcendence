@@ -30,7 +30,7 @@ function dropMenu() {
 .command_wrapper {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: $small_gap;
 
     .dropdown-wrapper {
         display: flex;

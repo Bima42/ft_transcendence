@@ -48,7 +48,7 @@ const cancel = () => {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: $small_gap;
 
     input {
         border: none;

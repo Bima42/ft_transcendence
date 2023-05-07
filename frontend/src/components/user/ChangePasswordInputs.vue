@@ -19,7 +19,7 @@ const props = defineProps<{}>()
 .password_change_wrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: $medium_gap;
     justify-content: center;
     padding: 10px 40px 10px 40px;
 }

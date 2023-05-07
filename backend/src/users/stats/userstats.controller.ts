@@ -33,7 +33,7 @@ export class UserStatsController {
 
 	@Get('leaderboard')
 	async getLeaderboard(): Promise<PlayerStatsDto[]> {
-		return this.userStatsService.getAllStatsForAllUsers();
+		return this.userStatsService.getLeaderboardStats();
 	}
 
 	@Get(':id')
@@ -49,5 +49,10 @@ export class UserStatsController {
 	@Get('elo/highest')
 	async getHighestElo(): Promise<number> {
 		return this.userStatsService.getHighestElo();
+	}
+
+	@Get('matchHistory/:id')
+	async getMatchHistoryByUserId(@Param('id', ParseIntPipe) userId: number) {
+		return this.userStatsService.getMatchHistoryByUserId(userId);
 	}
 }
