@@ -7,14 +7,14 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
-	Req,
+	Req
 } from '@nestjs/common';
-import { ChannelService } from './channel.service';
-import { ChatGateway } from './channel.gateway';
-import { Chat, UserChatRole, User } from '@prisma/client';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { NewChatMessageDto } from './dto/message.dto';
-import { UserchatAction, DetailedChannelDto, NewChannelDto } from './dto/channel.dto';
+import {ChannelService} from './channel.service';
+import {ChatGateway} from './channel.gateway';
+import {UserChatRole} from '@prisma/client';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+import {NewChatMessageDto} from './dto/message.dto';
+import {UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto} from './dto/channel.dto';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @ApiTags('Chat')
@@ -34,12 +34,12 @@ export class ChannelController {
 	}
 
 	@Post('rooms')
-	async createNewChannel(@Req() req: RequestWithUser, @Body() data: NewChannelDto): Promise<Chat> {
+	async createNewChannel(@Req() req: RequestWithUser, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
 		return this.channelService.createChannel(req.user, data)
 	}
 
 	@Get('rooms/:id')
-	async getOneChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number): Promise<DetailedChannelDto | NewChannelDto> {
+	async getOneChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number): Promise<DetailedChannelDto> {
 		return this.channelService.getChannelDetails(req.user, id);
 	}
 
@@ -53,14 +53,14 @@ export class ChannelController {
 		return this.channelService.deleteChannel(req.user, id);
 	}
 
-	@Put('rooms/:id/join')
-	async joinChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-		return this.channelService.joinChannel(req.user, id, data);
+	@Put('rooms/join')
+	async joinChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto) {
+		return this.channelService.joinChannel(req.user, data);
 	}
 
-	@Put('rooms/:id/leave')
-	async leaveChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
-		return this.channelService.leaveChannel(req.user, id);
+	@Put('rooms/leave')
+	async leaveChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto) {
+		return this.channelService.leaveChannel(req.user, data);
 	}
 
 	@Get('rooms/:id/messages')
@@ -98,8 +98,6 @@ export class ChannelController {
 				break;
 		}
 		const userchat = await this.channelService.getChannelDetails(user, chatId);
-		this.channelGateway.server.emit("updateChannelList", userchat);
+		this.channelGateway.server.emit('updateChannelList', userchat);
 	}
-
-
 }

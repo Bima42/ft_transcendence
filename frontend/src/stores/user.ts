@@ -85,7 +85,7 @@ export const useUserStore = defineStore('user', () => {
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
-    await patch(`users/id/${user.value?.id}`, "cannot update username", jsonHeaders, infos)
+    await patch(`users/me`, "cannot update username", jsonHeaders, infos)
     .then((res) => res.json())
     .then((newUser: IUser) => {
       user.value = newUser
@@ -98,7 +98,7 @@ export const useUserStore = defineStore('user', () => {
 
 	const uploadAvatar = function (file: FormData) {
 		post(
-			`users/avatar/${user.value?.id}`,
+			`users/avatar`,
 			'Failed to upload avatar',
 			mediaHeaders,
 			undefined,

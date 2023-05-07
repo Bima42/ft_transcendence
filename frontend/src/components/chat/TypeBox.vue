@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { put } from '../../../utils';
+import { jsonHeaders, put } from '../../../utils';
 import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat';
 import { useUserStore } from '@/stores/user';
@@ -59,14 +59,14 @@ async function executeCommand(cmd: string[]) {
                 muteDuration: (cmd.length >= 3 ? parseInt(cmd[2]) : null),
                 type: cmdName,
             };
-            await put(url, `cannot ${cmdName} user`, action)
+            await put(url, `cannot ${cmdName} user`, jsonHeaders, action)
                 .catch(err => console.error(err))
             break;
         case 'leave':
-            url = `chat/rooms/${chatStore.currentChat.id}/leave`;
-            await put(url, `cannot leave channel`, {})
+            url = `chat/rooms/leave`;
+            await put(url, `cannot leave channel`, jsonHeaders, {chatId: chatStore?.currentChat.id})
                 .then(() => {
-                    chatStore.setCurrentChat(null);
+                    // TODO: Leave chat window ?
                 })
                 .catch(err => console.error(err))
             break;

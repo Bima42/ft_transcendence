@@ -39,7 +39,7 @@ export class FriendsController {
 
 	@Get('is/:friendName')
 	@ApiProperty({ type: String })
-	async isFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
+	async isFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser): Promise<boolean> {
 		const friend = await this.usersService.findByName(friendName);
 		return this.friendsService.isFriend(req.user.id, friend.id);
 	}

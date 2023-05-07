@@ -1,6 +1,17 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUrl,
+  Matches,
+  MaxLength,
+  MinLength
+} from 'class-validator';
 
 export class UpdateUserDto {
 
@@ -13,6 +24,11 @@ export class UpdateUserDto {
   @IsEmail()
   @ApiProperty({ required: false })
   email?: string
+
+  @IsOptional()
+  @IsUrl()
+  @ApiProperty({ required: false })
+  avatar?: string
 
   @IsOptional()
   @MinLength(1)
