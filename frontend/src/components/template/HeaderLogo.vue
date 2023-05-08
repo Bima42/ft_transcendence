@@ -1,5 +1,7 @@
 <template>
-    <img src="@/assets/img/logo_name.svg" alt="logo" class="logo" @click="router.push('/')">
+    <div class="header">
+        <img src="@/assets/img/logo_name.svg" alt="logo" class="logo" @click="router.push('/')">
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -12,13 +14,19 @@ const router = useRouter()
 </script>
 
 <style scoped lang="scss">
-.logo {
+.header {
     grid-area: $header1-2;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     height: 100%;
-    cursor: pointer;
+
+    .logo {
+        max-width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
 }
+
 </style>
