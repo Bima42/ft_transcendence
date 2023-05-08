@@ -8,7 +8,7 @@ export class UserStatsService {
 		private readonly prismaService: PrismaService
 	) {}
 
-	_formatDate(dateToFormat: Date) {
+	private _formatDate(dateToFormat: Date) {
 		const date = new Date(dateToFormat);
 		const day = date.getDate().toString().padStart(2, '0');
 		const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);

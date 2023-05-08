@@ -18,7 +18,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	async _isFriendshipCanceled(userId: number, friendName: string) {
+	private async _isFriendshipCanceled(userId: number, friendName: string) {
 		const friend = await this.usersService.findByName(friendName);
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
