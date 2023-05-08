@@ -106,6 +106,7 @@ export class GameService {
       data: {
         score: player1.userGame.score,
         win: player1.userGame.win,
+        elo: player1.user.elo,
       },
     })
     this.prismaService.userGame.update({
@@ -113,6 +114,7 @@ export class GameService {
       data: {
         score: player2.userGame.score,
         win: player2.userGame.win,
+        elo: player2.user.elo,
       },
     })
   }

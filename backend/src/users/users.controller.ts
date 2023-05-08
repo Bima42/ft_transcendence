@@ -14,11 +14,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Request } from 'express'
 import * as path from 'path';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 import { UpdateUserDto, UserDto } from './dto/user.dto';
-import { User } from '@prisma/client';
 
 
 const storage = {
@@ -60,15 +58,16 @@ export class UsersController {
    * ParseIntPipe : protection to ensures that a method handler parameter is converted to a JavaScript integer
    * (or throws an exception if the conversion fails).
    *
-   * @param userId
+   * @param req: RequestWithUser
+   * @param targetId: number
    * @param data: User
    */
   @Patch('me')
   async updateUser(
-        @Req() req: Request,
-        @Body() data: UpdateUserDto
+      @Req() req: RequestWithUser,
+      @Body() data: UpdateUserDto
   ): Promise<UserDto> {
-      return this.usersService.updateData(req.user as User, data);
+      return this.usersService.updateData(req.user, data);
   }
 
   @Delete('me')
@@ -79,7 +78,7 @@ export class UsersController {
   @Post('avatar')
   @UseInterceptors(FileInterceptor('avatar', storage))
   async updateAvatar(
-      @Req() req: Request,
+      @Req() req: RequestWithUser,
       @UploadedFile(
         new ParseFilePipeBuilder()
           .addFileTypeValidator({ fileType: 'jpeg|png|jpg' })
@@ -88,7 +87,6 @@ export class UsersController {
       )  file: Express.Multer.File
   ) {
       const avatarUrl = `${process.env.FRONTEND_URL}/api/${file.path}`
-      return this.usersService.updateData(req.user as User, {avatar:avatarUrl});
+      return this.usersService.updateData(req.user, {avatar:avatarUrl});
   }
-
 }

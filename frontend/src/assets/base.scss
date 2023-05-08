@@ -1,5 +1,6 @@
 @import "theme/_grid.scss";
 @import "theme/_theme.scss";
+@import "theme/_variables.scss";
 
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
@@ -66,7 +67,8 @@ html {
 
 body {
   display: flex;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   color: white;
   background: #222831;
   transition: color 0.5s, background-color 0.5s;
@@ -78,7 +80,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, p {
   font-family: 'Karla', sans-serif;
   font-weight: 700;
 }
@@ -125,7 +127,7 @@ h1, h2, h3, h4, h5, h6 {
     position: sticky;
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: $medium_gap;
     color: $quaternary;
   }
 }
@@ -138,4 +140,14 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid $tertiary;
   border-top: 1px solid $tertiary;
   background-color: $secondary;
+}
+
+.score_card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
+  box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
+  border-radius: 10px;
+  padding: 20px;
 }

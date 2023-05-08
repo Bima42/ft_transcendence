@@ -103,7 +103,7 @@ button {
     z-index: 100;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: $small_gap;
     width: 200px;
 
     h1 {

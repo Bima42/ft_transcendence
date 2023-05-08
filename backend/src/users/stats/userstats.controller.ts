@@ -33,11 +33,26 @@ export class UserStatsController {
 
 	@Get('leaderboard')
 	async getLeaderboard(): Promise<PlayerStatsDto[]> {
-		return this.userStatsService.getAllStatsForAllUsers();
+		return this.userStatsService.getLeaderboardStats();
 	}
 
 	@Get(':id')
 	async getStatsByUserId(@Param('id', ParseIntPipe) userId: number): Promise<PlayerStatsDto> {
 		return this.userStatsService.getStatsByUserId(userId);
+	}
+
+	@Get('elo/history/:id')
+	async getEloHistoryByUserId(@Param('id', ParseIntPipe) userId: number) {
+		return this.userStatsService.getEloHistoryByUserId(userId);
+	}
+
+	@Get('elo/highest')
+	async getHighestElo(): Promise<number> {
+		return this.userStatsService.getHighestElo();
+	}
+
+	@Get('matchHistory/:id')
+	async getMatchHistoryByUserId(@Param('id', ParseIntPipe) userId: number) {
+		return this.userStatsService.getMatchHistoryByUserId(userId);
 	}
 }

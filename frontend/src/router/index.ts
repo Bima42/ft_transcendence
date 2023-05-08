@@ -4,7 +4,7 @@ import PlayAGameView from '@/views/PlayAGameView.vue'
 import redirectHandler from '@/components/redirectHandler.vue'
 import LoginView from '@/views/LoginView.vue'
 import IndexView from '@/views/IndexView.vue'
-import SettingsView from '@/views/SettingsView.vue';
+import ProfileView from '@/views/ProfileView.vue';
 import CommunityView from '@/views/CommunityView.vue';
 import { useUserStore } from '@/stores/user'
 import TwoFaView from '@/views/TwoFaView.vue';
@@ -25,9 +25,9 @@ const router = createRouter({
             component: IndexView,
         },
         {
-            path: '/settings',
-            name: 'settings',
-            component: SettingsView,
+            path: '/profile/:id?',
+            name: 'profile',
+            component: ProfileView,
         },
         {
             path: '/credits',

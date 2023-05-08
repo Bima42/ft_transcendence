@@ -84,7 +84,7 @@ const resetChat = () => {
         position: sticky;
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: $medium_gap;
         color: $quaternary;
 
         h2:hover {

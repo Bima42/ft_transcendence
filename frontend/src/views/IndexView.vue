@@ -7,8 +7,8 @@
         <router-link to="/main/community">
             Start Chatting
         </router-link>
-        <router-link to="/settings">
-            Settings
+        <router-link to="/profile">
+            Profile
         </router-link>
     </section>
 </template>
@@ -33,7 +33,7 @@ a {
 .index-wrapper {
     grid-area: $bigmain;
     display: flex;
-    gap: 20px;
+    gap: $medium_gap;
     justify-content: center;
     align-items: center;
     flex-direction: column;

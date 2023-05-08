@@ -20,7 +20,7 @@ const props = defineProps<{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: $small_gap;
 
   h2 {
     font-size: 18px;

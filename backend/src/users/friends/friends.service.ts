@@ -18,7 +18,31 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	async isFriend(userId: number, friendId: number) : Promise<boolean> {
+	private async _isFriendshipCanceled(userId: number, friendName: string) {
+		const friend = await this.usersService.findByName(friendName);
+		const friendship = await this.prismaService.friendship.findFirst({
+			where: {
+				OR: [
+					{
+						userId: userId,
+						friendId: friend.id,
+					},
+					{
+						userId: friend.id,
+						friendId: userId,
+					}
+				]
+			},
+			select: {
+				status: true
+			}
+		});
+		if (!friendship)
+			return false;
+		return friendship.status === FriendshipStatus.CANCELED;
+	}
+
+	async isFriend(userId: number, friendId: number) {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
@@ -41,6 +65,43 @@ export class FriendsService {
 		const friend = await this.usersService.findByName(friendName);
 		if (await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is already a friend or has a pending request');
+
+		// If the friendship was canceled, we just update the status to pending
+		if (await this._isFriendshipCanceled(userId, friendName)) {
+			await this.prismaService.friendship.updateMany({
+				where: {
+					OR: [
+						{
+							userId: userId,
+							friendId: friend.id,
+						},
+						{
+							userId: friend.id,
+							friendId: userId,
+						}
+					],
+				},
+				data: {
+					status: FriendshipStatus.PENDING
+				}
+			});
+
+			return this.prismaService.friendship.findFirst({
+				where: {
+					OR: [
+						{
+							userId: userId,
+							friendId: friend.id,
+						},
+						{
+							userId: friend.id,
+							friendId: userId,
+						}
+					],
+				}
+			});
+		}
+
 		return this.prismaService.friendship.create({
 			data: {
 				user: {
@@ -77,6 +138,23 @@ export class FriendsService {
 		});
 
 		return removed.count > 0;
+	}
+
+	async cancelFriendRequest(userId: number, friendName: string) {
+		const friend = await this.usersService.findByName(friendName);
+		if (!await this.isWaitingRequest(userId, friend))
+			throw new BadRequestException('There is no request to cancel');
+		return this.prismaService.friendship.update({
+			where: {
+				userId_friendId: {
+					userId: userId,
+					friendId: friend.id
+				}
+			},
+			data: {
+				status: FriendshipStatus.CANCELED
+			}
+		});
 	}
 
 	/**
@@ -169,8 +247,7 @@ export class FriendsService {
 		return waitingRequests;
 	}
 
-	async isWaitingRequest(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	async isWaitingRequest(userId: number, friend: UserDto) {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				userId: userId,

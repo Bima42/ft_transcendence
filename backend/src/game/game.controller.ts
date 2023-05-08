@@ -1,9 +1,8 @@
 import { Controller, Get, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { GameSettingsDto } from './dto/joinQueueData.dto';
 import { GameService } from './game.service';
-import { Request, Response } from 'express'
-import { User } from '@prisma/client';
+import { Response } from 'express'
+import { RequestWithUser } from '../interfaces/request-with-user.interface';
 
 @ApiTags('Game')
 @Controller('game')
@@ -15,8 +14,8 @@ export class GameController {
 
 
   @Get('current')
-  getCurrentGame(@Req() req: Request, @Res() res: Response) {
-      const gameSettings = this.gameService.getCurrentGame(req.user as User);
+  getCurrentGame(@Req() req: RequestWithUser, @Res() res: Response) {
+      const gameSettings = this.gameService.getCurrentGame(req.user);
       if (!gameSettings)
         return res.status(404).send("Game not Found");
       else

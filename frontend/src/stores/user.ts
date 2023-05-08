@@ -3,15 +3,17 @@ import { defineStore } from 'pinia'
 import type IUser from '../interfaces/user/IUser'
 import { getCookie } from 'typescript-cookie'
 import { ref } from 'vue'
-import type { Ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
-import type PlayerStatsDto from '@/interfaces/user/IUserStats';
-import type IPlayerStatsDto from '@/interfaces/user/IUserStats';
-import type IPlayerStats from '@/interfaces/user/IUserStats';
 import type IUserStats from '@/interfaces/user/IUserStats';
+import type IMatchHistory from '@/interfaces/user/IMatchHistory';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+
+	const resetState = function () {
+		user.value = null
+		localStorage.removeItem('localUser');
+	}
 
 	const redirect = function () {
 		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
@@ -94,8 +96,7 @@ export const useUserStore = defineStore('user', () => {
     return user.value
   }
 
-	const uploadAvatar = function (file: FormData, loading: Ref) {
-		loading.value = true
+	const uploadAvatar = function (file: FormData) {
 		post(
 			`users/avatar`,
 			'Failed to upload avatar',
@@ -108,11 +109,9 @@ export const useUserStore = defineStore('user', () => {
 				const datas = json as IUser
 				const avatar = datas.avatar
 				updateAvatar(avatar)
-				loading.value = false
 			})
 			.catch(error => {
 				console.log(error)
-				loading.value = false
 			})
 	}
 
@@ -123,27 +122,79 @@ export const useUserStore = defineStore('user', () => {
 		user.value!.avatar = `${avatar}?${cacheKey}`
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
-	
+
+	const getUserStats = async (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
+		const stats = await get(
+			`users/stats/${user_id}`,
+			'Failed to get user stats',
+			jsonHeaders,
+		)
+		return stats.json()
+	}
+
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
-		const response = await get(
+		let users :IUserStats[] = await get(
 			'users/stats/leaderboard',
 			'Failed to get leaderboard datas',
+			jsonHeaders,
+		).then(res => res.json())
+		.catch(() => [])
+		users.forEach((el) => { delete el.wonGames})
+		return users
+	}
+
+	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
+		const response = await get(
+			`users/stats/elo/history/${user_id}`,
+			'Failed to get elo history',
 			jsonHeaders,
 		)
 		return response.json()
 	}
 
+	const getHighestElo = async () => {
+		const response = await get(
+			`users/stats/elo/highest`,
+			'Failed to get highest elo',
+			jsonHeaders,
+		)
+		return response.json()
+	}
+
+	const getMatchHistory = async (user_id: number | undefined = user.value?.id): Promise<IMatchHistory[]> => {
+		const response = await get(
+			`users/stats/matchHistory/${user_id}`,
+			'Failed to get match history',
+			jsonHeaders,
+		)
+		return response.json()
+	}
+
+	const getUserInfos = (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
+		return get(
+			`users/id/${user_id}`,
+			'Failed to get user infos',
+			jsonHeaders,
+		).then(response => response.json())
+	}
+
 	return {
 		user,
+		resetState,
 		redirect,
 		login,
 		logout,
 		isLoggedIn,
 		updateTwoFaStatus,
 		verifyTwoFaCode,
-    updateInfos,
+		updateInfos,
 		uploadAvatar,
 		updateAvatar,
-		getLeaderboard
+		getUserStats,
+		getLeaderboard,
+		getEloHistory,
+		getHighestElo,
+		getMatchHistory,
+		getUserInfos
 	}
 });

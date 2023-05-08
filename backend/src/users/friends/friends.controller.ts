@@ -31,6 +31,12 @@ export class FriendsController {
 		return this.friendsService.removeFriend(req.user.id, friendName);
 	}
 
+	@Post('cancel/:friendName')
+	@ApiProperty({ type: String })
+	async cancelFriendRequest(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
+		return this.friendsService.cancelFriendRequest(req.user.id, friendName);
+	}
+
 	@Get('is/:friendName')
 	@ApiProperty({ type: String })
 	async isFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser): Promise<boolean> {
@@ -63,7 +69,8 @@ export class FriendsController {
 	@Get('isWaiting/:username')
 	@ApiProperty({ type: String })
 	async isWaiting(@Param('username') username: string, @Req() req: RequestWithUser) {
-		return this.friendsService.isWaitingRequest(req.user.id, username);
+		const friend = await this.usersService.findByName(username);
+		return this.friendsService.isWaitingRequest(req.user.id, friend);
 	}
 
 	@Get('pending')

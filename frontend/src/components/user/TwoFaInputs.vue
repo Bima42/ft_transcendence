@@ -52,7 +52,7 @@ const generateQrCode = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: $medium_gap;
     padding: 0 30px;
 
     .qr_code_wrap {

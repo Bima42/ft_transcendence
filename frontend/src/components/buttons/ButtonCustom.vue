@@ -1,7 +1,7 @@
 <template>
     <button
-        :class="style"
-        @click="click"
+        :class="props.style"
+        @click="props.click"
         :disabled="disabledTrack"
     >
         <p v-if="!loadingTrack">
@@ -28,9 +28,7 @@ const props = defineProps<{
     disabled?: boolean
 }>()
 
-const style = props.style;
 const loadingTrack = ref(props.loading);
-const click = props.click;
 const disabledTrack = ref(props.disabled);
 
 watch(() => props.loading, (loading) => {
@@ -82,6 +80,10 @@ button {
             height: 30px;
         }
     }
+
+	&.adapt {
+		width: 100%;
+	}
 
     &:disabled {
         filter: brightness(0.5);

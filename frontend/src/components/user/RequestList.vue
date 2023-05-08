@@ -60,7 +60,7 @@ const declineRequest = async (username: string) => {
   }
 
   .user_decisions {
-    gap: 20px;
+    gap: $medium_gap;
   }
 
   .user_infos {

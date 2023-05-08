@@ -74,7 +74,7 @@ function quitButton(e: Event) {
     flex-direction: column; /*aligns items vertically*/
     align-items: left;
     justify-items: left;
-    gap: 10px;
+    gap: $small_gap;
 
     h1 {
         margin-bottom: 20px;
@@ -92,12 +92,12 @@ function quitButton(e: Event) {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20px;
+        gap: $medium_gap;
 
         .radio-buttons {
             display: flex;
             color: rgb(255, 179, 0);
-            gap: 10px;
+            gap: $small_gap;
         }
         .chat-input-container {
             display: flex;
@@ -121,7 +121,7 @@ function quitButton(e: Event) {
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: $small_gap;
         }
     }
 }
