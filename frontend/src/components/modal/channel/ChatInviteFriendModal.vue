@@ -74,6 +74,10 @@ const submitInvite = () => {
     if (!selectedFriend.value) {
         return
     }
+    let oldSelection = document.getElementsByClassName('selected_friend')[0] as HTMLElement
+    if (oldSelection) {
+        oldSelection.classList.remove('selected_friend')
+    }
     chatStore.inviteFriendToChat(selectedFriend.value.username)
 }
 </script>
@@ -104,6 +108,7 @@ const submitInvite = () => {
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+            cursor: pointer;
 
             &.selected_friend {
                 background: $tertiary;

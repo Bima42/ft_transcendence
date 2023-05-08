@@ -29,7 +29,6 @@
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
 import type IUser from '@/interfaces/user/IUser'
-import type IUserChat from '@/interfaces/user/IUserChat';
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
@@ -67,6 +66,7 @@ const handleClick = (user: IUser) => {
         justify-content: flex-start;
         width: 100%;
         overflow: auto;
+        cursor: pointer;
 
         .user {
             display: flex;
