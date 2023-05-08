@@ -24,7 +24,6 @@ const props = defineProps<{
 const handleClick = (command: string) => {
     let newSelection = document.getElementById(command) as HTMLElement
     let oldSelection = document.getElementsByClassName('selected_command')[0] as HTMLElement
-    console.log(newSelection, oldSelection)
     if (oldSelection) {
         oldSelection.classList.remove('selected_command')
     }

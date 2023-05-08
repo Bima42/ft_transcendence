@@ -80,7 +80,6 @@ const takeAction = () => {
         }
         // do the action selected CARE IF MUTE ! USE MUTE TIME REF
         // then we reset the values
-        console.log(selectedAction.value, 'on', selectedUser.value.username,'for', muteTime.value)
         resetVariables()
         return
     }

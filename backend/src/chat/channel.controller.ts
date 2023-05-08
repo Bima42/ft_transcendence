@@ -20,6 +20,7 @@ import {NewChatMessageDto} from './dto/message.dto';
 import {UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto} from './dto/channel.dto';
 import {length} from 'class-validator';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
+import { ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -44,6 +45,12 @@ export class ChannelController {
 	@Get('rooms/subscribed')
 	async getSubscribedChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
 		return this.channelService.getSubscribedChannels(req.user);
+	}
+
+	@Get('rooms')
+	getAllChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
+		const whispers: boolean = (req.query.whispers ? JSON.parse(req.query.whispers as string) : false);
+		return this.channelService.getAllChannelsForUser(req.user, whispers);
 	}
 
 	@Post('rooms')

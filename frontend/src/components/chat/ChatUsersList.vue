@@ -32,7 +32,6 @@ const props = defineProps<{
 const handleClick = (user: IUser) => {
     let newSelection = document.getElementById(user.id.toString()) as HTMLElement
     let oldSelection = document.getElementsByClassName('selected_user')[0] as HTMLElement
-    console.log(newSelection, oldSelection)
     if (oldSelection) {
         oldSelection.classList.remove('selected_user')
     }
