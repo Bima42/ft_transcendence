@@ -33,7 +33,6 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			console.log('answer = ' + JSON.stringify(answer));
 		});
 	}
-
 	const onNewMessage = function (msg: IChatMessage): void {
 		if (!currentChat || msg.chatId != currentChat.value?.id)
 			return
