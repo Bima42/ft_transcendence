@@ -10,6 +10,13 @@
                 @click="handleClick(user.user)"
             >
                 {{ user.user.username }}
+                <div class="svg_wrapper">
+                    <font-awesome-icon v-if="user.role === 'OWNER'" icon="fa-crown" color="gold"/>
+                    <font-awesome-icon v-if="user.role === 'BANNED'" icon="fa-ban" color="red"/>
+                    <font-awesome-icon v-if="user.role === 'MEMBER'" icon="fa-user"/>
+                    <font-awesome-icon v-if="user.role === 'ADMIN'" icon="fa-user-astronaut" color="teal"/>
+                    <font-awesome-icon v-if="user.mutedUntil && new Date(user.mutedUntil) >= Date.now()" icon="fa-volume-xmark" color="brown"/>
+                </div>
             </li>
             <li v-if="chatStore.currentChat.users.length === 1">
                 You are alone in this channel
@@ -22,6 +29,7 @@
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
 import type IUser from '@/interfaces/user/IUser'
+import type IUserChat from '@/interfaces/user/IUserChat';
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
@@ -64,11 +72,16 @@ const handleClick = (user: IUser) => {
             display: flex;
             flex-direction: row;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             width: 100%;
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+
+            .svg_wrapper {
+                display: flex;
+                gap: 5px;
+            }
 
             &.selected_user {
                 background: $tertiary;
