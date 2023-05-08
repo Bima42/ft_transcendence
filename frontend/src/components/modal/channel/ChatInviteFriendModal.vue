@@ -24,14 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { useFriendStore } from '@/stores/friend'
 import { useChatStore } from '@/stores/chat'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type IFriend from '@/interfaces/user/IFriend'
 
 const modalStore = useModalStore()

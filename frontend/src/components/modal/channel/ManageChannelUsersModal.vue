@@ -78,6 +78,13 @@ const takeAction = () => {
             return
         }
         // do the action selected CARE IF MUTE ! USE MUTE TIME REF
+        chatStore.takeActionOnUser(selectedUser.value.username, selectedAction.value, muteTime.value)
+            .then(() => {
+                chatStore.updateStore()
+            })
+            .catch(err => {
+                console.log(err)
+            })
         // then we reset the values
         resetVariables()
         return

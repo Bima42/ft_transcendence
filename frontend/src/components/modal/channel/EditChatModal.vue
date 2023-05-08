@@ -19,7 +19,7 @@ import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import manageChannelUsersModal from '@/components/modal/channel/ManageChannelUsersModal.vue'
 import manageChannelModal from '@/components/modal/channel/ManageChannelModal.vue'
-import chatInviteFriendModal from '@/components/modal/channel/chatInviteFriendModal.vue'
+import chatInviteFriendModal from '@/components/modal/channel/ChatInviteFriendModal.vue'
 
 const modalStore = useModalStore()
 

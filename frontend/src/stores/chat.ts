@@ -239,6 +239,25 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return true
 	}
 
+	const takeActionOnUser = async function (userName: string, actionToPerform: string, muteDuration?: number): Promise<boolean> {
+		if (!currentChat.value) {
+			return false
+		}
+		const action: IUserChatAction = {
+			chatId: currentChat.value.id,
+			username: userName,
+			type: actionToPerform,
+			muteDuration: muteDuration
+		}
+		let url = `chat/rooms/${currentChat.value.id}/user`;
+		await put(url, `cannot ${actionToPerform} user`, jsonHeaders, action)
+			.catch(err => console.error(err))
+			.finally(() => {
+				updateStore()
+			})
+		return true
+	}
+
 	const updateStore = async function () {
 		await retrievePublicChats()
 		await retrieveWhispers()
@@ -275,6 +294,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		changeChatName,
 		currentChatPasswordProtected,
 		inviteFriendToChat,
+		takeActionOnUser,
 		updateStore
 	}
 })

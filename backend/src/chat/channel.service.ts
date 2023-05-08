@@ -463,7 +463,7 @@ export class ChannelService {
 		if (!targetUserChat) {
 			// Create the user role
 			Logger.log(`${targetUser.username}#${targetUser.id}'s role is created for chat ${chatId}: ${newRole}`);
-			const mutedUntil = this.updateMutedUntil(null, muteDuration);
+			const mutedUntil = this.updateMutedUntil(null, muteDuration * 60); //Dirty was here
 			await this.prismaService.userChat.create({
 				data: {
 					chatId: chatId,
@@ -501,7 +501,7 @@ export class ChannelService {
 	updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number): Date | null {
 		if (muteDuration) {
 			const newMutedUntil = new Date();
-			newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
+			newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration * 60);
 			if (!currentMutedUntil || newMutedUntil > currentMutedUntil) {
 				return newMutedUntil;
 			} else {

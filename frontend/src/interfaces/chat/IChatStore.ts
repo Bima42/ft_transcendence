@@ -29,5 +29,6 @@ export default interface IChatStore {
 	changeChatName: (newName: string) => Promise<boolean>;
 	currentChatPasswordProtected: (id: string) => Promise<boolean>;
 	inviteFriendToChat: (userName: string) => Promise<boolean>;
+	takeActionOnUser: (userName: string, actionToPerform: string, muteDuration?: number) => Promise<boolean>;
 	updateStore: () => Promise<void>;
 }
