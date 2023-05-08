@@ -140,7 +140,6 @@ export class UserStatsService {
 		const stats = [];
 		for (const user of users) {
 			const userStats = await this.getStatsByUserId(user.id);
-			delete userStats.wonGames;
 			stats.push(userStats);
 		}
 		stats.sort((a, b) => b.elo - a.elo);

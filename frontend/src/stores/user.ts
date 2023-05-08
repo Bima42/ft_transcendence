@@ -131,14 +131,16 @@ export const useUserStore = defineStore('user', () => {
 		)
 		return stats.json()
 	}
-	
+
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
-		const response = await get(
+		let users :IUserStats[] = await get(
 			'users/stats/leaderboard',
 			'Failed to get leaderboard datas',
 			jsonHeaders,
-		)
-		return response.json()
+		).then(res => res.json())
+		.catch(() => [])
+		users.forEach((el) => { delete el.wonGames})
+		return users
 	}
 
 	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
