@@ -28,5 +28,6 @@ export default interface IChatStore {
 	getListOfNotSubscribedChannels: () => void;
 	changeChatName: (newName: string) => Promise<boolean>;
 	currentChatPasswordProtected: (id: string) => Promise<boolean>;
+	inviteFriendToChat: (userName: string) => Promise<boolean>;
 	updateStore: () => Promise<void>;
 }

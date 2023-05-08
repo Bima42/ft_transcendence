@@ -6,7 +6,6 @@
         <section class="modal_body">
             <ChatUsersList
                 v-if="!takeActionView"
-                :userList="chatStore.currentChat.users"
                 :setSelectedUser="setSelectedUser"
             />
             <TakeActionOnUser

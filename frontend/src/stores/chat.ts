@@ -9,7 +9,7 @@ import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
-
+import type IUserChatAction from '@/interfaces/chat/IUserChatAction';
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
 	const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
@@ -221,11 +221,32 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		isChannelPasswordProtected.value = await response.json()
 	}
 
+	const inviteFriendToChat = async function (userName: string): Promise<boolean> {
+		if (!currentChat.value) {
+			return false
+		}
+		const action: IUserChatAction = {
+			chatId: currentChat.value.id,
+			username: userName,
+			type: 'add'
+		}
+		let url = `chat/rooms/${currentChat.value.id}/user`;
+		await put(url, `cannot add user`, jsonHeaders, action)
+			.catch(err => console.error(err))
+			.finally(() => {
+				updateStore()
+			})
+		return true
+	}
+
 	const updateStore = async function () {
 		await retrievePublicChats()
 		await retrieveWhispers()
 		await subscribedChannels()
 		await getListOfNotSubscribedChannels()
+		if (currentChat.value) {
+			await setCurrentChat(currentChat.value!.id.toString())
+		}
 	}
 
 	return {
@@ -253,6 +274,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		getListOfNotSubscribedChannels,
 		changeChatName,
 		currentChatPasswordProtected,
+		inviteFriendToChat,
 		updateStore
 	}
 })

@@ -7,6 +7,9 @@
         <ButtonCustom :style="'big'" :click="() => handleClick('manageChannel')">
             <h1>manage channel</h1>
         </ButtonCustom>
+        <ButtonCustom :style="'big'" :click="() => handleClick('inviteFriend')">
+            <h1>Invite friend</h1>
+        </ButtonCustom>
     </div>
 </template>
 
@@ -16,6 +19,7 @@ import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import manageChannelUsersModal from '@/components/modal/channel/ManageChannelUsersModal.vue'
 import manageChannelModal from '@/components/modal/channel/ManageChannelModal.vue'
+import chatInviteFriendModal from '@/components/modal/channel/chatInviteFriendModal.vue'
 
 const modalStore = useModalStore()
 
@@ -27,8 +31,11 @@ const handleClick = (option: string) => {
         case 'manageChannel':
             modalStore.loadAndDisplay(TheModal, manageChannelModal, {})
             break
+        case 'inviteFriend':
+            modalStore.loadAndDisplay(TheModal, chatInviteFriendModal, {})
+            break
         default:
-            console.log('default')
+            break
     }
 }
 </script>

@@ -14,7 +14,7 @@
  *
  * @param {Function} toggleChat - This function is used to send the clicked chat id to the parent
  */
-import { defineProps, ref, onMounted } from 'vue'
+import { defineProps, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 
 const error = ref(null);

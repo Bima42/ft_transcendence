@@ -3,7 +3,7 @@
         <ul class="users">
             <li
                 class="user"
-                v-for="user in userList"
+                v-for="user in chatStore.currentChat.users"
                 :key="user.user.id"
                 :id="user.user.id"
                 v-show="userStore.user.id !== user.user.id"
@@ -11,7 +11,7 @@
             >
                 {{ user.user.username }}
             </li>
-            <li v-if="userList.length === 1">
+            <li v-if="chatStore.currentChat.users.length === 1">
                 You are alone in this channel
             </li>
         </ul>
@@ -20,12 +20,13 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import type IUser from '@/interfaces/user/IUser';
+import { useChatStore } from '@/stores/chat'
+import type IUser from '@/interfaces/user/IUser'
 
 const userStore = useUserStore()
+const chatStore = useChatStore()
 
 const props = defineProps<{
-    userList: any,
     setSelectedUser: (user: any) => void
 }>()
 
