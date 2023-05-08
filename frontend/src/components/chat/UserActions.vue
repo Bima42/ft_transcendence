@@ -1,11 +1,11 @@
 <template>
 	<section class="user_actions">
-		<h2>{{ modalStore.data.username }}</h2>
+		<h2>{{ modalStore.data.user.username }}</h2>
 		<ButtonCustom :style="'big'" :click="toggleNewModal">
 			View profile
 		</ButtonCustom>
 		<section class="chat_actions_buttons">
-			<template v-if="userRole === role.admin">
+			<template v-if="userRole >= UserChatRoleEnum.Admin">
 				<h4>Admin actions</h4>
 				<section class="buttons_wrap">
 					<ButtonCustom :style="'small'">
@@ -25,9 +25,7 @@
 					</ButtonCustom>
 				</section>
 			</template>
-			<template v-if="userRole <= role.user">
-				<UserInteractions />
-			</template>
+			<UserInteractions />
 		</section>
 	</section>
 </template>
@@ -38,18 +36,19 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import UserInformations from '@/components/modal/UserInformationsModal.vue'
-import { useFriendStore } from '@/stores/friend';
 import UserInteractions from '@/components/user/UserInteractions.vue';
-
-enum role { admin = 0, user = 1 }
+import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
+import { useChatStore } from '@/stores/chat'
+import { useUserStore } from '@/stores/user'
 
 const modalStore = useModalStore()
+const chatStore = useChatStore()
+const userStore = useUserStore()
 
-// WE NEED A FUNCTION TO CATCH THE ROLE OF A USER TO DISPLAY WHAT HE CAN AND CANNOT DO
-// onMounted(async () => {
-//     await userRole = chatStore.getRole()
-// })
-const userRole = role.user
+const userRole = ref(UserChatRoleEnum.Unknown)
+onMounted(async () => {
+	userRole.value = await chatStore.getRoleFromUserId(userStore.user?.id ?? 0)
+})
 
 const toggleNewModal = () => {
 	modalStore.resetStateKeepData()
