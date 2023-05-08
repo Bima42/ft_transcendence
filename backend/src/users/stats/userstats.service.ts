@@ -56,17 +56,19 @@ export class UserStatsService {
 	async getAverageScoreByUserId(userId: number) {
 		const scores = await this.prismaService.userGame.findMany({
 			where: {
-				id: userId
+				userId: userId
 			},
 			select: {
 				score: true
 			}
 		});
+    if (scores.length == 0)
+      return 0
 		let totalScore = 0;
 		for (const score of scores) {
 			totalScore += score.score;
 		}
-		const playedGames = await this.getPlayedGamesByUserId(userId);
+		const playedGames = scores.length
 		return totalScore / playedGames;
 	}
 
