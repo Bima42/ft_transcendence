@@ -25,7 +25,7 @@ const userStats = ref<IUserStats | null>(null)
 const userEloHistory = ref<IEloHistory | null>(null)
 const userMatchHistory = ref<IMatchHistory[] | null>(null)
 
-function loadStuffAndShit() {
+function loadStuff() {
 	userStore.getUserStats(props.targetUser.id).then((stats) => {
 		userStats.value = stats
 	})
@@ -39,8 +39,8 @@ function loadStuffAndShit() {
 	})
 }
 
-loadStuffAndShit()
-watch(() => props.targetUser, () => loadStuffAndShit())
+loadStuff()
+watch(() => props.targetUser, () => loadStuff())
 
 const tableHeaders = {
 	opponent: {

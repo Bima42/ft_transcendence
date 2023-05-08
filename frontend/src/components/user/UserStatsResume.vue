@@ -31,7 +31,7 @@ const eloText = ref<string | null>(null)
 
 const highestElo = ref<number | null>(null)
 
-function loadStuffAndShit() {
+function loadStuff() {
 	userStore.getHighestElo().then((elo) => {
 		highestElo.value = elo
 	})
@@ -47,8 +47,8 @@ function loadStuffAndShit() {
 	})
 }
 
-loadStuffAndShit()
-watch(() => props.targetUser, () => loadStuffAndShit())
+loadStuff()
+watch(() => props.targetUser, () => loadStuff())
 </script>
 
 <style scoped lang="scss">
