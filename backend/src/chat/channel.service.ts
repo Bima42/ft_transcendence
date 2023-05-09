@@ -273,10 +273,11 @@ export class ChannelService {
 			newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
 		}
 
-		return this.prismaService.chat.update({
+		await this.prismaService.chat.update({
 			where: {id: chatId},
 			data: newChannel
 		});
+    return this.getChannelDetails(user, chatId)
 	}
 
 	async deleteChannel(user: User, chatId: number) {

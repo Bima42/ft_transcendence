@@ -58,21 +58,6 @@ export class ChannelController {
 		return this.channelService.createChannel(req.user, data)
 	}
 
-	@Get('rooms/:id')
-	async getOneChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number): Promise<DetailedChannelDto> {
-		return this.channelService.getChannelDetails(req.user, id);
-	}
-
-	@Put('rooms/:id')
-	async updateChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) {
-		return this.channelService.updateChannel(req.user, id, data);
-	}
-
-	@Delete('rooms/:id')
-	async DeleteChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
-		return this.channelService.deleteChannel(req.user, id);
-	}
-
 	@Put('rooms/join')
 	async joinChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto) {
 		return this.channelService.joinChannel(req.user, data);
@@ -83,6 +68,32 @@ export class ChannelController {
 		return this.channelService.leaveChannel(req.user, data);
 	}
 
+	@Get('rooms/subscriptions')
+	GetSubscriptions(@Req() req: RequestWithUser) {
+		return this.channelService.getSubscribedChannels(req.user);
+	}
+
+	@Post('rooms/editChannelName')
+	@ApiBody({required: true})
+	async changeChatName(@Req() req: RequestWithUser, @Body() data: { id: number, newName: string }) {
+		return this.channelService.changeChatName(req.user, data.id, data.newName);
+	}
+
+	@Get('rooms/:id')
+	async getOneChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number): Promise<DetailedChannelDto> {
+		return this.channelService.getChannelDetails(req.user, id);
+	}
+
+	@Put('rooms/:id')
+	async updateChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) : Promise<DetailedChannelDto> {
+		return this.channelService.updateChannel(req.user, id, data);
+	}
+
+	@Delete('rooms/:id')
+	async DeleteChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
+		return this.channelService.deleteChannel(req.user, id);
+	}
+
 	@Get('rooms/:id/messages')
 	getOneChannelMessages(@Param('id', new ParseIntPipe()) id: number) {
 		return this.channelService.getLastMessages(id, 50);
@@ -91,11 +102,6 @@ export class ChannelController {
 	@Post('rooms/:id/messages')
 	PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: RequestWithUser, @Body() data: NewChatMessageDto) {
 		return this.channelService.postMessage(req.user, id, data);
-	}
-
-	@Get('rooms/subscriptions')
-	GetSubscriptions(@Req() req: RequestWithUser) {
-		return this.channelService.getSubscribedChannels(req.user);
 	}
 
 	@Put('rooms/:id/user')
@@ -124,12 +130,6 @@ export class ChannelController {
 		}
 		const userchat = await this.channelService.getChannelDetails(user, chatId);
 		this.channelGateway.server.emit('updateChannelList', userchat);
-	}
-
-	@Post('rooms/editChannelName')
-	@ApiBody({required: true})
-	async changeChatName(@Req() req: RequestWithUser, @Body() data: { id: number, newName: string }) {
-		return this.channelService.changeChatName(req.user, data.id, data.newName);
 	}
 
 	@Get('rooms/:id/isPasswordProtected')
