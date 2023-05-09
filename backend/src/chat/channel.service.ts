@@ -573,7 +573,15 @@ export class ChannelService {
 		});
 	}
 
-	async changeChatName(chatId: number, newName: string): Promise<void> {
+	async changeChatName(user : UserDto, chatId: number, newName: string): Promise<void> {
+    const userChat = await this.prismaService.userChat.findFirst({
+      where: {
+        userId: user.id
+      }
+    })
+    if (!userChat || userChat.role != 'OWNER')
+      throw new ForbiddenException("Not allow to change chat name");
+
 		if (!newName) {
 			throw new BadRequestException('New name cannot be empty');
 		}

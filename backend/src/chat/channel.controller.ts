@@ -128,8 +128,8 @@ export class ChannelController {
 
 	@Post('rooms/editChannelName')
 	@ApiBody({required: true})
-	async changeChatName(@Body() data: { id: number, newName: string }) {
-		return this.channelService.changeChatName(data.id, data.newName);
+	async changeChatName(@Req() req: RequestWithUser, @Body() data: { id: number, newName: string }) {
+		return this.channelService.changeChatName(req.user, data.id, data.newName);
 	}
 
 	@Get('rooms/:id/isPasswordProtected')
