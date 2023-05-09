@@ -32,7 +32,7 @@
                 Back
             </ButtonCustom>
             <ButtonCustom :style="'big'" v-if="selectedUser" @click="takeAction">
-                {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.username }}
+                {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.user.username }}
             </ButtonCustom>
         </section>
     </section>
