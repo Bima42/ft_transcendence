@@ -243,7 +243,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			return false
 		}
 		if (actionToPerform === 'unban') {
-			actionToPerform = 'promote'
+			actionToPerform = 'add'
 		}
 		const action: IUserChatAction = {
 			chatId: currentChat.value.id,
