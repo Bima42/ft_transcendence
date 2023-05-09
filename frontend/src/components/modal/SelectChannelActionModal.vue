@@ -10,9 +10,13 @@
             <ButtonCustom :style="'big'" :click="() => handleClick('joinChannel')">
                 <h1>Join a channel</h1>
             </ButtonCustom>
+            <ButtonCustom :style="'big'" :click="() => handleClick('newWhisper')">
+                <h1>Create a Whisper</h1>
+            </ButtonCustom>
         </div>
         <NewChannelModal v-if="selectedOption === 1"/>
         <JoinChannelModal v-if="selectedOption === 2"/>
+        <NewWhisperModal v-if="selectedOption === 3"/>
     </section>
 </template>
 
@@ -20,6 +24,7 @@
 import { defineProps, ref } from 'vue'
 import NewChannelModal from '@/components/modal/channel/NewChannelModal.vue'
 import JoinChannelModal from '@/components/modal/channel/JoinChannelModal.vue'
+import NewWhisperModal from '@/components/modal/channel/NewWhisperModal.vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const props = defineProps<{}>()
@@ -31,6 +36,9 @@ const handleClick = (option: string) => {
             break
         case 'joinChannel':
             selectedOption.value = 2;
+            break
+        case 'newWhisper':
+            selectedOption.value = 3;
             break
         default:
             console.log('default')

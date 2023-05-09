@@ -47,7 +47,6 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
 import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
-import type IUser from '@/interfaces/user/IUser'
 import type IUserChat from '@/interfaces/user/IUserChat'
 
 const modalStore = useModalStore()
