@@ -72,6 +72,5 @@ const handleClick = (option: string) => {
             color: $tertiary;
         }
     }
-
 }
 </style>

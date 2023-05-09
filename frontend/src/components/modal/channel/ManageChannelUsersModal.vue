@@ -47,12 +47,13 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
 import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
-import type IUser from '@/interfaces/user/IUser';
+import type IUser from '@/interfaces/user/IUser'
+import type IUserChat from '@/interfaces/user/IUserChat'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore()
 
-const selectedUser = ref<IUser>()
+const selectedUser = ref<IUserChat>()
 const takeActionView = ref(false)
 const selectedAction = ref<string | null>(null)
 const muteTime = ref(1)
@@ -78,7 +79,7 @@ const takeAction = () => {
             return
         }
         // do the action selected CARE IF MUTE ! USE MUTE TIME REF
-        chatStore.takeActionOnUser(selectedUser.value.username, selectedAction.value, muteTime.value)
+        chatStore.takeActionOnUser(selectedUser.value.user.username, selectedAction.value, muteTime.value)
             .then(() => {
                 chatStore.updateStore()
             })
@@ -92,7 +93,7 @@ const takeAction = () => {
     takeActionView.value = !takeActionView.value
 }
 
-const setSelectedUser = (user: IUser) => {
+const setSelectedUser = (user: IUserChat) => {
     selectedUser.value = user
 }
 

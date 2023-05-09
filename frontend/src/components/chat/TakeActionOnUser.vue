@@ -1,14 +1,19 @@
 <template>
     <section class="action_wrapper">
-        <ChatCommandList :setSelectedCommand="setAction" />
+        <ChatCommandList
+            :setSelectedCommand="setAction"
+            :isUserBanned="selectedUser.role === 'BANNED'"
+        />
     </section>
 </template>
 
 <script setup lang="ts">
-import ChatCommandList from '@/components/chat/ChatCommandList.vue';
+import ChatCommandList from '@/components/chat/ChatCommandList.vue'
+import type IUserChat from '@/interfaces/user/IUserChat'
 
 const props = defineProps<{
     setAction: (action: string) => void,
+    selectedUser: IUserChat
 }>()
 </script>
 
@@ -19,5 +24,4 @@ const props = defineProps<{
     width: 100%;
     gap: 10px;
 }
-
 </style>

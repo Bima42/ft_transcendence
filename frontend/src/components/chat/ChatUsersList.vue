@@ -7,7 +7,7 @@
                 :key="user.user.id"
                 :id="user.user.id"
                 v-show="userStore.user.id !== user.user.id"
-                @click="handleClick(user.user)"
+                @click="handleClick(user)"
             >
                 {{ user.user.username }}
                 <div class="svg_wrapper">
@@ -28,17 +28,17 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
-import type IUser from '@/interfaces/user/IUser'
+import type IUserChat from '@/interfaces/user/IUserChat'
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
 
 const props = defineProps<{
-    setSelectedUser: (user: any) => void
+    setSelectedUser: (user: IUserChat) => void
 }>()
 
-const handleClick = (user: IUser) => {
-    let newSelection = document.getElementById(user.id.toString()) as HTMLElement
+const handleClick = (user: IUserChat) => {
+    let newSelection = document.getElementById(user.user.id.toString()) as HTMLElement
     let oldSelection = document.getElementsByClassName('selected_user')[0] as HTMLElement
     if (oldSelection) {
         oldSelection.classList.remove('selected_user')
@@ -77,6 +77,7 @@ const handleClick = (user: IUser) => {
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+            cursor: pointer;
 
             .svg_wrapper {
                 display: flex;

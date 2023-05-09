@@ -1,6 +1,6 @@
 <template>
     <section class="list_container">
-        <ul class="commands">
+        <ul class="commands" v-if="!props.isUserBanned">
             <li
                 v-for="(command, x) in commands"
                 class="command"
@@ -11,14 +11,24 @@
                 {{ command.command }}
             </li>
         </ul>
+        <ul class="commands" v-else>
+            <li
+                class="command"
+                :id="'unban'"
+                @click="handleClick('unban')"
+            >
+                Unban
+            </li>
+        </ul>
     </section>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps<{
     setSelectedCommand: (command: string) => void
+    isUserBanned: boolean
 }>()
 
 const handleClick = (command: string) => {
@@ -84,6 +94,7 @@ const commands = ref(
             padding: 10px;
             border: 1px solid $tertiary;
             background: $secondary;
+            cursor: pointer;
 
             &.selected_command {
                 background: $tertiary;
