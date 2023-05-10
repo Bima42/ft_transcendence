@@ -78,8 +78,7 @@ router.beforeEach((to, _from) => {
   const userStore = useUserStore();
 
   if ( to.path.startsWith("/main") && ! userStore.isLoggedIn()) {
-    userStore.user = null;
-    localStorage.removeItem('localUser');
+    userStore.resetState()
     return '/';
   }
   if ( to.path == '/' && userStore.isLoggedIn()) {

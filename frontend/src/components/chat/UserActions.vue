@@ -5,26 +5,6 @@
 			View profile
 		</ButtonCustom>
 		<section class="chat_actions_buttons">
-			<template v-if="userRole >= UserChatRoleEnum.Admin">
-				<h4>Admin actions</h4>
-				<section class="buttons_wrap">
-					<ButtonCustom :style="'small'">
-						kick
-					</ButtonCustom>
-					<ButtonCustom :style="'small'">
-						ban
-					</ButtonCustom>
-					<ButtonCustom :style="'small'">
-						mute
-					</ButtonCustom>
-					<ButtonCustom :style="'small'">
-						promote
-					</ButtonCustom>
-					<ButtonCustom :style="'small'">
-						demote
-					</ButtonCustom>
-				</section>
-			</template>
 			<UserInteractions />
 		</section>
 	</section>

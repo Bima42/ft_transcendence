@@ -18,10 +18,11 @@ export default interface IChatStore {
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<IChat[]>;
 	retrieveWhispers: () => Promise<IChat[]>;
-	getRoleFromUserId: (userId: number) => Promise<UserChatRoleEnum>;
+	getRoleFromUserId: (userId: number) => UserChatRoleEnum;
 	getMessages: () => void;
 	resetState: () => void;
 	createChannel: (name: string, type: string, password?: string) => Promise<boolean>;
+	createWhisper: (targetUser: string) => Promise<boolean>;
 	joinChannel: (chat: IChat, password?: string) => Promise<boolean>;
 	leaveChannel: (chatId: string) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;

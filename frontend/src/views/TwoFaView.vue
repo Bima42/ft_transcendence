@@ -4,7 +4,7 @@
     <div class="code-container">
       <h4>Enter your code here</h4>
       <input type="text" placeholder="Enter your code here" v-model="code">
-      <button @click="toggleCode">Submit</button>
+      <ButtonCustom @click="toggleCode">Submit</ButtonCustom>
     </div>
   </section>
 </template>
@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const code = ref('')
 const userStore = useUserStore()

@@ -2,7 +2,7 @@ import { Logger, UnauthorizedException } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
 import { ChannelService } from './channel.service'
-import { NewChatMessageDto } from './dto/message.dto';
+import { NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const user = this.userSockets[socket.id];
         Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
-        const msg = await this.channelService.postMessage(user, data.chatId, data)
+        const msg = this.channelService.postMessage(user, data.chatId, data)
         .then(msg => {
           // TODO: only send to the correct room
           // The server also send back to the sender, as acknowledgement and validation
@@ -51,6 +51,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // send error back to the client
         if (typeof msg === "string")
           return msg;
+    }
+
+	@SubscribeMessage('whisper')
+    async handleWhisperMessage(@MessageBody() data: NewWhisperMessageDto,
+                               @ConnectedSocket() socket: Socket) {
+        const msg = await this.channelService.postMessageInWhisperChat(socket.data.user, data)
+        .then(msg => {
+          // TODO: only send to the correct room
+          // The server also send back to the sender, as acknowledgement and validation
+          this.server.emit("msg", msg);
+          return msg
+        })
+        .catch(err => {
+          Logger.log(err);
+          return err;
+        });
+        // send error back to the client
+        if (typeof msg === "string")
+          return msg;
+
+        Logger.log(`New whisper from ${socket.data.user.username}#${socket.data.user.id} to ${data.receiverId}`);
+
     }
 
     private async verifyUser(token: string) : Promise<UserDto> {

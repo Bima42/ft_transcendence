@@ -3,23 +3,29 @@ import { ChatType, UserChatRole } from '@prisma/client';
 import { UserDto } from 'src/users/dto/user.dto';
 
 
+export class NewWhisperDto {
+	@IsString()
+	@IsNotEmpty()
+	targetUsername: string;
+}
+
 export class NewChannelDto {
-  @IsNotEmpty()
+	@IsNotEmpty()
 	name: string;
 
-  @IsEnum(ChatType)
-  type: ChatType;
+	@IsEnum(ChatType)
+	type: ChatType;
 
-  @IsOptional()
-  password?: string;
+	@IsOptional()
+	password?: string;
 }
 
 export class JoinChannelDto {
-  @IsNumber()
-  chatId: number
+	@IsNumber()
+	chatId: number
 
-  @IsOptional()
-  password?: string
+	@IsOptional()
+	password?: string
 }
 
 export class DetailedChannelDto {
@@ -28,27 +34,27 @@ export class DetailedChannelDto {
 	createdAt: Date;
 	updatedAt: Date;
 	users: {
-    userId: number
-    chatId: number,
-    role: UserChatRole,
-    mutedUntil: Date,
-    user: UserDto,
-  }[];
+		userId: number
+		chatId: number,
+		role: UserChatRole,
+		mutedUntil: Date,
+		user: UserDto,
+	}[];
 
 }
 
 export class UserchatAction {
-  @IsNumber()
-  chatId: number;
+	@IsNumber()
+	chatId: number;
 
-  @Matches(/[a-zA-Z0-9_-]{2,20}/)
-  username: string;
+	@Matches(/[a-zA-Z0-9_-]{2,20}/)
+	username: string;
 
-  @IsIn(['add', 'kick', 'ban', 'mute', 'promote', 'demote'])
-  type: string
+	@IsIn(['add', 'kick', 'ban', 'mute', 'promote', 'demote'])
+	type: string
 
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  muteDuration: number
+	@IsOptional()
+	@IsNumber()
+	@IsPositive()
+	muteDuration: number
 }
