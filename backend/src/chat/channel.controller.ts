@@ -105,33 +105,13 @@ export class ChannelController {
 	}
 
 	@Post('rooms/:id/messages')
-	PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: RequestWithUser, @Body() data: NewChatMessageDto) {
+	async PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: RequestWithUser, @Body() data: NewChatMessageDto): Promise<ChatMessageDto> {
 		return this.channelService.postMessage(req.user, id, data);
 	}
 
-	// TODO: remove :id
 	@Post('whisper/messages')
-	PostWhisperMessage(@Req() req: RequestWithUser, @Body() data: NewWhisperMessageDto) {
-		Logger.log("New Whisper message")
-		const user = req.user;
-		this.channelService.postMessageInWhisperChat(req.user, data)
-			.then((msg: ChatMessage) => {
-				const msgDto: ChatMessageDto = {
-					content: msg.content,
-					sentAt: msg.sentAt,
-					updatedAt: msg.updatedAt,
-					chatId: msg.chatId,
-					author: {
-						id: user.id,
-						username: user.username,
-						avatar: user.avatar
-					}
-				}
-				return msgDto;
-			})
-			.catch((e) => {
-				return "Cannot post whisper message: " + e
-			});
+	async PostWhisperMessage(@Req() req: RequestWithUser, @Body() data: NewWhisperMessageDto): Promise<ChatMessageDto> {
+		return this.channelService.postMessageInWhisperChat(req.user, data)
 	}
 
 	@Put('rooms/:id/user')

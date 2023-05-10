@@ -140,7 +140,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const createWhisper = async function (targetUsername: string): Promise<boolean> {
-		const chat = await post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
+		const chat = post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
 			.then((res) => res.json())
 			.catch((err) => {
 				console.log(err)
@@ -150,7 +150,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
-		await put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
+		put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
 			password: password
 		})
@@ -166,7 +166,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const leaveChannel = async function (chatId: string): Promise<boolean> {
-		await put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
+		put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
 			.then((res) => res.json())
 			.catch((err) => {
 				console.log(err)
@@ -179,7 +179,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const subscribedChannels = async function (): Promise<boolean> {
-		await get('chat/rooms/subscribed', 'Failed to get subscribed channels')
+		get('chat/rooms/subscribed', 'Failed to get subscribed channels')
 			.then((res) => res.json())
 			.then((chatList: IChat[]) => {
 				subscribedChannelsList.value = chatList
@@ -209,7 +209,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const changeChatName = async function (newName: string): Promise<boolean> {
-		await post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
+		post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
 			.then(() => {
 				setCurrentChat(currentChat.value!.id.toString())
 				updateStore()

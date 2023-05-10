@@ -428,7 +428,7 @@ export class ChannelService {
 		return msgs.map((msg) => toMessageDto(msg, msg.user))
 	}
 
-	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessage> {
+	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessageDto> {
 		try {
 			let chat = await this.prismaService.chat.findFirst({
 				where: {
@@ -450,7 +450,7 @@ export class ChannelService {
 					chat: { connect: { id: chat.id } }
 				}
 			});
-			return msg;
+			return toMessageDto(msg, user);
 		}
 		catch (error) {
 			Logger.error(error)
