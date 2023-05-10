@@ -12,13 +12,13 @@ import {
 	HttpStatus,
 	Logger
 } from '@nestjs/common';
-import {ChannelService} from './channel.service';
-import {ChatGateway} from './channel.gateway';
-import {Chat, ChatMessage, UserChatRole} from '@prisma/client';
-import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
-import {NewChatMessageDto} from './dto/message.dto';
-import {UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto} from './dto/channel.dto';
-import {length} from 'class-validator';
+import { ChannelService } from './channel.service';
+import { ChatGateway } from './channel.gateway';
+import { Chat, ChatMessage, UserChatRole } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
+import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto, NewWhisperDto } from './dto/channel.dto';
+import { length } from 'class-validator';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { ApiBody } from '@nestjs/swagger';
 
@@ -38,8 +38,8 @@ export class ChannelController {
 	}
 
 	@Get('rooms/whispers')
-	async getWhisperChannels(@Req() req: RequestWithUser): Promise<NewChannelDto[]> {
-		return this.channelService.getWhisperChannels(req.user);
+	async getWhisperChannels(@Req() req: RequestWithUser): Promise<DetailedChannelDto[]> {
+		return await this.channelService.getWhisperChannels(req.user);
 	}
 
 	@Get('rooms/subscribed')
@@ -56,6 +56,11 @@ export class ChannelController {
 	@Post('rooms')
 	async createNewChannel(@Req() req: RequestWithUser, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
 		return this.channelService.createChannel(req.user, data)
+	}
+	@Post('rooms/whispers')
+	async createNewWhisper(@Req() req: RequestWithUser, @Body() data: NewWhisperDto): Promise<DetailedChannelDto> {
+		const chat = await this.channelService.createWhisperChat(req.user, data.targetUsername)
+		return this.channelService.getChannelDetails(req.user, chat.id)
 	}
 
 	@Put('rooms/join')
@@ -74,7 +79,7 @@ export class ChannelController {
 	}
 
 	@Post('rooms/editChannelName')
-	@ApiBody({required: true})
+	@ApiBody({ required: true })
 	async changeChatName(@Req() req: RequestWithUser, @Body() data: { id: number, newName: string }) {
 		return this.channelService.changeChatName(req.user, data.id, data.newName);
 	}
@@ -85,7 +90,7 @@ export class ChannelController {
 	}
 
 	@Put('rooms/:id')
-	async updateChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto) : Promise<DetailedChannelDto> {
+	async updateChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
 		return this.channelService.updateChannel(req.user, id, data);
 	}
 
@@ -102,6 +107,31 @@ export class ChannelController {
 	@Post('rooms/:id/messages')
 	PostMessage(@Param('id', new ParseIntPipe()) id: number, @Req() req: RequestWithUser, @Body() data: NewChatMessageDto) {
 		return this.channelService.postMessage(req.user, id, data);
+	}
+
+	// TODO: remove :id
+	@Post('whisper/messages')
+	PostWhisperMessage(@Req() req: RequestWithUser, @Body() data: NewWhisperMessageDto) {
+		Logger.log("New Whisper message")
+		const user = req.user;
+		this.channelService.postMessageInWhisperChat(req.user, data)
+			.then((msg: ChatMessage) => {
+				const msgDto: ChatMessageDto = {
+					content: msg.content,
+					sentAt: msg.sentAt,
+					updatedAt: msg.updatedAt,
+					chatId: msg.chatId,
+					author: {
+						id: user.id,
+						username: user.username,
+						avatar: user.avatar
+					}
+				}
+				return msgDto;
+			})
+			.catch((e) => {
+				return "Cannot post whisper message: " + e
+			});
 	}
 
 	@Put('rooms/:id/user')

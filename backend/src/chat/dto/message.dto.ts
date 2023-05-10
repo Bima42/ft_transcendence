@@ -11,6 +11,17 @@ export class NewChatMessageDto {
   chatId: number;
 }
 
+export class NewWhisperMessageDto {
+  @IsString()
+  content: string
+
+  @IsInt()
+  senderId: number
+
+  @IsInt()
+  receiverId: number
+}
+
 export class ChatMessageDto {
   content: string;
   sentAt: Date;

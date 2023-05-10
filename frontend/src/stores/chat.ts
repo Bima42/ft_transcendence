@@ -139,6 +139,16 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return false
 	}
 
+	const createWhisper = async function (targetUsername: string): Promise<boolean> {
+		const chat = await post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
+			.then((res) => res.json())
+			.catch((err) => {
+				console.log(err)
+				return null
+			})
+		return !!chat
+	}
+
 	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
 		await put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
@@ -289,6 +299,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		retrieveWhispers,
 		resetState,
 		createChannel,
+		createWhisper,
 		joinChannel,
 		leaveChannel,
 		subscribedChannels,

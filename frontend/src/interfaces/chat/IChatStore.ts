@@ -22,6 +22,7 @@ export default interface IChatStore {
 	getMessages: () => void;
 	resetState: () => void;
 	createChannel: (name: string, type: string, password?: string) => Promise<boolean>;
+	createWhisper: (targetUser: string) => Promise<boolean>;
 	joinChannel: (chat: IChat, password?: string) => Promise<boolean>;
 	leaveChannel: (chatId: string) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;

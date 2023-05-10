@@ -5,17 +5,18 @@ import {
 	HttpStatus,
 	Injectable,
 	Logger,
+	InternalServerErrorException,
 } from '@nestjs/common';
-import {UserChatRole} from '@prisma/client'
-import {PrismaService} from '../prisma/prisma.service';
-import {UserChat, Chat, ChatMessage, User} from '@prisma/client';
-import {ChatMessageDto, NewChatMessageDto} from './dto/message.dto';
-import {DetailedChannelDto, JoinChannelDto, NewChannelDto} from './dto/channel.dto';
+import { UserChatRole } from '@prisma/client'
+import { PrismaService } from '../prisma/prisma.service';
+import { UserChat, Chat, ChatMessage, User } from '@prisma/client';
+import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
+import { DetailedChannelDto, JoinChannelDto, NewChannelDto, NewWhisperDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
-import {UsersService} from 'src/users/users.service';
-import {UserDto} from '../users/dto/user.dto';
-import {toUserDto} from 'src/shared/mapper/user.mapper';
-import {toMessageDto} from 'src/shared/mapper/message.mapper';
+import { UsersService } from 'src/users/users.service';
+import { UserDto } from '../users/dto/user.dto';
+import { toUserDto } from 'src/shared/mapper/user.mapper';
+import { toMessageDto } from 'src/shared/mapper/message.mapper';
 
 @Injectable()
 export class ChannelService {
@@ -29,16 +30,17 @@ export class ChannelService {
 		let channels: Chat[] = [];
 		channels = await this.prismaService.chat.findMany({
 			where: {
+				type: { not: 'WHISPER' },
 				users: {
 					some: {
-						userId: {equals: user.id},
+						userId: { equals: user.id },
 					},
 				},
 				NOT: {
 					users: {
 						some: {
-							userId: {equals: user.id},
-							role: {equals: 'BANNED'},
+							userId: { equals: user.id },
+							role: { equals: 'BANNED' },
 						},
 					},
 				},
@@ -54,12 +56,12 @@ export class ChannelService {
 		let channels: Chat[] = [];
 		channels = await this.prismaService.chat.findMany({
 			where: {
-				type: {equals: 'PUBLIC'},
+				type: { equals: 'PUBLIC' },
 				NOT: {
 					users: {
 						some: {
-							userId: {equals: user.id},
-							role: {equals: 'BANNED'},
+							userId: { equals: user.id },
+							role: { equals: 'BANNED' },
 						},
 					},
 				},
@@ -71,14 +73,14 @@ export class ChannelService {
 		return channels;
 	}
 
-	async getWhisperChannels(user: User): Promise<Array<NewChannelDto>> {
+	async getWhisperChannels(user: User): Promise<Array<DetailedChannelDto>> {
 		let channels: Chat[] = [];
 		channels = await this.prismaService.chat.findMany({
 			where: {
-				type: {equals: 'WHISPER'},
+				type: { equals: 'WHISPER' },
 				users: {
 					some: {
-						userId: {equals: user.id},
+						userId: { equals: user.id },
 					},
 				},
 			},
@@ -86,7 +88,20 @@ export class ChannelService {
 		if (!channels) {
 			throw new BadRequestException('No channel found');
 		}
-		return channels;
+
+		let details = []
+		for (const el of channels) {
+			const detail = await this.getChannelDetails(user, el.id)
+
+			// Change chat name to other person name
+			const otherUser = detail.users?.find((userChat) => userChat.user.id != user?.id)
+			if (otherUser)
+				detail.name = otherUser.user.username;
+
+			details.push(detail)
+		}
+		return details
+
 	}
 
 	// Return the detailed description of the chat, except for the messages
@@ -96,10 +111,10 @@ export class ChannelService {
 			channels = await this.prismaService.chat.findMany({
 				where: {
 					// Whispers and user is in
-					type: {equals: 'WHISPER'},
+					type: { equals: 'WHISPER' },
 					users: {
 						some: {
-							userId: {equals: user.id},
+							userId: { equals: user.id },
 						},
 					},
 				},
@@ -111,29 +126,29 @@ export class ChannelService {
 					NOT: {
 						users: {
 							some: {
-								userId: {equals: user.id},
-								role: {equals: 'BANNED'},
+								userId: { equals: user.id },
+								role: { equals: 'BANNED' },
 							},
 						},
 					},
 					OR: [
 						// Public channels
 						{
-							type: {equals: 'PUBLIC'},
+							type: { equals: 'PUBLIC' },
 						},
 						// Private channels, where user exists and is not banned
 						{
-							type: {equals: 'PRIVATE'},
+							type: { equals: 'PRIVATE' },
 							users: {
 								some: {
-									userId: {equals: user.id},
+									userId: { equals: user.id },
 								},
 							},
 						},
 
 					],
 				},
-				orderBy: {id: 'asc'},
+				orderBy: { id: 'asc' },
 			});
 		}
 
@@ -149,7 +164,7 @@ export class ChannelService {
 			// Create the default chat
 			Logger.log('Generate the general chat');
 			const generalChannel = await this.prismaService.chat.upsert({
-				where: {id: 1},
+				where: { id: 1 },
 				create: general,
 				update: general,
 			})
@@ -164,13 +179,13 @@ export class ChannelService {
 	async getChannelDetails(user: User, chatId: number): Promise<DetailedChannelDto> {
 
 		const chat: Chat = await this.prismaService.chat.findUnique({
-			where: {id: +chatId},
+			where: { id: +chatId },
 		});
 
 		// TODO TYR: When the chat is not found
 
 		const users = await this.prismaService.userChat.findMany({
-			where: {chatId: chatId},
+			where: { chatId: chatId },
 			select: {
 				id: true,
 				userId: true,
@@ -180,8 +195,8 @@ export class ChannelService {
 				mutedUntil: true
 			},
 			orderBy: [
-				{role: 'asc',},
-				{userId: 'desc',},
+				{ role: 'asc', },
+				{ userId: 'desc', },
 			],
 		})
 
@@ -212,7 +227,7 @@ export class ChannelService {
 
 	async findChannelById(chatId: number): Promise<Chat> {
 		const chat = await this.prismaService.chat.findUnique({
-			where: {id: +chatId}
+			where: { id: +chatId }
 		});
 		if (!chat) {
 			throw new NotFoundException('Chat not found')
@@ -222,7 +237,7 @@ export class ChannelService {
 
 	async findByName(chatName: string): Promise<Chat> {
 		const chat = await this.prismaService.chat.findFirst({
-			where: {name: chatName}
+			where: { name: chatName }
 		});
 		if (!chat) {
 			throw new NotFoundException('Chat not found')
@@ -260,6 +275,44 @@ export class ChannelService {
 		return this.getChannelDetails(user, newChat.id);
 	}
 
+	async createWhisperChat(user1: User, targetUsername: string): Promise<Chat> {
+		const targetUser = await this.userService.findByName(targetUsername);
+
+		// Find if already exists:
+		const existing = await this.prismaService.chat.findFirst({
+			where: {
+				type: 'WHISPER',
+				users: {
+					every: { id: { in: [user1.id, targetUser.id] } }
+				}
+			},
+		})
+		if (existing) {
+			Logger.log(`${user1.username}#${user1.id} wanted to create an existing whisper with ${targetUser.username}#${targetUser.id}`);
+			return existing
+		}
+		const chat = await this.prismaService.chat.create({
+			data: {
+				type: "WHISPER",
+				name: "whisper",
+				users: {
+					create: [
+						{
+							userId: user1.id,
+							role: 'MEMBER'
+						},
+						{
+							userId: targetUser.id,
+							role: 'MEMBER'
+						},
+					],
+				},
+			},
+		})
+		Logger.log(`${user1.username}#${user1.id} created a new whisper with ${targetUser.username}#${targetUser.id}`);
+		return chat
+	}
+
 	async updateChannel(user: User, chatId: number, newChannel: NewChannelDto) {
 		// Get the current role of the request user
 		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
@@ -274,10 +327,10 @@ export class ChannelService {
 		}
 
 		await this.prismaService.chat.update({
-			where: {id: chatId},
+			where: { id: chatId },
 			data: newChannel
 		});
-    return this.getChannelDetails(user, chatId)
+		return this.getChannelDetails(user, chatId)
 	}
 
 	async deleteChannel(user: User, chatId: number) {
@@ -290,17 +343,17 @@ export class ChannelService {
 
 		// Delete UserChatRole
 		const roleOutput = await this.prismaService.userChat.deleteMany({
-			where: {chatId: chatId}
+			where: { chatId: chatId }
 		})
 
 		// Delete messages
 		const MsgOutput = await this.prismaService.chatMessage.deleteMany({
-			where: {chatId: chatId}
+			where: { chatId: chatId }
 		})
 
 		// Delete Chat
 		this.prismaService.chat.delete({
-			where: {id: chatId},
+			where: { id: chatId },
 		});
 
 		Logger.log('Deleted chat ' + chatId + ': '
@@ -351,7 +404,7 @@ export class ChannelService {
 
 		// delete userRole
 		await this.prismaService.userChat.delete({
-			where: {id: reqUserChat.id}
+			where: { id: reqUserChat.id }
 		});
 
 		this.deleteChatIfEmpty(data.chatId);
@@ -364,13 +417,43 @@ export class ChannelService {
 		const msgs = await this.prismaService.chatMessage.findMany({
 			skip: 0,
 			take: nbrMsgs,
-			where: {chatId: chatId},
-			orderBy: {id: 'desc'},
+			where: { chatId: chatId },
+			orderBy: { id: 'desc' },
 			include: {
 				user: true
 			},
 		});
 		return msgs.map((msg) => toMessageDto(msg, msg.user))
+	}
+
+	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessage> {
+		try {
+			let chat = await this.prismaService.chat.findFirst({
+				where: {
+					type: 'WHISPER',
+					users: {
+						none: {
+							userId: { notIn: [user.id, data.receiverId] },
+						},
+					},
+				},
+			})
+			if (!chat) {
+				throw new BadRequestException("Cannot find chat")
+			}
+			const msg: ChatMessage = await this.prismaService.chatMessage.create({
+				data: {
+					content: data.content,
+					user: { connect: { id: user.id } },
+					chat: { connect: { id: chat.id } }
+				}
+			});
+			return msg;
+		}
+		catch (error) {
+			Logger.error(error)
+			return Promise.reject("cannot post message")
+		}
 	}
 
 	async postMessage(user: UserDto, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
@@ -408,8 +491,8 @@ export class ChannelService {
 		const msg: ChatMessage = await this.prismaService.chatMessage.create({
 			data: {
 				content: data.content,
-				user: {connect: {id: user.id}},
-				chat: {connect: {id: chatId}}
+				user: { connect: { id: user.id } },
+				chat: { connect: { id: chatId } }
 			}
 		});
 
@@ -442,7 +525,7 @@ export class ChannelService {
 
 		Logger.log(`${user.username}#${user.id} kicked ${targetUser.username}#${targetUser.id} from chat ${chatId}`);
 		await this.prismaService.userChat.delete({
-			where: {id: targetUserChat.id},
+			where: { id: targetUserChat.id },
 		});
 		return HttpStatus.OK;
 	}
@@ -493,7 +576,7 @@ export class ChannelService {
 		Logger.log(`${targetUser.username}#${targetUser.id}'s role is updated for chat ${chatId}: ${newRole} (muted for: ${diffMuted} sec)`);
 
 		await this.prismaService.userChat.update({
-			where: {id: targetUserChat.id},
+			where: { id: targetUserChat.id },
 			data: targetUserChat
 		});
 		return HttpStatus.OK;
@@ -530,8 +613,8 @@ export class ChannelService {
 	async deleteChatIfEmpty(chatId: number): Promise<void> {
 
 		const chat = await this.prismaService.chat.findUnique({
-			where: {id: chatId},
-			include: {users: true},
+			where: { id: chatId },
+			include: { users: true },
 		});
 
 		if (!chat) {
@@ -559,42 +642,42 @@ export class ChannelService {
 		const userChat = await this.prismaService.userChat.findFirst({
 			where: {
 				chatId: chatId,
-				userId: {not: leavingOwner},
-				role: {not: 'BANNED'},
+				userId: { not: leavingOwner },
+				role: { not: 'BANNED' },
 			},
-			orderBy: {id: 'asc'},
+			orderBy: { id: 'asc' },
 		});
 		if (!userChat) {
 			return
 		}
 		// Update the role of the user that will become the new owner
 		await this.prismaService.userChat.update({
-			where: {id: userChat.id},
-			data: {role: 'OWNER'},
+			where: { id: userChat.id },
+			data: { role: 'OWNER' },
 		});
 	}
 
-	async changeChatName(user : UserDto, chatId: number, newName: string): Promise<void> {
-    const userChat = await this.prismaService.userChat.findFirst({
-      where: {
-        userId: user.id
-      }
-    })
-    if (!userChat || userChat.role != 'OWNER')
-      throw new ForbiddenException("Not allow to change chat name");
+	async changeChatName(user: UserDto, chatId: number, newName: string): Promise<void> {
+		const userChat = await this.prismaService.userChat.findFirst({
+			where: {
+				userId: user.id
+			}
+		})
+		if (!userChat || userChat.role != 'OWNER')
+			throw new ForbiddenException("Not allow to change chat name");
 
 		if (!newName) {
 			throw new BadRequestException('New name cannot be empty');
 		}
 		await this.prismaService.chat.update({
-			where: {id: chatId},
-			data: {name: newName},
+			where: { id: chatId },
+			data: { name: newName },
 		});
 	}
 
 	async isPasswordProtected(chatId: number): Promise<boolean> {
 		const chat = await this.prismaService.chat.findUnique({
-			where: {id: chatId},
+			where: { id: chatId },
 		});
 		if (!chat) {
 			throw new NotFoundException(`Chat not found`);
