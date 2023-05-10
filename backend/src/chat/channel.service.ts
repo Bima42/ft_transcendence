@@ -183,6 +183,8 @@ export class ChannelService {
 		});
 
 		// TODO TYR: When the chat is not found
+		if (!chat)
+			throw new NotFoundException("Chat not found")
 
 		const users = await this.prismaService.userChat.findMany({
 			where: { chatId: chatId },
