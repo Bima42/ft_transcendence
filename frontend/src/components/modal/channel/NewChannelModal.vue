@@ -11,7 +11,7 @@
             </select>
             <label for="channel_password">Channel password</label>
             <input v-model="password" type="password" id="channel_password" name="channel_password" placeholder="Optional">
-            <button type="submit">Create</button>
+            <ButtonCustom type="submit">Create</ButtonCustom>
         </form>
     </section>
 </template>
@@ -20,6 +20,7 @@
 import { defineProps, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const chatStore = useChatStore()
 const modalStore = useModalStore()

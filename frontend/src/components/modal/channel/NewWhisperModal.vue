@@ -4,7 +4,7 @@
         <form @submit="handleNewChannelSubmit">
             <label for="username">User name</label>
             <input v-model="username" type="text" id="user_name" name="user_name" placeholder="User name" required>
-            <button type="submit">Create</button>
+            <ButtonCustom type="submit">Create</ButtonCustom>
         </form>
     </section>
 </template>
@@ -13,6 +13,7 @@
 import { defineProps, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const chatStore = useChatStore()
 const modalStore = useModalStore()
