@@ -78,5 +78,4 @@ const goToDetailedProfile = (id: string) => {
         align-items: center;
     }
 }
-
 </style>

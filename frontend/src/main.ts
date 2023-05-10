@@ -12,13 +12,16 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
-	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar
+	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar, faPlus,
+	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan
+
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
-	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar
+	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar, faPlus,
+	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan
 )
 
 createApp(App)

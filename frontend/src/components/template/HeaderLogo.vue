@@ -1,12 +1,12 @@
 <template>
-    <section class="header_logo_wrapper">
+    <div class="header">
         <img src="@/assets/img/logo_name.svg" alt="logo" class="logo" @click="router.push('/')">
-    </section>
+    </div>
 </template>
 
 <script setup lang="ts">
 import {defineProps} from 'vue'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 
 const props = defineProps<{}>()
 
@@ -14,13 +14,19 @@ const router = useRouter()
 </script>
 
 <style scoped lang="scss">
-.header_logo_wrapper {
+.header {
     grid-area: $header1-2;
     display: flex;
     justify-content: flex-start;
-    padding: 20px;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     height: 100%;
+
+    .logo {
+        max-width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
 }
+
 </style>

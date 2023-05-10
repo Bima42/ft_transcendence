@@ -25,6 +25,71 @@ export class ChannelService {
 	) {
 	}
 
+	async getSubscribedChannels(user: User): Promise<Array<NewChannelDto>> {
+		let channels: Chat[] = [];
+		channels = await this.prismaService.chat.findMany({
+			where: {
+				users: {
+					some: {
+						userId: {equals: user.id},
+					},
+				},
+				NOT: {
+					users: {
+						some: {
+							userId: {equals: user.id},
+							role: {equals: 'BANNED'},
+						},
+					},
+				},
+			},
+		});
+		if (!channels) {
+			throw new BadRequestException('No channel found');
+		}
+		return channels;
+	}
+
+	async getPublicChannels(user: User): Promise<Array<NewChannelDto>> {
+		let channels: Chat[] = [];
+		channels = await this.prismaService.chat.findMany({
+			where: {
+				type: {equals: 'PUBLIC'},
+				NOT: {
+					users: {
+						some: {
+							userId: {equals: user.id},
+							role: {equals: 'BANNED'},
+						},
+					},
+				},
+			},
+		});
+		if (!channels) {
+			throw new BadRequestException('No channel found');
+		}
+		return channels;
+	}
+
+	async getWhisperChannels(user: User): Promise<Array<NewChannelDto>> {
+		let channels: Chat[] = [];
+		channels = await this.prismaService.chat.findMany({
+			where: {
+				type: {equals: 'WHISPER'},
+				users: {
+					some: {
+						userId: {equals: user.id},
+					},
+				},
+			},
+		});
+		if (!channels) {
+			throw new BadRequestException('No channel found');
+		}
+		return channels;
+	}
+
+	// Return the detailed description of the chat, except for the messages
 	async getAllChannelsForUser(user: User, whispers: boolean): Promise<Array<NewChannelDto>> {
 		let channels: Chat[] = [];
 		if (whispers) {
@@ -208,10 +273,11 @@ export class ChannelService {
 			newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
 		}
 
-		return this.prismaService.chat.update({
+		await this.prismaService.chat.update({
 			where: {id: chatId},
 			data: newChannel
 		});
+    return this.getChannelDetails(user, chatId)
 	}
 
 	async deleteChannel(user: User, chatId: number) {
@@ -398,7 +464,7 @@ export class ChannelService {
 		if (!targetUserChat) {
 			// Create the user role
 			Logger.log(`${targetUser.username}#${targetUser.id}'s role is created for chat ${chatId}: ${newRole}`);
-			const mutedUntil = this.updateMutedUntil(null, muteDuration);
+			const mutedUntil = this.updateMutedUntil(null, muteDuration * 60); //Dirty was here
 			await this.prismaService.userChat.create({
 				data: {
 					chatId: chatId,
@@ -436,7 +502,7 @@ export class ChannelService {
 	updateMutedUntil(currentMutedUntil: Date | null, muteDuration: number): Date | null {
 		if (muteDuration) {
 			const newMutedUntil = new Date();
-			newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration);
+			newMutedUntil.setSeconds(newMutedUntil.getSeconds() + muteDuration * 60);
 			if (!currentMutedUntil || newMutedUntil > currentMutedUntil) {
 				return newMutedUntil;
 			} else {
@@ -506,5 +572,33 @@ export class ChannelService {
 			where: {id: userChat.id},
 			data: {role: 'OWNER'},
 		});
+	}
+
+	async changeChatName(user : UserDto, chatId: number, newName: string): Promise<void> {
+    const userChat = await this.prismaService.userChat.findFirst({
+      where: {
+        userId: user.id
+      }
+    })
+    if (!userChat || userChat.role != 'OWNER')
+      throw new ForbiddenException("Not allow to change chat name");
+
+		if (!newName) {
+			throw new BadRequestException('New name cannot be empty');
+		}
+		await this.prismaService.chat.update({
+			where: {id: chatId},
+			data: {name: newName},
+		});
+	}
+
+	async isPasswordProtected(chatId: number): Promise<boolean> {
+		const chat = await this.prismaService.chat.findUnique({
+			where: {id: chatId},
+		});
+		if (!chat) {
+			throw new NotFoundException(`Chat not found`);
+		}
+		return chat.password != null;
 	}
 }

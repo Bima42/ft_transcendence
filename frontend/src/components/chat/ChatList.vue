@@ -1,5 +1,7 @@
 <template>
-    <div class="content_element" v-for="chatRoom in currentChatList" :id="chatRoom.id"
+    <div class="content_element"
+         v-for="chatRoom in (selectedChatList === 'public' ? chatStore.subscribedChannelsList : chatStore.whisperChatList)"
+         :id="chatRoom.id" :key="chatRoom.id"
          @click="toggleChat(chatRoom.id)">
         <h1>{{ chatRoom.name }}</h1>
         <font-awesome-icon icon="fa-chevron-right"/>
@@ -12,56 +14,25 @@
  *
  * @param {Function} toggleChat - This function is used to send the clicked chat id to the parent
  */
-import {defineProps, ref, onMounted, watch, onUnmounted} from 'vue'
-import {useChatStore} from '@/stores/chat'
-import type IChat from '@/interfaces/chat/IChat'
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import { defineProps, ref } from 'vue'
+import { useChatStore } from '@/stores/chat'
 
 const error = ref(null);
 const chatStore = useChatStore();
-const currentChatList = ref<IChat[]>()
-let publicChatList = await chatStore.retrievePublicChats();
-let privateChatList = await chatStore.retrieveWhispers();
+await chatStore.updateStore();
 
 const props = defineProps<{
     selectedChatList: string
 }>()
 
-const getCurrentList = (): IChat[] => {
-    if (props.selectedChatList === 'public')
-        return publicChatList
-    else if (props.selectedChatList === 'private')
-        return privateChatList
-    else
-        return []
-}
-
-const toggleChat = (id: number) => {
+const toggleChat = async (id: number) => {
     const castedId = id.toString()
-    if (!chatStore.setCurrentChat(castedId)) {
+    const response = chatStore.setCurrentChat(castedId)
+    if (!response) {
         console.error('Chat not found') //TODO: set variable and display error message
         return
     }
 }
-
-watch(props, () => {
-    currentChatList.value = getCurrentList()
-})
-
-// Call it when loading the page
-onMounted(async () => {
-    publicChatList = await chatStore.retrievePublicChats()
-    privateChatList = await chatStore.retrieveWhispers()
-    currentChatList.value = getCurrentList()
-    chatStore.socket.on('msg', (data: IChatMessage) => {
-        chatStore.onNewMessage(data)
-    })
-})
-
-onUnmounted(async () => {
-    chatStore.socket.off('msg')
-    chatStore.resetState()
-})
 </script>
 
 <style scoped lang="scss">
