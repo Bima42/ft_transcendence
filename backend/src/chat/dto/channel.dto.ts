@@ -10,6 +10,7 @@ export class NewWhisperDto {
 }
 
 export class NewChannelDto {
+
 	@IsNotEmpty()
 	name: string;
 
@@ -44,6 +45,22 @@ export class JoinChannelDto {
 
 	@IsOptional()
 	password?: string
+}
+
+export class BriefChannelDto {
+
+	@IsNumber()
+	@IsPositive()
+	id: number
+
+	@IsNotEmpty()
+	name: string;
+
+	@IsEnum(ChatType)
+	type: ChatType;
+
+	@IsOptional()
+	password?: string;
 }
 
 export class DetailedChannelDto {
