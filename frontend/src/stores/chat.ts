@@ -178,11 +178,9 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	const leaveChannel = async function (chatId: number = (currentChat.value?.id || 0)): Promise<boolean> {
-		console.log(`leave channel #${chatId}`)
 		put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
 			.then((res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
-				return res.json()
 			})
 			.catch((err) => {
 				console.log(err)
