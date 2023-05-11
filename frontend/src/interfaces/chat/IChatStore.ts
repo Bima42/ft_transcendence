@@ -15,6 +15,7 @@ export default interface IChatStore {
 	notSubscribedChannelsList: Ref<IChat[]>;
 	isChannelPasswordProtected: Ref<boolean>;
 	sendMessage: (msg: any) => void;
+	refreshCurrentChat: () => Promise<boolean>;
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<IChat[]>;
 	retrieveWhispers: () => Promise<IChat[]>;

@@ -39,6 +39,17 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		currentChat.value.messages.unshift(msg);
 	}
 
+	const refreshCurrentChat = async function (): Promise<boolean> {
+		if (!currentChat.value)
+			return false;
+		get(`chat/rooms/${currentChat.value.id}`, "Failed to refresh chat")
+		.then(res => res.json())
+		.then(chat => currentChat.value = chat)
+		.catch(err => console.log(err))
+		console.log(`refreshed chat`)
+		return true;
+	}
+
 	const setCurrentChat = async function (chatId: string): Promise<boolean> {
 		if (!chatId) {
 			return false
@@ -296,6 +307,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		isChannelPasswordProtected,
 		onNewMessage,
 		sendMessage,
+		refreshCurrentChat,
 		setCurrentChat,
 		getRoleFromUserId,
 		getMessages,
