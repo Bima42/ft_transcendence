@@ -73,8 +73,11 @@ export class ChannelService {
 				},
 			},
 		});
-		if (!channels) {
-			throw new BadRequestException('No channel found');
+		if (channels.length == 0) {
+			const generalChannel = await this.generateGeneralChat()
+			if (generalChannel) {
+				channels.push(generalChannel);
+			}
 		}
 		const dtos: BriefChannelDto[] = channels.map(el => {
 			return {
@@ -170,22 +173,32 @@ export class ChannelService {
 		}
 
 		if (channels.length == 0) {
-			const general: NewChannelDto = {
-				name: 'General',
-				type: 'PUBLIC',
-			}
-			// Create the default chat
-			Logger.log('Generate the general chat');
-			const generalChannel = await this.prismaService.chat.upsert({
-				where: { id: 1 },
-				create: general,
-				update: general,
-			})
+			const generalChannel = await this.generateGeneralChat()
 			if (generalChannel) {
 				channels.push(generalChannel);
 			}
 		}
 		return channels;
+	}
+
+	async generateGeneralChat() : Promise<Chat> {
+		const general: NewChannelDto = {
+			name: 'General',
+			type: 'PUBLIC',
+		}
+		// Create the default chat
+		try {
+		const generalChannel = await this.prismaService.chat.upsert({
+			where: { id: 1 },
+			create: general,
+			update: general,
+		})
+		Logger.log('Generate the general chat');
+		return generalChannel;
+		} catch(e) {
+			Logger.log('Cannot generate the general chat');
+			return null
+		}
 	}
 
 	// Return the detailed description of the chat, except for the messages
