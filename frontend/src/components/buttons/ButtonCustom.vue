@@ -93,6 +93,11 @@ button {
         filter: brightness(0.5);
         cursor: not-allowed;
     }
+
+	&.danger {
+		color: red;
+		border-color: red;
+	}
 }
 
 </style>

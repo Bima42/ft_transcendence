@@ -10,18 +10,23 @@
         <ButtonCustom :style="'big'" :click="() => handleClick('inviteFriend')">
             <h1>Invite friend</h1>
         </ButtonCustom>
+        <ButtonCustom :style="'big danger'" :click="() => handleClick('leaveChat')">
+            <h1>Leave chat</h1>
+        </ButtonCustom>
     </div>
 </template>
 
 <script setup lang="ts">
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useModalStore } from '@/stores/modal'
+import { useChatStore } from '@/stores/chat'
 import TheModal from '@/components/modal/TheModal.vue'
 import manageChannelUsersModal from '@/components/modal/channel/ManageChannelUsersModal.vue'
 import manageChannelModal from '@/components/modal/channel/ManageChannelModal.vue'
 import chatInviteFriendModal from '@/components/modal/channel/ChatInviteFriendModal.vue'
 
 const modalStore = useModalStore()
+const chatStore = useChatStore()
 
 const handleClick = (option: string) => {
     switch (option) {
@@ -34,6 +39,9 @@ const handleClick = (option: string) => {
         case 'inviteFriend':
             modalStore.loadAndDisplay(TheModal, chatInviteFriendModal, {})
             break
+		case 'leaveChat':
+			chatStore.leaveChannel()
+			break
         default:
             break
     }
