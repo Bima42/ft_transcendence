@@ -20,8 +20,26 @@ export class NewChannelDto {
 	password?: string;
 }
 
+export class UpdateChannelDto {
+	@IsNumber()
+	@IsPositive()
+	id: number
+
+	@IsOptional()
+	@IsNotEmpty()
+	name: string;
+
+	@IsOptional()
+	@IsEnum(ChatType)
+	type: ChatType;
+
+	@IsOptional()
+	password?: string;
+}
+
 export class JoinChannelDto {
 	@IsNumber()
+	@IsPositive()
 	chatId: number
 
 	@IsOptional()
@@ -45,6 +63,7 @@ export class DetailedChannelDto {
 
 export class UserchatAction {
 	@IsNumber()
+	@IsPositive()
 	chatId: number;
 
 	@Matches(/[a-zA-Z0-9_-]{2,20}/)

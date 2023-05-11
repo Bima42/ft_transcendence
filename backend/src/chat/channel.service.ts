@@ -11,7 +11,7 @@ import { UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChat, Chat, ChatMessage, User } from '@prisma/client';
 import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
-import { DetailedChannelDto, JoinChannelDto, NewChannelDto, NewWhisperDto } from './dto/channel.dto';
+import { DetailedChannelDto, JoinChannelDto, NewChannelDto, NewWhisperDto, UpdateChannelDto } from './dto/channel.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -315,24 +315,33 @@ export class ChannelService {
 		return chat
 	}
 
-	async updateChannel(user: User, chatId: number, newChannel: NewChannelDto) {
+	async updateChannel(user: User, newChannel: UpdateChannelDto) {
 		// Get the current role of the request user
-		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
+		const reqUserChat = await this.findUserchatFromIds(newChannel.id, user.id);
 		if (!reqUserChat || reqUserChat.role != 'OWNER') {
 			throw new ForbiddenException('Not authorized to update Channel');
 		}
 
-		// TODO: can we remove the channel password ?
-		if (newChannel.password) {
+		if (newChannel.password === "") {
+			newChannel.password = null
+		}
+		else if (newChannel.password) {
 			const saltRounds = 10;
 			newChannel.password = await bcrypt.hash(newChannel.password, saltRounds);
 		}
 
-		await this.prismaService.chat.update({
-			where: { id: chatId },
-			data: newChannel
-		});
-		return this.getChannelDetails(user, chatId)
+
+		try {
+			await this.prismaService.chat.update({
+				where: { id: newChannel.id },
+				data: newChannel
+			});
+		}
+		catch (e) {
+			throw new BadRequestException("Cannot update chat");
+
+		}
+		return this.getChannelDetails(user, newChannel.id)
 	}
 
 	async deleteChannel(user: User, chatId: number) {
@@ -656,24 +665,6 @@ export class ChannelService {
 		await this.prismaService.userChat.update({
 			where: { id: userChat.id },
 			data: { role: 'OWNER' },
-		});
-	}
-
-	async changeChatName(user: UserDto, chatId: number, newName: string): Promise<void> {
-		const userChat = await this.prismaService.userChat.findFirst({
-			where: {
-				userId: user.id
-			}
-		})
-		if (!userChat || userChat.role != 'OWNER')
-			throw new ForbiddenException("Not allow to change chat name");
-
-		if (!newName) {
-			throw new BadRequestException('New name cannot be empty');
-		}
-		await this.prismaService.chat.update({
-			where: { id: chatId },
-			data: { name: newName },
 		});
 	}
 

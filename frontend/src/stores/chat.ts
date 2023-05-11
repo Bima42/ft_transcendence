@@ -3,13 +3,14 @@ import { defineStore } from 'pinia'
 import type IChat from '@/interfaces/chat/IChat'
 import { io, Socket } from 'socket.io-client'
 import { getCookie } from 'typescript-cookie'
-import { get, jsonHeaders, post, put } from '../../utils'
+import { get, jsonHeaders, post, patch } from '../../utils'
 import type IChatStore from '@/interfaces/chat/IChatStore'
 import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
 import type IUserChatAction from '@/interfaces/chat/IUserChatAction';
+import type { IUpdateChat } from '@/interfaces/chat/IChat'
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
 	const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
@@ -223,8 +224,8 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		})
 	}
 
-	const changeChatName = async function (newName: string): Promise<boolean> {
-		post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
+	const updateChat = async function (newData: IUpdateChat): Promise<boolean> {
+		patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
 			.then(() => {
 				setCurrentChat(currentChat.value!.id.toString())
 				updateStore()
@@ -320,7 +321,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		leaveChannel,
 		subscribedChannels,
 		getListOfNotSubscribedChannels,
-		changeChatName,
+		updateChat,
 		currentChatPasswordProtected,
 		inviteFriendToChat,
 		takeActionOnUser,
