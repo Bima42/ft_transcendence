@@ -164,7 +164,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
 		put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
-			password: password
+			password: password || null
 		})
 			.then((res) => res.json())
 			.catch((err) => {
