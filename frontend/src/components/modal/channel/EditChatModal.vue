@@ -49,7 +49,9 @@ const handleClick = (option: string) => {
             modalStore.loadAndDisplay(TheModal, chatInviteFriendModal, {})
             break
 		case 'leaveChat':
-			chatStore.leaveChannel()
+			if (confirm("Are you sure you want to leave the channel ?")) {
+				chatStore.leaveChannel()
+			}
 			break
         default:
             break
