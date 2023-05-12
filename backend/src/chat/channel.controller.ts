@@ -5,6 +5,7 @@ import {
 	Delete,
 	Param,
 	ParseIntPipe,
+	Patch,
 	Post,
 	Put,
 	Req,
@@ -17,7 +18,7 @@ import { ChatGateway } from './channel.gateway';
 import { Chat, ChatMessage, UserChatRole } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
-import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto, NewWhisperDto } from './dto/channel.dto';
+import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto, NewWhisperDto, UpdateChannelDto } from './dto/channel.dto';
 import { length } from 'class-validator';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { ApiBody } from '@nestjs/swagger';
@@ -57,6 +58,12 @@ export class ChannelController {
 	async createNewChannel(@Req() req: RequestWithUser, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
 		return this.channelService.createChannel(req.user, data)
 	}
+
+	@Patch('rooms')
+	async updateChannel(@Req() req: RequestWithUser, @Body() data: UpdateChannelDto): Promise<DetailedChannelDto> {
+		return this.channelService.updateChannel(req.user, data);
+	}
+
 	@Post('rooms/whispers')
 	async createNewWhisper(@Req() req: RequestWithUser, @Body() data: NewWhisperDto): Promise<DetailedChannelDto> {
 		const chat = await this.channelService.createWhisperChat(req.user, data.targetUsername)
@@ -78,20 +85,9 @@ export class ChannelController {
 		return this.channelService.getSubscribedChannels(req.user);
 	}
 
-	@Post('rooms/editChannelName')
-	@ApiBody({ required: true })
-	async changeChatName(@Req() req: RequestWithUser, @Body() data: { id: number, newName: string }) {
-		return this.channelService.changeChatName(req.user, data.id, data.newName);
-	}
-
 	@Get('rooms/:id')
 	async getOneChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number): Promise<DetailedChannelDto> {
 		return this.channelService.getChannelDetails(req.user, id);
-	}
-
-	@Put('rooms/:id')
-	async updateChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
-		return this.channelService.updateChannel(req.user, id, data);
 	}
 
 	@Delete('rooms/:id')

@@ -32,7 +32,7 @@ onMounted(async () => {
 const handleClick = async (chat: IChat) => {
     let password = undefined
     if (chat.password) {
-        //POP a modal to ask for password
+		password = prompt("Password:") || undefined
     }
     await chatStore.joinChannel(chat, password)
     modalStore.resetState()

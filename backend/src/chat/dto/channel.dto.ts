@@ -10,6 +10,7 @@ export class NewWhisperDto {
 }
 
 export class NewChannelDto {
+
 	@IsNotEmpty()
 	name: string;
 
@@ -20,12 +21,46 @@ export class NewChannelDto {
 	password?: string;
 }
 
+export class UpdateChannelDto {
+	@IsNumber()
+	@IsPositive()
+	id: number
+
+	@IsOptional()
+	@IsNotEmpty()
+	name: string;
+
+	@IsOptional()
+	@IsEnum(ChatType)
+	type: ChatType;
+
+	@IsOptional()
+	password?: string;
+}
+
 export class JoinChannelDto {
 	@IsNumber()
+	@IsPositive()
 	chatId: number
 
 	@IsOptional()
 	password?: string
+}
+
+export class BriefChannelDto {
+
+	@IsNumber()
+	@IsPositive()
+	id: number
+
+	@IsNotEmpty()
+	name: string;
+
+	@IsEnum(ChatType)
+	type: ChatType;
+
+	@IsOptional()
+	password?: string;
 }
 
 export class DetailedChannelDto {
@@ -45,6 +80,7 @@ export class DetailedChannelDto {
 
 export class UserchatAction {
 	@IsNumber()
+	@IsPositive()
 	chatId: number;
 
 	@Matches(/[a-zA-Z0-9_-]{2,20}/)

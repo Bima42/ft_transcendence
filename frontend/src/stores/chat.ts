@@ -3,13 +3,14 @@ import { defineStore } from 'pinia'
 import type IChat from '@/interfaces/chat/IChat'
 import { io, Socket } from 'socket.io-client'
 import { getCookie } from 'typescript-cookie'
-import { get, jsonHeaders, post, put } from '../../utils'
+import { get, jsonHeaders, post, put, patch } from '../../utils'
 import type IChatStore from '@/interfaces/chat/IChatStore'
 import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
 import type IUserChatAction from '@/interfaces/chat/IUserChatAction';
+import type { IUpdateChat } from '@/interfaces/chat/IChat'
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
 	const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
@@ -37,6 +38,17 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		if (!currentChat || msg.chatId != currentChat.value?.id)
 			return
 		currentChat.value.messages.unshift(msg);
+	}
+
+	const refreshCurrentChat = async function (): Promise<boolean> {
+		if (!currentChat.value)
+			return false;
+		get(`chat/rooms/${currentChat.value.id}`, "Failed to refresh chat")
+		.then(res => res.json())
+		.then(chat => currentChat.value = chat)
+		.catch(err => console.log(err))
+		console.log(`refreshed chat`)
+		return true;
 	}
 
 	const setCurrentChat = async function (chatId: string): Promise<boolean> {
@@ -152,7 +164,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
 		put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
-			password: password
+			password: password || null
 		})
 			.then((res) => res.json())
 			.catch((err) => {
@@ -165,9 +177,11 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return false
 	}
 
-	const leaveChannel = async function (chatId: string): Promise<boolean> {
+	const leaveChannel = async function (chatId: number = (currentChat.value?.id || 0)): Promise<boolean> {
 		put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
-			.then((res) => res.json())
+			.then((res) => {
+				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
+			})
 			.catch((err) => {
 				console.log(err)
 				return false
@@ -208,8 +222,8 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		})
 	}
 
-	const changeChatName = async function (newName: string): Promise<boolean> {
-		post('chat/rooms/editChannelName', 'Failed to change channel name', jsonHeaders, { id: currentChat.value?.id, newName: newName })
+	const updateChat = async function (newData: IUpdateChat): Promise<boolean> {
+		patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
 			.then(() => {
 				setCurrentChat(currentChat.value!.id.toString())
 				updateStore()
@@ -292,6 +306,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		isChannelPasswordProtected,
 		onNewMessage,
 		sendMessage,
+		refreshCurrentChat,
 		setCurrentChat,
 		getRoleFromUserId,
 		getMessages,
@@ -304,7 +319,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		leaveChannel,
 		subscribedChannels,
 		getListOfNotSubscribedChannels,
-		changeChatName,
+		updateChat,
 		currentChatPasswordProtected,
 		inviteFriendToChat,
 		takeActionOnUser,
