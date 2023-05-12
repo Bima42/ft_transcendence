@@ -51,7 +51,7 @@ export class AuthController {
 
       let redirectUrl = '';
       if (!user.twoFA || user.twoFAAuthenticated)
-        redirectUrl = `${process.env.FRONTEND_URL}/redirectHandler`
+        redirectUrl = `${process.env.FRONTEND_URL}/redirect/login`
       else
         redirectUrl = `${process.env.FRONTEND_URL}/2fa`;
       res.status(302).redirect(redirectUrl);

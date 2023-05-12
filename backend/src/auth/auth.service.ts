@@ -86,7 +86,6 @@ export class AuthService {
 				}
 			});
 		}
-		//TODO : check this update, some things can be wrong
 		else {
 			return this.prismaService.user.update({
 				where: {

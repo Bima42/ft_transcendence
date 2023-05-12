@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CreditsView from '@/views/CreditsView.vue'
 import PlayAGameView from '@/views/PlayAGameView.vue'
-import redirectHandler from '@/components/redirectHandler.vue'
+import RedirectHandler from '@/components/RedirectHandler.vue'
 import LoginView from '@/views/LoginView.vue'
 import IndexView from '@/views/IndexView.vue'
 import ProfileView from '@/views/ProfileView.vue';
@@ -20,14 +20,14 @@ const router = createRouter({
             component: LoginView,
         },
         {
-            path: '/index',
-            name: 'index',
-            component: IndexView,
+            path: '/redirect/:target',
+            name: 'redirectHandler',
+            component: RedirectHandler,
         },
         {
-            path: '/profile/:id?',
-            name: 'profile',
-            component: ProfileView,
+            path: '/2fa',
+            name: '2fa',
+            component: TwoFaView,
         },
         {
             path: '/credits',
@@ -58,18 +58,18 @@ const router = createRouter({
                     path: 'leaderboard',
                     name: 'leaderboard',
                     component: LeaderboardView,
-                }
+                },
+                {
+                    path: 'index',
+                    name: 'index',
+                    component: IndexView,
+                },
+                {
+                    path: 'profile/:id?',
+                    name: 'profile',
+                    component: ProfileView,
+                },
             ]
-        },
-        {
-            path: '/redirectHandler',
-            name: 'redirectHandler',
-            component: redirectHandler,
-        },
-        {
-            path: '/2fa',
-            name: '2fa',
-            component: TwoFaView,
         }
     ]
 })
@@ -77,12 +77,12 @@ const router = createRouter({
 router.beforeEach((to, _from) => {
   const userStore = useUserStore();
 
-  if ( to.path.startsWith("/main") && ! userStore.isLoggedIn()) {
+  if ( to.path.startsWith('/main') && !userStore.isLoggedIn()) {
     userStore.resetState()
     return '/';
   }
   if ( to.path == '/' && userStore.isLoggedIn()) {
-    return '/index';
+    return '/main/index';
   }
 });
 

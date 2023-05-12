@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { FriendsService } from './friends.service';
 import { RequestWithUser } from '../../interfaces/request-with-user.interface';
@@ -112,11 +112,6 @@ export class FriendsController {
 	@Get('blocked')
 	async getAllBlockedUsers(@Req() req: RequestWithUser) {
 		return this.friendsService.getAllBlockedUsers(req.user.id);
-	}
-
-	@Get('blockers')
-	async getAllBlockers(@Req() req: RequestWithUser) {
-		return this.friendsService.getAllBlockers(req.user.id);
 	}
 
 	@Get('can/unblock/:username')
