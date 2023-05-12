@@ -2,7 +2,6 @@
   <section class="gamePong">
     <Suspense>
       <PhaserContainer/>
-
       <template #fallback>
         <div class="placeholder">
           Downloading ...
@@ -14,7 +13,6 @@
 
 <script setup lang="ts">
 import PhaserContainer from '@/components/PhaserContainer.vue'
-
 </script>
 
 <style scoped lang="scss">
