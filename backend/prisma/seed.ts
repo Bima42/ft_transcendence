@@ -174,16 +174,6 @@ const chatMessages: Prisma.ChatMessageUncheckedCreateInput[] = [
 /******************************************************************************/
 /***************************** GAMES ******************************************/
 /******************************************************************************/
-const games: Game[] = [
-	{
-		id: 1,
-		type: 'CLASSIC',
-		status: 'ENDED',
-		createdAt: new Date(),
-		endedAt: new Date(),
-	},
-]
-
 async function generateGames() {
 	for (let index = 1; index < 100; index++) {
 		const game: Prisma.GameUncheckedCreateInput = {
@@ -230,27 +220,6 @@ async function generateGames() {
 		})
 	}
 }
-/******************************************************************************/
-/***************************** USERGAMES **************************************/
-/******************************************************************************/
-const userGames: UserGame[] = [
-	{
-		id: 1,
-		gameId: 1,
-		userId: 3,
-		score: 5,
-		win: 1,
-		elo: 1200,
-	},
-	{
-		id: 1,
-		gameId: 1,
-		userId: 2,
-		score: 2,
-		win: 0,
-		elo: 1200,
-	},
-]
 
 /******************************************************************************/
 /***************************** MAIN *******************************************/
@@ -265,6 +234,10 @@ async function main() {
 		})
 	}
 	for (const [idx, el] of chats.entries()) {
+		if (el.password) {
+			const saltRounds = 10;
+			el.password = await bcrypt.hash(el.password, saltRounds);
+		}
 		await prisma.chat.upsert({
 			where: { id: idx + 1 },
 			update: {},
