@@ -181,21 +181,21 @@ export class ChannelService {
 		return channels;
 	}
 
-	async generateGeneralChat() : Promise<Chat> {
+	async generateGeneralChat(): Promise<Chat> {
 		const general: NewChannelDto = {
 			name: 'General',
 			type: 'PUBLIC',
 		}
 		// Create the default chat
 		try {
-		const generalChannel = await this.prismaService.chat.upsert({
-			where: { id: 1 },
-			create: general,
-			update: general,
-		})
-		Logger.log('Generate the general chat');
-		return generalChannel;
-		} catch(e) {
+			const generalChannel = await this.prismaService.chat.upsert({
+				where: { id: 1 },
+				create: general,
+				update: general,
+			})
+			Logger.log('Generate the general chat');
+			return generalChannel;
+		} catch (e) {
 			Logger.log('Cannot generate the general chat');
 			return null
 		}
@@ -468,7 +468,7 @@ export class ChannelService {
 				user: true
 			},
 		});
-		return msgs.map((msg) => toMessageDto(msg, msg.user))
+		return msgs.map((msg: any) => toMessageDto(msg, msg.user))
 	}
 
 	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessageDto> {

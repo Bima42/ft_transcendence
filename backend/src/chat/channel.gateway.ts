@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('whisper')
 	async handleWhisperMessage(@MessageBody() data: NewWhisperMessageDto,
 		@ConnectedSocket() socket: Socket) {
-		const msg = await this.channelService.postMessageInWhisperChat(socket.data.user, data)
+		const msg = this.channelService.postMessageInWhisperChat(socket.data.user, data)
 			.then(msg => {
 				// TODO: only send to the correct room
 				// The server also send back to the sender, as acknowledgement and validation
@@ -99,7 +99,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// attach the user to the socket
 		client.data.user = user;
 
-		//TODO: set user status online
 		//TODO: add socket to all rooms (= channels) that the user is in
 	}
 
