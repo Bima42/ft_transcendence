@@ -411,22 +411,22 @@ export class ChannelService {
 		}
 
 		// add userRole
-		// TODO: use upsert (requires unique constraints)
-		const existing = await this.prismaService.userChat.findFirst({
+		const userchat: UserChat = await this.prismaService.userChat.upsert({
 			where: {
-				chatId: newData.chatId,
-				userId: user.id
-			}
-		})
-		if (!existing) {
-			await this.prismaService.userChat.create({
-				data: {
-					role: 'MEMBER',
+				userId_chatId: {
 					chatId: newData.chatId,
-					userId: user.id,
+					userId: user.id
 				}
-			});
-		}
+			},
+			create: {
+				role: 'MEMBER',
+				chatId: newData.chatId,
+				userId: user.id,
+			},
+			update: {}
+		})
+		if (userchat.role === 'BANNED')
+			throw new ForbiddenException("You are banned from channel")
 
 		Logger.log(`${user.username}#${user.id} joined channel ${chat.name}#${chat.id}`);
 		return this.getChannelDetails(user, newData.chatId);
