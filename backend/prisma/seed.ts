@@ -8,11 +8,7 @@ const prisma = new PrismaClient()
 /******************************************************************************/
 const users: Prisma.UserUncheckedCreateInput[] = [
 	{
-		username: "gege",
-		twoFA: false,
-		twoFAAuthenticated: false,
-		twoFASecret: null,
-		fortyTwoId: null,
+		username: "Gege",
 		email: "admin@example.com",
 		avatar: "https://imgur.com/t/cat/ydOW3tV",
 		firstName: "Gerard",
@@ -23,11 +19,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 	},
 	{
 		username: "fasel",
-		twoFA: false,
-		twoFAAuthenticated: false,
-		twoFASecret: null,
-		fortyTwoId: null,
-		email: "2fa@example.com",
+		email: "fasel@example.com",
 		avatar: "https://imgur.com/t/cat/qM3pEgO",
 		firstName: "Franck",
 		lastName: "Ribéri",
@@ -36,11 +28,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 		elo: 207,
 	},
 	{
-		username: "BestGamerEver",
-		twoFA: false,
-		twoFAAuthenticated: false,
-		twoFASecret: null,
-		fortyTwoId: null,
+		username: "Alpha_BestPongerEver",
 		email: "julius@example.com",
 		avatar: "https://imgur.com/t/cat/qM3pEgO",
 		firstName: "Julius",
@@ -51,10 +39,6 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 	},
 	{
 		username: "Xx-BullyGuy-xX",
-		twoFA: false,
-		twoFAAuthenticated: false,
-		twoFASecret: null,
-		fortyTwoId: null,
 		email: "bully@example.com",
 		avatar: "https://imgur.com/t/cat/qM3pEgO",
 		firstName: "Etienne",
@@ -87,17 +71,17 @@ const chats: Prisma.ChatUncheckedCreateInput[] = [
 	},
 	{
 		type: "PUBLIC",
+		name: "Tactic discussions",
+		password: null,
+	},
+	{
+		type: "PUBLIC",
 		name: "PasswordIs1234",
 		password: "1234", // Will be hashed
 	},
 	{
 		type: "PRIVATE",
 		name: "Team Alpha",
-		password: null,
-	},
-	{
-		type: "PUBLIC",
-		name: "Tactic discussions",
 		password: null,
 	},
 ]
@@ -148,6 +132,12 @@ const userChats: Prisma.UserChatUncheckedCreateInput[] = [
 		role: 'OWNER',
 		mutedUntil: null,
 	},
+	{
+		chatId: 4,
+		userId: 3,
+		role: 'OWNER',
+		mutedUntil: null,
+	},
 ]
 /******************************************************************************/
 /***************************** CHATMESSAGES ***********************************/
@@ -159,7 +149,7 @@ const chatMessages: Prisma.ChatMessageUncheckedCreateInput[] = [
 		chatId: 1,
 	},
 	{
-		content: "Tested worked apparently",
+		content: "Test worked apparently",
 		userId: 2,
 		chatId: 1,
 	},
@@ -167,6 +157,26 @@ const chatMessages: Prisma.ChatMessageUncheckedCreateInput[] = [
 		content: "Thanks ! 👍",
 		userId: 1,
 		chatId: 1,
+	},
+	{
+		content: "Hey guys, this channel is to discuss different tactics in Pong",
+		userId: 1,
+		chatId: 2,
+	},
+	{
+		content: "This sucks",
+		userId: 4,
+		chatId: 2,
+	},
+	{
+		content: "You all suck !",
+		userId: 4,
+		chatId: 1,
+	},
+	{
+		content: "Team Alpha FTW",
+		userId: 3,
+		chatId: 4,
 	},
 ]
 
