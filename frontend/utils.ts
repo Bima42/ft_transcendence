@@ -97,7 +97,7 @@ export async function put(
 	message: string,
 	headers: Headers = jsonHeaders,
 	body?: Object,
-): Promise<Response> {
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'PUT',
 		mode: 'cors',
@@ -107,9 +107,12 @@ export async function put(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
+	if (!response.ok){
+		jsonBody.message ??= message
+		throw jsonBody
+	}
+	return jsonBody
 }
 
 export async function patch(

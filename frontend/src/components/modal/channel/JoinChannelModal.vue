@@ -31,11 +31,15 @@ onMounted(async () => {
 const handleClick = async (chat: IChat) => {
     let password = undefined
     if (chat.password) {
-		password = prompt("Password:") || undefined
+		password = prompt("Password:")
+		if (!password)
+			return
     }
     await chatStore.joinChannel(chat, password)
+	.catch((e) => alert(e.message))
     modalStore.resetState()
     chatStore.updateStore()
+	chatStore.setCurrentChat(chat.id.toString())
     return
 }
 </script>

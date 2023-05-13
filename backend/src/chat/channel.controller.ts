@@ -71,7 +71,7 @@ export class ChannelController {
 	}
 
 	@Put('rooms/join')
-	async joinChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto) {
+	async joinChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto): Promise<DetailedChannelDto> {
 		return this.channelService.joinChannel(req.user, data);
 	}
 

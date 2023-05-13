@@ -51,6 +51,11 @@ const handleClick = (option: string) => {
 		case 'leaveChat':
 			if (confirm("Are you sure you want to leave the channel ?")) {
 				chatStore.leaveChannel(chatStore.currentChat?.id || 0)
+				.then(() => {
+					chatStore.resetState()
+					modalStore.resetState()
+				})
+				.catch((e) => alert(e.message))
 			}
 			break
         default:

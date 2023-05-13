@@ -160,35 +160,19 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return !!chat
 	}
 
-	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
-		put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
+	const joinChannel = async function (chat: IChat, password?: string): Promise<IChat> {
+		return await put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
-			password: password || null
+			password: password || undefined
 		})
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
 	}
 
 	const leaveChannel = async function (chatId: number = (currentChat.value?.id || 0)): Promise<boolean> {
-		put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
-			.then((res) => {
+		await put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
+			.then((_res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
 			})
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
+		return
 	}
 
 	const subscribedChannels = async function (): Promise<boolean> {
