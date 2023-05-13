@@ -32,22 +32,20 @@ export const useFriendStore = defineStore( 'friend', () => {
 		}
 
 		const acceptFriendRequest = async (friendName: string): Promise<boolean> => {
-			const response = await patch(
-				`friends/accept/${friendName}`,
+			const data: IFriendship = await patch(
+				`friends/accepte/${friendName}`,
 				'Failed to accept friend request',
 				jsonHeaders,
 			)
-			const data = await response.json() as IFriendship;
 			return data.status === 'ACCEPTED';
 		}
 
 		const declineFriendRequest = async (friendName: string): Promise<boolean> => {
-			const response = await patch(
+			const data: IFriendship = await patch(
 				`friends/decline/${friendName}`,
 				'Failed to decline friend request',
 				jsonHeaders,
 			)
-			const data = await response.json() as IFriendship;
 			return data.status === 'DECLINED';
 		}
 

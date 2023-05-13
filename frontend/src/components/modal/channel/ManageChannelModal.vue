@@ -66,7 +66,7 @@ const submitForm = async (e: Event) => {
 		if (removePassword.value) { payload.password = ""}
         else if (newPassword.value !== '') { payload.password = newPassword.value }
         loading.value = true
-        await chatStore.updateChat(payload)
+        await chatStore.updateChat(payload).catch(e => alert(e.message))
         loading.value = false
     }
     edit.value = !edit.value

@@ -29,7 +29,7 @@ export default interface IChatStore {
 	leaveChannel: (chatId: number) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;
 	getListOfNotSubscribedChannels: () => void;
-	updateChat: (newData: IUpdateChat) => Promise<boolean>;
+	updateChat: (newData: IUpdateChat) => Promise<IChat>;
 	currentChatPasswordProtected: () => Promise<void>;
 	inviteFriendToChat: (userName: string) => Promise<boolean>;
 	takeActionOnUser: (userName: string, actionToPerform: string, muteDuration?: number) => Promise<boolean>;

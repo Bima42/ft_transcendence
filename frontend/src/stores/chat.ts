@@ -24,7 +24,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const whisperChatList = ref<IChat[]>([]);
 	const subscribedChannelsList = ref<IChat[]>([]);
 	const notSubscribedChannelsList = ref<IChat[]>([]);
-	const isChannelPasswordProtected = ref<boolean>(false);
+	const isChannelPasswordProtected = ref<boolean>(false); // TODO: Remove if unused
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
 		if (!currentChat) return
@@ -47,7 +47,6 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		.then(res => res.json())
 		.then(chat => currentChat.value = chat)
 		.catch(err => console.log(err))
-		console.log(`refreshed chat`)
 		return true;
 	}
 
@@ -222,17 +221,11 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		})
 	}
 
-	const updateChat = async function (newData: IUpdateChat): Promise<boolean> {
-		patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
-			.then(() => {
-				setCurrentChat(currentChat.value!.id.toString())
-				updateStore()
-				return true
-			}).catch((err) => {
-				console.log(err)
-				return false
-			})
-		return false
+	const updateChat = async function (newData: IUpdateChat): Promise<IChat> {
+		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
+		if (newChat)
+			currentChat.value = newChat
+		return newChat
 	}
 
 	const currentChatPasswordProtected = async function (): Promise<void> {
