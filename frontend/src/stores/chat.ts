@@ -232,10 +232,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		}
 		let url = `chat/rooms/${currentChat.value.id}/user`;
 		await put(url, `cannot add user`, jsonHeaders, action)
-			.catch(err => console.error(err))
-			.finally(() => {
-				updateStore()
-			})
+		updateStore()
 		return true
 	}
 
@@ -254,10 +251,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		}
 		let url = `chat/rooms/${currentChat.value.id}/user`;
 		await put(url, `cannot ${actionToPerform} user`, jsonHeaders, action)
-			.catch(err => console.error(err))
-			.finally(() => {
-				updateStore()
-			})
+		updateStore()
 		return true
 	}
 

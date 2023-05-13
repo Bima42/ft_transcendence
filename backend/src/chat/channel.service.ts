@@ -559,7 +559,7 @@ export class ChannelService {
 
 		// Cannot kick the owner
 		if (targetUserChat.role == 'OWNER') {
-			throw new ForbiddenException('Not authorized to kick');
+			throw new ForbiddenException('Cannot kick the owner');
 		}
 
 		// Cannot kick a banned user, otherwise it will reset its permissions and he

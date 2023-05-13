@@ -87,7 +87,7 @@ const takeAction = () => {
                 chatStore.updateStore()
             })
             .catch(err => {
-                console.log(err)
+                alert(err.message)
             })
         // then we reset the values
         resetVariables()
