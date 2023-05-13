@@ -14,12 +14,12 @@ export class TwoFaController {
 		private readonly twoFaService: TwoFaService
 	) {}
 
-	@Patch(':id')
+	@Patch()
 	async updateUserTwoFa(
-		@Param('id', ParseIntPipe) userId: number,
-		@Body() datas: any
+		@Req() req: RequestWithUser,
+		@Body() datas: { twoFA: boolean }
 	): Promise<UserDto> {
-		return this.twoFaService.updateTwoFaStatus(userId, datas.twoFA);
+		return this.twoFaService.updateTwoFaStatus(req.user, datas.twoFA);
 	}
 
 	@Post('verify')

@@ -22,11 +22,9 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import UsernameInput from '@/components/user/UsernameInput.vue'
 import TwoFaInputs from '@/components/user/TwoFaInputs.vue'
 import Modal from '@/components/modal/TheModal.vue'
-import { useRoute } from 'vue-router';
 
 const modalStore = useModalStore()
 const userStore = useUserStore()
-const route = useRoute()
 
 
 const openModal = (modalName: string) => {

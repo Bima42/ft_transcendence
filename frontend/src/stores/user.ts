@@ -57,20 +57,20 @@ export const useUserStore = defineStore('user', () => {
 		return user.value != null && token != null;
 	}
 
-	const updateTwoFaStatus = function (status: boolean) {
+	const updateTwoFaStatus = async function (status: boolean) {
 		if (!user.value)
 			return
 
 		patch(
-			`2fa/${user.value.id}`,
-			'Failed to update user',
+			`2fa`,
+			'Failed to update 2FA status',
 			jsonHeaders,
 			{twoFA: status}
 		)
-			.then(json => {
-				user.value = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
-			})
+		.then((newUser: IUser) => {
+			user.value = newUser
+			localStorage.setItem('localUser', JSON.stringify(user.value))
+		})
 	}
 
 	const verifyTwoFaCode = function (code: string) {

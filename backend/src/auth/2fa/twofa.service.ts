@@ -15,17 +15,11 @@ export class TwoFaService {
 		private readonly usersService: UsersService
 	) {}
 
-	async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<UserDto> {
-		let user = await this.prismaService.user.findUnique({
-			where: {
-				id: +userId
-			}
-		})
-
+	async updateTwoFaStatus(user: User, enableTwoFA: boolean): Promise<UserDto> {
 		if (user.twoFA !== enableTwoFA) {
 			user = await this.prismaService.user.update({
 				where: {
-					id: +userId
+					id: +user.id
 				},
 				data: {
 					twoFA: { set: enableTwoFA }
