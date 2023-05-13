@@ -50,7 +50,7 @@ const handleClick = (option: string) => {
             break
 		case 'leaveChat':
 			if (confirm("Are you sure you want to leave the channel ?")) {
-				chatStore.leaveChannel()
+				chatStore.leaveChannel(chatStore.currentChat?.id || 0)
 			}
 			break
         default:

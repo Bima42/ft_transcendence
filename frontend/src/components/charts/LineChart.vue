@@ -13,7 +13,8 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip
+  Tooltip,
+type ChartData
 } from 'chart.js';
 import { Line } from 'vue-chartjs'
 import type IEloHistory from '@/interfaces/user/IEloHistory';
@@ -33,7 +34,7 @@ ChartJS.register(
     Legend
 )
 
-let data = {}
+let data: ChartData<"line">
 let options = {}
 
 function loadStuff() {

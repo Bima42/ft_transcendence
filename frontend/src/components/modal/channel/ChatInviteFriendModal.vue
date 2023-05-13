@@ -6,7 +6,7 @@
                 v-for="(friend, x) in availableFriends"
                 class="friend"
                 :key="x"
-                :id="friend.id"
+                :id="friend.id.toString()"
                 @click="handleClick(friend)"
             >
                 {{ friend.username }}

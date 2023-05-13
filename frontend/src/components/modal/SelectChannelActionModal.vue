@@ -21,13 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import NewChannelModal from '@/components/modal/channel/NewChannelModal.vue'
 import JoinChannelModal from '@/components/modal/channel/JoinChannelModal.vue'
 import NewWhisperModal from '@/components/modal/channel/NewWhisperModal.vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
-const props = defineProps<{}>()
 const selectedOption = ref(0)
 const handleClick = (option: string) => {
     switch (option) {

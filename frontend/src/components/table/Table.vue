@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th v-for="(header, index) in props.headers" :key="index" @click="props.sortDatas(header.name)">
+          <th v-for="(header, index) in props.headers" :key="index" @click="sortDatas(header.name)">
             {{ header.name }}
           </th>
         </tr>
@@ -28,10 +28,12 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const props = defineProps<{
   data: object[],
-  headers: object,
+  headers: any,
   rowsPerPage?: number,
   sortDatas?: (header: string) => void
 }>()
+
+const sortDatas = props.sortDatas ? props.sortDatas : function () {}
 const currentPage = ref(1);
 const rowsPerPage = props.rowsPerPage ?? 5;
 

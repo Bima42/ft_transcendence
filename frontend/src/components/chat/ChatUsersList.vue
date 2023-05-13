@@ -3,10 +3,10 @@
         <ul class="users">
             <li
                 class="user"
-                v-for="user in chatStore.currentChat.users"
+                v-for="user in chatStore.currentChat?.users"
                 :key="user.user.id"
-                :id="user.user.id"
-                v-show="userStore.user.id !== user.user.id"
+                :id="user.user.id.toString()"
+                v-show="userStore.user?.id !== user.user.id"
                 @click="handleClick(user)"
             >
                 {{ user.user.username }}
@@ -15,10 +15,10 @@
                     <font-awesome-icon v-if="user.role === 'BANNED'" icon="fa-ban" color="red"/>
                     <font-awesome-icon v-if="user.role === 'MEMBER'" icon="fa-user"/>
                     <font-awesome-icon v-if="user.role === 'ADMIN'" icon="fa-user-astronaut" color="teal"/>
-                    <font-awesome-icon v-if="user.mutedUntil && new Date(user.mutedUntil) >= Date.now()" icon="fa-volume-xmark" color="brown"/>
+                    <font-awesome-icon v-if="user.mutedUntil && new Date(user.mutedUntil) >= new Date()" icon="fa-volume-xmark" color="brown"/>
                 </div>
             </li>
-            <li v-if="chatStore.currentChat.users.length === 1">
+            <li v-if="chatStore.currentChat?.users.length === 1">
                 You are alone in this channel
             </li>
         </ul>

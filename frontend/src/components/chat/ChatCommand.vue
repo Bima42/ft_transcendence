@@ -13,11 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, ref} from 'vue'
+import { ref } from 'vue'
 import {useModalStore} from '@/stores/modal'
 
 const modalStore = useModalStore()
-const props = defineProps<{}>()
 const toggled = ref(false);
 const allCommands = modalStore.data.list
 

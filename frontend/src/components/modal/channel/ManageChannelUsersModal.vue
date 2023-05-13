@@ -10,7 +10,7 @@
             />
             <TakeActionOnUser
                 v-else
-                :selectedUser="selectedUser"
+                :selectedUser="selectedUser as IUserChat"
                 :setAction="setAction"
             />
             <section v-if="selectedAction === 'mute'">

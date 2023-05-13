@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Socket } from "socket.io-client"
+import type { Socket } from "socket.io-client"
 import type IGameSettings from '@/interfaces/game/IGameSettings'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'

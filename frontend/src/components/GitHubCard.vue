@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  link: String,
+  link: string,
 }>()
 </script>
 

@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
@@ -25,7 +25,6 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 const chatStore = useChatStore()
 const modalStore = useModalStore()
 
-const props = defineProps<{}>()
 const password = ref('')
 const channelName = ref('')
 const channelType = ref('')

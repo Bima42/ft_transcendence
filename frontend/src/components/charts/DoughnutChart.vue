@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { Doughnut } from 'vue-chartjs'
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { ArcElement, Chart as ChartJS, Legend, Tooltip, type ChartData } from 'chart.js';
 import type IUserStats from '@/interfaces/user/IUserStats';
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -14,14 +14,14 @@ const props = defineProps<{
 	userStats: IUserStats
 }>()
 
-const lostGames = props.userStats.playedGames - props.userStats.wonGames
+const lostGames = props.userStats.playedGames - (props.userStats.wonGames || 0)
 
-const data = {
+const data: ChartData<"doughnut"> = {
 	labels: ['Lost Games', 'Won Games'],
 	datasets: [
 		{
 			backgroundColor: ['#393E46', '#00ADB5'],
-			data: [lostGames, props.userStats.wonGames],
+			data: [lostGames, (props.userStats.wonGames || 0)],
 			borderWidth: 0,
 		}
 	],

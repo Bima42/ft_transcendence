@@ -22,11 +22,10 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { post } from '../../../utils'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
-const props = defineProps<{}>()
 const userStore = useUserStore()
 
 const enableTwoFa = ref(false)
