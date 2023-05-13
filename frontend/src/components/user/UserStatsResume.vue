@@ -39,7 +39,7 @@ function loadStuff() {
 	userStore.getUserStats(props.targetUser.id).then((stats) => {
 		userStats.value = stats
 		winRateStat.value = stats.winRate
-		winRateText.value = `${stats.winRate}%`
+		winRateText.value = `${stats.winRate.toFixed(1)}%`
 		eloText.value = `${stats.elo} Points`
 
 		if (highestElo.value === null) return
