@@ -16,7 +16,9 @@ import {
 export class UpdateUserDto {
 
   @IsOptional()
-  @Matches(/^[a-zA-Z0-9_-]{2,20}$/)
+    @MinLength(2)
+  @MaxLength(20)
+  @Matches(/^[a-zA-Z0-9_-]+$/, {message: "Username must contains only letters, numbers or -_"})
   @ApiProperty({ required: false })
   username?: string
 

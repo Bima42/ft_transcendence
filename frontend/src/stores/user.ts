@@ -67,7 +67,6 @@ export const useUserStore = defineStore('user', () => {
 			jsonHeaders,
 			{twoFA: status}
 		)
-			.then(response => response.json())
 			.then(json => {
 				user.value = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user.value))
@@ -91,13 +90,12 @@ export const useUserStore = defineStore('user', () => {
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
-    patch(`users/me`, "cannot update username", jsonHeaders, infos)
-    .then((res) => res.json())
+	// Yes, we have to use await and then, not sure why
+    await patch(`users/me`, "cannot update username", jsonHeaders, infos)
     .then((newUser: IUser) => {
       user.value = newUser
       localStorage.setItem('localUser', JSON.stringify(user.value))
     })
-    .catch((e) => alert(e))
 
     return user.value
   }

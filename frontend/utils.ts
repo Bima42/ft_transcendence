@@ -15,7 +15,7 @@ export async function post(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	body?: Record<string, unknown>,
+	body?: Object,
 	file?: FormData
 ): Promise<Response> {
 	const request: RequestInit = {
@@ -93,7 +93,7 @@ export async function put(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	body?: Record<string, unknown>,
+	body?: Object,
 ): Promise<Response> {
 	const request: RequestInit = {
 		method: 'PUT',
@@ -113,8 +113,8 @@ export async function patch(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	json?: Record<string, unknown>
-): Promise<Response> {
+	json?: Object
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'PATCH',
 		mode: 'cors',
@@ -124,10 +124,9 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
 	if (!response.ok){
-    // return Promise.reject(response)
-    const text = await response.text()
-		throw new Error(`${message} (status ${response.status}): ${text}`)
-  }
-	return response
+		throw jsonBody
+	}
+	return jsonBody
 }
