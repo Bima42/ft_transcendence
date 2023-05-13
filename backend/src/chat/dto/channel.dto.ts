@@ -1,4 +1,4 @@
-import { IsString, IsDefined, Matches, IsNotEmpty, IsEnum, IsOptional, IsNumber, IsAlpha, IsIn, IsPositive } from 'class-validator';
+import { IsString, IsDefined, Matches, IsNotEmpty, IsEnum, IsOptional, IsNumber, IsAlpha, IsIn, IsPositive, MaxLength } from 'class-validator';
 import { ChatType, UserChatRole } from '@prisma/client';
 import { UserDto } from 'src/users/dto/user.dto';
 
@@ -12,6 +12,7 @@ export class NewWhisperDto {
 export class NewChannelDto {
 
 	@IsNotEmpty()
+	@MaxLength(60)
 	name: string;
 
 	@IsEnum(ChatType)
@@ -28,6 +29,7 @@ export class UpdateChannelDto {
 
 	@IsOptional()
 	@IsNotEmpty()
+	@MaxLength(60)
 	name: string;
 
 	@IsOptional()
