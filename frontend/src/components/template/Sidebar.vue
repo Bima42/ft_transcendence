@@ -45,7 +45,7 @@ const sidebarElement = ref({
     game: {
         icon: 'fa-gamepad',
         id: 'game',
-        route: '/main/game'
+        route: '/main/joinGame'
     },
     logout: {
         icon: 'fa-arrow-right-from-bracket',

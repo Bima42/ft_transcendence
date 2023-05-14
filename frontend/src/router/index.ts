@@ -4,12 +4,13 @@ import PlayAGameView from '@/views/PlayAGameView.vue'
 import RedirectHandler from '@/components/RedirectHandler.vue'
 import LoginView from '@/views/LoginView.vue'
 import IndexView from '@/views/IndexView.vue'
-import ProfileView from '@/views/ProfileView.vue';
-import CommunityView from '@/views/CommunityView.vue';
+import ProfileView from '@/views/ProfileView.vue'
+import CommunityView from '@/views/CommunityView.vue'
 import { useUserStore } from '@/stores/user'
-import TwoFaView from '@/views/TwoFaView.vue';
-import FriendsView from '@/views/FriendsView.vue';
-import LeaderboardView from '@/views/LeaderboardView.vue';
+import TwoFaView from '@/views/TwoFaView.vue'
+import FriendsView from '@/views/FriendsView.vue'
+import LeaderboardView from '@/views/LeaderboardView.vue'
+import JoinAGameView from '@/views/JoinAGameView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,6 +43,11 @@ const router = createRouter({
                     path: 'game',
                     name: 'game',
                     component: PlayAGameView,
+                },
+                {
+                    path: 'joinGame',
+                    name: 'joinGame',
+                    component: JoinAGameView,
                 },
                 {
                     path: 'community',
