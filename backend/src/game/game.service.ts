@@ -90,17 +90,17 @@ export class GameService {
 		player2.user.elo = player2.user.elo + k * (player2.userGame.win - probability2);
 
 		// Users
-		this.prismaService.user.update({
+		await this.prismaService.user.update({
 			where: { id: player1.user.id, },
 			data: { elo: player1.user.elo, }
 		})
-		this.prismaService.user.update({
+		await this.prismaService.user.update({
 			where: { id: player2.user.id, },
 			data: { elo: player2.user.elo, }
 		})
 
 		// Usergame
-		this.prismaService.userGame.update({
+		await this.prismaService.userGame.update({
 			where: { id: player1.userGame.id },
 			data: {
 				score: player1.userGame.score,
@@ -108,7 +108,7 @@ export class GameService {
 				elo: player1.user.elo,
 			},
 		})
-		this.prismaService.userGame.update({
+		await this.prismaService.userGame.update({
 			where: { id: player2.userGame.id },
 			data: {
 				score: player2.userGame.score,
@@ -140,17 +140,18 @@ export class GameService {
 
 		// Find or create a match and create a UserGame
 		const match = await this.findOrCreateMatch(gameSettings)
-		socket.join("game" + match.id.toString())
+		await socket.join("game" + match.id.toString())
 		socket.data.userGame = await this.createUserGame(match, user);
 
 		// Check if there are enough players to start the game
 		const playersUserGames: UserGame[] = await this.prismaService.userGame.findMany({
 			where: {
-				game: match
+				game: { id: match.id }
 			}
 		})
 		if (playersUserGames.length >= 2) {
 			const players = await this.server.in("game" + match.id.toString()).fetchSockets()
+			Logger.log(`n sockets = ${players.length}`)
 
 			await this.startGame(match, players as unknown as Socket[]);
 		}
@@ -162,23 +163,27 @@ export class GameService {
 		const user: User = socket.data.user;
 		if (!user)
 			return;
-
-		const game = await this.prismaService.game.findFirst({
-			where: {
-				status: "SEARCHING",
-				users: { some: {userId: user.id}}
-			}
-		})
-		await this.prismaService.userGame.deleteMany({
-			where: {
-				game: { status: "SEARCHING" },
-				userId: user.id,
-			}
-		})
-		if (game) {
-			await this.prismaService.game.delete({
-				where: { id: game.id}
+		try {
+			const matches = await this.prismaService.game.findMany({
+				where: {
+					status: "SEARCHING",
+					users: { some: {userId: user.id}}
+				}
 			})
+			for(const match of matches) {
+				socket.leave("game" + match.id.toString())
+				await this.prismaService.userGame.deleteMany({
+					where: {
+						game: { status: "SEARCHING" },
+						userId: user.id,
+					}
+				})
+				await this.prismaService.game.delete({
+					where: { id: match.id}
+				})
+			}
+		} catch (e) {
+			Logger.error(e)
 		}
 		Logger.log(`Game: ${user.username}#${user.id} quit the classic queue`);
 	}
@@ -234,8 +239,8 @@ export class GameService {
 		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
 		// Update user informations
-		players[0].data.user = toUserDto(await this.prismaService.user.findUnique(players[0].data.user.id))
-		players[1].data.user = toUserDto(await this.prismaService.user.findUnique(players[1].data.user.id))
+		players[0].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[0].data.user.id}}))
+		players[1].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[1].data.user.id}}))
 
 		// Emit an event to the clients to indicate that a match has been found
 		const gameSettings: GameSettingsDto = {

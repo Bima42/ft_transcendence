@@ -390,7 +390,7 @@ export class GameServer {
         userGame: this.players[0].data.userGame,
       },
       {
-        user: users[0],
+        user: users[1],
         userGame: this.players[1].data.userGame,
       },
     ]

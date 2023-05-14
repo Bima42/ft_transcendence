@@ -10,17 +10,17 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 	{
 		username: "Gege",
 		email: "admin@example.com",
-		avatar: "https://imgur.com/t/cat/ydOW3tV",
+		avatar: `https://api.multiavatar.com/gege.png`,
 		firstName: "Gerard",
 		lastName: "Bouchard",
 		phone: "0836656565",
-		status: 'OFFLINE',
+		status: 'ONLINE',
 		elo: 987,
 	},
 	{
 		username: "fasel",
 		email: "fasel@example.com",
-		avatar: "https://imgur.com/t/cat/qM3pEgO",
+		avatar: `https://api.multiavatar.com/fasel.png`,
 		firstName: "Franck",
 		lastName: "Ribéri",
 		phone: null,
@@ -30,7 +30,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 	{
 		username: "Alpha_BestPongerEver",
 		email: "julius@example.com",
-		avatar: "https://imgur.com/t/cat/qM3pEgO",
+		avatar: `https://api.multiavatar.com/alpha.png`,
 		firstName: "Julius",
 		lastName: "O",
 		phone: null,
@@ -40,7 +40,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 	{
 		username: "Xx-BullyGuy-xX",
 		email: "bully@example.com",
-		avatar: "https://imgur.com/t/cat/qM3pEgO",
+		avatar: `https://api.multiavatar.com/bully.png`,
 		firstName: "Etienne",
 		lastName: "Leblanc",
 		phone: null,
@@ -193,7 +193,6 @@ async function generateGames() {
 
 	for (let index = 1; index < 100; index++) {
 		const game: Prisma.GameUncheckedCreateInput = {
-			id: index,
 			type: (index % 2 == 0 ? 'CLASSIC' : 'CUSTOM'),
 			status: 'ENDED',
 			createdAt: new Date(),
