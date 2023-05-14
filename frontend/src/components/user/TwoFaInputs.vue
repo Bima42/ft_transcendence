@@ -24,7 +24,7 @@
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import { post } from '../../../utils'
-import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 const userStore = useUserStore()
 
