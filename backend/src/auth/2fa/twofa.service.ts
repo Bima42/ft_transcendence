@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../../users/users.service';
 import { User } from '@prisma/client';
@@ -37,7 +37,7 @@ export class TwoFaService {
 			token: code
 		});
 		if (!verified) {
-			throw new BadRequestException('Invalid code');
+			throw new UnauthorizedException('Invalid 2FA code');
 		}
 		return true;
 	}

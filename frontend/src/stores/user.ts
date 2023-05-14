@@ -66,18 +66,17 @@ export const useUserStore = defineStore('user', () => {
 		})
 	}
 
-	const verifyTwoFaCode = function (code: string) {
-		post(
+	const verifyTwoFaCode = async function (code: string): Promise<boolean> {
+		const json = await post(
 			'2fa/verify',
 			'Failed to verify 2fa code',
 			jsonHeaders,
 			{code: code}
 		)
-			.then(json => {
-				if (json.twoFAAuthenticated) {
-					login();
-				}
-			})
+		if (json.twoFAAuthenticated) {
+			login();
+		}
+		return json.twoFAAuthenticated
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
