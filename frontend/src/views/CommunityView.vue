@@ -49,7 +49,7 @@ import { useChatStore } from '@/stores/chat'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
-import SelectChannelActionModal from '@/components/modal/SelectChannelActionModal.vue';
+import SelectChannelActionModal from '@/components/modal/channel/SelectChannelActionModal.vue';
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
 
 const selectedChatList = ref('public')
