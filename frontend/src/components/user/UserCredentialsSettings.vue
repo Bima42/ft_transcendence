@@ -10,7 +10,7 @@
 			@click="openModal('TwoFA')"
 			:style="'small adapt'"
 		>
-			{{ 'Two FA' }}
+			{{ userStore.user?.twoFA ? 'Deactivate TwoFA' : 'Activate TwoFA' }}
 		</ButtonCustom>
 	</section>
 </template>

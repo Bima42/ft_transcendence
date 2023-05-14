@@ -1,3 +1,4 @@
+import type { IUpdateChat } from '@/interfaces/chat/IChat';
 import type IChat from '@/interfaces/chat/IChat'
 import type { Ref } from 'vue'
 import type { UserChatRoleEnum } from '../user/IUserChat';
@@ -15,6 +16,7 @@ export default interface IChatStore {
 	notSubscribedChannelsList: Ref<IChat[]>;
 	isChannelPasswordProtected: Ref<boolean>;
 	sendMessage: (msg: any) => void;
+	refreshCurrentChat: () => Promise<boolean>;
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<IChat[]>;
 	retrieveWhispers: () => Promise<IChat[]>;
@@ -27,7 +29,7 @@ export default interface IChatStore {
 	leaveChannel: (chatId: string) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;
 	getListOfNotSubscribedChannels: () => void;
-	changeChatName: (newName: string) => Promise<boolean>;
+	updateChat: (newData: IUpdateChat) => Promise<boolean>;
 	currentChatPasswordProtected: (id: string) => Promise<boolean>;
 	inviteFriendToChat: (userName: string) => Promise<boolean>;
 	takeActionOnUser: (userName: string, actionToPerform: string, muteDuration?: number) => Promise<boolean>;

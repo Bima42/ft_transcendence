@@ -91,7 +91,7 @@ export const useUserStore = defineStore('user', () => {
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
-    await patch(`users/me`, "cannot update username", jsonHeaders, infos)
+    patch(`users/me`, "cannot update username", jsonHeaders, infos)
     .then((res) => res.json())
     .then((newUser: IUser) => {
       user.value = newUser

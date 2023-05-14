@@ -1,7 +1,7 @@
 <template>
     <section class="manage_users_channel_modal_wrap">
         <section class="modal_header">
-            <h2>Manage channel users</h2>
+            <h2>Channel users</h2>
         </section>
         <section class="modal_body">
             <ChatUsersList
@@ -31,7 +31,7 @@
             <ButtonCustom :style="'big'" @click="handleBack">
                 Back
             </ButtonCustom>
-            <ButtonCustom :style="'big'" v-if="selectedUser" @click="takeAction">
+            <ButtonCustom :style="'big'" v-if="selectedUser && userRole >= UserChatRoleEnum.Admin" @click="takeAction">
                 {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.user.username }}
             </ButtonCustom>
         </section>
@@ -43,15 +43,19 @@ import TheModal from '@/components/modal/TheModal.vue'
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
 import {useModalStore} from '@/stores/modal'
 import {useChatStore} from '@/stores/chat'
+import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
 import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
 import type IUserChat from '@/interfaces/user/IUserChat'
+import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore()
+const userStore = useUserStore()
 
+const userRole = chatStore.getRoleFromUserId(userStore.user?.id || 0)
 const selectedUser = ref<IUserChat>()
 const takeActionView = ref(false)
 const selectedAction = ref<string | null>(null)

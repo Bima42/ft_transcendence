@@ -12,4 +12,11 @@ export default interface IChat {
 	users: IUserChat[]
 }
 
-export type ChatType = 'PRIVATE' | 'GROUP' | 'GAMECHAT'
+export interface IUpdateChat {
+	id: number
+	name?: string
+	password?: string
+	type?: ChatType
+}
+
+export type ChatType = 'PRIVATE' | 'PUBLIC' | 'WHISPER' | 'GAMECHAT'

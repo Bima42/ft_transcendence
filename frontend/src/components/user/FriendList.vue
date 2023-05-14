@@ -10,7 +10,7 @@
 import UserPicture from '@/components/avatar/UserPicture.vue';
 import { useFriendStore } from '@/stores/friend';
 import TheModal from '@/components/modal/TheModal.vue';
-import UserActions from '@/components/chat/UserActions.vue';
+import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal';
 import { onMounted, ref } from 'vue';
 import type IFriend from '@/interfaces/user/IFriend';
@@ -26,14 +26,14 @@ onMounted( async () => {
 
 const showUserProfile = async (username: string) => {
   const user = await friendStore.getUserInfos(username)
-  modalStore.loadAndDisplay(TheModal, UserActions, { user: user })
+  modalStore.loadAndDisplay(TheModal, UserInformations, { user: user })
 }
 </script>
 
 <style scoped lang="scss">
 .element_line {
   padding: 15px;
-  
+
   &:hover {
     cursor: pointer;
   }

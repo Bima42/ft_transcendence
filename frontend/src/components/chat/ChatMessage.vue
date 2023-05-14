@@ -1,6 +1,6 @@
 <template>
     <div class="message_wrap" :class="side">
-        <div class="author" @click="toggleUserActions(props.author)" v-show="side === 'left'">
+        <div class="author" @click="toggleUserInformations(props.author)" v-show="side === 'left'">
             {{ props.author.username }}
         </div>
         <div class="content">
@@ -16,7 +16,7 @@
 import { defineProps, computed, ref } from 'vue'
 import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
-import UserActions from '@/components/chat/UserActions.vue'
+import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import type { IAuthor } from '@/interfaces/chat/IChatMessage'
 import { get } from '../../../utils'
 
@@ -31,10 +31,10 @@ let side = ref(computed(() => {
     return props.author.id === props.userIs ? 'right' : 'left'
 }))
 
-const toggleUserActions = async (author: IAuthor) => {
+const toggleUserInformations = async (author: IAuthor) => {
     const user = await get(`users/id/${author.id}`, "Cannot get user details")
        .then((res) => res.json())
-    modalStore.loadAndDisplay(TheModal, UserActions, { user: user })
+    modalStore.loadAndDisplay(TheModal, UserInformations, { user: user })
 }
 
 </script>

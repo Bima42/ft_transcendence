@@ -1,5 +1,5 @@
-import { Logger, UnauthorizedException } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets'
+import { Logger, UseFilters } from '@nestjs/common';
+import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsException, BaseWsExceptionFilter } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
 import { GameService } from './game.service';
 import { JoinQueueDto } from './dto/joinQueueData.dto';
@@ -10,6 +10,7 @@ import { toUserDto } from '../shared/mapper/user.mapper';
 import { InvitePlayer } from './dto/game.dto';
 
 
+@UseFilters(new BaseWsExceptionFilter())
 @WebSocketGateway({
     path: "/api/socket.io",
     namespace: "game",
@@ -59,7 +60,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         const user = await this.usersService.findById(verifiedToken.sub);
         return toUserDto(user);
       } catch (err) {
-        throw new UnauthorizedException("Invalid token");
+        return undefined
       }
     }
 

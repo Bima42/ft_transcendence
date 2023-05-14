@@ -25,6 +25,7 @@ if [ "${NODE_ENV:-production}" = "development" ];then
       echo "Cannot initialize the database."
       exit 1
     fi
+	npx prisma db seed
 else
     echo "Starting in production environment."
     if ! npx prisma migrate deploy ; then
