@@ -1,7 +1,7 @@
 <template>
     <section class="new_channel_wrap">
         <h2>Create a new Whisper</h2>
-        <form @submit="handleNewChannelSubmit">
+        <form @submit="handleNewChannelSubmit" @keydown.enter="handleNewChannelSubmit">
             <label for="username">User name</label>
             <input v-model="username" type="text" id="user_name" name="user_name" placeholder="User name" required>
             <ButtonCustom type="submit">Create</ButtonCustom>
@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
@@ -22,9 +22,9 @@ const modalStore = useModalStore()
 const password = ref('')
 const username = ref('')
 
-const handleNewChannelSubmit = async (e: Event) => {
+const handleNewChannelSubmit = (e: Event) => {
     e.preventDefault()
-    await chatStore.createWhisper(username.value)
+    chatStore.createWhisper(username.value)
 	.then((newChat: IChat) => {
 		chatStore.setCurrentChat(newChat.id.toString())
 		chatStore.updateStore()
@@ -41,10 +41,12 @@ const handleNewChannelSubmit = async (e: Event) => {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    gap: 10px;
 
     form {
         display: flex;
         flex-direction: column;
+        gap: 5px;
     }
 }
 </style>

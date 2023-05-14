@@ -2,7 +2,8 @@
     <section class="new_channel_wrap">
         <h2>Join a channel</h2>
         <div class="channel_list" v-if="chatStore.notSubscribedChannelsList.length !== 0">
-            <div class="channel_line" v-for="chat in chatStore.notSubscribedChannelsList" :key="chat.id" @click="handleClick(chat)">
+            <div class="channel_line" v-for="chat in chatStore.notSubscribedChannelsList" :key="chat.id"
+                 @click="handleClick(chat)">
                 <h3>{{ chat.name }}</h3>
                 <font-awesome-icon v-if="chat.password" icon="fa-lock"/>
             </div>
@@ -15,31 +16,31 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useChatStore } from '@/stores/chat'
+import {onMounted} from 'vue'
+import {useChatStore} from '@/stores/chat'
 import type IChat from '@/interfaces/chat/IChat'
-import { useModalStore } from '@/stores/modal'
+import {useModalStore} from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
 const chatStore = useChatStore()
 const modalStore = useModalStore()
 
-onMounted(async () => {
-    chatStore.updateStore()
-})
+chatStore.updateStore()
 
-const handleClick = async (chat: IChat) => {
+const handleClick = (chat: IChat) => {
     let password = undefined
     if (chat.password) {
-		password = prompt("Password:")
-		if (!password)
-			return
+        password = prompt('Password:')
+        if (!password)
+            return
     }
-    await chatStore.joinChannel(chat, password)
-	.catch((e) => alert(e.message))
-    modalStore.resetState()
-    chatStore.updateStore()
-	chatStore.setCurrentChat(chat.id.toString())
+    chatStore.joinChannel(chat, password)
+        .then(() => {
+            modalStore.resetState()
+            chatStore.updateStore()
+            chatStore.setCurrentChat(chat.id.toString())
+        })
+        .catch((e) => alert(e.message))
     return
 }
 </script>
@@ -59,7 +60,7 @@ const handleClick = async (chat: IChat) => {
         align-items: center;
         border: 1px solid $tertiary;
         max-height: 200px;
-        overflow-x: scroll;
+        overflow-x: auto;
         width: 100%;
 
         .channel_line {
@@ -71,6 +72,8 @@ const handleClick = async (chat: IChat) => {
             width: 100%;
             background: $transparent-quaternary;
             border-bottom: 1px dotted $tertiary;
+            gap: 10px;
+            text-align: center;
         }
     }
 

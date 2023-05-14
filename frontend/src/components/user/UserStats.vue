@@ -13,7 +13,7 @@ import { ref, watch } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
 import type IEloHistory from '@/interfaces/user/IEloHistory';
 import type IMatchHistory from '@/interfaces/user/IMatchHistory';
-import Table from '@/components/table/Table.vue';
+import Table from '@/components/table/TheTable.vue';
 import type IUser from '@/interfaces/user/IUser';
 
 const props = defineProps<{

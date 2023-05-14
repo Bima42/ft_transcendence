@@ -15,8 +15,7 @@
             <li
                 class="command"
                 :id="'unban'"
-                @click="handleClick('unban')"
-            >
+                @click="handleClick('unban')"            >
                 Unban
             </li>
         </ul>

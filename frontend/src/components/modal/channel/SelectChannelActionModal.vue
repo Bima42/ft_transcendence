@@ -1,8 +1,5 @@
 <template>
     <section class="channel_action_wrap">
-        <section class="modal_header">
-            <font-awesome-icon icon="fa-chevron-left" v-if="selectedOption !== 0" @click="selectedOption = 0"/>
-        </section>
         <div class="option_wrap" v-if="selectedOption === 0">
             <ButtonCustom :style="'big'" :click="() => handleClick('newChannel')">
                 <h1 >Create a channel</h1>
@@ -17,6 +14,7 @@
         <NewChannelModal v-if="selectedOption === 1"/>
         <JoinChannelModal v-if="selectedOption === 2"/>
         <NewWhisperModal v-if="selectedOption === 3"/>
+        <ButtonCustom :style="'small adapt'" v-if="selectedOption !== 0" @click="selectedOption = 0">Back</ButtonCustom>
     </section>
 </template>
 
@@ -64,19 +62,6 @@ const handleClick = (option: string) => {
 
         &:hover {
             cursor: pointer;
-        }
-    }
-    .modal_header {
-        position: absolute;
-        left: calc(0% - 14px);
-        top: 0;
-        display: flex;
-        justify-content: flex-start;
-
-        svg {
-            font-weight: bold;
-            font-size: 30px;
-            color: $tertiary;
         }
     }
 }

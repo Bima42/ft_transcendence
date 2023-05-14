@@ -1,7 +1,7 @@
 <template>
     <section class="manage_channel_wrap">
         <h2>Edit Channel</h2>
-        <form @submit="submitForm">
+        <form @submit="submitForm" @keydown.enter="submitForm">
             <div class="channel_infos">
                 <div class="channel_info">
                     <h3>Channel Name:</h3>

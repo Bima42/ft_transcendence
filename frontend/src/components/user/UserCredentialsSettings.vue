@@ -1,11 +1,11 @@
 <template>
 	<section class="user_credentials">
 		<UsernameInput/>
-		<ButtonCustom
-			:style="'small adapt'"
-		>
-			{{ 'Settings' }}
-		</ButtonCustom>
+<!--		<ButtonCustom-->
+<!--			:style="'small adapt'"-->
+<!--		>-->
+<!--			{{ 'Settings' }}-->
+<!--		</ButtonCustom>-->
 		<ButtonCustom
 			@click="openModal('TwoFA')"
 			:style="'small adapt'"
