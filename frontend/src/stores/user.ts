@@ -38,18 +38,11 @@ export const useUserStore = defineStore('user', () => {
 			})
 	}
 
-	const logout = function () {
-		if (!user.value) return
-		return get(`auth/logout/${user.value.id}`, 'Failed to logout')
-			.then(() => {
-				user.value = null
-				localStorage.removeItem('localUser');
-				return true
-		})
-			.catch(err => {
-				alert(err)
-				return false
-			})
+	const logout = function () : boolean {
+		resetState()
+		get(`auth/logout/${user.value.id}`, 'Failed to logout')
+		.catch(e => console.log(e.message))
+		return true
 	}
 
 	const isLoggedIn = function (): boolean {

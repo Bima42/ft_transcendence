@@ -70,13 +70,13 @@ export class AuthController {
     res.status(200).send(user);
   }
 
-  @Get('logout/:id')
+  @Get('logout')
   @ApiBearerAuth('JWT')
   async logout(
     @Res({ passthrough: true }) res,
-    @Param() params: { id: number }
+	@Req() req: RequestWithUser,
   ) {
-    await this.usersService.updateStatus(params.id, UserStatus.OFFLINE);
+    await this.usersService.updateStatus(req.user.id, UserStatus.OFFLINE);
     await this.authService.logout(res);
   }
 }
