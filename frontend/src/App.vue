@@ -12,18 +12,17 @@
                 <component :is="Component"/>
             </Transition>
         </router-view>
-        <CreditLink v-if="route.name !== 'community'"></CreditLink>
+        <CreditLink v-if="route.name !== 'community' && route.name !== 'profile'"></CreditLink>
     </section>
 </template>
 
 <script setup lang="ts">
-import {useRoute} from 'vue-router'
-
+import { useRoute } from 'vue-router'
 import CreditLink from '@/components/footers/CreditLink.vue'
 import Sidebar from '@/components/template/Sidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
-import HeaderLogo from '@/components/template/HeaderLogo.vue';
+import HeaderLogo from '@/components/template/HeaderLogo.vue'
 
 const route = useRoute()
 const modalStore = useModalStore()
