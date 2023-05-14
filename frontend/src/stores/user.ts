@@ -39,9 +39,9 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const logout = function () : boolean {
-		resetState()
-		get(`auth/logout/${user.value.id}`, 'Failed to logout')
+		get(`auth/logout`, 'Failed to logout')
 		.catch(e => console.log(e.message))
+		resetState()
 		return true
 	}
 
