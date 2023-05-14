@@ -27,7 +27,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const isChannelPasswordProtected = ref<boolean>(false); // TODO: Remove if unused
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
-		if (!currentChat) return
+		if (!currentChat.value) return
 		this.socket.emit('msg', msg, (answer: any) => {
 			// Handle from here if the server answer something (i.e error)
 			// for example 'banned', 'muted', etc.
@@ -35,7 +35,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		});
 	}
 	const onNewMessage = function (msg: IChatMessage): void {
-		if (!currentChat || msg.chatId != currentChat.value?.id)
+		if (!currentChat.value || msg.chatId != currentChat.value?.id)
 			return
 		currentChat.value.messages.unshift(msg);
 	}
