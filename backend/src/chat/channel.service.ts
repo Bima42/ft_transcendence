@@ -6,6 +6,7 @@ import {
 	Injectable,
 	Logger,
 	InternalServerErrorException,
+    ConflictException,
 } from '@nestjs/common';
 import { UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
@@ -275,12 +276,12 @@ export class ChannelService {
 	}
 
 	async createChannel(user: User, newChannel: NewChannelDto): Promise<DetailedChannelDto> {
+		let existingChannel = null
 		try {
-			const existingChannel = await this.findByName(newChannel.name);
-			if (existingChannel) {
-				return this.getChannelDetails(user, existingChannel.id);
-			}
-		} catch (e) {
+			existingChannel = await this.findByName(newChannel.name);
+		} catch (e) { }
+		if (existingChannel) {
+			throw new ConflictException("A Channel already exists with this name")
 		}
 
 		if (newChannel.password) {
