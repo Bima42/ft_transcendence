@@ -2,7 +2,8 @@
     <section class="user_information_modal">
 		<hr>
         <section class="user_data">
-            <UserPicture :type="'small'" :url="modalStore.data.user.avatar"></UserPicture>
+            <UserPicture :type="'small'" :url="modalStore.data.user.avatar"
+				:isSelf="false" :status="modalStore.data.user.status" :pictureDotSize="'medium'" />
             <section class="data">
                 <h2>{{ modalStore.data.user.username }}</h2>
 				<section class="buttons_wrap">
@@ -28,8 +29,8 @@ const router = useRouter()
 const modalStore = useModalStore()
 
 const goToDetailedProfile = (id: string) => {
-	router.push({ name: 'main/profile', params: { id } });
-	modalStore.toggleModal()
+	router.push(`/main/profile/${id}`);
+	modalStore.resetState()
 }
 
 </script>

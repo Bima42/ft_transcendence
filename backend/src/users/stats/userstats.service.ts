@@ -111,6 +111,21 @@ export class UserStatsService {
 		}
 	}
 
+	async getRankByUserId(userId: number) {
+		const users = await this.prismaService.user.findMany({
+			select: {
+				id: true,
+				elo: true
+			}
+		});
+		users.sort((a, b) => b.elo - a.elo);
+		for (let i = 0; i < users.length; i++) {
+			if (users[i].id === userId)
+				return i + 1;
+		}
+		return 0;
+	}
+
 	async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
 		const { username } = await this.prismaService.user.findUnique({
 			where: {
@@ -125,6 +140,7 @@ export class UserStatsService {
 		const winRate = await this.getWinRateByUserId(userId);
 		const elo = await this.getEloByUserId(userId);
 		const averageScore = await this.getAverageScoreByUserId(userId);
+		const rank = await this.getRankByUserId(userId);
 		return {
 			username: username,
 			playedGames: playedGames,
@@ -132,6 +148,7 @@ export class UserStatsService {
 			winRate: winRate,
 			averageScore: averageScore,
 			elo: elo,
+			rank: rank
 		}
 	}
 
@@ -140,6 +157,7 @@ export class UserStatsService {
 		const stats = [];
 		for (const user of users) {
 			const userStats = await this.getStatsByUserId(user.id);
+			delete userStats.rank;
 			stats.push(userStats);
 		}
 		stats.sort((a, b) => b.elo - a.elo);

@@ -6,22 +6,28 @@ import { ref } from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
 import type IUserStats from '@/interfaces/user/IUserStats';
 import type IMatchHistory from '@/interfaces/user/IMatchHistory';
+import type { UserStatus } from '@/interfaces/user/IUser';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 
-	const resetState = function () {
+	const resetState = () => {
 		user.value = null
 		localStorage.removeItem('localUser');
 	}
 
-	const redirect = function () {
+	const setState =  (newUser: IUser) => {
+		user.value = newUser
+		localStorage.setItem('localUser', JSON.stringify(user.value))
+	}
+
+	const redirect = () => {
 		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
 		redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
 		redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
 		window.open(redirect, '_self')
 	}
-	const login = function () {
+	const login = () => {
 		return get(
 			'auth/login',
 			'Failed to login',
@@ -38,19 +44,19 @@ export const useUserStore = defineStore('user', () => {
 			})
 	}
 
-	const logout = function () : boolean {
+	const logout =  () : boolean => {
 		get(`auth/logout`, 'Failed to logout')
 		.catch(e => console.log(e.message))
 		resetState()
 		return true
 	}
 
-	const isLoggedIn = function (): boolean {
+	const isLoggedIn = (): boolean => {
 		const token = getCookie(import.meta.env.VITE_JWT_COOKIE);
 		return user.value != null && token != null;
 	}
 
-	const updateTwoFaStatus = async function (status: boolean) {
+	const updateTwoFaStatus = (status: boolean) => {
 		if (!user.value)
 			return
 
@@ -66,7 +72,7 @@ export const useUserStore = defineStore('user', () => {
 		})
 	}
 
-	const verifyTwoFaCode = async function (code: string): Promise<boolean> {
+	const verifyTwoFaCode = async (code: string): Promise<boolean> => {
 		const json = await post(
 			'2fa/verify',
 			'Failed to verify 2fa code',
@@ -74,14 +80,14 @@ export const useUserStore = defineStore('user', () => {
 			{code: code}
 		)
 		if (json.twoFAAuthenticated) {
-			login();
+			await login();
 		}
 		return json.twoFAAuthenticated
 	}
 
-  const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
+  const updateInfos = async (infos: IUserUpdate) : Promise<IUser | null> => {
 	// Yes, we have to use await and then, not sure why
-    await patch(`users/me`, "cannot update username", jsonHeaders, infos)
+    patch(`users/me`, "cannot update username", jsonHeaders, infos)
     .then((newUser: IUser) => {
       user.value = newUser
       localStorage.setItem('localUser', JSON.stringify(user.value))
@@ -90,7 +96,7 @@ export const useUserStore = defineStore('user', () => {
     return user.value
   }
 
-	const uploadAvatar = function (file: FormData) {
+	const uploadAvatar = (file: FormData) => {
 		post(
 			`users/avatar`,
 			'Failed to upload avatar',
@@ -109,7 +115,7 @@ export const useUserStore = defineStore('user', () => {
 			})
 	}
 
-	const updateAvatar = function (avatar: string) {
+	const updateAvatar = (avatar: string) => {
 		// This cache key is used to force the browser to reload the image without changing the url
 		const cacheKey = new Date().getTime()
 
@@ -117,13 +123,42 @@ export const useUserStore = defineStore('user', () => {
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
 
-	const getUserStats = async (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
-		const stats = await get(
+	const updateStatus = (status: UserStatus | undefined): Promise<UserStatus> => {
+		switch (status) {
+			case 'ONLINE':
+				user.value!.status = 'OFFLINE'
+				break
+			case 'OFFLINE':
+				user.value!.status = 'AWAY'
+				break
+			case 'AWAY':
+				user.value!.status = 'BUSY'
+				break
+			case 'BUSY':
+				user.value!.status = 'ONLINE'
+				break
+			default:
+				break
+		}
+
+		return patch(
+			`users/me`,
+			'Failed to update status',
+			jsonHeaders,
+			{status: user.value!.status}
+		).then((newUser: IUser) => {
+			setState(newUser)
+			return newUser.status
+		})
+	}
+
+	const getUserStats = (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
+		return get(
 			`users/stats/${user_id}`,
 			'Failed to get user stats',
 			jsonHeaders,
 		)
-		return stats.json()
+			.then(res => res.json())
 	}
 
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
@@ -137,13 +172,13 @@ export const useUserStore = defineStore('user', () => {
 		return users
 	}
 
-	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
-		const response = await get(
+	const getEloHistory = (user_id: number | undefined = user.value?.id) => {
+		return get(
 			`users/stats/elo/history/${user_id}`,
 			'Failed to get elo history',
 			jsonHeaders,
 		)
-		return response.json()
+			.then(res => res.json())
 	}
 
 	const getHighestElo = async () => {
@@ -164,6 +199,14 @@ export const useUserStore = defineStore('user', () => {
 		return response.json()
 	}
 
+	const getRank = async (user_id: number | undefined = user.value?.id): Promise<number> => {
+		return get(
+			`users/stats/rank/${user_id}`,
+			'Failed to get rank',
+			jsonHeaders,
+		).then(response => response.json())
+	}
+
 	const getUserInfos = (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
 		return get(
 			`users/id/${user_id}`,
@@ -175,6 +218,7 @@ export const useUserStore = defineStore('user', () => {
 	return {
 		user,
 		resetState,
+		setState,
 		redirect,
 		login,
 		logout,
@@ -184,11 +228,13 @@ export const useUserStore = defineStore('user', () => {
 		updateInfos,
 		uploadAvatar,
 		updateAvatar,
+		updateStatus,
 		getUserStats,
 		getLeaderboard,
 		getEloHistory,
 		getHighestElo,
 		getMatchHistory,
+		getRank,
 		getUserInfos
 	}
 });

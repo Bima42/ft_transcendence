@@ -31,7 +31,6 @@ const canUnblock = ref(false)
 const isRequestSent = ref(false)
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
 
-console.log(user.value)
 friendStore.isFriend(user.value.username).then(res => isFriend.value = res)
 friendStore.isWaitingRequest(user.value.username).then(res => isRequestSent.value = res)
 friendStore.isBlocked(user.value.username).then(res => isBlocked.value = res)
@@ -46,7 +45,6 @@ const addOrRemoveFriend = async () => {
 			isRequestSent.value = await friendStore.addFriend(user.value.username)
 		else {
 			isRequestSent.value = !(await friendStore.cancelFriendRequest(user.value.username))
-			console.log(isRequestSent.value)
 		}
 	}
 	} catch (e: any) {
