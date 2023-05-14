@@ -84,7 +84,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   handleDisconnect(client: any): any {
-      Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
+      Logger.log(`Game: ${client.data.user?.username}#${client.data.user?.id} left`);
       this.gameService.onPlayerDisconnect(client);
   }
 
@@ -100,14 +100,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('newJoinQueue')
-  handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
-                  @ConnectedSocket() client: Socket): string {
-    return this.gameService.joinQueue(client, joinQueueData);
+  async handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
+                  @ConnectedSocket() client: Socket): Promise<string> {
+    return await this.gameService.joinQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')
-  handleAbortQueue(@ConnectedSocket() client: Socket) {
-    return this.gameService.quitQueue(client);
+  async handleAbortQueue(@ConnectedSocket() client: Socket) {
+    return await this.gameService.quitQueue(client);
   }
 
   @SubscribeMessage('playerReady')

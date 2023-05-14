@@ -185,6 +185,12 @@ const chatMessages: Prisma.ChatMessageUncheckedCreateInput[] = [
 /***************************** GAMES ******************************************/
 /******************************************************************************/
 async function generateGames() {
+
+	// Only add games if none
+	const games = await prisma.game.findMany({})
+	if (games.length)
+		return
+
 	for (let index = 1; index < 100; index++) {
 		const game: Prisma.GameUncheckedCreateInput = {
 			id: index,
@@ -213,20 +219,14 @@ async function generateGames() {
 			win: scoreRand <= 0.5 ? 1 : 0,
 			elo: Math.round(400 + 800 * Math.random()),
 		}
-		await prisma.game.upsert({
-			where: { id: game.id },
-			update: {},
-			create: game,
+		await prisma.game.create({
+			data: game,
 		})
-		await prisma.userGame.upsert({
-			where: { id: 2 * index },
-			update: {},
-			create: userGame1,
+		await prisma.userGame.create({
+			data: userGame1,
 		})
-		await prisma.userGame.upsert({
-			where: { id: 2 * index + 1 },
-			update: {},
-			create: userGame2,
+		await prisma.userGame.create({
+			data: userGame2,
 		})
 	}
 }
