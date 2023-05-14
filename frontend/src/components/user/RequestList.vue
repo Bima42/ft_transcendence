@@ -37,6 +37,7 @@ const showUserProfile = async (username: string) => {
 
 const acceptRequest = async (username: string) => {
   await friendStore.acceptFriendRequest(username)
+  .catch(e => alert(e.message))
   requests.value = await friendStore.getAllPendingRequests()
 }
 

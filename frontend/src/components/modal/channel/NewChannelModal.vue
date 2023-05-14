@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
@@ -25,16 +25,18 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 const chatStore = useChatStore()
 const modalStore = useModalStore()
 
-const props = defineProps<{}>()
 const password = ref('')
 const channelName = ref('')
 const channelType = ref('')
 
 const handleNewChannelSubmit = async (e: Event) => {
     e.preventDefault()
-    await chatStore.createChannel(channelName.value, channelType.value, password.value)
-    chatStore.updateStore()
-    modalStore.resetState()
+    chatStore.createChannel(channelName.value, channelType.value, password.value)
+	.then(_ => {
+		chatStore.updateStore()
+		modalStore.resetState()
+	})
+	.catch(e => alert(e.message))
 }
 </script>
 

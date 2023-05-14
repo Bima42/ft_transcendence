@@ -9,13 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, ref} from 'vue'
+import { ref } from 'vue'
 import ChatCommand from '@/components/chat/ChatCommand.vue'
 import {useModalStore} from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue';
 
 const modalStore = useModalStore()
-const props = defineProps<{}>()
 const helpBox = ref(false);
 
 function toggleHelpBoxModal() {

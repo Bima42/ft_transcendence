@@ -6,7 +6,7 @@
                 v-for="(friend, x) in availableFriends"
                 class="friend"
                 :key="x"
-                :id="friend.id"
+                :id="friend.id.toString()"
                 @click="handleClick(friend)"
             >
                 {{ friend.username }}
@@ -70,7 +70,7 @@ const handleClick = (friend: IFriend) => {
     }
 }
 
-const submitInvite = () => {
+const submitInvite = async () => {
     if (!selectedFriend.value) {
         return
     }
@@ -78,7 +78,8 @@ const submitInvite = () => {
     if (oldSelection) {
         oldSelection.classList.remove('selected_friend')
     }
-    chatStore.inviteFriendToChat(selectedFriend.value.username)
+    await chatStore.inviteFriendToChat(selectedFriend.value.username)
+	.catch(e => alert(e.message))
 }
 </script>
 

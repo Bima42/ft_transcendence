@@ -63,12 +63,8 @@ const handleClick = (route: string) => {
         return
     toggleSidebar()
     if (route === 'LOGOUT') {
-		userStore.logout()?.then(res => {
-			if (res)
-				router.push('/')
-			else
-				return
-		})
+		userStore.logout()
+		router.push('/')
 	}
     else
         router.push(route)

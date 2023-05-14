@@ -6,6 +6,7 @@ import {
 	Injectable,
 	Logger,
 	InternalServerErrorException,
+    ConflictException,
 } from '@nestjs/common';
 import { UserChatRole } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service';
@@ -108,14 +109,7 @@ export class ChannelService {
 
 		let details = []
 		for (const el of channels) {
-			const detail = await this.getChannelDetails(user, el.id)
-
-			// Change chat name to other person name
-			const otherUser = detail.users?.find((userChat) => userChat.user.id != user?.id)
-			if (otherUser)
-				detail.name = otherUser.user.username;
-
-			details.push(detail)
+			details.push(await this.getChannelDetails(user, el.id))
 		}
 		return details
 	}
@@ -233,6 +227,14 @@ export class ChannelService {
 			throw new ForbiddenException('Not allowed to access this channel')
 		}
 
+		if(chat.type === "WHISPER") {
+			// Change chat name to other person name
+			const otherUser = users?.find((userChat) => userChat.user.id != user?.id)
+			if (otherUser) {
+				chat.name = otherUser.user.username;
+			}
+		}
+
 		const usersChatDto = users.map((el) => {
 			return {
 				userId: el.userId,
@@ -244,6 +246,7 @@ export class ChannelService {
 		})
 		const chatDto: DetailedChannelDto = {
 			id: chatId,
+			type: chat.type,
 			name: chat.name,
 			createdAt: chat.createdAt,
 			updatedAt: chat.updatedAt,
@@ -273,12 +276,12 @@ export class ChannelService {
 	}
 
 	async createChannel(user: User, newChannel: NewChannelDto): Promise<DetailedChannelDto> {
+		let existingChannel = null
 		try {
-			const existingChannel = await this.findByName(newChannel.name);
-			if (existingChannel) {
-				return this.getChannelDetails(user, existingChannel.id);
-			}
-		} catch (e) {
+			existingChannel = await this.findByName(newChannel.name);
+		} catch (e) { }
+		if (existingChannel) {
+			throw new ConflictException("A Channel already exists with this name")
 		}
 
 		if (newChannel.password) {
@@ -310,7 +313,7 @@ export class ChannelService {
 			where: {
 				type: 'WHISPER',
 				users: {
-					every: { id: { in: [user1.id, targetUser.id] } }
+					every: { userId: { in: [user1.id, targetUser.id] } }
 				}
 			},
 		})
@@ -559,7 +562,7 @@ export class ChannelService {
 
 		// Cannot kick the owner
 		if (targetUserChat.role == 'OWNER') {
-			throw new ForbiddenException('Not authorized to kick');
+			throw new ForbiddenException('Cannot kick the owner');
 		}
 
 		// Cannot kick a banned user, otherwise it will reset its permissions and he

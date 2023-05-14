@@ -10,7 +10,7 @@
             />
             <TakeActionOnUser
                 v-else
-                :selectedUser="selectedUser"
+                :selectedUser="selectedUser as IUserChat"
                 :setAction="setAction"
             />
             <section v-if="selectedAction === 'mute'">
@@ -87,7 +87,7 @@ const takeAction = () => {
                 chatStore.updateStore()
             })
             .catch(err => {
-                console.log(err)
+                alert(err.message)
             })
         // then we reset the values
         resetVariables()

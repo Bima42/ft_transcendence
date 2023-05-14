@@ -21,13 +21,13 @@
       <label for="password2">Confirm password</label>
       <input type="password" id="password2" placeholder="Confirm your password...">
     </li>
-    <CustomButton styles="fat" @click="registerClick">Register</CustomButton>
+    <ButtonCustom styles="fat" @click="registerClick">Register</ButtonCustom>
   </form>
 </template>
 
 <script setup lang="ts">
 import {defineProps, ref} from 'vue'
-import CustomButton from '@/components/multiusage/CustomButton.vue'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import {useRouter} from "vue-router";
 const router = useRouter()
 

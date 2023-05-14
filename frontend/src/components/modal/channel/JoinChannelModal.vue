@@ -15,13 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import type IChat from '@/interfaces/chat/IChat'
 import { useModalStore } from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
-const props = defineProps<{}>()
 const chatStore = useChatStore()
 const modalStore = useModalStore()
 
@@ -32,11 +31,15 @@ onMounted(async () => {
 const handleClick = async (chat: IChat) => {
     let password = undefined
     if (chat.password) {
-		password = prompt("Password:") || undefined
+		password = prompt("Password:")
+		if (!password)
+			return
     }
     await chatStore.joinChannel(chat, password)
+	.catch((e) => alert(e.message))
     modalStore.resetState()
     chatStore.updateStore()
+	chatStore.setCurrentChat(chat.id.toString())
     return
 }
 </script>

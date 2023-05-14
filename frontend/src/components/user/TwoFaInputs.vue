@@ -22,27 +22,26 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { post } from '../../../utils'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
-const props = defineProps<{}>()
 const userStore = useUserStore()
 
 const enableTwoFa = ref(false)
 const qrCodeImage = ref('')
-const toggleTwoFaStatus = () => {
+const toggleTwoFaStatus = async() => {
     enableTwoFa.value = !enableTwoFa.value
-    userStore.updateTwoFaStatus(enableTwoFa.value)
+	await userStore.updateTwoFaStatus(enableTwoFa.value)
+	.catch(e => alert(e.message))
 }
 
 const generateQrCode = () => {
     post('2fa/generate', 'Impossible to generate QR code: Please try again later')
-        .then(response => response.json())
         .then(data => {
             qrCodeImage.value = data.qrCodeImage
         })
-        .catch(err => console.log(err))
+        .catch(err => alert(err.message))
 }
 </script>
 

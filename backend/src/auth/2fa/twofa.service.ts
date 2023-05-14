@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../../users/users.service';
 import { User } from '@prisma/client';
@@ -15,17 +15,11 @@ export class TwoFaService {
 		private readonly usersService: UsersService
 	) {}
 
-	async updateTwoFaStatus(userId: number, enableTwoFA: boolean): Promise<UserDto> {
-		let user = await this.prismaService.user.findUnique({
-			where: {
-				id: +userId
-			}
-		})
-
+	async updateTwoFaStatus(user: User, enableTwoFA: boolean): Promise<UserDto> {
 		if (user.twoFA !== enableTwoFA) {
 			user = await this.prismaService.user.update({
 				where: {
-					id: +userId
+					id: +user.id
 				},
 				data: {
 					twoFA: { set: enableTwoFA }
@@ -43,7 +37,7 @@ export class TwoFaService {
 			token: code
 		});
 		if (!verified) {
-			throw new BadRequestException('Invalid code');
+			throw new UnauthorizedException('Invalid 2FA code');
 		}
 		return true;
 	}

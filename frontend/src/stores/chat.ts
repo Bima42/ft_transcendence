@@ -24,10 +24,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const whisperChatList = ref<IChat[]>([]);
 	const subscribedChannelsList = ref<IChat[]>([]);
 	const notSubscribedChannelsList = ref<IChat[]>([]);
-	const isChannelPasswordProtected = ref<boolean>(false);
+	const isChannelPasswordProtected = ref<boolean>(false); // TODO: Remove if unused
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
-		if (!currentChat) return
+		if (!currentChat.value) return
 		this.socket.emit('msg', msg, (answer: any) => {
 			// Handle from here if the server answer something (i.e error)
 			// for example 'banned', 'muted', etc.
@@ -35,7 +35,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		});
 	}
 	const onNewMessage = function (msg: IChatMessage): void {
-		if (!currentChat || msg.chatId != currentChat.value?.id)
+		if (!currentChat.value || msg.chatId != currentChat.value?.id)
 			return
 		currentChat.value.messages.unshift(msg);
 	}
@@ -47,7 +47,6 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		.then(res => res.json())
 		.then(chat => currentChat.value = chat)
 		.catch(err => console.log(err))
-		console.log(`refreshed chat`)
 		return true;
 	}
 
@@ -135,61 +134,32 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		chats.value = [];
 	}
 
-	const createChannel = async function (name: string, type: string, password?: string): Promise<boolean> {
+	const createChannel = async function (name: string, type: string, password?: string): Promise<IChat> {
 		if (password == ''){
 			password = undefined
 		}
-		await post('chat/rooms', 'Failed to create channel', jsonHeaders, { name, type, password })
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
+		const newChat = await post('chat/rooms', 'Failed to create channel', jsonHeaders, { name, type, password })
+		return newChat
 	}
 
-	const createWhisper = async function (targetUsername: string): Promise<boolean> {
-		const chat = post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return null
-			})
-		return !!chat
+	const createWhisper = async function (targetUsername: string): Promise<IChat> {
+		const chat = await post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
+		return chat
 	}
 
-	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
-		put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
+	const joinChannel = async function (chat: IChat, password?: string): Promise<IChat> {
+		return await put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
-			password: password || null
+			password: password || undefined
 		})
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
 	}
 
 	const leaveChannel = async function (chatId: number = (currentChat.value?.id || 0)): Promise<boolean> {
-		put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
-			.then((res) => {
+		await put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, { chatId: chatId })
+			.then((_res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
 			})
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
+		return true
 	}
 
 	const subscribedChannels = async function (): Promise<boolean> {
@@ -222,17 +192,12 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		})
 	}
 
-	const updateChat = async function (newData: IUpdateChat): Promise<boolean> {
-		patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
-			.then(() => {
-				setCurrentChat(currentChat.value!.id.toString())
-				updateStore()
-				return true
-			}).catch((err) => {
-				console.log(err)
-				return false
-			})
-		return false
+	const updateChat = async function (newData: IUpdateChat): Promise<IChat> {
+		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
+		if (newChat)
+			currentChat.value = newChat
+		updateStore()
+		return newChat
 	}
 
 	const currentChatPasswordProtected = async function (): Promise<void> {
@@ -255,10 +220,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		}
 		let url = `chat/rooms/${currentChat.value.id}/user`;
 		await put(url, `cannot add user`, jsonHeaders, action)
-			.catch(err => console.error(err))
-			.finally(() => {
-				updateStore()
-			})
+		updateStore()
 		return true
 	}
 
@@ -277,10 +239,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		}
 		let url = `chat/rooms/${currentChat.value.id}/user`;
 		await put(url, `cannot ${actionToPerform} user`, jsonHeaders, action)
-			.catch(err => console.error(err))
-			.finally(() => {
-				updateStore()
-			})
+		updateStore()
 		return true
 	}
 

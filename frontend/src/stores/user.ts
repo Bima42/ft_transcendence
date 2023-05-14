@@ -38,18 +38,11 @@ export const useUserStore = defineStore('user', () => {
 			})
 	}
 
-	const logout = function () {
-		if (!user.value) return
-		return get(`auth/logout/${user.value.id}`, 'Failed to logout')
-			.then(() => {
-				user.value = null
-				localStorage.removeItem('localUser');
-				return true
-		})
-			.catch(err => {
-				alert(err)
-				return false
-			})
+	const logout = function () : boolean {
+		get(`auth/logout`, 'Failed to logout')
+		.catch(e => console.log(e.message))
+		resetState()
+		return true
 	}
 
 	const isLoggedIn = function (): boolean {
@@ -57,47 +50,42 @@ export const useUserStore = defineStore('user', () => {
 		return user.value != null && token != null;
 	}
 
-	const updateTwoFaStatus = function (status: boolean) {
+	const updateTwoFaStatus = async function (status: boolean) {
 		if (!user.value)
 			return
 
 		patch(
-			`2fa/${user.value.id}`,
-			'Failed to update user',
+			`2fa`,
+			'Failed to update 2FA status',
 			jsonHeaders,
 			{twoFA: status}
 		)
-			.then(response => response.json())
-			.then(json => {
-				user.value = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
-			})
+		.then((newUser: IUser) => {
+			user.value = newUser
+			localStorage.setItem('localUser', JSON.stringify(user.value))
+		})
 	}
 
-	const verifyTwoFaCode = function (code: string) {
-		post(
+	const verifyTwoFaCode = async function (code: string): Promise<boolean> {
+		const json = await post(
 			'2fa/verify',
 			'Failed to verify 2fa code',
 			jsonHeaders,
 			{code: code}
 		)
-			.then(response => response.json())
-			.then(json => {
-				if (json.twoFAAuthenticated) {
-					login();
-				}
-			})
-			.catch(error => console.log(error))
+		if (json.twoFAAuthenticated) {
+			login();
+		}
+		return json.twoFAAuthenticated
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {
-    patch(`users/me`, "cannot update username", jsonHeaders, infos)
-    .then((res) => res.json())
+	// Yes, we have to use await and then, not sure why
+    await patch(`users/me`, "cannot update username", jsonHeaders, infos)
     .then((newUser: IUser) => {
       user.value = newUser
       localStorage.setItem('localUser', JSON.stringify(user.value))
     })
-    .catch((e) => alert(e))
 
     return user.value
   }

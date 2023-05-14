@@ -38,6 +38,7 @@ friendStore.isBlocked(user.value.username).then(res => isBlocked.value = res)
 friendStore.canUnblock(user.value.username).then(res => canUnblock.value = res)
 
 const addOrRemoveFriend = async () => {
+	try {
 	if (isFriend.value) {
 		isFriend.value = !(await friendStore.removeFriend(user.value.username))
 	} else {
@@ -47,6 +48,9 @@ const addOrRemoveFriend = async () => {
 			isRequestSent.value = !(await friendStore.cancelFriendRequest(user.value.username))
 			console.log(isRequestSent.value)
 		}
+	}
+	} catch (e: any) {
+		alert(e.message)
 	}
 }
 

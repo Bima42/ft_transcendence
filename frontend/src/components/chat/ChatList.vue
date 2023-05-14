@@ -1,7 +1,7 @@
 <template>
     <div class="content_element"
-         v-for="chatRoom in (selectedChatList === 'public' ? chatStore.subscribedChannelsList : chatStore.whisperChatList)"
-         :id="chatRoom.id" :key="chatRoom.id"
+         v-for="chatRoom in (props.selectedChatList === 'public' ? chatStore.subscribedChannelsList : chatStore.whisperChatList)"
+         :id="chatRoom.id.toString()" :key="chatRoom.id"
          @click="toggleChat(chatRoom.id)">
         <h1>{{ chatRoom.name }}</h1>
         <font-awesome-icon icon="fa-chevron-right"/>
@@ -14,10 +14,9 @@
  *
  * @param {Function} toggleChat - This function is used to send the clicked chat id to the parent
  */
-import { defineProps, ref } from 'vue'
+import { defineProps } from 'vue'
 import { useChatStore } from '@/stores/chat'
 
-const error = ref(null);
 const chatStore = useChatStore();
 await chatStore.updateStore();
 

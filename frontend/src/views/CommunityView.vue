@@ -12,7 +12,7 @@
                 {{ chat.name }}
             </h2>
             <h2 @click="toggleEditChatModal" v-else>
-                {{ chatStore.currentChat.name }}
+                {{ chatStore.currentChat?.name || "Chat name"}}
             </h2>
         </section>
         <div class="community_content">
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, watch } from 'vue'
+import { ref } from 'vue'
 import ChatList from '@/components/chat/ChatList.vue'
 import ChatElements from '@/components/chat/ChatElements.vue'
 import TypeBox from '@/components/chat/TypeBox.vue'
@@ -51,8 +51,6 @@ import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import SelectChannelActionModal from '@/components/modal/SelectChannelActionModal.vue';
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
-
-const props = defineProps<{}>()
 
 const selectedChatList = ref('public')
 const chatStore = useChatStore()
@@ -81,7 +79,8 @@ const toggleAddChatModal = () => {
 }
 
 const toggleEditChatModal = () => {
-    modalStore.loadAndDisplay(TheModal, EditChatModal, {})
+	if (chatStore.currentChat?.type != "WHISPER")
+		modalStore.loadAndDisplay(TheModal, EditChatModal, {})
 }
 </script>
 

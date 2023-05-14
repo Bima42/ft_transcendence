@@ -15,9 +15,9 @@ export async function post(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	body?: Record<string, unknown>,
+	body?: Object,
 	file?: FormData
-): Promise<Response> {
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'POST',
 		mode: 'cors',
@@ -29,9 +29,13 @@ export async function post(
 	else if (file)
 		request.body = file
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
+	if (!response.ok){
+		jsonBody.message ??= message
+		jsonBody.statusCode ??= response.status
+		throw jsonBody
+	}
+	return jsonBody
 }
 
 /**
@@ -93,8 +97,8 @@ export async function put(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	body?: Record<string, unknown>,
-): Promise<Response> {
+	body?: Object,
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'PUT',
 		mode: 'cors',
@@ -104,17 +108,20 @@ export async function put(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
+	if (!response.ok){
+		jsonBody.message ??= message
+		throw jsonBody
+	}
+	return jsonBody
 }
 
 export async function patch(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders,
-	json?: Record<string, unknown>
-): Promise<Response> {
+	json?: Object
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'PATCH',
 		mode: 'cors',
@@ -124,10 +131,10 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
 	if (!response.ok){
-    // return Promise.reject(response)
-    const text = await response.text()
-		throw new Error(`${message} (status ${response.status}): ${text}`)
-  }
-	return response
+		jsonBody.message ??= message
+		throw jsonBody
+	}
+	return jsonBody
 }

@@ -34,8 +34,9 @@ const save = async () => {
       return
     // TODO: Check locally if the username is compliant
     const infos: IUserUpdate = { username: userValue.value }
-    const newUser = await userStore.updateInfos(infos)
-    userValue.value = newUser.username
+    await userStore.updateInfos(infos)
+		.catch(e => alert(e.message))
+	userValue.value = userStore.user?.username
 };
 
 const cancel = () => {
