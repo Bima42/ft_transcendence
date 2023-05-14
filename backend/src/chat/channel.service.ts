@@ -244,6 +244,7 @@ export class ChannelService {
 		})
 		const chatDto: DetailedChannelDto = {
 			id: chatId,
+			type: chat.type,
 			name: chat.name,
 			createdAt: chat.createdAt,
 			updatedAt: chat.updatedAt,

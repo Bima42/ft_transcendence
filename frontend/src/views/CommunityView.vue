@@ -79,7 +79,8 @@ const toggleAddChatModal = () => {
 }
 
 const toggleEditChatModal = () => {
-    modalStore.loadAndDisplay(TheModal, EditChatModal, {})
+	if (chatStore.currentChat?.type != "WHISPER")
+		modalStore.loadAndDisplay(TheModal, EditChatModal, {})
 }
 </script>
 

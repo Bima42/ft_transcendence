@@ -67,6 +67,7 @@ export class BriefChannelDto {
 
 export class DetailedChannelDto {
 	id: number;
+	type: ChatType;
 	name: string;
 	createdAt: Date;
 	updatedAt: Date;
