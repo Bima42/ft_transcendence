@@ -108,14 +108,7 @@ export class ChannelService {
 
 		let details = []
 		for (const el of channels) {
-			const detail = await this.getChannelDetails(user, el.id)
-
-			// Change chat name to other person name
-			const otherUser = detail.users?.find((userChat) => userChat.user.id != user?.id)
-			if (otherUser)
-				detail.name = otherUser.user.username;
-
-			details.push(detail)
+			details.push(await this.getChannelDetails(user, el.id))
 		}
 		return details
 	}
@@ -233,6 +226,14 @@ export class ChannelService {
 			throw new ForbiddenException('Not allowed to access this channel')
 		}
 
+		if(chat.type === "WHISPER") {
+			// Change chat name to other person name
+			const otherUser = users?.find((userChat) => userChat.user.id != user?.id)
+			if (otherUser) {
+				chat.name = otherUser.user.username;
+			}
+		}
+
 		const usersChatDto = users.map((el) => {
 			return {
 				userId: el.userId,
@@ -311,7 +312,7 @@ export class ChannelService {
 			where: {
 				type: 'WHISPER',
 				users: {
-					every: { id: { in: [user1.id, targetUser.id] } }
+					every: { userId: { in: [user1.id, targetUser.id] } }
 				}
 			},
 		})
