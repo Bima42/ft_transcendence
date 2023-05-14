@@ -25,7 +25,7 @@ const sidebarElement = ref({
     user: {
       icon: 'fa-user',
       id: 'user',
-      route: '/profile'
+      route: '/main/profile'
     },
     friends: {
       icon: 'fa-user-friends',
@@ -62,8 +62,14 @@ const handleClick = (route: string) => {
     if (!route)
         return
     toggleSidebar()
-    if (route === 'LOGOUT')
-        userStore.logout()
+    if (route === 'LOGOUT') {
+		userStore.logout()?.then(res => {
+			if (res)
+				router.push('/')
+			else
+				return
+		})
+	}
     else
         router.push(route)
 }

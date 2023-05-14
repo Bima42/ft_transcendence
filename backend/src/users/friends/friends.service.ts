@@ -312,17 +312,7 @@ export class FriendsService {
 			}
 		});
 
-		// Find if the user got the blockedUser in the blockers list
-		const blockedBy = await this.prismaService.user.findUnique({
-			where: { id: blockedUser.id },
-			select: {
-				blockers: {
-					where: { id: userId }
-				}
-			}
-		});
-
-		return blocked.blocked.length > 0 || blockedBy.blockers.length > 0;
+		return blocked.blocked.length > 0;
 	}
 
 	async blockUser(userId: number, blockedUsername: string) {
@@ -331,16 +321,6 @@ export class FriendsService {
 		// Check if the user is already blocked
 		if (await this.isBlocked(userId, blockedUsername))
 			throw new BadRequestException('User is already blocked');
-
-		// Update the blockedUser blockers list
-		await this.prismaService.user.update({
-			where: { id: blockedUser.id },
-			data: {
-				blockers: {
-					connect: [{ id: userId }]
-				}
-			}
-		});
 
 		// Update the user blocked list
 		await this.prismaService.user.update({
@@ -364,16 +344,6 @@ export class FriendsService {
 		if (!await this.isBlocked(userId, blockedUsername))
 			throw new BadRequestException('User is not blocked');
 
-		// Update the blockedUser blockers list
-		await this.prismaService.user.update({
-			where: { id: blockedUser.id },
-			data: {
-				blockers: {
-					disconnect: [{ id: userId }]
-				}
-			}
-		});
-
 		// Update the user blocked list
 		await this.prismaService.user.update({
 			where: { id: userId },
@@ -395,14 +365,6 @@ export class FriendsService {
 			select: { blocked: true }
 		});
 		return users.blocked.map(toBlockedDto);
-	}
-
-	async getAllBlockers(userId: number) {
-		const users = await this.prismaService.user.findUnique({
-			where: { id: userId },
-			select: { blockers: true }
-		});
-		return users.blockers.map(toBlockedDto);
 	}
 
 	async canUnblock(userId: number, blockedUsername: string) {

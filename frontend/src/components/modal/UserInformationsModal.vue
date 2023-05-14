@@ -28,7 +28,7 @@ const router = useRouter()
 const modalStore = useModalStore()
 
 const goToDetailedProfile = (id: string) => {
-	router.push({ name: 'profile', params: { id } });
+	router.push({ name: 'main/profile', params: { id } });
 	modalStore.toggleModal()
 }
 

@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
 		window.open(redirect, '_self')
 	}
 	const login = function () {
-		get(
+		return get(
 			'auth/login',
 			'Failed to login',
 		)
@@ -30,20 +30,26 @@ export const useUserStore = defineStore('user', () => {
 			.then(json => {
 				user.value = json as IUser
 				localStorage.setItem('localUser', JSON.stringify(user.value))
-				window.location.href = `https://${import.meta.env.VITE_APP_URL}/index`
+				return true
+			})
+			.catch(err => {
+				alert(err)
+				return false
 			})
 	}
 
 	const logout = function () {
-		if (!user.value) {
-			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
-			return
-		}
-		get(`auth/logout/${user.value.id}`, 'Failed to logout').then(() => {
-			user.value = null
-			localStorage.removeItem('localUser');
-			window.location.href = `https://${import.meta.env.VITE_APP_URL}/`
+		if (!user.value) return
+		return get(`auth/logout/${user.value.id}`, 'Failed to logout')
+			.then(() => {
+				user.value = null
+				localStorage.removeItem('localUser');
+				return true
 		})
+			.catch(err => {
+				alert(err)
+				return false
+			})
 	}
 
 	const isLoggedIn = function (): boolean {
@@ -133,7 +139,7 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
-		let users :IUserStats[] = await get(
+		const users: IUserStats[] = await get(
 			'users/stats/leaderboard',
 			'Failed to get leaderboard datas',
 			jsonHeaders,

@@ -148,18 +148,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 				});
 		}
 
-		const getAllBlockers = function() {
-			get(
-				'friends/blockers',
-				'Failed to get all blockers',
-				jsonHeaders,
-			)
-				.then(response => response.json())
-				.then(json => {
-					return json;
-				});
-		}
-
 		const isBlocked = (username: string): Promise<boolean> => {
 			return get(
 				`friends/isBlocked/${username}`,
@@ -203,7 +191,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 			blockUser,
 			unblockUser,
 			getAllBlocked,
-			getAllBlockers,
 			isBlocked,
 			canUnblock,
 			getUserInfos

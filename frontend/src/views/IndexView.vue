@@ -7,7 +7,7 @@
         <router-link to="/main/community">
             Start Chatting
         </router-link>
-        <router-link to="/profile">
+        <router-link to="/main/profile">
             Profile
         </router-link>
     </section>
