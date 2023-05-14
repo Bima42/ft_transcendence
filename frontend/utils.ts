@@ -17,7 +17,7 @@ export async function post(
 	headers: Headers = jsonHeaders,
 	body?: Object,
 	file?: FormData
-): Promise<Response> {
+): Promise<any> {
 	const request: RequestInit = {
 		method: 'POST',
 		mode: 'cors',
@@ -32,9 +32,10 @@ export async function post(
 	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
 	if (!response.ok){
 		jsonBody.message ??= message
+		jsonBody.statusCode ??= response.status
 		throw jsonBody
 	}
-	return response
+	return jsonBody
 }
 
 /**

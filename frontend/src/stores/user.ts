@@ -80,13 +80,11 @@ export const useUserStore = defineStore('user', () => {
 			jsonHeaders,
 			{code: code}
 		)
-			.then(response => response.json())
 			.then(json => {
 				if (json.twoFAAuthenticated) {
 					login();
 				}
 			})
-			.catch(error => console.log(error))
 	}
 
   const updateInfos = async function (infos: IUserUpdate) : Promise<IUser | null> {

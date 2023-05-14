@@ -23,8 +23,8 @@ export default interface IChatStore {
 	getRoleFromUserId: (userId: number) => UserChatRoleEnum;
 	getMessages: () => void;
 	resetState: () => void;
-	createChannel: (name: string, type: string, password?: string) => Promise<boolean>;
-	createWhisper: (targetUser: string) => Promise<boolean>;
+	createChannel: (name: string, type: string, password?: string) => Promise<IChat>;
+	createWhisper: (targetUser: string) => Promise<IChat>;
 	joinChannel: (chat: IChat, password?: string) => Promise<IChat>;
 	leaveChannel: (chatId: number) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;

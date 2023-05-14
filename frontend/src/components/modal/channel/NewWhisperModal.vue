@@ -14,6 +14,7 @@ import { defineProps, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useModalStore } from '@/stores/modal'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import type IChat from '@/interfaces/chat/IChat'
 
 const chatStore = useChatStore()
 const modalStore = useModalStore()
@@ -24,8 +25,12 @@ const username = ref('')
 const handleNewChannelSubmit = async (e: Event) => {
     e.preventDefault()
     await chatStore.createWhisper(username.value)
-    chatStore.updateStore()
-    modalStore.resetState()
+	.then((newChat: IChat) => {
+		chatStore.setCurrentChat(newChat.id.toString())
+		chatStore.updateStore()
+		modalStore.resetState()
+	})
+	.catch(e => alert(e.message))
 }
 </script>
 

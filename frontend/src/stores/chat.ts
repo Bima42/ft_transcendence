@@ -134,30 +134,17 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		chats.value = [];
 	}
 
-	const createChannel = async function (name: string, type: string, password?: string): Promise<boolean> {
+	const createChannel = async function (name: string, type: string, password?: string): Promise<IChat> {
 		if (password == ''){
 			password = undefined
 		}
-		await post('chat/rooms', 'Failed to create channel', jsonHeaders, { name, type, password })
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return false
-			})
-			.finally(() => {
-				return true
-			})
-		return false
+		const newChat = await post('chat/rooms', 'Failed to create channel', jsonHeaders, { name, type, password })
+		return newChat
 	}
 
-	const createWhisper = async function (targetUsername: string): Promise<boolean> {
-		const chat = post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
-			.then((res) => res.json())
-			.catch((err) => {
-				console.log(err)
-				return null
-			})
-		return !!chat
+	const createWhisper = async function (targetUsername: string): Promise<IChat> {
+		const chat = await post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, { targetUsername })
+		return chat
 	}
 
 	const joinChannel = async function (chat: IChat, password?: string): Promise<IChat> {
@@ -172,7 +159,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			.then((_res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
 			})
-		return
+		return true
 	}
 
 	const subscribedChannels = async function (): Promise<boolean> {
@@ -209,6 +196,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
 		if (newChat)
 			currentChat.value = newChat
+		updateStore()
 		return newChat
 	}
 
