@@ -1,6 +1,9 @@
+<template>
+</template>
+
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-import { useRoute, useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user'
+import { useRoute, useRouter } from 'vue-router'
 
 const userStore = useUserStore()
 const route = useRoute()
@@ -17,6 +20,5 @@ function redirectUser() {
 		})
 	}
 }
-
 redirectUser();
 </script>
