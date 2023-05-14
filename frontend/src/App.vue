@@ -1,6 +1,6 @@
 <template>
     <section class="UI-grid">
-        <template v-if="route.name !== 'landing page'">
+        <template v-if="route.name !== 'landing page' && route.name !== '2fa'">
             <Sidebar />
             <HeaderLogo />
         </template>
