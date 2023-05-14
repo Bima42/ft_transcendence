@@ -47,7 +47,6 @@ const router = createRouter({
                     path: 'community',
                     name: 'community',
                     component: CommunityView,
-                    longName: 'Community',
                 },
                 {
                     path: 'friends',
