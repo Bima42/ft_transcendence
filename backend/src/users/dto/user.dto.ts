@@ -112,4 +112,5 @@ export class PlayerStatsDto {
     winRate: number;
     elo: number;
     averageScore: number;
+    rank: number;
 }

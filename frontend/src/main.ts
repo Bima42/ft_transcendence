@@ -13,7 +13,7 @@ import {
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
 	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar, faPlus,
-	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan
+	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan, faMagnifyingGlass
 
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -21,7 +21,7 @@ library.add(
 	faCheck, faXmark, faPencil, faQuestion, faPaperPlane, faChevronLeft,
 	faBars, faUser, faArrowRightFromBracket, faArrowUpFromBracket, faEllipsis,
 	faComments, faChevronRight, faGamepad, faUserFriends, faRankingStar, faPlus,
-	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan
+	faLock, faCrown, faUserAstronaut, faVolumeXmark, faBan, faMagnifyingGlass
 )
 
 createApp(App)

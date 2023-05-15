@@ -18,7 +18,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	private async _isFriendshipCanceled(userId: number, friendName: string) {
+	private async _isFriendshipCanceledOrDeclined(userId: number, friendName: string) {
 		const friend = await this.usersService.findByName(friendName);
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
@@ -39,7 +39,7 @@ export class FriendsService {
 		});
 		if (!friendship)
 			return false;
-		return friendship.status === FriendshipStatus.CANCELED;
+		return friendship.status === FriendshipStatus.CANCELED || friendship.status === FriendshipStatus.DECLINED;
 	}
 
 	async isFriend(userId: number, friendId: number) {
@@ -67,7 +67,7 @@ export class FriendsService {
 			throw new BadRequestException('User is already a friend or has a pending request');
 
 		// If the friendship was canceled, we just update the status to pending
-		if (await this._isFriendshipCanceled(userId, friendName)) {
+		if (await this._isFriendshipCanceledOrDeclined(userId, friendName)) {
 			await this.prismaService.friendship.updateMany({
 				where: {
 					OR: [

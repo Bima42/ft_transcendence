@@ -2,7 +2,7 @@
     <section v-if="user" class="profile_wrapper">
         <section class="profile_wrap">
 			<div class="user_settings">
-				<UserPicture :url="user?.avatar" :type="'big'"/>
+				<UserPicture :url="user?.avatar" :type="'big'" :status="user.status" :isSelf="isSelf" :pictureDotSize="'large'" />
 				<div class="buttons_wrap">
 					<h2 v-if="!isSelf">{{ user?.username }}</h2>
 					<UserCredentialsSettings v-if="isSelf" />
@@ -50,6 +50,7 @@ function loadUser() {
 }
 
 watch(() => route.params, () => {loadUser()})
+watch(() => userStore.user, () => {loadUser()})
 
 loadUser()
 </script>
@@ -97,10 +98,10 @@ loadUser()
     .scores_wrap {
         flex: 1;
         width: 100%;
+		height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
 		gap: $medium_gap;
     }
 }

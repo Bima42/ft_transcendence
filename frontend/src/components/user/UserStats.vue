@@ -2,7 +2,7 @@
 	<LineChart v-if="userEloHistory" :userEloHistory="userEloHistory" />
 	<div class="match_history score_card">
 		<h2>Match History</h2>
-		<Table v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" />
+		<Table v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" :rowsPerPage="4" />
 	</div>
 </template>
 
@@ -63,6 +63,7 @@ const tableHeaders = {
 .match_history {
 	display: flex;
 	width: 100%;
+	height: 100%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
