@@ -59,7 +59,6 @@ export class UsersController {
    * (or throws an exception if the conversion fails).
    *
    * @param req: RequestWithUser
-   * @param targetId: number
    * @param data: User
    */
   @Patch('me')

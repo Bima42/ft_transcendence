@@ -11,10 +11,15 @@
                 Custom
             </ButtonCustom>
         </div>
-        <div class="join_button">
-            <ButtonCustom id="join_btn" @click="joinQueue" :loading="isLoading" :style="'big'">
+        <div class="join_button" v-if="!isLoading">
+            <ButtonCustom id="join_btn" @click="joinQueue" :style="'big'">
                 Join the queue
             </ButtonCustom>
+        </div>
+        <div class="queue_wrapper" v-else>
+            <h1>{{queueTimer}}s</h1>
+            <img src="@/assets/img/loading.svg" alt="loading">
+            <ButtonCustom @click="leaveQueue" :style="'big'">Leave Queue</ButtonCustom>
         </div>
     </section>
 </template>
@@ -31,19 +36,32 @@ const router = useRouter()
 const gameStore = useGameStore();
 const isLoading = ref(false);
 const useClassicMode = ref(true);
+const queueTimer = ref(0)
+let queueTimerIntervalID = 0
 
 function joinQueue() {
     isLoading.value = !isLoading.value
     // Joining queue !
     if (isLoading.value) {
         gameStore.socket.emit('newJoinQueue', {
-            type: useClassicMode ? 'CLASSIC' : 'CUSTOM'
+            type: useClassicMode.value ? 'CLASSIC' : 'CUSTOM'
         });
+        // This is ubercrade
+        queueTimerIntervalID = setInterval(() => {
+            queueTimer.value += 1
+        }, 1000)
     }
     // Aborting queue
     else {
-        gameStore.socket.emit('abortJoinQueue');
+        leaveQueue()
     }
+}
+
+function leaveQueue() {
+    isLoading.value = false
+    gameStore.socket.emit('abortJoinQueue')
+    queueTimer.value = 0
+    clearInterval(queueTimerIntervalID)
 }
 
 function onJoinClassic() {
@@ -89,10 +107,16 @@ gameStore.socket.on('connect', () => {
         }
     }
 
-    .join_button {
+    .join_button, .queue_wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
+        gap: $medium-gap;
+
+        img {
+            max-width: 250px;
+        }
     }
 }
 </style>

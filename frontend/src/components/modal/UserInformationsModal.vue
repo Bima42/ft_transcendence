@@ -2,7 +2,8 @@
     <section class="user_information_modal">
 		<hr>
         <section class="user_data">
-            <UserPicture :type="'small'" :url="modalStore.data.user.avatar"></UserPicture>
+            <UserPicture :type="'small'" :url="modalStore.data.user.avatar"
+				:isSelf="false" :status="modalStore.data.user.status" :pictureDotSize="'medium'" />
             <section class="data">
                 <h2>{{ modalStore.data.user.username }}</h2>
 				<section class="buttons_wrap">
@@ -19,17 +20,17 @@
 
 <script setup lang="ts">
 import { useModalStore } from '@/stores/modal'
-import UserPicture from '@/components/avatar/UserPicture.vue';
-import UserInteractions from '@/components/user/UserInteractions.vue';
-import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
-import { useRouter } from 'vue-router';
+import UserPicture from '@/components/avatar/UserPicture.vue'
+import UserInteractions from '@/components/user/UserInteractions.vue'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const modalStore = useModalStore()
 
 const goToDetailedProfile = (id: string) => {
-	router.push({ name: 'main/profile', params: { id } });
-	modalStore.toggleModal()
+	router.push(`/main/profile/${id}`);
+	modalStore.resetState()
 }
 
 </script>

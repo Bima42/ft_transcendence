@@ -31,7 +31,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 
 		const acceptFriendRequest = async (friendName: string): Promise<boolean> => {
 			const data: IFriendship = await patch(
-				`friends/accepte/${friendName}`,
+				`friends/accept/${friendName}`,
 				'Failed to accept friend request',
 				jsonHeaders,
 			)
@@ -57,44 +57,39 @@ export const useFriendStore = defineStore( 'friend', () => {
 		}
 
 		const getAllFriends = async (): Promise<IFriend[]> => {
-			const response = await get(
+			return get(
 				'friends/all',
 				'Failed to get all friends',
 				jsonHeaders,
 			)
-			return await response.json();
+				.then(response => response.json())
 		}
 
-		const getAllWaitingRequests = function() {
-			get(
+		const getAllWaitingRequests = () => {
+			return get(
 				'friends/waiting',
 				'Failed to get all waiting requests',
 				jsonHeaders,
 			)
 				.then(response => response.json())
-				.then(json => {
-					return json;
-				});
 		}
 
-		const isWaitingRequest =  (friendName: string): Promise<boolean> => {
+		const isWaitingRequest = (friendName: string): Promise<boolean> => {
 			return get(
 				`friends/isWaiting/${friendName}`,
 				'Failed to check if waiting request',
 				jsonHeaders,
 			)
-				.then(response => {
-					return response.json();
-				})
+				.then(response => response.json())
 		}
 
-		const getAllPendingRequests = async (): Promise<IUser[]> => {
-			const response = await get(
+		const getAllPendingRequests = (): Promise<IUser[]> => {
+			return get(
 				'friends/pending',
 				'Failed to get all pending requests',
 				jsonHeaders,
 			)
-			return await response.json();
+				.then(response => response.json())
 		}
 
 		const isFriend = (friendName: string): Promise<boolean> => {
@@ -113,32 +108,31 @@ export const useFriendStore = defineStore( 'friend', () => {
 	 *                                                                       *
 	 *************************************************************************/
 
-		const blockUser = async (username: string): Promise<boolean> => {
-			return await post(
+		const blockUser = (username: string): Promise<boolean> => {
+			return post(
 				`friends/block/${username}`,
 				'Failed to block user',
 				jsonHeaders,
 			)
+				.then(response => response.json())
 		}
 
-		const unblockUser = async (username: string): Promise<boolean> => {
-			return await post(
+		const unblockUser = (username: string): Promise<boolean> => {
+			return post(
 				`friends/unblock/${username}`,
 				'Failed to unblock user',
 				jsonHeaders,
 			)
+				.then(response => response.json())
 		}
 
-		const getAllBlocked = function() {
-			get(
+		const getAllBlocked = () => {
+			return get(
 				'friends/blocked',
 				'Failed to get all blocked',
 				jsonHeaders,
 			)
 				.then(response => response.json())
-				.then(json => {
-					return json;
-				});
 		}
 
 		const isBlocked = (username: string): Promise<boolean> => {
@@ -146,9 +140,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				`friends/isBlocked/${username}`,
 				'Failed to check if blocked',
 				jsonHeaders,
-			).then(response => {
-					return response.json();
-			})
+			).then(response => response.json())
 		}
 
 		const canUnblock = (username: string): Promise<boolean> => {
@@ -156,18 +148,15 @@ export const useFriendStore = defineStore( 'friend', () => {
 				`friends/can/unblock/${username}`,
 				'Failed to check if can unblock',
 				jsonHeaders,
-			).then(response => {
-				return response.json();
-			})
+			).then(response => response.json())
 	}
 
-	const getUserInfos = async (username: string): Promise<IUser> => {
-		const response = await get(
+	const getUserInfos = (username: string): Promise<IUser> => {
+		return get(
 			`users/${username}`,
 			'Failed to get user infos',
 		)
-		const json = await response.json()
-		return json as IUser
+			.then(response => response.json())
 	}
 
 		return {

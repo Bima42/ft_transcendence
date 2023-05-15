@@ -1,14 +1,14 @@
 import { getCookie } from 'typescript-cookie';
 
 export const jsonHeaders = new Headers({
-			'Content-Type': 'application/json',
-			'Accept': 'application/json',
-			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
-		})
+	'Content-Type': 'application/json',
+	'Accept': 'application/json',
+	'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+})
 
 export const mediaHeaders = new Headers({
-			'Accept': 'application/json',
-			'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
+	'Accept': 'application/json',
+	'Authorization': `Bearer ${getCookie(import.meta.env.VITE_JWT_COOKIE)}`
 })
 
 export async function post(
@@ -23,14 +23,14 @@ export async function post(
 		mode: 'cors',
 		credentials: 'include',
 		headers: headers,
-  }
+	}
 	if (body)
 		request.body = JSON.stringify(body)
 	else if (file)
 		request.body = file
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
-	if (!response.ok){
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	if (!response.ok) {
 		jsonBody.message ??= message
 		jsonBody.statusCode ??= response.status
 		throw jsonBody
@@ -72,15 +72,26 @@ export async function get(
 export async function del(
 	route: string,
 	message: string,
-	headers: Headers = jsonHeaders
-): Promise<Response> {
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
+	headers: Headers = jsonHeaders,
+	body?: Object,
+): Promise<any> {
+	const request: RequestInit = {
 		method: 'DELETE',
-    headers: headers
-	})
+		mode: 'cors',
+		credentials: 'include',
+		headers: headers,
+	}
+	if (body)
+		request.body = JSON.stringify(body)
+	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	if (!response.ok) {
+		jsonBody.message ??= message
+		throw jsonBody
+	}
+	return jsonBody
 }
 
 /**
@@ -104,12 +115,12 @@ export async function put(
 		mode: 'cors',
 		credentials: 'include',
 		headers: headers,
-  }
+	}
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
-	if (!response.ok){
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	if (!response.ok) {
 		jsonBody.message ??= message
 		throw jsonBody
 	}
@@ -131,10 +142,14 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
-	if (!response.ok){
+	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	if (!response.ok) {
 		jsonBody.message ??= message
 		throw jsonBody
 	}
 	return jsonBody
+}
+
+export function roundValue(value: number, decimals: number): number {
+	return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals)
 }

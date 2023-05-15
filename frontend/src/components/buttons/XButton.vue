@@ -1,6 +1,6 @@
 <template>
     <button :class="props.size">
-        <font-awesome-icon icon="fa-solid fa-xmark"/>
+        <font-awesome-icon icon="fa-solid fa-xmark" color="white"/>
     </button>
 </template>
 

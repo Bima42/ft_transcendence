@@ -18,9 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import FriendList from '@/components/user/FriendList.vue';
-import RequestList from '@/components/user/RequestList.vue';
+import { ref } from 'vue'
+import FriendList from '@/components/user/FriendList.vue'
+import RequestList from '@/components/user/RequestList.vue'
+
 const selectedList = ref('Friends')
 
 const friendListsSources = ref({

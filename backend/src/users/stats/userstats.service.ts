@@ -19,7 +19,8 @@ export class UserStatsService {
 	async getPlayedGamesByUserId(userId: number) {
 		return this.prismaService.userGame.count({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			}
 		});
 	}
@@ -28,7 +29,8 @@ export class UserStatsService {
 		return this.prismaService.userGame.count({
 			where: {
 				userId: userId,
-				win: 1
+				game: { status : "ENDED" },
+				win: 1,
 			}
 		});
 	}
@@ -56,7 +58,8 @@ export class UserStatsService {
 	async getAverageScoreByUserId(userId: number) {
 		const scores = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			},
 			select: {
 				score: true
@@ -75,7 +78,8 @@ export class UserStatsService {
 	async getEloHistoryByUserId(userId: number) {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			},
 			select: {
 				elo: true,
@@ -111,6 +115,21 @@ export class UserStatsService {
 		}
 	}
 
+	async getRankByUserId(userId: number) {
+		const users = await this.prismaService.user.findMany({
+			select: {
+				id: true,
+				elo: true
+			}
+		});
+		users.sort((a, b) => b.elo - a.elo);
+		for (let i = 0; i < users.length; i++) {
+			if (users[i].id === userId)
+				return i + 1;
+		}
+		return 0;
+	}
+
 	async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
 		const { username } = await this.prismaService.user.findUnique({
 			where: {
@@ -125,6 +144,7 @@ export class UserStatsService {
 		const winRate = await this.getWinRateByUserId(userId);
 		const elo = await this.getEloByUserId(userId);
 		const averageScore = await this.getAverageScoreByUserId(userId);
+		const rank = await this.getRankByUserId(userId);
 		return {
 			username: username,
 			playedGames: playedGames,
@@ -132,6 +152,7 @@ export class UserStatsService {
 			winRate: winRate,
 			averageScore: averageScore,
 			elo: elo,
+			rank: rank
 		}
 	}
 
@@ -140,6 +161,7 @@ export class UserStatsService {
 		const stats = [];
 		for (const user of users) {
 			const userStats = await this.getStatsByUserId(user.id);
+			delete userStats.rank;
 			stats.push(userStats);
 		}
 		stats.sort((a, b) => b.elo - a.elo);
@@ -161,7 +183,8 @@ export class UserStatsService {
 	async getMatchHistoryByUserId(userId: number) {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" }
 			},
 			select: {
 				gameId: true,

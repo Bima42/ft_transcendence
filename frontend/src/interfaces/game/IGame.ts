@@ -2,7 +2,7 @@ import type IUser from '@/interfaces/user/IUser';
 
 export default interface IGame {
 	id: number
-  type: GameType
+	type: GameType
 	status: GameStatus
 	createdAt: Date
 	endedAt: Date

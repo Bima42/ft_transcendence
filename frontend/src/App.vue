@@ -1,7 +1,7 @@
 <template>
     <section class="UI-grid">
         <template v-if="route.name !== 'landing page' && route.name !== '2fa'">
-            <Sidebar />
+            <ElSidebar />
             <HeaderLogo />
         </template>
         <TheModal v-if="modalStore.show">
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import CreditLink from '@/components/footers/CreditLink.vue'
-import Sidebar from '@/components/template/Sidebar.vue'
+import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'

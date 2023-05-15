@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PlayerStatsDto } from '../dto/user.dto';
 import { UserStatsService } from './userstats.service';
@@ -34,6 +34,11 @@ export class UserStatsController {
 	@Get('leaderboard')
 	async getLeaderboard(): Promise<PlayerStatsDto[]> {
 		return this.userStatsService.getLeaderboardStats();
+	}
+
+	@Get('rank/:id')
+	async getRankByUserId(@Param('id', ParseIntPipe) userId: number) {
+		return this.userStatsService.getRankByUserId(userId);
 	}
 
 	@Get(':id')

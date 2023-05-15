@@ -14,8 +14,7 @@ export default interface IUser {
 	games: IUserGame[]
 	messages: IChatMessage[]
 	friendRequest: IFriendship[]
-	blockers?: IUser[] // TODO: check if this is needed or not
 	blocked: IUser[]
 }
 
-export type UserStatus = 'ONLINE' | 'OFFLINE'
+export type UserStatus = 'ONLINE' | 'OFFLINE' | 'AWAY' | 'BUSY'
