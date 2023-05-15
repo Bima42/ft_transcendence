@@ -24,7 +24,7 @@ const props = defineProps<{
     selectedChatList: string
 }>()
 
-const toggleChat = async (id: number) => {
+const toggleChat = (id: number) => {
     const castedId = id.toString()
     const response = chatStore.setCurrentChat(castedId)
     if (!response) {

@@ -20,7 +20,7 @@ const friendStore = useFriendStore()
 
 const friendList = ref<IFriend[]>([])
 
-onMounted( async () => {
+onMounted(async () => {
   friendList.value = await friendStore.getAllFriends()
 })
 
