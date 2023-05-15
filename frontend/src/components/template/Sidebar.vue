@@ -2,7 +2,8 @@
     <section class="sidebar_wrap">
         <span v-if="isActive" class="background" @click="outsideClickHandle"></span>
         <button @click="toggleSidebar">
-            <font-awesome-icon icon="fa-bars" />
+            <font-awesome-icon icon="fa-bars" v-if="!isActive"/>
+            <font-awesome-icon icon="fa-xmark" v-if="isActive"/>
         </button>
         <div :class="['sidebar_menu', isActive ? 'active' : '']">
             <div v-for="element in sidebarElement" :id="element.id" @click="handleClick(element.route)">

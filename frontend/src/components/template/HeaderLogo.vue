@@ -1,13 +1,22 @@
 <template>
     <div class="header">
-        <img src="@/assets/img/logo_name.svg" alt="logo" class="logo" @click="router.push('/')">
+        <img v-if="shouldDisplayLogo" src="@/assets/img/logo_name.svg" alt="logo" class="logo" @click="router.push('/')">
     </div>
 </template>
 
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
+import {watch, ref} from 'vue'
+
+const hiddenLogo = [
+    'index',
+]
 
 const router = useRouter()
+const shouldDisplayLogo = ref(true)
+watch(() => router.currentRoute.value.name, () => {
+    shouldDisplayLogo.value = !hiddenLogo.includes(router.currentRoute.value.name)
+})
 </script>
 
 <style scoped lang="scss">
