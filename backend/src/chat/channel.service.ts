@@ -391,7 +391,7 @@ export class ChannelService {
 		})
 
 		// Delete Chat
-		this.prismaService.chat.delete({
+		await this.prismaService.chat.delete({
 			where: { id: chatId },
 		});
 
