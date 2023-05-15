@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import Table from '@/components/table/Table.vue'
+import Table from '@/components/table/TheTable.vue'
 import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';

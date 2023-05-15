@@ -33,7 +33,6 @@ const creators = ref(
         },
     ]
 )
-const props = defineProps<{}>()
 </script>
 
 <style scoped lang="scss">
@@ -48,5 +47,4 @@ const props = defineProps<{}>()
     height: 100%;
     gap: 50px;
 }
-
 </style>

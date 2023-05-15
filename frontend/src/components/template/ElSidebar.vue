@@ -22,11 +22,15 @@ import { useRouter } from 'vue-router'
 import TheModal from '@/components/modal/TheModal.vue'
 import SearchProfileModal from '@/components/modal/SearchProfileModal.vue'
 import { useModalStore } from '@/stores/modal'
+import { useChatStore } from '@/stores/chat';
+import { useGameStore } from '@/stores/game';
 
-const isActive = ref(false)
 const userStore = useUserStore()
 const modalStore = useModalStore()
+const chatStore = useChatStore()
+const gameStore = useGameStore()
 const router = useRouter()
+const isActive = ref(false)
 
 const sidebarElement = ref({
     user: {
@@ -75,6 +79,8 @@ const handleClick = (route: string) => {
     toggleSidebar()
     if (route === 'LOGOUT') {
 		userStore.logout()
+		chatStore.socket.disconnect()
+		gameStore.socket.disconnect()
 		router.push('/')
 	}
     else

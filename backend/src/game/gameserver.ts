@@ -166,7 +166,7 @@ export class GameServer {
       if (!this.disconnectTimeout)
         this.disconnectTimeout = setTimeout(() => { this.onAbortGame("player timeout") }, disconnectTimeoutDuration);
     }
-    if (!this.players[0].data.isReady && !this.players[1].data.isReady)
+    if (!this.players[0].data.isReady && !this.players[1].data.isReady && this.status != 'ENDED')
       this.onAbortGame("both players disconnected");
   }
 
@@ -223,6 +223,8 @@ export class GameServer {
 
   private onGameOver() {
     Logger.log(`Game#${this.roomID}: Gameover`);
+    this.players[0].data.userGame.score = this.scores[0]
+    this.players[1].data.userGame.score = this.scores[1]
     this.players[0].data.userGame.win = this.scores[0] > this.scores[1] ? 1 : 0
     this.players[1].data.userGame.win = this.scores[1] > this.scores[0] ? 1 : 0
     const gameoverData : GameoverDto = {
@@ -390,7 +392,7 @@ export class GameServer {
         userGame: this.players[0].data.userGame,
       },
       {
-        user: users[0],
+        user: users[1],
         userGame: this.players[1].data.userGame,
       },
     ]
