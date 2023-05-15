@@ -2,7 +2,7 @@ import { Logger, UseFilters } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsException, BaseWsExceptionFilter } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
 import { GameService } from './game.service';
-import { JoinQueueDto } from './dto/joinQueueData.dto';
+import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -79,12 +79,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       client.data.user = user;
 
       // client joins its own rooms, so that we send messages to all his devices
-      client.join(user.username);
+      client.join("user" + user.id.toString());
 
   }
 
   handleDisconnect(client: any): any {
-      Logger.log(`Game: ${client.data.user.username}#${client.data.user.id} left`);
+      Logger.log(`Game: ${client.data.user?.username}#${client.data.user?.id} left`);
       this.gameService.onPlayerDisconnect(client);
   }
 
@@ -100,14 +100,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('newJoinQueue')
-  handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
-                  @ConnectedSocket() client: Socket): string {
-    return this.gameService.joinQueue(client, joinQueueData);
+  async handleJoinQueue(@MessageBody() joinQueueData: JoinQueueDto,
+                  @ConnectedSocket() client: Socket): Promise<string> {
+    return await this.gameService.joinQueue(client, joinQueueData);
   }
 
   @SubscribeMessage('abortJoinQueue')
-  handleAbortQueue(@ConnectedSocket() client: Socket) {
-    return this.gameService.quitQueue(client);
+  async handleAbortQueue(@ConnectedSocket() client: Socket) {
+    return await this.gameService.quitQueue(client);
   }
 
   @SubscribeMessage('playerReady')
@@ -119,6 +119,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   inviteSomebodyToPlay(@MessageBody() inviteSettings: InvitePlayer,
     @ConnectedSocket() client: Socket) {
       return this.gameService.inviteSomebodyToPlay(client, inviteSettings);
+  }
+
+  @SubscribeMessage('acceptInvitation')
+  acceptInvitation(@ConnectedSocket() client: Socket,
+				   @MessageBody() inviteSettings: GameSettingsDto) {
+      return this.gameService.acceptInvitation(client, inviteSettings);
+  }
+
+  @SubscribeMessage('declineInviration')
+  declineInvitation(@ConnectedSocket() client: Socket,
+					@MessageBody() inviteSettings: GameSettingsDto) {
+      return this.gameService.declineInvitation(client, inviteSettings);
   }
 // }
 
