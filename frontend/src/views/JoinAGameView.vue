@@ -113,6 +113,10 @@ gameStore.socket.on('connect', () => {
         align-items: center;
         flex-direction: column;
         gap: $medium-gap;
+
+        img {
+            max-width: 250px;
+        }
     }
 }
 </style>
