@@ -5,7 +5,7 @@ import { Game, GameStatus, GameType } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
-import { EndGamePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
+import { EndGamePlayer, InvitePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 
 
@@ -48,6 +48,7 @@ export class GameService {
 					},
 					data: {
 						status: "ABORTED",
+						endedAt: new Date()
 					}
 				})
 
@@ -59,13 +60,15 @@ export class GameService {
 				const players = serv.getEndPlayers()
 
 				// Update stats
-				this.updateUserElo(players[0], players[1]);
+				await this.updateUserElo(players[0], players[1]);
 
-				this.prismaService.game.update({
+				await this.prismaService.game.update({
 					where: { id: serv.game.id, },
-					data: { status: "ENDED", }
+					data: {
+						status: "ENDED",
+						endedAt: new Date(),
+					}
 				})
-				// TODO: Update player score in DB (total victories)
 				serv.cleanupGameDataOnSockets();
 				this.gameServers.splice(this.gameServers.indexOf(serv));
 			}
@@ -80,24 +83,6 @@ export class GameService {
 	 *   - Scale Factor : 400 by default, based on satisfying human perception of ratings
 	 */
 	async updateUserElo(player1: EndGamePlayer, player2: EndGamePlayer) {
-		const k = 32;
-		const scaleFactor = 400;
-
-		const probability1 = 1 / (1 + Math.pow(10, (player2.user.elo - player1.user.elo) / scaleFactor));
-		const probability2 = 1 / (1 + Math.pow(10, (player1.user.elo - player2.user.elo) / scaleFactor));
-
-		player1.user.elo = player1.user.elo + k * (player1.userGame.win - probability1);
-		player2.user.elo = player2.user.elo + k * (player2.userGame.win - probability2);
-
-		// Users
-		await this.prismaService.user.update({
-			where: { id: player1.user.id, },
-			data: { elo: player1.user.elo, }
-		})
-		await this.prismaService.user.update({
-			where: { id: player2.user.id, },
-			data: { elo: player2.user.elo, }
-		})
 
 		// Usergame
 		await this.prismaService.userGame.update({
@@ -116,6 +101,46 @@ export class GameService {
 				elo: player2.user.elo,
 			},
 		})
+
+		const k = 32;
+		const scaleFactor = 400;
+
+		const probability1 = 1 / (1 + Math.pow(10, (player2.user.elo - player1.user.elo) / scaleFactor));
+		const probability2 = 1 / (1 + Math.pow(10, (player1.user.elo - player2.user.elo) / scaleFactor));
+
+		player1.user.elo = Math.round(player1.user.elo + k * (player1.userGame.win - probability1));
+		player2.user.elo = Math.round(player2.user.elo + k * (player2.userGame.win - probability2));
+
+		// Users
+		await this.prismaService.user.update({
+			where: { id: player1.user.id, },
+			data: { elo: player1.user.elo, }
+		})
+		await this.prismaService.user.update({
+			where: { id: player2.user.id, },
+			data: { elo: player2.user.elo, }
+		})
+
+	}
+
+	private async isInQueue(user: User): Promise<boolean> {
+		const existingUserGame = await this.prismaService.userGame.findFirst({
+			where: {
+				game: { status: { in: ["SEARCHING", "INVITING"] } },
+				userId: user.id,
+			}
+		})
+		return !!existingUserGame
+	}
+
+	private async isInGame(user: User): Promise<boolean> {
+		const existingUserGame = await this.prismaService.userGame.findFirst({
+			where: {
+				game: { status: "STARTED" },
+				userId: user.id,
+			}
+		})
+		return !!existingUserGame
 	}
 
 	async joinQueue(socket: Socket, gameSettings: JoinQueueDto): Promise<string> {
@@ -125,15 +150,9 @@ export class GameService {
 			return;
 
 		// Verify if the user already in queue:
-		const existingUserGame = await this.prismaService.userGame.findFirst({
-			where: {
-				game: { status: "SEARCHING" },
-				userId: socket.data.user.id,
-			}
-		})
-		if (existingUserGame) {
+		if (await this.isInQueue(user)) {
 			Logger.log(`Game: ${user.username}#${user.id} is already in a queue !`);
-			return "already in a game !";
+			return "already in queue !";
 		}
 
 		Logger.log(`Game: ${user.username}#${user.id} joined the ${gameSettings.type} queue`);
@@ -166,11 +185,11 @@ export class GameService {
 		try {
 			const matches = await this.prismaService.game.findMany({
 				where: {
-					status: "SEARCHING",
-					users: { some: {userId: user.id}}
+					status: { in: ["SEARCHING", "INVITING"] },
+					users: { some: { userId: user.id } }
 				}
 			})
-			for(const match of matches) {
+			for (const match of matches) {
 				socket.leave("game" + match.id.toString())
 				await this.prismaService.userGame.deleteMany({
 					where: {
@@ -179,11 +198,11 @@ export class GameService {
 					}
 				})
 				await this.prismaService.game.delete({
-					where: { id: match.id}
+					where: { id: match.id }
 				})
 			}
 		} catch (e) {
-			Logger.error(e)
+			// Logger.error(e)
 		}
 		Logger.log(`Game: ${user.username}#${user.id} quit the classic queue`);
 	}
@@ -238,19 +257,14 @@ export class GameService {
 	private async startGame(match: Game, players: Socket[]): Promise<void> {
 		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
-		// Update user informations
-		players[0].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[0].data.user.id}}))
-		players[1].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[1].data.user.id}}))
-
-		// Emit an event to the clients to indicate that a match has been found
-		const gameSettings: GameSettingsDto = {
-			game: match,
-			player1: players[0].data.user,
-			player2: players[1].data.user,
+		for(const sock of players) {
+			Logger.log(`startGame: player = ${sock.data.user.username}`)
 		}
-		this.server.to(players[0].data.user.username)
-			.to(players[1].data.user.username)
-			.emit("matchFound", gameSettings);
+
+		// Update user informations
+		players[0].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[0].data.user.id } }))
+		players[1].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[1].data.user.id } }))
+
 
 		// Update the game status to 'STARTED'
 		await this.prismaService.game.update({
@@ -269,6 +283,16 @@ export class GameService {
 			player.data.isReady = false;
 			player.join(String(match.id))
 		})
+
+		// Emit an event to the clients to indicate that a match has been found
+		const gameSettings: GameSettingsDto = {
+			game: match,
+			player1: players[0].data.user,
+			player2: players[1].data.user,
+		}
+		this.server.to(players[0].data.user.username)
+			.to("game" + match.id.toString())
+			.emit("matchFound", gameSettings);
 	}
 
 	async onPlayerDisconnect(client: Socket) {
@@ -311,36 +335,87 @@ export class GameService {
 
 	async inviteSomebodyToPlay(client: Socket, inviteSettings: InviteSettings) {
 		Logger.log(`Invited to play: ${JSON.stringify(inviteSettings)}`)
+
+		const user: User = client.data.user;
+		if (!user)
+			return;
+
 		// cannot invite if already in a game
-		if (this.getCurrentGame(client.data.user))
-			return;
+		if (await this.isInGame(user))
+			return "You are already in a game !";
 
-		const game = await this.prismaService.game.findFirst({
-			where: {
-				users: { some: { userId: client.data.user.id } },
-				status: { in: ['SEARCHING', 'INVITING', 'STARTED'] }
-			}
-		})
-		if (game) {
-			Logger.log(`Invite: already in a game`)
-			return;
-		}
-
+		// Retrieving other player
 		const otherUser = await this.prismaService.user.findUnique({
 			where: { id: inviteSettings.userId }
 		})
 		if (!otherUser) {
 			Logger.log(`Invite: cannot find other user`)
-			return;
+			return "Cannot find other user";
+		}
+		if (otherUser.status === "OFFLINE") {
+			return `${otherUser.username} is currently offline`
+		} else if (otherUser.status === "BUSY") {
+			return `${otherUser.username} is currently playing`
 		}
 
-		const newGame = await this.createMatch(inviteSettings.gameType, 'INVITING')
+		if (this.isInQueue(user))
+			this.quitQueue(client)
+
+		const match = await this.createMatch(inviteSettings.gameType, 'INVITING')
+		await client.join("game" + match.id.toString())
+		client.data.userGame = await this.createUserGame(match, client.data.user);
+		await this.createUserGame(match, otherUser);
+
 		const settings: GameSettingsDto = {
 			player1: client.data.user,
 			player2: otherUser,
-			game: newGame,
+			game: match,
 		}
-		this.server.to(otherUser.username).emit("gameInvitation", settings)
+		this.server.to("user" + otherUser.id.toString()).emit("gameInvitation", settings)
+		Logger.log(`invite: gameid=${settings.game.id}`)
+
+		return "OK"
 	}
 
+	async acceptInvitation(client: Socket, settings: GameSettingsDto) {
+		const user: User = client.data.user;
+		if (!user)
+			return;
+		Logger.log(`${user.username} accepted the invitation of ${settings.player1.username}`)
+		// Get the updated game in the DB (if invitation is not cancelled)
+		const match = await this.prismaService.game.findFirst({
+			where: {
+				id: settings.game.id
+			}
+		})
+		if (!match) {
+			console.error("invitation: match not found")
+			return
+		}
+		Logger.log(`accept: gameid=${settings.game.id}`)
+		await client.join("game" + match.id.toString())
+		const players = await this.server.in("game" + match.id.toString()).fetchSockets()
+		Logger.log(`sockets in game #${match.id}: ${players.length}`)
+		await this.startGame(match, players as unknown as Socket[])
+	}
+
+	async declineInvitation(client: Socket, settings: GameSettingsDto) {
+		const user: User = client.data.user;
+		if (!user)
+			return;
+		Logger.log(`${user.username} declined the invitation of ${settings.player1.username}`)
+
+		Logger.log(`decline: gameid=${settings.game.id}`)
+		client.to("game" + settings.game.id.toString()).emit("invitationDeclined", settings)
+		await this.prismaService.userGame.deleteMany({
+			where: {
+				gameId: settings.game.id
+			}
+		})
+		await this.prismaService.game.delete({
+			where: {
+				id: settings.game.id
+			}
+		})
+	}
 }

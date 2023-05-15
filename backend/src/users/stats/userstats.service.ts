@@ -19,7 +19,8 @@ export class UserStatsService {
 	async getPlayedGamesByUserId(userId: number) {
 		return this.prismaService.userGame.count({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			}
 		});
 	}
@@ -28,7 +29,8 @@ export class UserStatsService {
 		return this.prismaService.userGame.count({
 			where: {
 				userId: userId,
-				win: 1
+				game: { status : "ENDED" },
+				win: 1,
 			}
 		});
 	}
@@ -56,7 +58,8 @@ export class UserStatsService {
 	async getAverageScoreByUserId(userId: number) {
 		const scores = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			},
 			select: {
 				score: true
@@ -75,7 +78,8 @@ export class UserStatsService {
 	async getEloHistoryByUserId(userId: number) {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" },
 			},
 			select: {
 				elo: true,
@@ -161,7 +165,8 @@ export class UserStatsService {
 	async getMatchHistoryByUserId(userId: number) {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
-				userId: userId
+				userId: userId,
+				game: { status : "ENDED" }
 			},
 			select: {
 				gameId: true,

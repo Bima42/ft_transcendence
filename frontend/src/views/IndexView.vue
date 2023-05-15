@@ -22,6 +22,31 @@
 </template>
 
 <script setup lang="ts">
+import type IGameSettings from '@/interfaces/game/IGameSettings';
+import { useChatStore } from '@/stores/chat';
+import { useGameStore } from '@/stores/game';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+// DO NOT REMOVE: used to initialize the websocket
+const gameStore = useGameStore()
+
+gameStore.socket.on("gameInvitation", (gameSettings: IGameSettings) => {
+	console.log(`Received invitation: ${JSON.stringify(gameSettings)} !`)
+	// TODO: silent refuse if already in a game (already checked on server)
+	const accept = confirm(`Play with ${gameSettings.player1.username} ?`)
+	if (accept) {
+		gameStore.socket.emit("acceptInvitation", gameSettings)
+		console.log("Let's play !")
+		router.push('game')
+	} else {
+		gameStore.socket.emit("declineInvitation", gameSettings)
+		console.log("Maybe not now")
+	}
+})
+// DO NOT REMOVE` used to initialize the websocket
+const chatStore = useChatStore()
+
 </script>
 
 <style scoped lang="scss">

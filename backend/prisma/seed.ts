@@ -191,7 +191,7 @@ async function generateGames() {
 	if (games.length)
 		return
 
-	for (let index = 1; index < 100; index++) {
+	for (let index = 1; index < 5; index++) {
 		const game: Prisma.GameUncheckedCreateInput = {
 			type: (index % 2 == 0 ? 'CLASSIC' : 'CUSTOM'),
 			status: 'ENDED',

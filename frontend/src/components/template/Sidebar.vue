@@ -16,9 +16,13 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import { useChatStore } from '@/stores/chat';
+import { useGameStore } from '@/stores/game';
 
 const isActive = ref(false)
 const userStore = useUserStore()
+const chatStore = useChatStore()
+const gameStore = useGameStore()
 const router = useRouter()
 
 const sidebarElement = ref({
@@ -64,6 +68,8 @@ const handleClick = (route: string) => {
     toggleSidebar()
     if (route === 'LOGOUT') {
 		userStore.logout()
+		chatStore.socket.disconnect()
+		gameStore.socket.disconnect()
 		router.push('/')
 	}
     else

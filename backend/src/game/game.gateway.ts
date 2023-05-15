@@ -2,7 +2,7 @@ import { Logger, UseFilters } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect, ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, WsException, BaseWsExceptionFilter } from '@nestjs/websockets'
 import { Socket, Server } from 'socket.io'
 import { GameService } from './game.service';
-import { JoinQueueDto } from './dto/joinQueueData.dto';
+import { GameSettingsDto, JoinQueueDto } from './dto/joinQueueData.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -79,7 +79,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       client.data.user = user;
 
       // client joins its own rooms, so that we send messages to all his devices
-      client.join(user.username);
+      client.join("user" + user.id.toString());
 
   }
 
@@ -119,6 +119,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   inviteSomebodyToPlay(@MessageBody() inviteSettings: InvitePlayer,
     @ConnectedSocket() client: Socket) {
       return this.gameService.inviteSomebodyToPlay(client, inviteSettings);
+  }
+
+  @SubscribeMessage('acceptInvitation')
+  acceptInvitation(@ConnectedSocket() client: Socket,
+				   @MessageBody() inviteSettings: GameSettingsDto) {
+      return this.gameService.acceptInvitation(client, inviteSettings);
+  }
+
+  @SubscribeMessage('declineInviration')
+  declineInvitation(@ConnectedSocket() client: Socket,
+					@MessageBody() inviteSettings: GameSettingsDto) {
+      return this.gameService.declineInvitation(client, inviteSettings);
   }
 // }
 
