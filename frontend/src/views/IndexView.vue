@@ -12,13 +12,16 @@
         <router-link to="/main/profile" class="slide_right">
             Profile
         </router-link>
+        <router-link to="/main/friends" class="slide_right">
+            Friends
+        </router-link>
+        <router-link to="/main/leaderboard" class="slide_right">
+            Leaderboard
+        </router-link>
     </section>
 </template>
 
 <script setup lang="ts">
-import {defineProps} from 'vue'
-
-const props = defineProps<{}>()
 </script>
 
 <style scoped lang="scss">
