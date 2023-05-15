@@ -1,11 +1,12 @@
 <template>
     <section class="sidebar_wrap">
         <span v-if="isActive" class="background" @click="outsideClickHandle"></span>
-		<button class="search_button" @click="searchProfile">
-			<font-awesome-icon icon="fa-magnifying-glass" />
-		</button>
-        <button class="sidebar_button" @click="toggleSidebar">
-            <font-awesome-icon icon="fa-bars" />
+	<button class="search_button" @click="searchProfile">
+		<font-awesome-icon icon="fa-magnifying-glass" />
+	</button>        
+	<button @click="toggleSidebar">
+            <font-awesome-icon icon="fa-bars" v-if="!isActive"/>
+            <font-awesome-icon icon="fa-xmark" v-if="isActive"/>
         </button>
         <div :class="['sidebar_menu', isActive ? 'active' : '']">
             <div v-for="(element, index) in sidebarElement" :id="element.id" @click="handleClick(element.route)" :key="index">

@@ -1,6 +1,7 @@
 @import "theme/_grid.scss";
 @import "theme/_theme.scss";
 @import "theme/_variables.scss";
+@import "theme/_fonts.scss";
 
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
@@ -81,7 +82,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 h1, h2, h3, h4, h5, h6, p, a {
-  font-family: 'Karla', sans-serif;
+  font-family: 'Martian Mono', sans-serif;
   font-weight: 700;
 }
 
