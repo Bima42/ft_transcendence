@@ -40,7 +40,7 @@ const showUserProfile = async (username: string) => {
 
 <style scoped lang="scss">
 .element_line {
-	padding: 15px;
+	padding: 10px 30px 10px 30px;
 
 	&:hover {
 		cursor: pointer;

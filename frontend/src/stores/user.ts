@@ -215,6 +215,15 @@ export const useUserStore = defineStore('user', () => {
 		).then(response => response.json())
 	}
 
+	const getUserInfosByUsername = (username: string): Promise<IUser> => {
+		return get(
+			`users/${username}`,
+			'Failed to get user infos',
+			jsonHeaders,
+		)
+			.then(response => response.json())
+	}
+
 	return {
 		user,
 		resetState,
@@ -235,6 +244,7 @@ export const useUserStore = defineStore('user', () => {
 		getHighestElo,
 		getMatchHistory,
 		getRank,
-		getUserInfos
+		getUserInfos,
+		getUserInfosByUsername
 	}
 });

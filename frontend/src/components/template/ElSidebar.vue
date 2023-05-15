@@ -1,11 +1,14 @@
 <template>
     <section class="sidebar_wrap">
         <span v-if="isActive" class="background" @click="outsideClickHandle"></span>
-        <button @click="toggleSidebar">
+		<button class="search_button" @click="searchProfile">
+			<font-awesome-icon icon="fa-magnifying-glass" />
+		</button>
+        <button class="sidebar_button" @click="toggleSidebar">
             <font-awesome-icon icon="fa-bars" />
         </button>
         <div :class="['sidebar_menu', isActive ? 'active' : '']">
-            <div v-for="element in sidebarElement" :id="element.id" @click="handleClick(element.route)">
+            <div v-for="(element, index) in sidebarElement" :id="element.id" @click="handleClick(element.route)" :key="index">
                 <font-awesome-icon :icon="element.icon" :id="element.id"/>
             </div>
         </div>
@@ -16,9 +19,13 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import TheModal from '@/components/modal/TheModal.vue';
+import SearchProfileModal from '@/components/modal/SearchProfileModal.vue';
+import { useModalStore } from '@/stores/modal';
 
 const isActive = ref(false)
 const userStore = useUserStore()
+const modalStore = useModalStore()
 const router = useRouter()
 
 const sidebarElement = ref({
@@ -56,6 +63,10 @@ const sidebarElement = ref({
 
 const toggleSidebar = () => {
     isActive.value = !isActive.value
+}
+
+const searchProfile = () => {
+	modalStore.loadAndDisplay(TheModal, SearchProfileModal, {})
 }
 
 const handleClick = (route: string) => {
@@ -97,19 +108,26 @@ const outsideClickHandle = () => {
         background-color: transparent;
     }
 
-    button {
-        position: absolute;
-        top: 18px;
-        right: 18px;
-        background-color: transparent;
-        border: 0;
-        transition: background-color 0.5s ease-in-out;
-        cursor: pointer;
+	button {
+		position: absolute;
+		background-color: transparent;
+		border: 0;
+		transition: background-color 0.5s ease-in-out;
+		cursor: pointer;
+		top: 18px;
 
-        svg {
-            font-size: 30px;
-            color: $tertiary;
-        }
+		svg {
+			font-size: 30px;
+			color: $tertiary;
+		}
+	}
+
+	.search_button {
+		right: 70px;
+	}
+
+	.sidebar_button {
+        right: 18px;
     }
 
     .sidebar_menu {
