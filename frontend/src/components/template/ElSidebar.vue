@@ -19,9 +19,9 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import TheModal from '@/components/modal/TheModal.vue';
-import SearchProfileModal from '@/components/modal/SearchProfileModal.vue';
-import { useModalStore } from '@/stores/modal';
+import TheModal from '@/components/modal/TheModal.vue'
+import SearchProfileModal from '@/components/modal/SearchProfileModal.vue'
+import { useModalStore } from '@/stores/modal'
 
 const isActive = ref(false)
 const userStore = useUserStore()

@@ -20,10 +20,10 @@
 
 <script setup lang="ts">
 import { useModalStore } from '@/stores/modal'
-import UserPicture from '@/components/avatar/UserPicture.vue';
-import UserInteractions from '@/components/user/UserInteractions.vue';
-import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
-import { useRouter } from 'vue-router';
+import UserPicture from '@/components/avatar/UserPicture.vue'
+import UserInteractions from '@/components/user/UserInteractions.vue'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const modalStore = useModalStore()
