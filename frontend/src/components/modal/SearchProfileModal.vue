@@ -19,6 +19,8 @@ const modalStore = useModalStore()
 
 const router = useRouter()
 const searchedProfile = ref('')
+
+//TODO: add error handling
 const searchProfile = () => {
 	userStore.getUserInfosByUsername(searchedProfile.value).then((res) => {
 		if (res.id === userStore.user?.id)
