@@ -50,14 +50,22 @@ export async function get(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders
-): Promise<Response> {
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
-		method: 'GET',
-		headers: headers,
-	})
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+) {
+	try {
+		const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
+			method: 'GET',
+			headers: headers,
+		})
+		const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message }})
+		if (!response.ok){
+			jsonBody.message ??= message
+			throw jsonBody
+		}
+		return jsonBody
+	}
+	catch(e) {
+		throw { statusCode: 500, message: message };
+	}
 }
 
 /**

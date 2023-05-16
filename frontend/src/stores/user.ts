@@ -152,13 +152,12 @@ export const useUserStore = defineStore('user', () => {
 		})
 	}
 
-	const getUserStats = (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
+	const getUserStats = async (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
 		return get(
 			`users/stats/${user_id}`,
 			'Failed to get user stats',
 			jsonHeaders,
 		)
-			.then(res => res.json())
 	}
 
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
@@ -166,37 +165,33 @@ export const useUserStore = defineStore('user', () => {
 			'users/stats/leaderboard',
 			'Failed to get leaderboard datas',
 			jsonHeaders,
-		).then(res => res.json())
-		.catch(() => [])
+		)
 		users.forEach((el) => { delete el.wonGames})
 		return users
 	}
 
-	const getEloHistory = (user_id: number | undefined = user.value?.id) => {
+	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
 		return get(
 			`users/stats/elo/history/${user_id}`,
 			'Failed to get elo history',
 			jsonHeaders,
 		)
-			.then(res => res.json())
 	}
 
 	const getHighestElo = async () => {
-		const response = await get(
+		return get(
 			`users/stats/elo/highest`,
 			'Failed to get highest elo',
 			jsonHeaders,
 		)
-		return response.json()
 	}
 
 	const getMatchHistory = async (user_id: number | undefined = user.value?.id): Promise<IMatchHistory[]> => {
-		const response = await get(
+		return get(
 			`users/stats/matchHistory/${user_id}`,
 			'Failed to get match history',
 			jsonHeaders,
 		)
-		return response.json()
 	}
 
 	const getRank = async (user_id: number | undefined = user.value?.id): Promise<number> => {
@@ -204,24 +199,23 @@ export const useUserStore = defineStore('user', () => {
 			`users/stats/rank/${user_id}`,
 			'Failed to get rank',
 			jsonHeaders,
-		).then(response => response.json())
+		)
 	}
 
-	const getUserInfos = (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
+	const getUserInfos = async (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
 		return get(
 			`users/id/${user_id}`,
 			'Failed to get user infos',
 			jsonHeaders,
-		).then(response => response.json())
+		)
 	}
 
-	const getUserInfosByUsername = (username: string): Promise<IUser> => {
+	const getUserInfosByUsername = async (username: string): Promise<IUser> => {
 		return get(
 			`users/${username}`,
 			'Failed to get user infos',
 			jsonHeaders,
 		)
-			.then(response => response.json())
 	}
 
 	return {
