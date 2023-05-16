@@ -2,7 +2,7 @@
 	<LineChart v-if="userEloHistory" :userEloHistory="userEloHistory" />
 	<div class="match_history score_card">
 		<h2>Match History</h2>
-		<Table v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" :rowsPerPage="4" />
+		<TheTable v-if="userMatchHistory" :data="userMatchHistory" :headers="tableHeaders" :rowsPerPage="4" />
 	</div>
 </template>
 
@@ -13,7 +13,7 @@ import { ref, watch } from 'vue';
 import type IUserStats from '@/interfaces/user/IUserStats';
 import type IEloHistory from '@/interfaces/user/IEloHistory';
 import type IMatchHistory from '@/interfaces/user/IMatchHistory';
-import Table from '@/components/table/TheTable.vue';
+import TheTable from '@/components/table/TheTable.vue';
 import type IUser from '@/interfaces/user/IUser';
 
 const props = defineProps<{
@@ -62,8 +62,8 @@ const tableHeaders = {
 <style scoped lang="scss">
 .match_history {
 	display: flex;
+    max-width: 600px;
 	width: 100%;
-	height: 100%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;

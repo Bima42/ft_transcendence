@@ -3,7 +3,7 @@
         <span v-if="isActive" class="background" @click="outsideClickHandle"></span>
 	<button class="search_button" @click="searchProfile">
 		<font-awesome-icon icon="fa-magnifying-glass" />
-	</button>        
+	</button>
 	<button @click="toggleSidebar">
             <font-awesome-icon icon="fa-bars" v-if="!isActive"/>
             <font-awesome-icon icon="fa-xmark" v-if="isActive"/>
@@ -130,7 +130,7 @@ const outsideClickHandle = () => {
 	}
 
 	.search_button {
-		right: 70px;
+		right: 40px;
 	}
 
 	.sidebar_button {

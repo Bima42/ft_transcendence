@@ -96,13 +96,14 @@ loadUser()
     }
 
     .scores_wrap {
+        display: flex;
         flex: 1;
         width: 100%;
 		height: 100%;
-        display: flex;
         align-items: center;
         justify-content: center;
 		gap: $medium_gap;
+        flex-wrap: wrap;
     }
 }
 </style>

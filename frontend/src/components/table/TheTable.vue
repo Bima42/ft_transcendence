@@ -14,7 +14,7 @@
 			</tr>
 			</tbody>
 		</table>
-		<div class="table_buttons">
+		<div class="table_buttons" v-if="totalPages > 0">
 			<ButtonCustom @click="prevPage" :disabled="currentPage === 1">Prev</ButtonCustom>
 			<span>Page {{ currentPage }} of {{ totalPages }}</span>
 			<ButtonCustom @click="nextPage" :disabled="currentPage === totalPages">Next</ButtonCustom>
