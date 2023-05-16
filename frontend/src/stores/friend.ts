@@ -15,7 +15,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 		blocked.value = await getAllBlocked();
 	}
 
-	const resetStoreDatas = () => {
+	const resetState = () => {
 		friends.value = [];
 		blocked.value = [];
 	}
@@ -36,11 +36,13 @@ export const useFriendStore = defineStore( 'friend', () => {
 		}
 
 		const removeFriend = async (friendName: string): Promise<boolean> => {
-			return post(
+			await post(
 				`friends/remove/${friendName}`,
 				'Failed to remove friend',
 				jsonHeaders,
 			)
+			await updateStoreDatas();
+			return true;
 		}
 
 		const acceptFriendRequest = async (friendName: string): Promise<boolean> => {
@@ -49,6 +51,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to accept friend request',
 				jsonHeaders,
 			)
+			await updateStoreDatas();
 			return data.status === 'ACCEPTED';
 		}
 
@@ -108,22 +111,24 @@ export const useFriendStore = defineStore( 'friend', () => {
 	 *                                                                       *
 	 *************************************************************************/
 
-		const blockUser = (username: string): Promise<boolean> => {
-			return post(
+		const blockUser = async (username: string): Promise<boolean> => {
+			await post(
 				`friends/block/${username}`,
 				'Failed to block user',
 				jsonHeaders,
 			)
-				.then(response => response.json())
+			await updateStoreDatas();
+			return true;
 		}
 
-		const unblockUser = (username: string): Promise<boolean> => {
-			return post(
+		const unblockUser = async (username: string): Promise<boolean> => {
+			await post(
 				`friends/unblock/${username}`,
 				'Failed to unblock user',
 				jsonHeaders,
 			)
-				.then(response => response.json())
+			await updateStoreDatas();
+			return true;
 		}
 
 		const getAllBlocked = async () => {
@@ -158,8 +163,10 @@ export const useFriendStore = defineStore( 'friend', () => {
 	}
 
 		return {
+			friends,
+			blocked,
 			updateStoreDatas,
-			resetStoreDatas,
+			resetState,
 			addFriend,
 			removeFriend,
 			acceptFriendRequest,

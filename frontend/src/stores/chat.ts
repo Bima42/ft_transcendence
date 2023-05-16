@@ -52,7 +52,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			return false
 		}
 		const url = 'chat/rooms/' + chatId;
-		get(url, 'Cannot load channel').then((newChannel) => {
+		await get(url, 'Cannot load channel').then((newChannel) => {
 			currentChat.value = newChannel;
 			isChatOpen.value = true;
 			getMessages()
@@ -80,11 +80,14 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	}
 
 	// Get the message history
-	const getMessages = async function () {
-		if (!currentChat.value) return
+	const getMessages = async function (): Promise<boolean> {
+		if (!currentChat.value) return false
+
 		isChatOpen.value = true;
+
 		const url = 'chat/rooms/' + currentChat.value.id + '/messages';
 		currentChat.value.messages = await get(url, 'Failed to get messages')
+		return true
 	}
 	const retrievePublicChats = async function (): Promise<boolean> {
 		await get('chat/rooms/public', 'Cannot load public channels')

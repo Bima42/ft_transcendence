@@ -18,7 +18,7 @@ import { defineProps } from 'vue'
 import { useChatStore } from '@/stores/chat'
 
 const chatStore = useChatStore();
-await chatStore.updateStore();
+chatStore.updateStore();
 
 const props = defineProps<{
     selectedChatList: string

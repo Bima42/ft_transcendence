@@ -26,8 +26,13 @@ import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useChatStore } from '@/stores/chat';
 import { useGameStore } from '@/stores/game';
 import { useRouter } from 'vue-router';
+import { useFriendStore } from '@/stores/friend';
 
 const router = useRouter()
+
+const friendStore = useFriendStore()
+friendStore.updateStoreDatas()
+
 // DO NOT REMOVE: used to initialize the websocket
 const gameStore = useGameStore()
 

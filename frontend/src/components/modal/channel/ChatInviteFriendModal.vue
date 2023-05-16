@@ -37,17 +37,12 @@ const modalStore = useModalStore()
 const friendStore = useFriendStore()
 const chatStore = useChatStore()
 const selectedFriend = ref<IFriend | null>()
-const friends = ref<IFriend[]>([])
 
 const availableFriends = computed(() => {
     const allUsersID = Array.from(chatStore.currentChat!.users, x => x.user.id)
-    return friends.value.filter((friend) => {
+    return friendStore.friends.filter((friend) => {
         return !allUsersID?.includes(friend.id)
     })
-})
-
-friendStore.getAllFriends().then((res) => {
-    friends.value = res
 })
 
 const handleBack = () => {

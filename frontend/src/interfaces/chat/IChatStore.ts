@@ -21,7 +21,7 @@ export default interface IChatStore {
 	retrievePublicChats: () => Promise<boolean>;
 	retrieveWhispers: () => Promise<boolean>;
 	getRoleFromUserId: (userId: number) => UserChatRoleEnum;
-	getMessages: () => void;
+	getMessages: () => Promise<boolean>;
 	resetState: () => void;
 	deleteChannel: (chatId: number) => Promise<boolean>;
 	createChannel: (name: string, type: string, password?: string) => Promise<IChat>;

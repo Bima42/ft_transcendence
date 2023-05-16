@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', () => {
 		localStorage.removeItem('localUser');
 	}
 
-	const setState =  (newUser: IUser) => {
+	const setState = (newUser: IUser) => {
 		user.value = newUser
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
@@ -31,22 +31,17 @@ export const useUserStore = defineStore('user', () => {
 		return get(
 			'auth/login',
 			'Failed to login',
-		)
-			.then(response => response.json())
-			.then(json => {
-				user.value = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
-				return true
-			})
-			.catch(err => {
-				alert(err)
-				return false
-			})
+		).then(json => {
+			user.value = json as IUser
+			localStorage.setItem('localUser', JSON.stringify(user.value))
+			return true
+		}).catch(err => {
+			alert(err)
+		})
 	}
 
-	const logout =  () : boolean => {
+	const logout = (): boolean => {
 		get(`auth/logout`, 'Failed to logout')
-		.catch(e => console.log(e.message))
 		resetState()
 		return true
 	}
@@ -66,10 +61,10 @@ export const useUserStore = defineStore('user', () => {
 			jsonHeaders,
 			{twoFA: status}
 		)
-		.then((newUser: IUser) => {
-			user.value = newUser
-			localStorage.setItem('localUser', JSON.stringify(user.value))
-		})
+			.then((newUser: IUser) => {
+				user.value = newUser
+				localStorage.setItem('localUser', JSON.stringify(user.value))
+			})
 	}
 
 	const verifyTwoFaCode = async (code: string): Promise<boolean> => {
@@ -85,16 +80,16 @@ export const useUserStore = defineStore('user', () => {
 		return json.twoFAAuthenticated
 	}
 
-  const updateInfos = async (infos: IUserUpdate) : Promise<IUser | null> => {
-	// Yes, we have to use await and then, not sure why
-    patch(`users/me`, "cannot update username", jsonHeaders, infos)
-    .then((newUser: IUser) => {
-      user.value = newUser
-      localStorage.setItem('localUser', JSON.stringify(user.value))
-    })
+	const updateInfos = async (infos: IUserUpdate): Promise<IUser | null> => {
+		// Yes, we have to use await and then, not sure why
+		patch(`users/me`, "cannot update username", jsonHeaders, infos)
+			.then((newUser: IUser) => {
+				user.value = newUser
+				localStorage.setItem('localUser', JSON.stringify(user.value))
+			})
 
-    return user.value
-  }
+		return user.value
+	}
 
 	const uploadAvatar = (file: FormData) => {
 		post(
@@ -104,7 +99,6 @@ export const useUserStore = defineStore('user', () => {
 			undefined,
 			file
 		)
-			.then(response => response.json())
 			.then(json => {
 				const datas = json as IUser
 				const avatar = datas.avatar
@@ -166,7 +160,9 @@ export const useUserStore = defineStore('user', () => {
 			'Failed to get leaderboard datas',
 			jsonHeaders,
 		)
-		users.forEach((el) => { delete el.wonGames})
+		users.forEach((el) => {
+			delete el.wonGames
+		})
 		return users
 	}
 

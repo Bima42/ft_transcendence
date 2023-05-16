@@ -32,7 +32,6 @@ let side = ref(computed(() => {
 }))
 const toggleUserInformations = async (author: IAuthor) => {
     const user = await get(`users/id/${author.id}`, 'Cannot get user details')
-        .then((res) => res.json())
     modalStore.loadAndDisplay(TheModal, UserInformations, {user: user})
 }
 </script>
