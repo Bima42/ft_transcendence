@@ -190,13 +190,11 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const getRank = (user_id: number | undefined = user.value?.id): Promise<number> => {
-		console.log('id', user_id)
 		return get(
 			`users/stats/rank/${user_id}`,
 			'Failed to get rank',
 			jsonHeaders,
 		).then((rank: number) => {
-			console.log(rank)
 			return rank
 		})
 	}

@@ -34,6 +34,7 @@ FROM base AS dev
 
 ENV NODE_ENV="development"
 
+USER node
 CMD ["yarn", "start:dev"]
 
 ############# PRODUCTION ###############

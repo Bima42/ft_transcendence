@@ -36,19 +36,32 @@ friendStore.updateStoreDatas()
 // DO NOT REMOVE: used to initialize the websocket
 const gameStore = useGameStore()
 
-gameStore.socket.on("gameInvitation", (gameSettings: IGameSettings) => {
-	console.log(`Received invitation: ${JSON.stringify(gameSettings)} !`)
+let receivedInvite = false
+const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
+	console.log(`Received invitation from ${gameSettings.player1.username} !`)
+	if (receivedInvite)
+		return
+	receivedInvite = true
 	// TODO: silent refuse if already in a game (already checked on server)
-	const accept = confirm(`Play with ${gameSettings.player1.username} ?`)
-	if (accept) {
-		gameStore.socket.emit("acceptInvitation", gameSettings)
-		console.log("Let's play !")
-		router.push('game')
-	} else {
-		gameStore.socket.emit("declineInvitation", gameSettings)
-		console.log("Maybe not now")
-	}
-})
+	const gameType = gameSettings.game.type
+	setTimeout(() => {
+		const accept = confirm(`Play a ${gameSettings.game.type.toLowerCase()} game with ${gameSettings.player1.username} ?`)
+		if (accept) {
+			gameStore.socket.emit("acceptInvitation", gameSettings)
+			console.log("Let's play !")
+			router.push('game')
+		} else {
+			console.log("Maybe not now")
+			gameStore.socket.emit("declineInvitation", gameSettings)
+		}
+		receivedInvite = false
+
+	}, 100);
+	gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
+}
+
+gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
+
 // DO NOT REMOVE` used to initialize the websocket
 const chatStore = useChatStore()
 

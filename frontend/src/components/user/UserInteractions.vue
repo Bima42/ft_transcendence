@@ -19,12 +19,14 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 import type IUser from '@/interfaces/user/IUser';
 import { useRouter } from 'vue-router';
 import type IGameSettings from '@/interfaces/game/IGameSettings';
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
 	invitePlay?: boolean,
 	targetUser?: IUser,
 }>()
 
+const userStore = useUserStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 const gameStore = useGameStore()
@@ -65,26 +67,20 @@ const blockOrUnblockUser = async () => {
 
 const inviteToPlay = async () => {
 	console.log(`invite ${user.value.username} to play`)
-	const invite = {
-		gameType: "CLASSIC",
-		userId: user.value.id,
+	if (!userStore.user || !user.value)
+		return;
+
+	gameStore.currentGame = {
+		game: {
+			type: 'CLASSIC',
+			status: "INVITING",
+			users: [userStore.user, user]
+		},
+		player1: userStore.user,
+		player2: user,
 	}
-	gameStore.socket.once("matchFound", (_gameSettings: IGameSettings) => {
-		console.log("Invitation accepted !")
-		router.push(`game`)
-	})
-	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
-		gameStore.socket.off("matchFound")
-		alert(`${gameSettings.player2.username} refused your invitation.`)
-	})
-	gameStore.socket.emit("invitePlayer", invite, (res: string) => {
-		if (res === "OK") {
-			modalStore.resetState()
-			router.push('joinGame')
-		} else {
-			alert(res);
-		}
-	})
+	modalStore.resetState()
+	router.push('joinGame')
 }
 
 </script>

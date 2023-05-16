@@ -42,15 +42,19 @@ export class GameService {
 		this.gameServers.forEach(async (serv) => {
 			if (serv.getStatus() == "ABORTED") {
 				Logger.log(`Game #${serv.game.id} written as aborted in DB`);
-				await this.prismaService.game.update({
-					where: {
-						id: serv.game.id,
-					},
-					data: {
-						status: "ABORTED",
-						endedAt: new Date()
-					}
-				})
+				try {
+					await this.prismaService.game.update({
+						where: {
+							id: serv.game.id,
+						},
+						data: {
+							status: "ABORTED",
+							endedAt: new Date()
+						}
+					})
+				} catch {
+					Logger.error(`Game #${serv.game.id} was already deleted`)
+				}
 
 				serv.cleanupGameDataOnSockets();
 				this.gameServers.splice(this.gameServers.indexOf(serv));
@@ -60,15 +64,20 @@ export class GameService {
 				const players = serv.getEndPlayers()
 
 				// Update stats
-				await this.updateUserElo(players[0], players[1]);
+				try {
+					await this.updateUserElo(players[0], players[1]);
 
-				await this.prismaService.game.update({
-					where: { id: serv.game.id, },
-					data: {
-						status: "ENDED",
-						endedAt: new Date(),
-					}
-				})
+					await this.prismaService.game.update({
+						where: { id: serv.game.id, },
+						data: {
+							status: "ENDED",
+							endedAt: new Date(),
+						}
+					})
+				} catch {
+					Logger.error(`Game #${serv.game.id} was already deleted`)
+				}
+
 				serv.cleanupGameDataOnSockets();
 				this.gameServers.splice(this.gameServers.indexOf(serv));
 			}
@@ -257,10 +266,6 @@ export class GameService {
 	private async startGame(match: Game, players: Socket[]): Promise<void> {
 		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
-		for(const sock of players) {
-			Logger.log(`startGame: player = ${sock.data.user.username}`)
-		}
-
 		// Update user informations
 		players[0].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[0].data.user.id } }))
 		players[1].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[1].data.user.id } }))
@@ -281,7 +286,7 @@ export class GameService {
 			player.data.gameServer = gameServer;
 			player.data.game = match;
 			player.data.isReady = false;
-			player.join(String(match.id))
+			player.join("game" + String(match.id))
 		})
 
 		// Emit an event to the clients to indicate that a match has been found
@@ -362,9 +367,7 @@ export class GameService {
 			this.quitQueue(client)
 
 		const match = await this.createMatch(inviteSettings.gameType, 'INVITING')
-		await client.join("game" + match.id.toString())
 		client.data.userGame = await this.createUserGame(match, client.data.user);
-		await this.createUserGame(match, otherUser);
 
 		const settings: GameSettingsDto = {
 			player1: client.data.user,
@@ -372,9 +375,32 @@ export class GameService {
 			game: match,
 		}
 		this.server.to("user" + otherUser.id.toString()).emit("gameInvitation", settings)
-		Logger.log(`invite: gameid=${settings.game.id}`)
+		await client.join("game" + match.id.toString())
+
+		Logger.log(`${user.username}#${user.id} invited ${otherUser.username}#${otherUser.id} to play a ${match.type} game`)
 
 		return "OK"
+	}
+
+	async cancelInvitation(client: Socket, settings: GameSettingsDto) {
+		const user: User = client.data.user;
+		if (!user)
+			return;
+		Logger.log(`${user.username} cancelled the invitation to ${settings.player2.username}`)
+		try {
+			await this.prismaService.userGame.deleteMany({
+				where: {
+					gameId: settings.game.id
+				}
+			})
+			await this.prismaService.game.delete({
+				where: {
+					id: settings.game.id
+				}
+			})
+		} catch (error) {
+		}
+		// TODO: send a message to target user (unless we still use alert in frontend)
 	}
 
 	async acceptInvitation(client: Socket, settings: GameSettingsDto) {
@@ -382,20 +408,25 @@ export class GameService {
 		if (!user)
 			return;
 		Logger.log(`${user.username} accepted the invitation of ${settings.player1.username}`)
+
+
 		// Get the updated game in the DB (if invitation is not cancelled)
 		const match = await this.prismaService.game.findFirst({
 			where: {
 				id: settings.game.id
 			}
 		})
-		if (!match) {
-			console.error("invitation: match not found")
-			return
+		// Sometimes the game is already cancelled or started
+		if (!match || match.status != "INVITING") {
+			Logger.error(`game #${match.id}: match not found`)
+			return "Match not found"
 		}
-		Logger.log(`accept: gameid=${settings.game.id}`)
+		client.data.userGame = await this.createUserGame(match, user);
 		await client.join("game" + match.id.toString())
+
+		// Get all sockets in game room:
 		const players = await this.server.in("game" + match.id.toString()).fetchSockets()
-		Logger.log(`sockets in game #${match.id}: ${players.length}`)
+
 		await this.startGame(match, players as unknown as Socket[])
 	}
 
@@ -405,17 +436,19 @@ export class GameService {
 			return;
 		Logger.log(`${user.username} declined the invitation of ${settings.player1.username}`)
 
-		Logger.log(`decline: gameid=${settings.game.id}`)
 		client.to("game" + settings.game.id.toString()).emit("invitationDeclined", settings)
-		await this.prismaService.userGame.deleteMany({
-			where: {
-				gameId: settings.game.id
+		try {
+			await this.prismaService.userGame.deleteMany({
+				where: {
+					gameId: settings.game.id
+				}
+			})
+			await this.prismaService.game.delete({
+				where: {
+					id: settings.game.id
+				}
+			})
 			}
-		})
-		await this.prismaService.game.delete({
-			where: {
-				id: settings.game.id
-			}
-		})
+		catch {}
 	}
 }

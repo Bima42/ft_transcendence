@@ -27,6 +27,8 @@ async function launch(containerId: any) {
   const config = {
     type: Phaser.AUTO,
     scale: { // See doc here: https://newdocs.phaser.io/docs/3.55.2/Phaser.Scale.ScaleManager
+      width: 800,
+      height: 600,
       parent: "gameContainer",
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,

@@ -12,6 +12,35 @@ export const useGameStore = defineStore('game', () => {
 
   let currentGame = ref<IGameSettings | null>(null);
 
+  const waitForInvitation = function () {
 
-  return { socket, currentGame }
+  }
+
+  const stopWaitingForInvitation = function () {
+
+  }
+
+  const acceptInvitation = function () {
+
+  }
+
+  const declineInvitation = function () {
+
+  }
+
+  const resetStore = function () {
+
+  }
+
+
+
+  return {
+	socket,
+	currentGame,
+	waitForInvitation,
+	stopWaitingForInvitation,
+	acceptInvitation,
+	declineInvitation,
+	resetStore,
+  }
 })

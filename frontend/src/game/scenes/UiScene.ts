@@ -101,7 +101,7 @@ export default class UiScene extends Phaser.Scene {
   }
 
   onPlayerDisconnect() {
-      console.log("Player disconnected");
+      console.log(`other player ${this.otherPlayer.username} disconnected`);
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
   }
