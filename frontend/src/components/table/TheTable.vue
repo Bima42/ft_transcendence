@@ -14,7 +14,7 @@
 			</tr>
 			</tbody>
 		</table>
-		<div class="table_buttons" v-if="totalPages > 0">
+		<div class="table_buttons" v-if="totalPages > 1">
 			<ButtonCustom @click="prevPage" :disabled="currentPage === 1">Prev</ButtonCustom>
 			<span>Page {{ currentPage }} of {{ totalPages }}</span>
 			<ButtonCustom @click="nextPage" :disabled="currentPage === totalPages">Next</ButtonCustom>
@@ -66,9 +66,13 @@ const tableDataPaginated = computed(() => {
 	flex-direction: column;
 	width: 100%;
 	height: 100%;
-	font-family: 'Karla', sans-serif;
 	font-weight: 400;
+    gap: 20px;
+    font-size: 16px;
 
+    @media (max-width: 980px) {
+        font-size: 12px;
+    }
 	.table_buttons {
 		display: flex;
 		justify-content: center;
@@ -78,13 +82,10 @@ const tableDataPaginated = computed(() => {
 
 	table {
 		width: 100%;
-		border-radius: 5px;
 		border-collapse: collapse;
 		overflow: hidden;
-		box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-		margin: 20px auto;
+		margin: 0 auto;
 
-		line-height: 1.5;
 		text-align: center;
 
 		thead tr th {
@@ -97,7 +98,7 @@ const tableDataPaginated = computed(() => {
 
 		th,
 		td {
-			padding: 12px 0 12px 0;
+			padding: 12px 5px 12px 5px;
 		}
 
 		tbody tr {
