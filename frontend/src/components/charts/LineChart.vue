@@ -89,6 +89,8 @@ watch(() => props.userEloHistory, () => loadStuff())
 
 <style scoped lang="scss">
 .line_chart {
+    max-width: 600px;
+    max-height: 400px;
 	width: 100%;
 	height: 100%;
 }

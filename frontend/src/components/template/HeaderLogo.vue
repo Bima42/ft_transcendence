@@ -29,7 +29,7 @@ watch(() => router.currentRoute.value.name, () => {
     height: 100%;
 
     .logo {
-        max-width: 100%;
+        max-width: 90%;
         height: 100%;
         cursor: pointer;
     }
