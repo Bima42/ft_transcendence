@@ -104,7 +104,6 @@ export const useUserStore = defineStore('user', () => {
 			undefined,
 			file
 		)
-			.then(response => response.json())
 			.then(json => {
 				const datas = json as IUser
 				const avatar = datas.avatar
