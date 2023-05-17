@@ -69,8 +69,9 @@ const tableHeaders = {
 	align-items: center;
 	gap: $small_gap;
 
-	h3 {
+	h2 {
 		font-size: 20px;
+		margin-bottom: 10px;
 	}
 }
 </style>

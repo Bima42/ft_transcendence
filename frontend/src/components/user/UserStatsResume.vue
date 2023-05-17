@@ -40,7 +40,7 @@ function loadStuff() {
 		userStats.value = stats
 		winRateStat.value = stats.winRate
 		winRateText.value = `${stats.winRate.toFixed(1)}%`
-		eloText.value = `${stats.elo} Points`
+		eloText.value = `${stats.elo} Pts`
 
 		if (highestElo.value === null) return
 		eloStat.value = stats.elo * 100 / highestElo.value

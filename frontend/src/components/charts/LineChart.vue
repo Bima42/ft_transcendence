@@ -74,6 +74,7 @@ function loadStuff() {
 				text: 'Elo Progression',
 				color: '#EEEEEE',
 				font: {
+					family: 'Martian Mono',
 					size: 20,
 				},
 			},
