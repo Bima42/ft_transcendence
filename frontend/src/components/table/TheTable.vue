@@ -85,8 +85,15 @@ const tableDataPaginated = computed(() => {
 		border-collapse: collapse;
 		overflow: hidden;
 		margin: 0 auto;
+		font-family: 'Martian Mono';
+		font-weight: 400;
+		letter-spacing: -0.15em;
 
 		text-align: center;
+
+		thead tr {
+			height: 5em;
+		}
 
 		thead tr th {
 			background-color: $secondary;
@@ -94,6 +101,7 @@ const tableDataPaginated = computed(() => {
 			border-bottom: 1px solid $tertiary;
 			border-top: 1px solid $tertiary;
 			color: white;
+			vertical-align: middle;
 		}
 
 		th,
