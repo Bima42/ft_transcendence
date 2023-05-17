@@ -18,21 +18,23 @@
  *
  * @param {number} chatId - This is the chat ID that is received from the parent
  */
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import ChatMessage from '@/components/chat/ChatMessage.vue'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
+import { useFriendStore } from '@/stores/friend';
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
+const friendStore = useFriendStore()
 
 const currentUser = userStore.user?.id
-
 chatStore.getMessages().then(() => {
 	chatStore.socket.on('msg', (data: IChatMessage) => {
 		chatStore.onNewMessage(data)
 	})
+
 })
 
 onUnmounted(() => {
