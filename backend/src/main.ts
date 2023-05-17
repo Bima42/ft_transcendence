@@ -24,7 +24,7 @@ async function bootstrap() {
     methods: 'GET,PUT,PATCH,POST,DELETE',
   });
 
-  const staticAssetsPath = join(__dirname, "..", "uploads")
+  const staticAssetsPath = join(__dirname,'../..', "uploads")
   app.useStaticAssets(staticAssetsPath, {
     prefix: "/api/uploads/",
   })
