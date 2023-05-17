@@ -67,7 +67,7 @@ const tableDataPaginated = computed(() => {
 	width: 100%;
 	height: 100%;
     gap: 20px;
-	font-family: 'Martian Mono', serif;
+	font-family: 'Martian Mono', sans-serif;
     font-size: 12px;
 
     @media (max-width: 980px) {
@@ -85,7 +85,14 @@ const tableDataPaginated = computed(() => {
 		border-collapse: collapse;
 		overflow: hidden;
 		margin: 0 auto;
+		font-family: 'Martian Mono', sans-serif;
+		font-weight: 400;
+		letter-spacing: -0.15em;
 		text-align: center;
+
+		thead tr {
+			height: 5em;
+		}
 
 		thead tr th {
 			background-color: $secondary;
@@ -93,6 +100,7 @@ const tableDataPaginated = computed(() => {
 			border-bottom: 1px solid $tertiary;
 			border-top: 1px solid $tertiary;
 			color: white;
+			vertical-align: middle;
 		}
 
 		th,
