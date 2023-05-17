@@ -110,7 +110,7 @@ export const useUserStore = defineStore('user', () => {
 				updateAvatar(avatar)
 			})
 			.catch(error => {
-				console.log(error)
+				window.alert(error.message)
 			})
 	}
 

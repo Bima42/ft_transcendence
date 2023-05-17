@@ -38,6 +38,7 @@ const statusClass = ref(props.status === 'ONLINE' ? 'green'
 
 const handleImageChange = (event: Event) => {
 	const file = (event.target as HTMLInputElement).files![0]
+	if (!file) return
 	const formData = new FormData()
 	formData.append('avatar', file, file.name)
 	userStore.uploadAvatar(formData)
