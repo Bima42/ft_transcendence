@@ -127,6 +127,7 @@ const outsideClickHandle = () => {
 		transition: background-color 0.5s ease-in-out;
 		cursor: pointer;
 		top: 18px;
+		right: 5px;
 		z-index: 9;
 
 		svg {

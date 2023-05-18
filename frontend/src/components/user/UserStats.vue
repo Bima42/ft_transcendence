@@ -62,7 +62,6 @@ const tableHeaders = {
 <style scoped lang="scss">
 .match_history {
 	display: flex;
-    max-width: 600px;
 	width: 100%;
 	flex-direction: column;
 	justify-content: center;

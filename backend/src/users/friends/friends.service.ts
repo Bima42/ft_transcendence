@@ -366,18 +366,4 @@ export class FriendsService {
 		});
 		return users.blocked.map(toBlockedDto);
 	}
-
-	async canUnblock(userId: number, blockedUsername: string) {
-		const blockedUser = await this.usersService.findByName(blockedUsername);
-		// Need to check if the blockedUser is in the blocked list of the user
-		const blocked = await this.prismaService.user.findUnique({
-			where: { id: userId },
-			select: {
-				blocked: {
-					where: { id: blockedUser.id }
-				}
-			}
-		});
-		return blocked.blocked.length > 0;
-	}
 }

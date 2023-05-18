@@ -97,12 +97,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 		}
 
-		const isFriend = async (friendName: string): Promise<boolean> => {
-			return get(
-				`friends/is/${friendName}`,
-				'Failed to check if friend',
-				jsonHeaders,
-			)
+		const isFriend = (id: number): boolean => {
+			return friends.value.some((friend) => friend.id === id);
 		}
 
 	/*************************************************************************
@@ -139,21 +135,10 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 		}
 
-		const isBlocked = async (username: string): Promise<boolean> => {
-			return get(
-				`friends/isBlocked/${username}`,
-				'Failed to check if blocked',
-				jsonHeaders,
-			)
+		const isBlocked = (id: number): boolean => {
+			return blocked.value.some((blocked) => blocked.id === id);
 		}
 
-		const canUnblock = async (username: string): Promise<boolean> => {
-			return get(
-				`friends/can/unblock/${username}`,
-				'Failed to check if can unblock',
-				jsonHeaders,
-			)
-	}
 
 	const getUserInfos = async (username: string): Promise<IUser> => {
 		return get(
@@ -180,7 +165,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 			unblockUser,
 			getAllBlocked,
 			isBlocked,
-			canUnblock,
 			getUserInfos
 		}
 });

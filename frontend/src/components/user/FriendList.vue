@@ -22,6 +22,7 @@ const userStore = useUserStore()
 
 const friendList = ref<{friend: IFriend, rank: number}[]>([])
 const loadDatas = () => {
+	friendStore.updateStoreDatas()
 	friendStore.friends.forEach((friend) => {
 		userStore.getRank(friend.id).then((res) => {
 			friendList.value.push({friend: friend, rank: res})

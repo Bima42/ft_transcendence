@@ -28,15 +28,20 @@ const startEditing = () => {
     editing.value = !editing.value;
 };
 
-const save = async () => {
+const save = () => {
     editing.value = !editing.value;
     if (!userValue.value)
       return
     // TODO: Check locally if the username is compliant
     const infos: IUserUpdate = { username: userValue.value }
-    await userStore.updateInfos(infos)
-		.catch(e => alert(e.message))
-	userValue.value = userStore.user?.username
+	userStore.updateInfos(infos).then((res) => {
+		if (res)
+			userValue.value = res.username
+	})
+		.catch(e => {
+			alert(e.message)
+			userValue.value = userStore.user?.username
+		})
 };
 
 const cancel = () => {

@@ -113,10 +113,4 @@ export class FriendsController {
 	async getAllBlockedUsers(@Req() req: RequestWithUser) {
 		return this.friendsService.getAllBlockedUsers(req.user.id);
 	}
-
-	@Get('can/unblock/:username')
-	@ApiProperty({ type: String })
-	async canUnblock(@Param('username') username: string, @Req() req: RequestWithUser) {
-		return this.friendsService.canUnblock(req.user.id, username);
-	}
 }

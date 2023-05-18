@@ -32,9 +32,11 @@ const friendStore = useFriendStore()
 const currentUser = userStore.user?.id
 chatStore.getMessages().then(() => {
 	chatStore.socket.on('msg', (data: IChatMessage) => {
+		if (friendStore.blocked.some((user) => user.id === data.author.id)) {
+			return
+		}
 		chatStore.onNewMessage(data)
 	})
-
 })
 
 onUnmounted(() => {

@@ -10,9 +10,11 @@ import type { UserStatus } from '@/interfaces/user/IUser';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+	const stats = ref<IUserStats | null>()
 
 	const resetState = () => {
 		user.value = null
+		stats.value = null
 		localStorage.removeItem('localUser');
 	}
 
@@ -32,8 +34,7 @@ export const useUserStore = defineStore('user', () => {
 			'auth/login',
 			'Failed to login',
 		).then(json => {
-			user.value = json as IUser
-			localStorage.setItem('localUser', JSON.stringify(user.value))
+			setState(json as IUser)
 			return true
 		}).catch(err => {
 			alert(err)
@@ -41,7 +42,7 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const logout = (): boolean => {
-		get(`auth/logout`, 'Failed to logout')
+		get(`auth/logout`, 'Failed to logout').then()
 		resetState()
 		return true
 	}
@@ -80,15 +81,13 @@ export const useUserStore = defineStore('user', () => {
 		return json.twoFAAuthenticated
 	}
 
-	const updateInfos = async (infos: IUserUpdate): Promise<IUser | null> => {
+	const updateInfos = (infos: IUserUpdate): Promise<IUser | null> => {
 		// Yes, we have to use await and then, not sure why
-		patch(`users/me`, "cannot update username", jsonHeaders, infos)
+		return patch(`users/me`, "cannot update username", jsonHeaders, infos)
 			.then((newUser: IUser) => {
-				user.value = newUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
+				setState(newUser)
+				return user.value
 			})
-
-		return user.value
 	}
 
 	const uploadAvatar = (file: FormData) => {
@@ -190,12 +189,16 @@ export const useUserStore = defineStore('user', () => {
 		)
 	}
 
-	const getRank = async (user_id: number | undefined = user.value?.id): Promise<number> => {
+	const getRank = (user_id: number | undefined = user.value?.id): Promise<number> => {
+		console.log('id', user_id)
 		return get(
 			`users/stats/rank/${user_id}`,
 			'Failed to get rank',
 			jsonHeaders,
-		)
+		).then((rank: number) => {
+			console.log(rank)
+			return rank
+		})
 	}
 
 	const getUserInfos = async (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {

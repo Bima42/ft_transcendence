@@ -1,11 +1,6 @@
 <template>
 	<section class="user_credentials">
 		<UsernameInput/>
-<!--		<ButtonCustom-->
-<!--			:style="'small adapt'"-->
-<!--		>-->
-<!--			{{ 'Settings' }}-->
-<!--		</ButtonCustom>-->
 		<ButtonCustom
 			@click="openModal('TwoFA')"
 			:style="'small adapt'"
@@ -44,7 +39,7 @@ const openModal = (modalName: string) => {
 .user_credentials, .user_infos {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: center;
 	gap: $medium_gap;
 }

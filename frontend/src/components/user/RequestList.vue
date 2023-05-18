@@ -27,9 +27,13 @@ const friendStore = useFriendStore()
 
 const requests = ref<IUser[]>([])
 
-onMounted(async () => {
-	requests.value = await friendStore.getAllPendingRequests()
-})
+function loadDatas() {
+	friendStore.updateStoreDatas()
+	friendStore.getAllPendingRequests().then((res) => {
+		requests.value = res
+	})
+}
+loadDatas()
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)
