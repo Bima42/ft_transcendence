@@ -326,7 +326,7 @@ export class ChannelService {
 		const chat = await this.prismaService.chat.create({
 			data: {
 				type: "WHISPER",
-				name: "whisper",
+				name: `whisper ${user1.id} - ${targetUser.id}`,
 				users: {
 					create: [
 						{

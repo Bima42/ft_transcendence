@@ -7,6 +7,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
+import { FriendsService } from 'src/users/friends/friends.service';
 
 @WebSocketGateway({
 	path: "/api/socket.io",
@@ -27,6 +28,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly channelService: ChannelService,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
+		private readonly friendService: FriendsService,
 	) { }
 
 	@SubscribeMessage('msg')
@@ -38,7 +40,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const msg = this.channelService.postMessage(user, data.chatId, data)
 			.then(msg => {
 				// The server also send back to the sender, as acknowledgement and validation
-				this.server.to("channel" + msg.chatId.toString()).emit("msg", msg);
+				this.server
+					.to("channel" + msg.chatId.toString())
+					.except("block" + msg.author.id.toString())
+					.emit("msg", msg);
 				return msg
 			})
 			.catch(err => {
@@ -56,7 +61,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const msg = this.channelService.postMessageInWhisperChat(socket.data.user, data)
 			.then(msg => {
 				// The server also send back to the sender, as acknowledgement and validation
-				this.server.to("channel" + msg.chatId.toString()).emit("msg", msg);
+				this.server
+					.to("channel" + msg.chatId.toString())
+					.except("block" + msg.author.id.toString())
+					.emit("msg", msg);
 				return msg
 			})
 			.catch(err => {
@@ -101,12 +109,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const subscriptions = await this.channelService.getSubscribedChannels(user);
 		const whispers = await this.channelService.getWhisperChannels(user)
 		for (const chan of subscriptions) {
-			console.log(`${user.username} joined chan ${chan.name}`)
 			client.join("channel" + chan.id.toString())
 		}
 		for (const chan of whispers) {
-			console.log(`${user.username} joined whisper ${chan.name}`)
 			client.join("channel" + chan.id.toString())
+		}
+		const blockedUsers = await this.friendService.getAllBlockedUsers(user.id)
+		for (const user of blockedUsers) {
+			client.join("block" + user.id.toString())
 		}
 	}
 
@@ -121,7 +131,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async onChannelJoin(user: UserDto, chatId: number) {
-		console.log(`Gateway: join channel`)
 		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
 		for (const socket of sockets) {
 			socket.join("channel" + chatId.toString())
@@ -133,6 +142,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
 		for (const socket of sockets) {
 			socket.leave("channel" + chatId.toString())
+		}
+	}
+
+	async onBlockUser(user: UserDto, targetUserId: number) {
+		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of sockets) {
+			socket.join("block" + targetUserId.toString())
+		}
+	}
+
+	async onUnblockUser(user: UserDto, targetUserId: number) {
+		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of sockets) {
+			socket.leave("block" + targetUserId.toString())
 		}
 	}
 };

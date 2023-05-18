@@ -1,5 +1,5 @@
 
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, forwardRef } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { ChannelController } from './channel.controller';
 import { ChatGateway } from './channel.gateway';
@@ -9,10 +9,10 @@ import { UsersMiddleware } from '../users/middlewares/users.middleware';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [UsersModule, AuthModule],
+  imports: [forwardRef(() => UsersModule), AuthModule],
   providers: [PrismaService, ChannelService, ChatGateway],
   controllers: [ChannelController],
-  exports: [ChannelService],
+  exports: [ChannelService, ChatGateway],
 })
 export class ChatModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

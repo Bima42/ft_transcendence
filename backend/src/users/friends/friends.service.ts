@@ -315,11 +315,10 @@ export class FriendsService {
 		return blocked.blocked.length > 0;
 	}
 
-	async blockUser(userId: number, blockedUsername: string) {
-		const blockedUser = await this.usersService.findByName(blockedUsername);
+	async blockUser(userId: number, blockedUser: UserDto) {
 
 		// Check if the user is already blocked
-		if (await this.isBlocked(userId, blockedUsername))
+		if (await this.isBlocked(userId, blockedUser.username))
 			throw new BadRequestException('User is already blocked');
 
 		// Update the user blocked list
@@ -331,17 +330,16 @@ export class FriendsService {
 			}
 		});
 
-		if (!await this.isBlocked(userId, blockedUsername))
+		if (!await this.isBlocked(userId, blockedUser.username))
 			throw new InternalServerErrorException('Blocking failed');
 
 		return true;
 	}
 
-	async unblockUser(userId: number, blockedUsername: string) {
-		const blockedUser = await this.usersService.findByName(blockedUsername);
+	async unblockUser(userId: number, blockedUser: UserDto) {
 
 		// Check if the user is not blocked
-		if (!await this.isBlocked(userId, blockedUsername))
+		if (!await this.isBlocked(userId, blockedUser.username))
 			throw new BadRequestException('User is not blocked');
 
 		// Update the user blocked list
@@ -353,7 +351,7 @@ export class FriendsService {
 			}
 		});
 
-		if (await this.isBlocked(userId, blockedUsername))
+		if (await this.isBlocked(userId, blockedUser.username))
 			throw new InternalServerErrorException('Unblocking failed');
 
 		return true;
