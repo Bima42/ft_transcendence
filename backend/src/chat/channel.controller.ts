@@ -17,6 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
 import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto, NewWhisperDto, UpdateChannelDto } from './dto/channel.dto';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
+import { UsersService } from 'src/users/users.service';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -25,6 +26,7 @@ export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
 		private channelGateway: ChatGateway,
+		private usersService: UsersService
 	) {
 	}
 
@@ -51,7 +53,9 @@ export class ChannelController {
 
 	@Post('rooms')
 	async createNewChannel(@Req() req: RequestWithUser, @Body() data: NewChannelDto): Promise<DetailedChannelDto> {
-		return this.channelService.createChannel(req.user, data)
+		const chat = await this.channelService.createChannel(req.user, data)
+		this.channelGateway.onChannelJoin(req.user, chat.id)
+		return chat
 	}
 
 	@Patch('rooms')
@@ -62,17 +66,22 @@ export class ChannelController {
 	@Post('rooms/whispers')
 	async createNewWhisper(@Req() req: RequestWithUser, @Body() data: NewWhisperDto): Promise<DetailedChannelDto> {
 		const chat = await this.channelService.createWhisperChat(req.user, data.targetUsername)
+		this.channelGateway.onChannelJoin(req.user, chat.id)
 		return this.channelService.getChannelDetails(req.user, chat.id)
 	}
 
 	@Put('rooms/join')
 	async joinChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto): Promise<DetailedChannelDto> {
-		return this.channelService.joinChannel(req.user, data);
+		const chat = await this.channelService.joinChannel(req.user, data);
+		this.channelGateway.onChannelJoin(req.user, chat.id)
+		return chat
 	}
 
 	@Put('rooms/leave')
 	async leaveChannel(@Req() req: RequestWithUser, @Body() data: JoinChannelDto) {
-		return this.channelService.leaveChannel(req.user, data);
+		await this.channelService.leaveChannel(req.user, data);
+		this.channelGateway.onChannelLeave(req.user, data.chatId)
+		return
 	}
 
 	@Get('rooms/subscriptions')
@@ -87,7 +96,9 @@ export class ChannelController {
 
 	@Delete('rooms/:id')
 	async DeleteChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
-		return this.channelService.deleteChannel(req.user, id);
+		await this.channelService.deleteChannel(req.user, id);
+		this.channelGateway.onChannelLeave(req.user, id)
+		return
 	}
 
 	@Get('rooms/:id/messages')
@@ -108,29 +119,33 @@ export class ChannelController {
 	@Put('rooms/:id/user')
 	async UpsertUserChat(@Req() req: RequestWithUser, @Body() action: UserchatAction, @Param('id', new ParseIntPipe()) chatId: number) {
 		const user = req.user;
+		const targetUser = await this.usersService.findByName(action.username);
 		switch (action.type) {
 			case 'kick':
-				await this.channelService.deleteUserChatRole(user, chatId, action.username);
+				await this.channelService.deleteUserChatRole(user, chatId, targetUser);
+				await this.channelGateway.onChannelLeave(targetUser, chatId)
 				break;
 			case 'add':
 			case 'demote':
-				await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, null);
+				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.MEMBER, null);
+				await this.channelGateway.onChannelJoin(targetUser, chatId)
 				break;
 			case 'mute':
 				if (!action.muteDuration)
 					return;
-				await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.MEMBER, action.muteDuration);
+				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.MEMBER, action.muteDuration);
+				await this.channelGateway.onChannelJoin(targetUser, chatId)
 				break;
 			case 'ban':
-				await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.BANNED, null);
+				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.BANNED, null);
+				await this.channelGateway.onChannelLeave(targetUser, chatId)
 				break;
 			case 'promote':
-				await this.channelService.UpsertUserChatRole(user, chatId, action.username, UserChatRole.ADMIN, null);
+				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.ADMIN, null);
+				await this.channelGateway.onChannelJoin(targetUser, chatId)
 			default:
 				break;
 		}
-		const userchat = await this.channelService.getChannelDetails(user, chatId);
-		this.channelGateway.server.emit('updateChannelList', userchat);
 	}
 
 	@Get('rooms/:id/isPasswordProtected')

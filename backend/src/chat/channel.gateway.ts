@@ -37,9 +37,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		Logger.log(`New message from ${user.username}#${user.id} on chat ${data.chatId}`);
 		const msg = this.channelService.postMessage(user, data.chatId, data)
 			.then(msg => {
-				// TODO: only send to the correct room
 				// The server also send back to the sender, as acknowledgement and validation
-				this.server.emit("msg", msg);
+				this.server.to("channel" + msg.chatId.toString()).emit("msg", msg);
 				return msg
 			})
 			.catch(err => {
@@ -56,9 +55,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket) {
 		const msg = this.channelService.postMessageInWhisperChat(socket.data.user, data)
 			.then(msg => {
-				// TODO: only send to the correct room
 				// The server also send back to the sender, as acknowledgement and validation
-				this.server.emit("msg", msg);
+				this.server.to("channel" + msg.chatId.toString()).emit("msg", msg);
 				return msg
 			})
 			.catch(err => {
@@ -99,7 +97,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// attach the user to the socket
 		client.data.user = user;
 
-		//TODO: add socket to all rooms (= channels) that the user is in
+		client.join("user" + user.id.toString())
+		const subscriptions = await this.channelService.getSubscribedChannels(user);
+		const whispers = await this.channelService.getWhisperChannels(user)
+		for (const chan of subscriptions) {
+			console.log(`${user.username} joined chan ${chan.name}`)
+			client.join("channel" + chan.id.toString())
+		}
+		for (const chan of whispers) {
+			console.log(`${user.username} joined whisper ${chan.name}`)
+			client.join("channel" + chan.id.toString())
+		}
 	}
 
 	handleDisconnect(client: any): any {
@@ -112,4 +120,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		//TODO: send notifications to all users to change his status to offline
 	}
 
+	async onChannelJoin(user: UserDto, chatId: number) {
+		console.log(`Gateway: join channel`)
+		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of sockets) {
+			socket.join("channel" + chatId.toString())
+		}
+	}
+
+	async onChannelLeave(user: UserDto, chatId: number) {
+		console.log(`Gateway: leave channel`)
+		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of sockets) {
+			socket.leave("channel" + chatId.toString())
+		}
+	}
 };
