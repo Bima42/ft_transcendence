@@ -8,9 +8,9 @@ const prisma = new PrismaClient()
 /******************************************************************************/
 const users: Prisma.UserUncheckedCreateInput[] = [
 	{
-		username: "Gege",
+		username: "Bob42",
 		email: "admin@example.com",
-		avatar: `https://api.multiavatar.com/gege.png`,
+		avatar: `https://api.multiavatar.com/Bob42.png`,
 		firstName: "Gerard",
 		lastName: "Bouchard",
 		phone: "0836656565",
@@ -47,6 +47,17 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 		status: 'OFFLINE',
 		elo: 420,
 	},
+	{
+		username: "trossel",
+		fortyTwoId: 91909,
+		email: "trossel@student.42lausanne.ch",
+		avatar: `https://cdn.intra.42.fr/users/fa5ee5528e562fa9dafadbf473d7254b/medium_trossel.jpg`,
+		firstName: "Tanguy",
+		lastName: "Rossel",
+		phone: "hidden",
+		status: 'ONLINE',
+		elo: 800,
+	},
 ]
 
 /******************************************************************************/
@@ -57,7 +68,12 @@ const friendships: Prisma.FriendshipUncheckedCreateInput[] = [
 		status: "ACCEPTED",
 		userId: 1,
 		friendId: 2,
-	}
+	},
+	{
+		status: "ACCEPTED",
+		userId: 5,
+		friendId: 1,
+	},
 ]
 
 /******************************************************************************/
@@ -251,6 +267,18 @@ async function main() {
 			where: { id: idx + 1 },
 			update: {},
 			create: el,
+		})
+	}
+	for (const friendship of friendships) {
+		await prisma.friendship.upsert({
+			where: {
+				userId_friendId: {
+					userId: friendship.userId,
+					friendId: friendship.friendId,
+				}
+			},
+			create: friendship,
+			update: {},
 		})
 	}
 	for (const el of userChats) {
