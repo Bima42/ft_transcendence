@@ -4,6 +4,7 @@
 			<div class="user_infos">
 				<div class="user_overview">
 					<UserPicture :url="user?.avatar" :type="'big'" :status="user.status" :isSelf="isSelf" :pictureDotSize="'large'" />
+                    <h3>Rank #{{ rank }} <font-awesome-icon color="gold" icon="fa-ranking-star"/></h3>
 				</div>
 				<div class="buttons_wrap">
 					<h2 v-if="!isSelf">{{ user?.username }}</h2>
@@ -28,27 +29,31 @@ import UserStats from '@/components/user/UserStats.vue';
 import { useUserStore } from '@/stores/user';
 import UserStatsResume from '@/components/user/UserStatsResume.vue';
 import { useRoute } from 'vue-router';
-import { ref, watch } from 'vue';
+import {onUpdated, ref, watch} from 'vue';
 import type IUser from '@/interfaces/user/IUser';
 import UserInteractions from '@/components/user/UserInteractions.vue';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 const userStore = useUserStore()
 const route = useRoute()
 
 const user = ref<IUser | null>()
 const isSelf = ref(true)
+const rank = ref(0)
 
-function loadUser() {
+async function loadUser() {
 	if (route.params.id) {
 		isSelf.value = false
-		userStore.getUserInfos(route.params.id as string).then((userData) => {
-			user.value = userData
-		})
+		user.value = await userStore.getUserInfos(route.params.id as string)
 	}
 	else {
 		isSelf.value = true
 		user.value = userStore.user
 	}
+    userStore.getRank(user.value?.id).then((res) => {
+        rank.value = res
+        return
+    })
 }
 
 watch(() => route.params, () => {loadUser()})
@@ -89,6 +94,7 @@ loadUser()
 				gap: $small_gap;
 				flex-direction: column;
 				justify-content: center;
+                text-align: center;
 			}
 
 			.user_overview {
