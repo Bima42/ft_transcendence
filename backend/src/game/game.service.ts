@@ -49,8 +49,8 @@ export class GameService {
 			}
 			const players = serv.getEndPlayers()
 
-			await this.usersService.updateStatus(players[0].user.id, "ONLINE")
-			await this.usersService.updateStatus(players[1].user.id, "ONLINE")
+			await this.usersService.updateData(players[0].user.id, {status: "ONLINE"})
+			await this.usersService.updateData(players[1].user.id, {status: "ONLINE"})
 
 			if (servStatus == "ABORTED") {
 				Logger.log(`Game #${serv.game.id} written as aborted in DB`);
@@ -278,8 +278,8 @@ export class GameService {
 		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
 		// Update user informations
-		players[0].data.user = await this.usersService.updateStatus(players[0].data.user.id, "BUSY")
-		players[1].data.user = await this.usersService.updateStatus(players[1].data.user.id, "BUSY")
+		players[0].data.user = await this.usersService.updateData(players[0].data.user.id, { status: "BUSY"})
+		players[1].data.user = await this.usersService.updateData(players[1].data.user.id, {status: "BUSY"})
 
 
 		// Update the game status to 'STARTED'

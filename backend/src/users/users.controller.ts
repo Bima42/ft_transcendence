@@ -66,7 +66,7 @@ export class UsersController {
       @Req() req: RequestWithUser,
       @Body() data: UpdateUserDto
   ): Promise<UserDto> {
-      return this.usersService.updateData(req.user, data);
+      return this.usersService.updateData(req.user.id, data);
   }
 
   @Delete('me')
@@ -86,6 +86,6 @@ export class UsersController {
       )  file: Express.Multer.File
   ) {
       const avatarUrl = `${process.env.FRONTEND_URL}/api/${file.path}`
-      return this.usersService.updateData(req.user, {avatar:avatarUrl});
+      return this.usersService.updateData(req.user.id, {avatar:avatarUrl});
   }
 }

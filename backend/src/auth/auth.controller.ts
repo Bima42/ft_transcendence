@@ -62,7 +62,7 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user = await this.usersService.updateData(req.user, {status: UserStatus.ONLINE});
+    const user = await this.usersService.updateData(req.user.id, {status: UserStatus.ONLINE});
 
     res.status(200).send(user);
   }
@@ -73,7 +73,7 @@ export class AuthController {
     @Res({ passthrough: true }) res,
 	@Req() req: RequestWithUser,
   ) {
-    await this.usersService.updateData(req.user, {status: UserStatus.OFFLINE})
+    await this.usersService.updateData(req.user.id, {status: UserStatus.OFFLINE})
     await this.authService.logout(res);
   }
 }
