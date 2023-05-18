@@ -5,6 +5,7 @@ import { Game, GameStatus, GameType } from '@prisma/client';
 import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
+import { UsersService } from '../users/users.service';
 import { EndGamePlayer, InvitePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 
@@ -18,7 +19,8 @@ export class GameService {
 	server: Server
 
 	constructor(
-		private readonly prismaService: PrismaService
+		private readonly prismaService: PrismaService,
+		private readonly usersService: UsersService,
 	) { }
 
 	async init(server: Server) {
@@ -40,7 +42,17 @@ export class GameService {
 
 	async checkCurrentGames() {
 		this.gameServers.forEach(async (serv) => {
-			if (serv.getStatus() == "ABORTED") {
+			const servStatus = serv.getStatus()
+			if (["INVITING", "SEARCHING", "STARTED"].includes(servStatus)) {
+				console.log(`game is ${servStatus}, skipped}`)
+				return;
+			}
+			const players = serv.getEndPlayers()
+
+			await this.usersService.updateStatus(players[0].user.id, "ONLINE")
+			await this.usersService.updateStatus(players[1].user.id, "ONLINE")
+
+			if (servStatus == "ABORTED") {
 				Logger.log(`Game #${serv.game.id} written as aborted in DB`);
 				try {
 					await this.prismaService.game.update({
@@ -61,7 +73,6 @@ export class GameService {
 
 			} else if (serv.getStatus() == "ENDED") {
 				Logger.log(`Game #${serv.game.id} written as ended in DB`);
-				const players = serv.getEndPlayers()
 
 				// Update stats
 				try {
@@ -267,8 +278,8 @@ export class GameService {
 		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
 
 		// Update user informations
-		players[0].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[0].data.user.id } }))
-		players[1].data.user = toUserDto(await this.prismaService.user.findUnique({ where: { id: players[1].data.user.id } }))
+		players[0].data.user = await this.usersService.updateStatus(players[0].data.user.id, "BUSY")
+		players[1].data.user = await this.usersService.updateStatus(players[1].data.user.id, "BUSY")
 
 
 		// Update the game status to 'STARTED'
