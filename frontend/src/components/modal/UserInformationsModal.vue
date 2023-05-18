@@ -12,6 +12,9 @@
 				<ButtonCustom :style="'small'" @click="goToDetailedProfile(modalStore.data.user.id)">
 					View Detailed Profile
 				</ButtonCustom>
+                <ButtonCustom :style="'small'" @click="goToWhisper(modalStore.data.user.username)">
+                    Send a private message
+                </ButtonCustom>
             </section>
         </section>
         <hr>
@@ -24,15 +27,36 @@ import UserPicture from '@/components/avatar/UserPicture.vue'
 import UserInteractions from '@/components/user/UserInteractions.vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useRouter } from 'vue-router'
+import { useChatStore } from '@/stores/chat'
 
 const router = useRouter()
 const modalStore = useModalStore()
+const chatStore = useChatStore()
 
 const goToDetailedProfile = (id: string) => {
 	router.push(`/main/profile/${id}`);
 	modalStore.resetState()
 }
 
+const goToWhisper = (name: string) => {
+    chatStore.whisperChatList.map((chat) => {
+        if (chat.name === name) {
+            chatStore.setCurrentChat(chat.id.toString()).catch((err) => {
+                console.log(err)
+            })
+            modalStore.resetState()
+            return
+        }
+    })
+    chatStore.createWhisper(name).then((res) => {
+        chatStore.setCurrentChat(res.id.toString())
+        chatStore.updateStore()
+    }).catch((err) => {
+        console.log(err)
+    })
+    modalStore.resetState()
+    return
+}
 </script>
 
 <style scoped lang="scss">
