@@ -13,7 +13,6 @@ async function launch(containerId: any) {
 
   // Get the current game from the server and put it into the store
   const settings = await get('game/current', "Cannot get game config")
-    .then(answer => answer.json())
     .then((gameSettings : IGameSettings) => {
       console.log(`GameSettings: ${JSON.stringify(gameSettings)}`);
       gameStore.currentGame = gameSettings;

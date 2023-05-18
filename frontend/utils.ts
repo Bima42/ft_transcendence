@@ -29,7 +29,7 @@ export async function post(
 	else if (file)
 		request.body = file
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
 		jsonBody.statusCode ??= response.status
@@ -50,14 +50,18 @@ export async function get(
 	route: string,
 	message: string,
 	headers: Headers = jsonHeaders
-): Promise<Response> {
+) {
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
 		headers: headers,
-	})
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	return response
+	}).catch(() => { throw new Error(message) })
+
+	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message }})
+	if (!response.ok) {
+		jsonBody.message ??= message
+		throw jsonBody
+	}
+	return jsonBody
 }
 
 /**
@@ -86,7 +90,7 @@ export async function del(
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 	if (!response.ok)
 		throw new Error(`${message} (status ${response.status}): ${response.body}`)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
 		throw jsonBody
@@ -119,7 +123,7 @@ export async function put(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
 		throw jsonBody
@@ -142,7 +146,7 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(_ => { return { statusCode: 500, message: message } })
+	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
 		throw jsonBody

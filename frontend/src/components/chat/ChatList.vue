@@ -18,13 +18,13 @@ import { defineProps } from 'vue'
 import { useChatStore } from '@/stores/chat'
 
 const chatStore = useChatStore();
-await chatStore.updateStore();
+chatStore.updateStore();
 
 const props = defineProps<{
     selectedChatList: string
 }>()
 
-const toggleChat = async (id: number) => {
+const toggleChat = (id: number) => {
     const castedId = id.toString()
     const response = chatStore.setCurrentChat(castedId)
     if (!response) {

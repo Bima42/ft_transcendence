@@ -32,33 +32,31 @@ const router = useRouter()
 
 const isBlocked = ref(false)
 const isFriend = ref(false)
-const canUnblock = ref(false)
 const isRequestSent = ref(false)
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
 
-friendStore.isFriend(user.value.username).then(res => isFriend.value = res)
+isFriend.value = friendStore.isFriend(user.value.id)
+isBlocked.value = friendStore.isBlocked(user.value.id)
 friendStore.isWaitingRequest(user.value.username).then(res => isRequestSent.value = res)
-friendStore.isBlocked(user.value.username).then(res => isBlocked.value = res)
-friendStore.canUnblock(user.value.username).then(res => canUnblock.value = res)
 
 const addOrRemoveFriend = async () => {
 	try {
-	if (isFriend.value) {
-		isFriend.value = !(await friendStore.removeFriend(user.value.username))
-	} else {
-		if (!isRequestSent.value)
-			isRequestSent.value = await friendStore.addFriend(user.value.username)
-		else {
-			isRequestSent.value = !(await friendStore.cancelFriendRequest(user.value.username))
+		if (isFriend.value) {
+			isFriend.value = !(await friendStore.removeFriend(user.value.username))
+		} else {
+			if (!isRequestSent.value)
+				isRequestSent.value = await friendStore.addFriend(user.value.username)
+			else {
+				isRequestSent.value = !(await friendStore.cancelFriendRequest(user.value.username))
+			}
 		}
-	}
 	} catch (e: any) {
 		alert(e.message)
 	}
 }
 
 const blockOrUnblockUser = async () => {
-	if (isBlocked.value && canUnblock.value) {
+	if (isBlocked.value) {
 		isBlocked.value = !(await friendStore.unblockUser(user.value.username))
 	} else {
 		isBlocked.value = await friendStore.blockUser(user.value.username)

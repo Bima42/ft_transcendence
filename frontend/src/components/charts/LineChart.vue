@@ -74,6 +74,7 @@ function loadStuff() {
 				text: 'Elo Progression',
 				color: '#EEEEEE',
 				font: {
+					family: 'Martian Mono',
 					size: 20,
 				},
 			},
@@ -89,7 +90,6 @@ watch(() => props.userEloHistory, () => loadStuff())
 
 <style scoped lang="scss">
 .line_chart {
-    max-width: 600px;
     max-height: 400px;
 	width: 100%;
 	height: 100%;

@@ -74,8 +74,8 @@ const strokeDashoffset = computed(() => {
 	}
 
 	.value {
-		font-family: 'Karla', sans-serif;
-		font-size: 20px;
+		font-family: 'Martian Mono', sans-serif;
+		font-size: 16px;
 		font-weight: 700;
 	}
 

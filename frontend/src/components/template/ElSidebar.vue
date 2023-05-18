@@ -25,9 +25,11 @@ import SearchProfileModal from '@/components/modal/SearchProfileModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { useChatStore } from '@/stores/chat';
 import { useGameStore } from '@/stores/game';
+import { useFriendStore } from '@/stores/friend';
 
 const userStore = useUserStore()
 const modalStore = useModalStore()
+const friendStore = useFriendStore()
 const chatStore = useChatStore()
 const gameStore = useGameStore()
 const router = useRouter()
@@ -82,6 +84,9 @@ const handleClick = (route: string) => {
 		userStore.logout()
 		chatStore.socket.disconnect()
 		gameStore.socket.disconnect()
+		chatStore.resetState()
+		friendStore.resetState()
+		modalStore.resetState()
 		router.push('/')
 	}
     else
@@ -122,6 +127,8 @@ const outsideClickHandle = () => {
 		transition: background-color 0.5s ease-in-out;
 		cursor: pointer;
 		top: 18px;
+		right: 5px;
+		z-index: 9;
 
 		svg {
 			font-size: 30px;

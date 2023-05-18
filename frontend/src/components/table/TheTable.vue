@@ -66,9 +66,9 @@ const tableDataPaginated = computed(() => {
 	flex-direction: column;
 	width: 100%;
 	height: 100%;
-	font-weight: 400;
     gap: 20px;
-    font-size: 16px;
+	font-family: 'Martian Mono', sans-serif;
+    font-size: 12px;
 
     @media (max-width: 980px) {
         font-size: 12px;
@@ -85,11 +85,16 @@ const tableDataPaginated = computed(() => {
 		border-collapse: collapse;
 		overflow: hidden;
 		margin: 0 auto;
-		font-family: 'Martian Mono';
+		font-family: 'Martian Mono', sans-serif;
 		font-weight: 400;
 		letter-spacing: -0.15em;
-
 		text-align: center;
+
+		@media (orientation: landscape) {
+			font-weight: 700;
+			letter-spacing: unset;
+			font-size: large;
+		}
 
 		thead tr {
 			height: 5em;

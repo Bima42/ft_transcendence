@@ -51,10 +51,14 @@ import { useModalStore } from '@/stores/modal'
 import TheModal from '@/components/modal/TheModal.vue'
 import SelectChannelActionModal from '@/components/modal/channel/SelectChannelActionModal.vue';
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
+import { get } from '../../utils';
+import UserInformations from '@/components/modal/UserInformationsModal.vue';
+import { useUserStore } from '@/stores/user';
 
 const selectedChatList = ref('public')
 const chatStore = useChatStore()
 const modalStore = useModalStore()
+const userStore = useUserStore()
 
 const chatListsSources = ref({
     chat1: {
@@ -81,6 +85,14 @@ const toggleAddChatModal = () => {
 const toggleEditChatModal = () => {
 	if (chatStore.currentChat?.type != "WHISPER")
 		modalStore.loadAndDisplay(TheModal, EditChatModal, {})
+	else if (chatStore.currentChat?.type == "WHISPER") {
+		const author = chatStore.currentChat?.users.find((user) => user.user.id != userStore.user?.id)?.user
+		get(`users/id/${author?.id}`, 'Cannot get user details').then((user) => {
+			modalStore.loadAndDisplay(TheModal, UserInformations, {user: user})
+		}).catch((err) => {
+			alert(err)
+		})
+	}
 }
 </script>
 

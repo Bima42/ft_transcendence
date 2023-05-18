@@ -18,12 +18,14 @@ import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 import { toMessageDto } from 'src/shared/mapper/message.mapper';
+import { FriendsService } from '../users/friends/friends.service';
 
 @Injectable()
 export class ChannelService {
 	constructor(
 		private readonly prismaService: PrismaService,
 		private readonly userService: UsersService,
+		private readonly friendService: FriendsService,
 	) {
 	}
 
@@ -107,7 +109,7 @@ export class ChannelService {
 			throw new BadRequestException('No channel found');
 		}
 
-		let details = []
+		const details = []
 		for (const el of channels) {
 			details.push(await this.getChannelDetails(user, el.id))
 		}
@@ -458,14 +460,23 @@ export class ChannelService {
 		this.deleteChatIfEmpty(data.chatId);
 	}
 
-	async getLastMessages(chatId: number, nbrMsgs: number): Promise<ChatMessageDto[]> {
+	async getLastMessages(userId: number, chatId: number, nbrMsgs: number): Promise<ChatMessageDto[]> {
 		const chat = await this.findChannelById(chatId);
 		if (!chat)
 			return [];
+
+		const blockedUsers = await this.friendService.getAllBlockedUsers(userId);
+		const blockedUsersIds = blockedUsers.map((user: User) => user.id);
+
 		const msgs = await this.prismaService.chatMessage.findMany({
 			skip: 0,
 			take: nbrMsgs,
-			where: { chatId: chatId },
+			where: {
+				chatId: chatId,
+				NOT: {
+					userId: { in: blockedUsersIds }
+				},
+			},
 			orderBy: { id: 'desc' },
 			include: {
 				user: true
@@ -476,7 +487,7 @@ export class ChannelService {
 
 	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessageDto> {
 		try {
-			let chat = await this.prismaService.chat.findFirst({
+			const chat = await this.prismaService.chat.findFirst({
 				where: {
 					type: 'WHISPER',
 					users: {

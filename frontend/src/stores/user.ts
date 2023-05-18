@@ -10,13 +10,15 @@ import type { UserStatus } from '@/interfaces/user/IUser';
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
+	const stats = ref<IUserStats | null>()
 
 	const resetState = () => {
 		user.value = null
+		stats.value = null
 		localStorage.removeItem('localUser');
 	}
 
-	const setState =  (newUser: IUser) => {
+	const setState = (newUser: IUser) => {
 		user.value = newUser
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
@@ -31,22 +33,16 @@ export const useUserStore = defineStore('user', () => {
 		return get(
 			'auth/login',
 			'Failed to login',
-		)
-			.then(response => response.json())
-			.then(json => {
-				user.value = json as IUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
-				return true
-			})
-			.catch(err => {
-				alert(err)
-				return false
-			})
+		).then(json => {
+			setState(json as IUser)
+			return true
+		}).catch(err => {
+			alert(err)
+		})
 	}
 
-	const logout =  () : boolean => {
-		get(`auth/logout`, 'Failed to logout')
-		.catch(e => console.log(e.message))
+	const logout = (): boolean => {
+		get(`auth/logout`, 'Failed to logout').then()
 		resetState()
 		return true
 	}
@@ -66,10 +62,10 @@ export const useUserStore = defineStore('user', () => {
 			jsonHeaders,
 			{twoFA: status}
 		)
-		.then((newUser: IUser) => {
-			user.value = newUser
-			localStorage.setItem('localUser', JSON.stringify(user.value))
-		})
+			.then((newUser: IUser) => {
+				user.value = newUser
+				localStorage.setItem('localUser', JSON.stringify(user.value))
+			})
 	}
 
 	const verifyTwoFaCode = async (code: string): Promise<boolean> => {
@@ -85,16 +81,14 @@ export const useUserStore = defineStore('user', () => {
 		return json.twoFAAuthenticated
 	}
 
-  const updateInfos = async (infos: IUserUpdate) : Promise<IUser | null> => {
-	// Yes, we have to use await and then, not sure why
-    patch(`users/me`, "cannot update username", jsonHeaders, infos)
-    .then((newUser: IUser) => {
-      user.value = newUser
-      localStorage.setItem('localUser', JSON.stringify(user.value))
-    })
-
-    return user.value
-  }
+	const updateInfos = (infos: IUserUpdate): Promise<IUser | null> => {
+		// Yes, we have to use await and then, not sure why
+		return patch(`users/me`, "cannot update username", jsonHeaders, infos)
+			.then((newUser: IUser) => {
+				setState(newUser)
+				return user.value
+			})
+	}
 
 	const uploadAvatar = (file: FormData) => {
 		post(
@@ -151,13 +145,12 @@ export const useUserStore = defineStore('user', () => {
 		})
 	}
 
-	const getUserStats = (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
+	const getUserStats = async (user_id: number | undefined = user.value?.id): Promise<IUserStats> => {
 		return get(
 			`users/stats/${user_id}`,
 			'Failed to get user stats',
 			jsonHeaders,
 		)
-			.then(res => res.json())
 	}
 
 	const getLeaderboard = async (): Promise<IUserStats[]> => {
@@ -165,62 +158,63 @@ export const useUserStore = defineStore('user', () => {
 			'users/stats/leaderboard',
 			'Failed to get leaderboard datas',
 			jsonHeaders,
-		).then(res => res.json())
-		.catch(() => [])
-		users.forEach((el) => { delete el.wonGames})
+		)
+		users.forEach((el) => {
+			delete el.wonGames
+		})
 		return users
 	}
 
-	const getEloHistory = (user_id: number | undefined = user.value?.id) => {
+	const getEloHistory = async (user_id: number | undefined = user.value?.id) => {
 		return get(
 			`users/stats/elo/history/${user_id}`,
 			'Failed to get elo history',
 			jsonHeaders,
 		)
-			.then(res => res.json())
 	}
 
 	const getHighestElo = async () => {
-		const response = await get(
+		return get(
 			`users/stats/elo/highest`,
 			'Failed to get highest elo',
 			jsonHeaders,
 		)
-		return response.json()
 	}
 
 	const getMatchHistory = async (user_id: number | undefined = user.value?.id): Promise<IMatchHistory[]> => {
-		const response = await get(
+		return get(
 			`users/stats/matchHistory/${user_id}`,
 			'Failed to get match history',
 			jsonHeaders,
 		)
-		return response.json()
 	}
 
-	const getRank = async (user_id: number | undefined = user.value?.id): Promise<number> => {
+	const getRank = (user_id: number | undefined = user.value?.id): Promise<number> => {
+		console.log('id', user_id)
 		return get(
 			`users/stats/rank/${user_id}`,
 			'Failed to get rank',
 			jsonHeaders,
-		).then(response => response.json())
+		).then((rank: number) => {
+			console.log(rank)
+			return rank
+		})
 	}
 
-	const getUserInfos = (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
+	const getUserInfos = async (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {
 		return get(
 			`users/id/${user_id}`,
 			'Failed to get user infos',
 			jsonHeaders,
-		).then(response => response.json())
+		)
 	}
 
-	const getUserInfosByUsername = (username: string): Promise<IUser> => {
+	const getUserInfosByUsername = async (username: string): Promise<IUser> => {
 		return get(
 			`users/${username}`,
 			'Failed to get user infos',
 			jsonHeaders,
 		)
-			.then(response => response.json())
 	}
 
 	return {

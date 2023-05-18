@@ -1,8 +1,10 @@
 <template>
     <section v-if="user" class="profile_wrapper">
         <section class="profile_wrap">
-			<div class="user_settings">
-				<UserPicture :url="user?.avatar" :type="'big'" :status="user.status" :isSelf="isSelf" :pictureDotSize="'large'" />
+			<div class="user_infos">
+				<div class="user_overview">
+					<UserPicture :url="user?.avatar" :type="'big'" :status="user.status" :isSelf="isSelf" :pictureDotSize="'large'" />
+				</div>
 				<div class="buttons_wrap">
 					<h2 v-if="!isSelf">{{ user?.username }}</h2>
 					<UserCredentialsSettings v-if="isSelf" />
@@ -65,13 +67,6 @@ loadUser()
     padding: 5px;
     gap: $medium_gap;
 
-	.buttons_wrap {
-		display: flex;
-		gap: $small_gap;
-		flex-direction: column;
-		justify-content: center;
-	}
-
     .profile_wrap {
         flex: 1;
         width: 100%;
@@ -80,13 +75,28 @@ loadUser()
         justify-content: center;
 		gap: $small_gap;
 
-		.user_settings, .user_progression_bar {
+		.user_infos, .user_progression_bar {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			flex-wrap: wrap;
 			gap: $medium_gap;
 			width: 50%;
+			max-width: 600px;
+
+			.buttons_wrap {
+				display: flex;
+				gap: $small_gap;
+				flex-direction: column;
+				justify-content: center;
+			}
+
+			.user_overview {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: $medium_gap;
+			}
 		}
 
 		.user_progression_bar {

@@ -5,12 +5,12 @@
 				Leaderboard
 			</h2>
 		</section>
-		<Table :headers="tableHeaders" :data="datas" :sortDatas="sortDatas" :rowsPerPage="11"/>
+		<TheTable :headers="tableHeaders" :data="datas" :sortDatas="sortDatas" :rowsPerPage="11"/>
 	</section>
 </template>
 
 <script setup lang="ts">
-import Table from '@/components/table/TheTable.vue'
+import TheTable from '@/components/table/TheTable.vue'
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import type IUserStats from '@/interfaces/user/IUserStats'

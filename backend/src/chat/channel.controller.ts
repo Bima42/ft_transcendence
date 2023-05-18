@@ -9,19 +9,14 @@ import {
 	Post,
 	Put,
 	Req,
-	HttpException,
-	HttpStatus,
-	Logger
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { ChatGateway } from './channel.gateway';
-import { Chat, ChatMessage, UserChatRole } from '@prisma/client';
+import { UserChatRole } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ChatMessageDto, NewChatMessageDto, NewWhisperMessageDto } from './dto/message.dto';
 import { UserchatAction, DetailedChannelDto, NewChannelDto, JoinChannelDto, NewWhisperDto, UpdateChannelDto } from './dto/channel.dto';
-import { length } from 'class-validator';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
-import { ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -96,8 +91,8 @@ export class ChannelController {
 	}
 
 	@Get('rooms/:id/messages')
-	getOneChannelMessages(@Param('id', new ParseIntPipe()) id: number) {
-		return this.channelService.getLastMessages(id, 50);
+	getOneChannelMessages(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
+		return this.channelService.getLastMessages(req.user.id, id, 50);
 	}
 
 	@Post('rooms/:id/messages')

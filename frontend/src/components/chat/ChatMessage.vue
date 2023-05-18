@@ -30,13 +30,10 @@ const modalStore = useModalStore()
 let side = ref(computed(() => {
     return props.author.id === props.userIs ? 'right' : 'left'
 }))
-
 const toggleUserInformations = async (author: IAuthor) => {
-    const user = await get(`users/id/${author.id}`, "Cannot get user details")
-       .then((res) => res.json())
-    modalStore.loadAndDisplay(TheModal, UserInformations, { user: user })
+    const user = await get(`users/id/${author.id}`, 'Cannot get user details')
+    modalStore.loadAndDisplay(TheModal, UserInformations, {user: user})
 }
-
 </script>
 
 <style scoped lang="scss">
@@ -55,6 +52,7 @@ const toggleUserInformations = async (author: IAuthor) => {
         align-self: flex-start;
         background-color: $transparent-quaternary;
     }
+
     &.right {
         align-self: flex-end;
         background-color: $transparent-tertiary;
@@ -62,13 +60,16 @@ const toggleUserInformations = async (author: IAuthor) => {
 
     .author {
         font-weight: bold;
+
         &:hover {
             cursor: pointer;
         }
     }
+
     .content {
         font-size: 14px;
     }
+
     .time {
         position: absolute;
         font-size: 10px;

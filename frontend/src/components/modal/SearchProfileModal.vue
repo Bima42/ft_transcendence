@@ -29,7 +29,7 @@ const searchProfile = () => {
 			router.push(`/main/profile/${res.id}`)
 		modalStore.resetState()
 	}).catch((err) => {
-		console.log(err)
+		alert(err.message)
 	})
 }
 </script>

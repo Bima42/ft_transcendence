@@ -172,6 +172,8 @@ h1, h2, h3, h4, h5, h6, p, a {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	max-width: 600px;
+	min-height: 250px;
 	-webkit-box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
 	box-shadow: inset 0px 0px 8px 5px rgba(89, 89, 89, 0.75);
 	border-radius: 10px;

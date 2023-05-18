@@ -37,7 +37,7 @@ import { FriendsService } from './friends/friends.service';
     UsersMiddleware,
     AuthService,
   ],
-  exports: [UsersService, UsersMiddleware, AuthService],
+  exports: [UsersService, UsersMiddleware, AuthService, FriendsService],
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
