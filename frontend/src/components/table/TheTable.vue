@@ -90,6 +90,12 @@ const tableDataPaginated = computed(() => {
 		letter-spacing: -0.15em;
 		text-align: center;
 
+		@media (orientation: landscape) {
+			font-weight: 700;
+			letter-spacing: unset;
+			font-size: large;
+		}
+
 		thead tr {
 			height: 5em;
 		}
