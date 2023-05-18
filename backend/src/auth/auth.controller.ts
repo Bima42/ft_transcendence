@@ -13,7 +13,6 @@ import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { randomBytes} from 'crypto'
 
 @Controller('auth')
 export class AuthController {
@@ -79,44 +78,5 @@ export class AuthController {
   ) {
     await this.usersService.updateStatus(req.user.id, UserStatus.OFFLINE);
     await this.authService.logout(res);
-  }
-
-  @Get('bob')
-  async signInAsBob(@Req() req: RequestWithUser, @Res() res: Response) {
-    const username = randomBytes(3).toString('hex')
-    // Available only on localhost
-    if ( ! process.env.FRONTEND_URL.startsWith("https://localhost")) {
-        res.status(403).send("Forbidden");
-    }
-    let bob: any;
-    try {
-      bob = await this.usersService.findByName(username);
-    }
-    catch(e) {
-      bob = {
-        twoFA: false,
-        twoFASecret:  null,
-        twoFAAuthenticated: false,
-        fortyTwoId: null,
-        username: username,
-        email: username + "@example.com",
-        avatar: `https://api.multiavatar.com/${username}.png`,
-        firstName: null,
-        lastName: null,
-        phone: null,
-        status: 'OFFLINE',
-      }
-      bob = await this.usersService.create(bob);
-    }
-    // If a real user is using this pseudo, abort
-    if (bob.fortyTwoId != null) {
-      res.status(403).send("Already a bob42");
-    }
-
-    if (!req.cookies[process.env.JWT_COOKIE]) {
-      this.authService.storeTokenInCookie(bob, res);
-    }
-    const redirectUrl = `${process.env.FRONTEND_URL}/redirect/login`
-    res.status(302).redirect(redirectUrl);
   }
 }
