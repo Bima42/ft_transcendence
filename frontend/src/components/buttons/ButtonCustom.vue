@@ -7,6 +7,7 @@
         <p v-if="!loadingTrack">
             <slot></slot>
         </p>
+        <img v-else src="@/assets/img/loading.svg" alt="loading">
     </button>
 </template>
 
