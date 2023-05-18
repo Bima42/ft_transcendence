@@ -59,22 +59,6 @@ export class UsersService {
     return users.map(user => toUserDto(user));
   }
 
-  async updateStatus(userId: number, status: UserStatus): Promise<UserDto> {
-    try {
-      const user = await this.prismaService.user.update({
-        where: {
-          id: +userId
-        },
-        data: {
-          status: status
-        }
-      });
-      return toUserDto(user);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
-  }
-
   async updateData(user: User, data: UpdateUserDto): Promise<UserDto> {
 
     // Username must be unique

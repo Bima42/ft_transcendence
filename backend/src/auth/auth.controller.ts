@@ -10,8 +10,6 @@ import { UsersService } from '../users/users.service';
 import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
-import { UserDto } from '../users/dto/user.dto';
-import { toUserDto } from '../shared/mapper/user.mapper';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -64,9 +62,8 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user: UserDto = toUserDto(req.user);
+    const user = await this.usersService.updateData(req.user, {status: UserStatus.ONLINE});
 
-    await this.usersService.updateStatus(user.id, UserStatus.ONLINE);
     res.status(200).send(user);
   }
 
@@ -76,7 +73,7 @@ export class AuthController {
     @Res({ passthrough: true }) res,
 	@Req() req: RequestWithUser,
   ) {
-    await this.usersService.updateStatus(req.user.id, UserStatus.OFFLINE);
+    await this.usersService.updateData(req.user, {status: UserStatus.OFFLINE})
     await this.authService.logout(res);
   }
 }
