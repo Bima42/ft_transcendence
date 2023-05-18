@@ -42,6 +42,7 @@ FROM base AS prod
 
 ENV NODE_ENV="production"
 
+USER node
 RUN npx prisma generate && yarn build
 
 CMD ["yarn", "start:prod"]
