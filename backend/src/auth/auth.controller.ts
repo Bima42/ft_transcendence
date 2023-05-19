@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Param,
   Req,
   Res
 } from '@nestjs/common';
@@ -32,7 +31,7 @@ export class AuthController {
 
       // Create or validate user with data from 42 API
       const { id, email, first_name, last_name, phone, login, image } = userData;
-      const user = await this.authService.findOrCreate({
+      const { user, firstLogin } = await this.authService.findOrCreate({
         username: login,
         email,
         firstName: first_name,
@@ -49,7 +48,7 @@ export class AuthController {
 
       let redirectUrl = '';
       if (!user.twoFA || user.twoFAAuthenticated)
-        redirectUrl = `${process.env.FRONTEND_URL}/redirect/login`
+        redirectUrl = `${process.env.FRONTEND_URL}/redirect/login?firstLogin=${firstLogin}`
       else
         redirectUrl = `${process.env.FRONTEND_URL}/2fa`;
       res.status(302).redirect(redirectUrl);
@@ -62,7 +61,7 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user = await this.usersService.updateData(req.user.id, {status: UserStatus.ONLINE});
+    const user = await this.usersService.updateData(req.user.id, { status: UserStatus.ONLINE });
 
     res.status(200).send(user);
   }
@@ -73,7 +72,7 @@ export class AuthController {
     @Res({ passthrough: true }) res,
 	@Req() req: RequestWithUser,
   ) {
-    await this.usersService.updateData(req.user.id, {status: UserStatus.OFFLINE})
+    await this.usersService.updateData(req.user.id, { status: UserStatus.OFFLINE })
     await this.authService.logout(res);
   }
 }

@@ -66,15 +66,16 @@ export class AuthService {
 		phone: string,
 		fortyTwoId: number,
 		avatar: string
-	}): Promise<User> {
+	}) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email: email
 			}
 		});
 
+		let newUser: User | null = null;
 		if (!user) {
-			return this.prismaService.user.create({
+			newUser = await this.prismaService.user.create({
 				data: {
 					username,
 					email,
@@ -85,9 +86,13 @@ export class AuthService {
 					avatar
 				}
 			});
+			return {
+				user: newUser,
+				firstLogin: true
+			}
 		}
 		else {
-			return this.prismaService.user.update({
+			newUser = await this.prismaService.user.update({
 				where: {
 					id: user.id
 				},
@@ -97,6 +102,10 @@ export class AuthService {
 					fortyTwoId
 				}
 			});
+			return {
+				user: newUser,
+				firstLogin: false
+			}
 		}
 	}
 
