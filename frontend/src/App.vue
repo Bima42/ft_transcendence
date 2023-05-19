@@ -7,6 +7,7 @@
         <TheModal v-if="modalStore.show">
             <Component :is="modalStore.component"/>
         </TheModal>
+        <AlertBox v-if="alertStore.show"/>
         <router-view v-slot="{ Component }">
             <Transition>
                 <component :is="Component"/>
@@ -23,9 +24,12 @@ import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
+import AlertBox from '@/components/alert/AlertBox.vue'
+import { useAlertStore } from '@/stores/alert'
 
 const route = useRoute()
 const modalStore = useModalStore()
+const alertStore = useAlertStore()
 </script>
 
 <style lang="scss">
