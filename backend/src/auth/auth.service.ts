@@ -66,7 +66,7 @@ export class AuthService {
 		phone: string,
 		fortyTwoId: number,
 		avatar: string
-	}) {
+	}): Promise<{user: User, firstLogin: boolean}> {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email: email
