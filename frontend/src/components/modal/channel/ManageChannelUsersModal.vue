@@ -126,6 +126,7 @@ const setAction = (action: string) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-family: 'Martian Mono', sans-serif;
     gap: 10px;
 
     .modal_header {
