@@ -3,11 +3,11 @@ import { ref } from 'vue';
 import type INotification from '@/interfaces/INotification';
 
 export const useNotificationStore = defineStore('notification', () => {
-	const show = ref(false);
+	const show = ref(true);
 	const notifications = ref<INotification[]>([]);
 
 	const resetState = function () {
-		show.value = false;
+		show.value = true;
 		notifications.value = [];
 	}
 

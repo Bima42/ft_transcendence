@@ -51,6 +51,7 @@ const notificationStore = useNotificationStore()
 
 	@media (orientation: landscape) {
 		width: 100%;
+		height: 100px;
 		-webkit-animation: slide-in-right 1.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 		animation: slide-in-right 1.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 
@@ -77,6 +78,7 @@ const notificationStore = useNotificationStore()
 	}
 	@media (orientation: portrait) {
 		height: 100%;
+		width: 100%;
 		position: absolute;
 		top: 0;
 		left: 0;

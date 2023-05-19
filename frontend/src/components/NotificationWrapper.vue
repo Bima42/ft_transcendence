@@ -19,7 +19,6 @@ const notificationStore = useNotificationStore()
 	@media (orientation: landscape) {
 		min-width: 250px;
 		max-width: 300px;
-		height: 100px;
 		bottom: 0;
 		right: 0;
 		position: fixed;

@@ -7,7 +7,7 @@
         <TheModal v-if="modalStore.show">
             <Component :is="modalStore.component"/>
         </TheModal>
-		<NotificationWrapper />
+		<NotificationWrapper v-show="notificationStore.show && notificationStore.notifications.length" />
         <router-view v-slot="{ Component }">
             <Transition>
                 <component :is="Component"/>
@@ -25,9 +25,27 @@ import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
 import NotificationWrapper from '@/components/NotificationWrapper.vue';
+import { useChatStore } from '@/stores/chat';
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import { useUserStore } from '@/stores/user';
+import { useNotificationStore } from '@/stores/notification';
 
 const route = useRoute()
 const modalStore = useModalStore()
+const chatStore = useChatStore()
+const userStore = useUserStore()
+const notificationStore = useNotificationStore()
+
+chatStore.socket.on('msg', (data: IChatMessage) => {
+	if (data.author.id === userStore.user?.id)
+		return
+	notificationStore.addNotification({
+		picture: data.author?.avatar,
+		title: data.author.username,
+		message: data.content,
+		lifespan: 2000,
+	})
+})
 </script>
 
 <style lang="scss">
