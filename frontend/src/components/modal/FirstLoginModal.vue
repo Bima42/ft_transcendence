@@ -19,11 +19,11 @@ const router = useRouter()
 
 const goToProfile = () => {
 	router.push('/main/profile')
-	modalStore.toggleModal()
+	modalStore.resetState()
 }
 
 const goToIndex = () => {
-	modalStore.toggleModal()
+	modalStore.resetState()
 }
 </script>
 
