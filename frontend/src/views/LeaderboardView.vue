@@ -76,5 +76,11 @@ const tableHeaders = {
 </script>
 
 <style scoped lang="scss">
-
+.view_wrapper {
+    grid-area: $gigamain;
+    background-image: url("@/assets/img/wave.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom;
+}
 </style>

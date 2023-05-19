@@ -41,6 +41,7 @@ async function sendMessage() {
     gap: $small_gap;
     padding-left: 10px;
     position: relative;
+    max-width: 980px;
 
     input {
         flex: 1;

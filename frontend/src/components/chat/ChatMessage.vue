@@ -55,7 +55,7 @@ const toggleUserInformations = async (author: IAuthor) => {
 
     &.right {
         align-self: flex-end;
-        background-color: $transparent-tertiary;
+        background-color: $tertiary;
     }
 
     .author {

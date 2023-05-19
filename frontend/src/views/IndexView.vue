@@ -75,17 +75,23 @@ a {
         text-decoration: none;
         scale: 120%;
         color: $tertiary;
+        -webkit-text-stroke-width: 0.5px;
+        -webkit-text-stroke-color: black;
     }
 }
 
 .index_wrapper {
-    grid-area: $bigmain;
+    grid-area: $gigamain;
     display: flex;
     gap: $medium_gap * 1.5;
     flex-direction: column;
     width: 100%;
     height: 100%;
     text-align: center;
+    background-image: url("@/assets/img/wave.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom;
 
     .slide_down {
         -webkit-animation: slide_down 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) forwards;
