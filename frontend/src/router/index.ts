@@ -11,6 +11,7 @@ import TwoFaView from '@/views/TwoFaView.vue'
 import FriendsView from '@/views/FriendsView.vue'
 import LeaderboardView from '@/views/LeaderboardView.vue'
 import JoinAGameView from '@/views/JoinAGameView.vue'
+import MainPage from "@/MainPage.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,7 @@ const router = createRouter({
         {
             path: '/main',
             name: 'main',
+            component: MainPage,
             children: [
                 {
                     path: 'game',
@@ -75,7 +77,7 @@ const router = createRouter({
                     component: ProfileView,
                 },
             ]
-        }
+        },
     ]
 })
 
