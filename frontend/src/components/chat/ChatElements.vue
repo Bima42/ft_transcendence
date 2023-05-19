@@ -23,18 +23,13 @@ import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import ChatMessage from '@/components/chat/ChatMessage.vue'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
-import { useFriendStore } from '@/stores/friend';
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
-const friendStore = useFriendStore()
 
 const currentUser = userStore.user?.id
 chatStore.getMessages().then(() => {
 	chatStore.socket.on('msg', (data: IChatMessage) => {
-		if (friendStore.blocked.some((user) => user.id === data.author.id)) {
-			return
-		}
 		chatStore.onNewMessage(data)
 	})
 })

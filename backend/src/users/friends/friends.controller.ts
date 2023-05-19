@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { FriendsService } from './friends.service';
 import { RequestWithUser } from '../../interfaces/request-with-user.interface';
 import { UsersService } from '../users.service';
+import { ChatGateway } from 'src/chat/channel.gateway';
 
 @Controller('friends')
 @ApiTags('Friends')
@@ -11,6 +12,7 @@ export class FriendsController {
 	constructor(
 		private readonly friendsService: FriendsService,
 		private readonly usersService: UsersService,
+		private readonly channelGateway: ChatGateway,
 	) {}
 
 	/*************************************************************************
@@ -100,13 +102,19 @@ export class FriendsController {
 	@Post('block/:username')
 	@ApiProperty({ type: String })
 	async blockUser(@Param('username') username: string, @Req() req: RequestWithUser) {
-		return this.friendsService.blockUser(req.user.id, username);
+		const blockedUser = await this.usersService.findByName(username);
+		const res = await this.friendsService.blockUser(req.user.id, blockedUser);
+		await this.channelGateway.onBlockUser(req.user, blockedUser.id)
+		return res
 	}
 
 	@Post('unblock/:username')
 	@ApiProperty({ type: String })
 	async unblockUser(@Param('username') username: string, @Req()  req: RequestWithUser) {
-		return this.friendsService.unblockUser(req.user.id, username);
+		const blockedUser = await this.usersService.findByName(username);
+		const res = await this.friendsService.unblockUser(req.user.id, blockedUser);
+		await this.channelGateway.onUnblockUser(req.user, blockedUser.id)
+		return res
 	}
 
 	@Get('blocked')

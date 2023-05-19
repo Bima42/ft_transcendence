@@ -26,7 +26,7 @@ export class AuthModule  implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UsersMiddleware)
-      .exclude('auth/42/callback')
+      .exclude('auth/42/callback', 'auth/bob')
       .forRoutes(AuthController, TwoFaController)
   }
 }

@@ -29,7 +29,7 @@ export class ChannelService {
 	) {
 	}
 
-	async getSubscribedChannels(user: User): Promise<Array<BriefChannelDto>> {
+	async getSubscribedChannels(user: UserDto): Promise<Array<BriefChannelDto>> {
 		const channels: Chat[] = await this.prismaService.chat.findMany({
 			where: {
 				type: { not: 'WHISPER' },
@@ -93,7 +93,7 @@ export class ChannelService {
 		return dtos;
 	}
 
-	async getWhisperChannels(user: User): Promise<Array<DetailedChannelDto>> {
+	async getWhisperChannels(user: UserDto): Promise<Array<DetailedChannelDto>> {
 		let channels: Chat[] = [];
 		channels = await this.prismaService.chat.findMany({
 			where: {
@@ -198,7 +198,7 @@ export class ChannelService {
 	}
 
 	// Return the detailed description of the chat, except for the messages
-	async getChannelDetails(user: User, chatId: number): Promise<DetailedChannelDto> {
+	async getChannelDetails(user: UserDto, chatId: number): Promise<DetailedChannelDto> {
 
 		const chat: Chat = await this.prismaService.chat.findUnique({
 			where: { id: +chatId },
@@ -326,7 +326,7 @@ export class ChannelService {
 		const chat = await this.prismaService.chat.create({
 			data: {
 				type: "WHISPER",
-				name: "whisper",
+				name: `whisper ${user1.id} - ${targetUser.id}`,
 				users: {
 					create: [
 						{
@@ -374,13 +374,15 @@ export class ChannelService {
 		return this.getChannelDetails(user, newChannel.id)
 	}
 
-	async deleteChannel(user: User, chatId: number) {
+	async deleteChannel(user: User, chatId: number): Promise<DetailedChannelDto> {
 
 		// Get the current role of the request user
 		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
 		if (!reqUserChat || reqUserChat.role != 'OWNER') {
 			throw new ForbiddenException('Not authorized to delete Channel');
 		}
+
+		const details = await this.getChannelDetails(user, chatId)
 
 		// Delete UserChatRole
 		const roleOutput = await this.prismaService.userChat.deleteMany({
@@ -399,7 +401,7 @@ export class ChannelService {
 
 		Logger.log('Deleted chat ' + chatId + ': '
 			+ roleOutput.count + ' roles and ' + MsgOutput.count + ' messages erased');
-
+		return details
 	}
 
 	async joinChannel(user: User, newData: JoinChannelDto): Promise<DetailedChannelDto> {
@@ -558,15 +560,12 @@ export class ChannelService {
 		return toMessageDto(msg, user);
 	}
 
-	async deleteUserChatRole(user: User, chatId: number, targetUsername: string) {
+	async deleteUserChatRole(user: User, chatId: number, targetUser: UserDto) {
 		// Check current user permissions
 		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
 		if (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER') {
 			throw new ForbiddenException('Not authorized to kick');
 		}
-
-		// Get the target user from username:
-		const targetUser = await this.userService.findByName(targetUsername);
 
 		// Get the current role of the target user
 		const targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);
@@ -589,16 +588,13 @@ export class ChannelService {
 		return HttpStatus.OK;
 	}
 
-	async UpsertUserChatRole(user: User, chatId: number, targetUsername: string, newRole: UserChatRole, muteDuration: number | null): Promise<HttpStatus> {
+	async UpsertUserChatRole(user: User, chatId: number, targetUser: UserDto, newRole: UserChatRole, muteDuration: number | null): Promise<HttpStatus> {
 
 		// Check current user permissions
 		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
 		if (reqUserChat.role != 'ADMIN' && reqUserChat.role != 'OWNER') {
 			throw new ForbiddenException('Not authorized to update role');
 		}
-
-		// Get the target user from username:
-		const targetUser = await this.userService.findByName(targetUsername);
 
 		// Get the current role of the target user
 		const targetUserChat = await this.findUserchatFromIds(chatId, targetUser.id);

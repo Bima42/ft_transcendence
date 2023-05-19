@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,6 +11,7 @@ import { UserStatsController } from './stats/userstats.controller';
 import { UserStatsService } from './stats/userstats.service';
 import { FriendsController } from './friends/friends.controller';
 import { FriendsService } from './friends/friends.service';
+import { ChatModule } from 'src/chat/chat.module';
 
 /**
  * Users module
@@ -22,6 +23,7 @@ import { FriendsService } from './friends/friends.service';
  */
 @Module({
   imports: [
+	forwardRef(() => ChatModule),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_KEY,

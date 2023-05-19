@@ -139,6 +139,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 
 	const deleteChannel = async function (chatId: number): Promise<boolean> {
 		await del(`chat/rooms/${chatId}`, "Cannot delete channel")
+		subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
 		return true
 	}
 
