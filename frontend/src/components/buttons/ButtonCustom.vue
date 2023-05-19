@@ -95,7 +95,6 @@ button {
     }
 
 	&.danger {
-		color: red;
 		border-color: red;
 	}
 }
