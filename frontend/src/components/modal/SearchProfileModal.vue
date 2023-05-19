@@ -5,6 +5,8 @@
 			<input class="input" type="text" name="search_profile" placeholder="Find a profile" v-model="searchedProfile" @keydown.enter="searchProfile">
 			<font-awesome-icon icon="fa-magnifying-glass" class="search_icon" @click="searchProfile"/>
 		</div>
+        <button @click="alertStore.error = !alertStore.error">toggle error</button>
+        <button @click="alertStore.show = true">Show alert</button>
 	</section>
 </template>
 
@@ -13,7 +15,10 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
+import { useAlertStore } from '@/stores/alert'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 const modalStore = useModalStore()
 

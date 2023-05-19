@@ -38,11 +38,9 @@ const userRole = ref(chatStore.getRoleFromUserId(userStore.user?.id || 0))
 const handleClick = (option: string) => {
     switch (option) {
         case 'manageChannelUsers':
-			chatStore.refreshCurrentChat()
             modalStore.loadAndDisplay(TheModal, manageChannelUsersModal, {})
             break
         case 'manageChannel':
-			chatStore.refreshCurrentChat()
             modalStore.loadAndDisplay(TheModal, manageChannelModal, {})
             break
         case 'inviteFriend':
