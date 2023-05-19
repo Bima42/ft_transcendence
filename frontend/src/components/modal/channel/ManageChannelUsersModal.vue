@@ -35,31 +35,43 @@
                 {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.user.username }}
             </ButtonCustom>
         </section>
+        <ButtonCustom :style="'big'" v-if="selectedUser" @click="handleUserProfileClick">
+            View profile
+        </ButtonCustom>
     </section>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
-import {useModalStore} from '@/stores/modal'
-import {useChatStore} from '@/stores/chat'
+import { useModalStore } from '@/stores/modal'
+import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
-import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
 import type IUserChat from '@/interfaces/user/IUserChat'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
+import { useRouter } from 'vue-router'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
+const router = useRouter()
 
 const userRole = chatStore.getRoleFromUserId(userStore.user?.id || 0)
 const selectedUser = ref<IUserChat>()
 const takeActionView = ref(false)
 const selectedAction = ref<string | null>(null)
 const muteTime = ref(1)
+
+const handleUserProfileClick = () => {
+    if (selectedUser.value) {
+        router.push(`/main/profile/${selectedUser.value.user.id}`)
+        modalStore.resetState()
+    }
+}
 
 const resetVariables = () => {
     selectedUser.value = undefined
