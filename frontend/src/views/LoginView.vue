@@ -4,7 +4,7 @@
         <ButtonCustom :loading="loading" :click="login" :style="'login'">
             Login with 42
         </ButtonCustom>
-      <ButtonCustom styles="fat" @click="loginAsBob">Login as bob</ButtonCustom>
+      <ButtonCustom v-if="is_dev" styles="fat" @click="loginAsBob">Login as bob</ButtonCustom>
     </section>
 </template>
 
@@ -19,6 +19,7 @@ async function loginAsBob() {
 }
 
 const loading = ref(false)
+const is_dev = ref(import.meta.env.DEV)
 
 const userStore = useUserStore()
 
