@@ -18,7 +18,6 @@ import { ref } from 'vue';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 import type IUser from '@/interfaces/user/IUser';
 import { useRouter } from 'vue-router';
-import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
@@ -65,8 +64,7 @@ const blockOrUnblockUser = async () => {
 	}
 }
 
-const inviteToPlay = async () => {
-	console.log(`invite ${user.value.username} to play`)
+const inviteToPlay = () => {
 	if (!userStore.user || !user.value)
 		return;
 
@@ -80,7 +78,7 @@ const inviteToPlay = async () => {
 		player2: user,
 	}
 	modalStore.resetState()
-	router.push('joinGame')
+	router.replace('/main/joinGame')
 }
 
 </script>

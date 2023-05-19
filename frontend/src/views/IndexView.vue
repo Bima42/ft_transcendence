@@ -38,7 +38,6 @@ const gameStore = useGameStore()
 
 let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
-	console.log(`Received invitation from ${gameSettings.player1.username} !`)
 	if (receivedInvite)
 		return
 	receivedInvite = true
@@ -48,10 +47,8 @@ const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 		const accept = confirm(`Play a ${gameSettings.game.type.toLowerCase()} game with ${gameSettings.player1.username} ?`)
 		if (accept) {
 			gameStore.socket.emit("acceptInvitation", gameSettings)
-			console.log("Let's play !")
 			router.push('game')
 		} else {
-			console.log("Maybe not now")
 			gameStore.socket.emit("declineInvitation", gameSettings)
 		}
 		receivedInvite = false

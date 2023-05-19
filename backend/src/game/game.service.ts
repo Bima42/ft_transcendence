@@ -459,7 +459,8 @@ export class GameService {
 					id: settings.game.id
 				}
 			})
-			}
-		catch {}
+		} catch {
+			console.log("Game already deleted")
+		}
 	}
 }

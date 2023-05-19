@@ -1,7 +1,7 @@
 <template>
     <section class="select_game_mode_wrap">
         <h2>Select the game mode you wish to play</h2>
-		<h3 v-if="gameStore.currentGame">Opponent is {{ gameStore.currentGame.player2.username }} </h3>
+		<h3 v-if="gameStore.currentGame">Opponent is {{ gameStore.currentGame?.player2.username }} </h3>
         <div class="buttons_wrap">
             <ButtonCustom id="classic_btn" @click="onJoinClassic" :disabled="isLoading" :style="'big'"
                           :class="[useClassicMode ? 'selected' : '']">
@@ -41,14 +41,13 @@ const gameStore = useGameStore();
 const isLoading = ref(false);
 const useClassicMode = ref(true);
 const queueTimer = ref(0)
-let queueTimerIntervalID = 0
+let queueTimerIntervalID: ReturnType<typeof setTimeout> = setTimeout(() => {}, 0)
 
-function inviteToPlay() : boolean {
-	console.log("invite !")
-	gameStore.currentGame.game.type = useClassicMode.value ? 'CLASSIC' : 'CUSTOM'
+function inviteToPlay() {
+	gameStore.currentGame!.game.type = useClassicMode.value ? 'CLASSIC' : 'CUSTOM'
 	const invite = {
-		gameType: gameStore.currentGame.game.type,
-		userId: gameStore.currentGame.player2.id,
+		gameType: gameStore.currentGame?.game.type,
+		userId: gameStore.currentGame?.player2.id,
 	}
 	gameStore.socket.emit("invitePlayer", invite, ((res: string) => {
 		if (res !== "OK") {
@@ -66,20 +65,17 @@ function joinQueue() {
 		inviteToPlay()
 	}
 	else {
-		console.log(`join queue`)
 		gameStore.socket.emit('newJoinQueue', {
 			type: useClassicMode.value ? 'CLASSIC' : 'CUSTOM'
 		});
 	}
 
-	gameStore.socket.once('matchFound', (gameSettings: IGameSettings) => {
-		console.log(`match found !`)
+	gameStore.socket.once('matchFound', () => {
 		isLoading.value = false;
 		gameStore.socket.off("invitationDeclined")
 		router.push(`game`);
 	});
 	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
-		console.log(`invitation declined :(`)
 		isLoading.value = false
 		gameStore.socket.off("invitationDeclined")
 		gameStore.socket.off("matchFound")
@@ -110,7 +106,6 @@ function leaveQueue() {
 		cancelInvitation()
 	}
 	else {
-		console.log(`leave queue`)
 		gameStore.socket.emit('abortJoinQueue')
 	}
 	queueTimer.value = 0

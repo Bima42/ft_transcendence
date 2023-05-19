@@ -69,12 +69,10 @@ export default class UiScene extends Phaser.Scene {
     }
     // Are we player 1 or 2 ?
     if(userStore.user?.id == this.gameSettings.player1?.id) {
-      console.log("player 1");
       this.isPlayer1 = true;
       this.myPlayer = this.gameSettings.player1;
       this.otherPlayer = this.gameSettings.player2;
     } else {
-      console.log("player 2");
       this.isPlayer1 = false;
       this.myPlayer = this.gameSettings.player2;
       this.otherPlayer = this.gameSettings.player1;
@@ -94,19 +92,16 @@ export default class UiScene extends Phaser.Scene {
   }
 
   onServerDisconnect() {
-      console.log("Server disconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`Server disconnected.`)
   }
 
   onPlayerDisconnect() {
-      console.log(`other player ${this.otherPlayer.username} disconnected`);
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
   }
 
   onPlayerReconnect() {
-      console.log("Player reconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} reconnected!`)
       setTimeout(() => {
