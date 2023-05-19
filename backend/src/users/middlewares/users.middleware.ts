@@ -19,8 +19,7 @@ export class UsersMiddleware implements NestMiddleware {
 		}
 		try {
 			const verifiedToken = this.authService.verifyToken(token);
-			const user = await this.usersService.findById(verifiedToken.sub);
-			req.user = user;
+			req.user = await this.usersService.findById(verifiedToken.sub);
 			next();
 		} catch (e) {
 			res.clearCookie(process.env.JWT_COOKIE);
