@@ -61,11 +61,10 @@ export const useUserStore = defineStore('user', () => {
 			'Failed to update 2FA status',
 			jsonHeaders,
 			{twoFA: status}
-		)
-			.then((newUser: IUser) => {
-				user.value = newUser
-				localStorage.setItem('localUser', JSON.stringify(user.value))
-			})
+		).then((newUser: IUser) => {
+			user.value = newUser
+			localStorage.setItem('localUser', JSON.stringify(user.value))
+		})
 	}
 
 	const verifyTwoFaCode = async (code: string): Promise<boolean> => {

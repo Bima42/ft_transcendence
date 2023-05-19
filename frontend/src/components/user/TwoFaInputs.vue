@@ -30,10 +30,13 @@ const userStore = useUserStore()
 
 const enableTwoFa = ref(false)
 const qrCodeImage = ref('')
-const toggleTwoFaStatus = async() => {
+const toggleTwoFaStatus = () => {
     enableTwoFa.value = !enableTwoFa.value
-	await userStore.updateTwoFaStatus(enableTwoFa.value)
-	.catch(e => alert(e.message))
+	try {
+		userStore.updateTwoFaStatus(enableTwoFa.value)
+	} catch (err: any) {
+		alert(err.message)
+	}
 }
 
 const generateQrCode = () => {

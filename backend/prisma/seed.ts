@@ -62,7 +62,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 		username: "Mattia Dirty Diallo",
 		fortyTwoId: 10939,
 		email: "mtorsell@student.42.fr",
-		avatar: `https://cdn.intra.42.fr/users/2c8f08a1ced2497e2b985bc9c4b80f5d/medium_mtorsell.jpg`,
+		avatar: `https://cdn.intra.42.fr/users/2c8f08a1ced2497e2b985bc9c4b80f5d/mtorsell.jpg`,
 		firstName: "Mattia",
 		lastName: "Torsello",
 		phone: "hidden",
