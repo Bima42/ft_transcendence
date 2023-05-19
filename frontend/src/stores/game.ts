@@ -10,8 +10,37 @@ export const useGameStore = defineStore('game', () => {
     path: "/api/socket.io/",
   }));
 
-  let currentGame = ref<IGameSettings | null>(null);
+  const currentGame = ref<IGameSettings | null>(null);
+
+  const waitForInvitation = function () {
+
+  }
+
+  const stopWaitingForInvitation = function () {
+
+  }
+
+  const acceptInvitation = function () {
+
+  }
+
+  const declineInvitation = function () {
+
+  }
+
+  const resetStore = function () {
+
+  }
 
 
-  return { socket, currentGame }
+
+  return {
+	socket,
+	currentGame,
+	waitForInvitation,
+	stopWaitingForInvitation,
+	acceptInvitation,
+	declineInvitation,
+	resetStore,
+  }
 })

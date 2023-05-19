@@ -59,23 +59,23 @@ export class UsersService {
     return users.map(user => toUserDto(user));
   }
 
-  async updateData(user: User, data: UpdateUserDto): Promise<UserDto> {
+  async updateData(userId: number, data: UpdateUserDto): Promise<UserDto> {
 
     // Username must be unique
     let otherUser: UserDto | null = null
-    if (data.username && data.username != user.username) {
+    if (data.username) {
       try {
         otherUser = await this.findByName(data.username)
       } catch (_e) {}
     }
-    if (otherUser)
+    if (otherUser && otherUser.id != userId)
       throw new BadRequestException("Username is already taken");
 
 
     try {
       const targetUser = await this.prismaService.user.update({
         where: {
-          id: +user.id
+          id: +userId
         },
         data: data
       });

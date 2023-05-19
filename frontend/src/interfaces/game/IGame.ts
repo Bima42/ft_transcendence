@@ -1,13 +1,13 @@
 import type IUser from '@/interfaces/user/IUser';
 
 export default interface IGame {
-	id: number
+	id?: number
 	type: GameType
 	status: GameStatus
-	createdAt: Date
-	endedAt: Date
+	createdAt?: Date
+	endedAt?: Date
 	users: IUser[]
 }
 
-export type GameStatus = 'SEARCHING' | 'STARTED' | 'ENDED'
+export type GameStatus = 'SEARCHING' | 'INVITING' | 'STARTED' | 'ENDED'
 export type GameType = 'CLASSIC' | 'CUSTOM'

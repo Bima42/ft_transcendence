@@ -62,7 +62,6 @@ export default class UiScene extends Phaser.Scene {
     this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
 
     if (!this.gameSettings.game) {
-      console.error("No game settings in store");
       // TODO: show error message
       // this.scene.stop('UiScene');
       this.scoreWidget.setText("No game. Invite someone or get in the queue !");
@@ -70,12 +69,10 @@ export default class UiScene extends Phaser.Scene {
     }
     // Are we player 1 or 2 ?
     if(userStore.user?.id == this.gameSettings.player1?.id) {
-      console.log("player 1");
       this.isPlayer1 = true;
       this.myPlayer = this.gameSettings.player1;
       this.otherPlayer = this.gameSettings.player2;
     } else {
-      console.log("player 2");
       this.isPlayer1 = false;
       this.myPlayer = this.gameSettings.player2;
       this.otherPlayer = this.gameSettings.player1;
@@ -95,19 +92,16 @@ export default class UiScene extends Phaser.Scene {
   }
 
   onServerDisconnect() {
-      console.log("Server disconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`Server disconnected.`)
   }
 
   onPlayerDisconnect() {
-      console.log("Player disconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
   }
 
   onPlayerReconnect() {
-      console.log("Player reconnected");
       this.startButton.setVisible(true)
       this.startButton.setText(`${this.otherPlayer.username} reconnected!`)
       setTimeout(() => {
