@@ -138,7 +138,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async onChannelLeave(user: UserDto, chatId: number) {
-		console.log(`Gateway: leave channel`)
 		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
 		for (const socket of sockets) {
 			socket.leave("channel" + chatId.toString())

@@ -374,13 +374,15 @@ export class ChannelService {
 		return this.getChannelDetails(user, newChannel.id)
 	}
 
-	async deleteChannel(user: User, chatId: number) {
+	async deleteChannel(user: User, chatId: number): Promise<DetailedChannelDto> {
 
 		// Get the current role of the request user
 		const reqUserChat = await this.findUserchatFromIds(chatId, user.id);
 		if (!reqUserChat || reqUserChat.role != 'OWNER') {
 			throw new ForbiddenException('Not authorized to delete Channel');
 		}
+
+		const details = await this.getChannelDetails(user, chatId)
 
 		// Delete UserChatRole
 		const roleOutput = await this.prismaService.userChat.deleteMany({
@@ -399,7 +401,7 @@ export class ChannelService {
 
 		Logger.log('Deleted chat ' + chatId + ': '
 			+ roleOutput.count + ' roles and ' + MsgOutput.count + ' messages erased');
-
+		return details
 	}
 
 	async joinChannel(user: User, newData: JoinChannelDto): Promise<DetailedChannelDto> {
