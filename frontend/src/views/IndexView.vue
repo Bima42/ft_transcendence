@@ -22,11 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import type IGameSettings from '@/interfaces/game/IGameSettings';
-import { useChatStore } from '@/stores/chat';
-import { useGameStore } from '@/stores/game';
-import { useRouter } from 'vue-router';
-import { useFriendStore } from '@/stores/friend';
+import type IGameSettings from '@/interfaces/game/IGameSettings'
+import { useChatStore } from '@/stores/chat'
+import { useGameStore } from '@/stores/game'
+import { useRouter } from 'vue-router'
+import { useFriendStore } from '@/stores/friend'
 
 const router = useRouter()
 
