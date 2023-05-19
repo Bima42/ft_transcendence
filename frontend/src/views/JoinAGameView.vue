@@ -145,10 +145,6 @@ onUnmounted(() => {
     grid-area: $gigamain;
     gap: 20px;
     text-align: center;
-    background-image: url("@/assets/img/wave.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: bottom;
 
     .buttons_wrap {
         display: flex;

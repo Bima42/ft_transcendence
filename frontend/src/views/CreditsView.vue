@@ -38,10 +38,6 @@ const creators = ref(
 <style scoped lang="scss">
 .credit-wrapper {
     grid-area: $gigamain;
-    background-image: url("@/assets/img/wave.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: bottom;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

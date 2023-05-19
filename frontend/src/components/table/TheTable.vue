@@ -121,6 +121,10 @@ const tableDataPaginated = computed(() => {
 		tbody tr:nth-of-type(even) {
 			background-color: $lighter-gray;
 		}
+        tbody tr:nth-of-type(odd) {
+			background-color: $background;
+		}
+
 
 		tbody tr:last-of-type {
 			border-bottom: 1px solid $tertiary;

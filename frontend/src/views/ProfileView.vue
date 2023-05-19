@@ -95,6 +95,10 @@ loadUser()
         justify-content: center;
         gap: $small_gap;
 
+        .user_progression_bar {
+            background: $background;
+        }
+
         .user_infos, .user_progression_bar {
             display: flex;
             justify-content: center;

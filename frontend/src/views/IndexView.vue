@@ -88,10 +88,6 @@ a {
     width: 100%;
     height: 100%;
     text-align: center;
-    background-image: url("@/assets/img/wave.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: bottom;
 
     .slide_down {
         -webkit-animation: slide_down 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940) forwards;

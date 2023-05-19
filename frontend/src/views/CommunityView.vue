@@ -108,10 +108,6 @@ const toggleEditChatModal = () => {
     height: 100%;
     position: relative;
     overflow: hidden;
-    background-image: url("@/assets/img/wave.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: bottom;
 
     .community_header {
         border-bottom: 1px solid $tertiary;
@@ -154,6 +150,18 @@ const toggleEditChatModal = () => {
         bottom: 20px;
         right: 20px;
         z-index: 1;
+
+        svg {
+            height: 50px;
+            width: 50px;
+            padding-left: 3px;
+            @media (max-width: 980px) {
+                height: 30px;
+                width: 30px;
+                padding-left: 1px;
+            }
+        }
+
     }
 }
 

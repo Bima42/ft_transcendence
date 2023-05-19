@@ -50,6 +50,10 @@ const alertStore = useAlertStore()
     font-weight: normal;
     overflow-x: hidden;
     overflow-y: auto;
+    background-image: url("@/assets/img/wave.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom;
 
     .UI-grid {
         display: grid;
