@@ -23,6 +23,7 @@ export class UsersMiddleware implements NestMiddleware {
 			next();
 		} catch (e) {
 			res.clearCookie(process.env.JWT_COOKIE);
+			res.clearCookie('choco');
 			throw new UnauthorizedException('Token is invalid');
 		}
 	}

@@ -56,6 +56,18 @@ export class AuthService {
 			secure: true,
 			sameSite: 'none',
 		});
+
+		res.cookie('choco',
+			"1 - Laissez ramollir le beurre à température ambiante. Dans un saladier, malaxez-le avec le sucre.\n" +
+			"2 - Ajoutez l'oeuf et éventuellement le sucre vanillé.\n" +
+			"3 - Versez progressivement la farine, la levure chimique, le sel et les pépites de chocolat. Mélangez bien.\n" +
+			"4 - Beurrez une plaque allant au four ou recouvrez-la d'une plaque de silicone. À l'aide de deux cuillères à soupe ou simplement avec les mains, formez des noix de pâte en les espaçant car elles s'étaleront à la cuisson.\n" +
+			"Pour finir\n" +
+			"Faites cuire 8 à 10 minutes à 180°C soit thermostat 6. Il faut les sortir dès que les contours commencent à brunir.", {
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+			secure: true,
+			sameSite: 'none',
+		});
 	}
 
 	async findOrCreate({username, email, firstName, lastName, phone, fortyTwoId, avatar}: {
@@ -133,6 +145,7 @@ export class AuthService {
 
 	async logout(res: Response) {
 		res.clearCookie(process.env.JWT_COOKIE);
+		res.clearCookie('choco')
 		res.status(200).send('Sign out success');
 	}
 }
