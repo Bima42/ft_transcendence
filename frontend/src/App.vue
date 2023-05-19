@@ -37,8 +37,10 @@ const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
-	if (data.author.id === userStore.user?.id)
+	if (data.author.id === userStore.user?.id ||
+		chatStore.whisperChatList.some((chat) => chat.id !== data.chatId))
 		return
+
 	notificationStore.addNotification({
 		picture: data.author?.avatar,
 		title: data.author.username,
