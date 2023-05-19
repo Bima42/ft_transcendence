@@ -1,5 +1,5 @@
 <template>
-    <section class="alert">
+    <section class="alert" >
         <div :class="['alert_container', alertStore.error ? 'error' : '']">
             <div class="alert_content">
                 <div class="alert_content_title" v-if="alertStore.title">
@@ -8,8 +8,27 @@
                 <div class="alert_content_text" v-if="alertStore.message">
                     <p>{{ alertStore.message }}</p>
                 </div>
+                <form v-if="alertStore.passwordInput" @submit="handleSubmit">
+                    <input type="password" placeholder="Password" v-model="password"/>
+                </form>
                 <div class="alert_content_button">
-                    <button @click="alertStore.show = false">Button</button>
+                    <ButtonCustom @click="alertStore.passwordCallback ? handleSubmit() : handleClick()"
+                                  :style="'big danger'"
+                    >
+                        {{ !alertStore.callBack ? 'Ok' : 'Yes' }}
+                    </ButtonCustom>
+                    <ButtonCustom @click="alertStore.resetState()"
+                                  :style="'big'"
+                                  v-if="!alertStore.error && alertStore.callBack"
+                    >
+                        No
+                    </ButtonCustom>
+                    <ButtonCustom @click="alertStore.resetState()"
+                                  :style="'big'"
+                                  v-if="alertStore.passwordCallback"
+                    >
+                        Cancel
+                    </ButtonCustom>
                 </div>
             </div>
         </div>
@@ -17,13 +36,49 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps} from 'vue'
-import {useAlertStore} from '@/stores/alert'
+/**
+ * @description HOW TO USE ME
+ * @example To use this component, use the store invokers such as: setValidationAlert, setErrorAlert etc..
+ * Here is an example for the validation alert:
+ * callback : const testFunction = () => { console.log('Foo Bar') }
+ * call : <button @click="alertStore.setValidationAlert(
+ *             'You are about to kill Bima',
+ *             'Are you sure ?',
+ *             testFunction)" />
+ *
+ * For the setPasswordAlert, it's the same process but the function must return a bool and recieve a string
+ * const passwordValid = (pass: string) => {
+ *     console.log('entered callback')
+ *     console.log('pass recieved : ', pass)
+ *     if (pass === '1234') {
+ *         console.log('valid')
+ *         return true
+ *     }
+ *     return false
+ * }
+ */
+import { useAlertStore } from '@/stores/alert'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import { ref } from 'vue';
 
 const alertStore = useAlertStore()
-const props = defineProps<{}>()
-// Case 1 Doit pouvoir display une info et ensuite dire ok pour fermer
-// possibilite de passer un prompt
+const password = ref<string>('')
+
+const handleClick = () => {
+    if (alertStore.callBack)
+        alertStore.callBack()
+    alertStore.resetState()
+}
+
+const handleSubmit = (e?: Event) => {
+    if (e)
+        e.preventDefault()
+    let ret = false
+    if (alertStore.passwordCallback)
+        ret = alertStore.passwordCallback(password.value)
+    if (ret)
+        alertStore.resetState()
+}
 </script>
 
 <style scoped lang="scss">
@@ -58,6 +113,22 @@ const props = defineProps<{}>()
         }
         @media (max-width: 768px) {
             padding: 20px;
+        }
+
+        .alert_content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .alert_content_button {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
         }
     }
 }
