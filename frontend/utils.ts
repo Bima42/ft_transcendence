@@ -88,8 +88,6 @@ export async function del(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	if (!response.ok)
-		throw new Error(`${message} (status ${response.status}): ${response.body}`)
 	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message

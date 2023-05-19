@@ -83,7 +83,7 @@ export class GameServer {
   constructor(private server: Server,
               public game: Game,
               sockets: Socket[]) {
-    this.roomID = String(this.game.id);
+    this.roomID = "game" + this.game.id.toString();
     this.players = [];
     this.players.push(sockets[0])
     this.players.push(sockets[1])
@@ -155,7 +155,7 @@ export class GameServer {
   onPlayerDisconnect(client: Socket) {
     if (!this.hasStarted)
       return;
-    Logger.log(`Game#${this.roomID}: ${client.data.user.username} disconnected`);
+    Logger.log(`Game#${this.game.id}: ${client.data.user.username} disconnected`);
 
     // check if already disconnected
     if (client.data.isReady) {
@@ -176,8 +176,9 @@ export class GameServer {
       return;
     }
 
-    Logger.log(`Game#${this.roomID}: ${newClient.data.user.username} reconnected`);
+    Logger.log(`Game#${this.game.id}: ${newClient.data.user.username} reconnected`);
     clearTimeout(this.disconnectTimeout)
+	this.disconnectTimeout = null
 
     // Socket shenanigans
     newClient.join(this.roomID);
@@ -202,27 +203,27 @@ export class GameServer {
   }
 
   onPlayerIsReady(client: Socket) {
-    Logger.log(`Game#${this.roomID}: ${client.data.user.username} is ready to play`);
+    Logger.log(`Game#${this.game.id}: ${client.data.user.username} is ready to play`);
 
     client.data.isReady = true;
 
     // Check if everybody is ready
     if (!this.hasStarted && this.players[0].data.isReady && this.players[1].data.isReady) {
       clearTimeout(this.startTimeout);
-      Logger.log(`Game#${this.roomID}: Starting game !`);
+      Logger.log(`Game#${this.game.id}: Starting game !`);
       this.onStartGame();
     }
   }
 
   private onAbortGame(reason: string) {
-    Logger.log(`Game#${this.roomID} aborted: ${reason}`);
+    Logger.log(`Game#${this.game.id} aborted: ${reason}`);
     this.status = "ABORTED"
 
     this.server.to(this.roomID).emit("abortGame", reason)
   }
 
   private onGameOver() {
-    Logger.log(`Game#${this.roomID}: Gameover`);
+    Logger.log(`Game#${this.game.id}: Gameover`);
     this.players[0].data.userGame.score = this.scores[0]
     this.players[1].data.userGame.score = this.scores[1]
     this.players[0].data.userGame.win = this.scores[0] > this.scores[1] ? 1 : 0
@@ -258,7 +259,7 @@ export class GameServer {
     } else {
       this.scores[0] += 1;
     }
-    Logger.log(`Game#${this.roomID}: ${this.scores[0]} - ${this.scores[1]}`);
+    Logger.log(`Game#${this.game.id}: ${this.scores[0]} - ${this.scores[1]}`);
 
     const pointWon: PointWonDto = {
       score1: this.scores[0],

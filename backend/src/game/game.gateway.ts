@@ -121,13 +121,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       return this.gameService.inviteSomebodyToPlay(client, inviteSettings);
   }
 
+  @SubscribeMessage('cancelInvitation')
+  cancelInvitation(@MessageBody() inviteSettings: GameSettingsDto,
+    @ConnectedSocket() client: Socket) {
+      return this.gameService.cancelInvitation(client, inviteSettings);
+  }
+
   @SubscribeMessage('acceptInvitation')
   acceptInvitation(@ConnectedSocket() client: Socket,
 				   @MessageBody() inviteSettings: GameSettingsDto) {
       return this.gameService.acceptInvitation(client, inviteSettings);
   }
 
-  @SubscribeMessage('declineInviration')
+  @SubscribeMessage('declineInvitation')
   declineInvitation(@ConnectedSocket() client: Socket,
 					@MessageBody() inviteSettings: GameSettingsDto) {
       return this.gameService.declineInvitation(client, inviteSettings);

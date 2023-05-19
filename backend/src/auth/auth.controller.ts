@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Param,
   Req,
   Res
 } from '@nestjs/common';
@@ -11,6 +10,7 @@ import { Response } from 'express';
 import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { randomBytes} from 'crypto'
 
 @Controller('auth')
 export class AuthController {
@@ -32,7 +32,7 @@ export class AuthController {
 
       // Create or validate user with data from 42 API
       const { id, email, first_name, last_name, phone, login, image } = userData;
-      const user = await this.authService.findOrCreate({
+      const { user, firstLogin } = await this.authService.findOrCreate({
         username: login,
         email,
         firstName: first_name,
@@ -49,7 +49,7 @@ export class AuthController {
 
       let redirectUrl = '';
       if (!user.twoFA || user.twoFAAuthenticated)
-        redirectUrl = `${process.env.FRONTEND_URL}/redirect/login`
+        redirectUrl = `${process.env.FRONTEND_URL}/redirect/login?firstLogin=${firstLogin}`
       else
         redirectUrl = `${process.env.FRONTEND_URL}/2fa`;
       res.status(302).redirect(redirectUrl);
@@ -62,7 +62,7 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user = await this.usersService.updateData(req.user, {status: UserStatus.ONLINE});
+    const user = await this.usersService.updateData(req.user.id, { status: UserStatus.ONLINE });
 
     res.status(200).send(user);
   }
@@ -73,7 +73,46 @@ export class AuthController {
     @Res({ passthrough: true }) res,
 	@Req() req: RequestWithUser,
   ) {
-    await this.usersService.updateData(req.user, {status: UserStatus.OFFLINE})
+    await this.usersService.updateData(req.user.id, { status: UserStatus.OFFLINE })
     await this.authService.logout(res);
+  }
+
+  @Get('bob')
+  async signInAsBob(@Req() req: RequestWithUser, @Res() res: Response) {
+    const username = randomBytes(3).toString('hex')
+    // Available only on localhost
+    if ( ! process.env.FRONTEND_URL.startsWith("https://localhost")) {
+        res.status(403).send("Forbidden");
+    }
+    let bob: any;
+    try {
+      bob = await this.usersService.findByName(username);
+    }
+    catch(e) {
+      bob = {
+        twoFA: false,
+        twoFASecret:  null,
+        twoFAAuthenticated: false,
+        fortyTwoId: null,
+        username: username,
+        email: username + "@example.com",
+        avatar: `https://api.multiavatar.com/${username}.png`,
+        firstName: null,
+        lastName: null,
+        phone: null,
+        status: 'OFFLINE',
+      }
+      bob = await this.usersService.create(bob);
+    }
+    // If a real user is using this pseudo, abort
+    if (bob.fortyTwoId != null) {
+      res.status(403).send("Already a bob42");
+    }
+
+    if (!req.cookies[process.env.JWT_COOKIE]) {
+      this.authService.storeTokenInCookie(bob, res);
+    }
+    const redirectUrl = `${process.env.FRONTEND_URL}/redirect/login`
+    res.status(302).redirect(redirectUrl);
   }
 }

@@ -72,6 +72,7 @@ const chatListsSources = ref({
 })
 
 const selectChatList = (chatID: string) => {
+	chatStore.updateStore()
     selectedChatList.value = chatID
 }
 const resetChat = () => {
