@@ -66,8 +66,11 @@ export class ChannelController {
 	@Post('rooms/whispers')
 	async createNewWhisper(@Req() req: RequestWithUser, @Body() data: NewWhisperDto): Promise<DetailedChannelDto> {
 		const chat = await this.channelService.createWhisperChat(req.user, data.targetUsername)
-		this.channelGateway.onChannelJoin(req.user, chat.id)
-		return this.channelService.getChannelDetails(req.user, chat.id)
+		const details = await this.channelService.getChannelDetails(req.user, chat.id)
+		for( const user of details.users) {
+			this.channelGateway.onChannelJoin(user.user, chat.id)
+		}
+		return details
 	}
 
 	@Put('rooms/join')
