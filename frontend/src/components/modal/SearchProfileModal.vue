@@ -13,9 +13,7 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
-import { useAlertStore } from '@/stores/alert'
 
-const alertStore = useAlertStore()
 const userStore = useUserStore()
 const modalStore = useModalStore()
 
