@@ -33,7 +33,7 @@ const goToIndex = () => {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: $small_gap;
+	gap: $medium_gap;
 
 	h2, p {
 		text-align: center;
