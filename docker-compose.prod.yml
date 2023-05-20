@@ -5,10 +5,7 @@ networks:
 
 services:
   server:
-    image: trans-nginx-prod
-    build:
-      context: ./nginx
-      target: dev
+    image: nginx
     container_name: transcendence-nginx-prod
     restart: always
     depends_on:

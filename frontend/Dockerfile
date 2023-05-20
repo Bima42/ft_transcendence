@@ -9,6 +9,7 @@ RUN apk add --no-cache --update yarn shadow
 
 # Use the already generated `node` user to run the app
 RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
+
 USER node
 
 # set working directory
@@ -26,7 +27,6 @@ COPY --chown=node:node . .
 ################## DEV ###################
 # Dev target
 FROM base AS dev
-USER node
 
 EXPOSE 8000
 
@@ -36,7 +36,8 @@ CMD ["yarn", "dev"]
 ################## PROD ##################
 
 FROM base AS prod
-USER node
 
+USER node
+RUN mkdir dist
 # build app
-CMD ["yarn", "build"]
+CMD ["yarn", "build-only"]
