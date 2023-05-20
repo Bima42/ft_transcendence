@@ -133,7 +133,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		}
 		const retChat = await post('chat/rooms', 'Failed to create channel', jsonHeaders, {name, type, password})
 			.catch((err) => {
-				alertStore.setErrorAlert(err)
+				alertStore.setErrorAlert(err.message)
 				return null
 			})
 		return retChat

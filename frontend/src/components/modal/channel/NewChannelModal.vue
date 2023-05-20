@@ -34,11 +34,10 @@ const channelType = ref('')
 const handleNewChannelSubmit = (e: Event) => {
     e.preventDefault()
     chatStore.createChannel(channelName.value, channelType.value, password.value)
-        .then(_ => {
+        .then(() => {
             chatStore.updateStore()
             modalStore.resetState()
         })
-        .catch(e => alert(e.message))
 }
 </script>
 
