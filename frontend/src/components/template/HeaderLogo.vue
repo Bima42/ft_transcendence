@@ -13,7 +13,7 @@ const hiddenLogo = [
 ]
 
 const router = useRouter()
-const shouldDisplayLogo = ref(true)
+const shouldDisplayLogo = ref(!hiddenLogo.includes(router.currentRoute.value.name))
 watch(() => router.currentRoute.value.name, () => {
     shouldDisplayLogo.value = !hiddenLogo.includes(router.currentRoute.value.name)
 })
