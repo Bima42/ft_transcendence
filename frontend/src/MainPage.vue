@@ -17,11 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 import CreditLink from '@/components/footers/CreditLink.vue'
 import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
-import {useModalStore} from '@/stores/modal'
+import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
 import AlertBox from '@/components/alert/AlertBox.vue'
 import { useAlertStore } from '@/stores/alert'
@@ -39,28 +39,29 @@ const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
-  if (data.author.id === userStore.user?.id ||
-      chatStore.whisperChatList.some((chat) => chat.id !== data.chatId))
-    return
+	if (data.author.id === userStore.user?.id ||
+		chatStore.whisperChatList.some((chat) => chat.id !== data.chatId) ||
+		chatStore.currentChat?.id == data.chatId)
+		return
 
-  notificationStore.addNotification({
-    picture: data.author?.avatar,
-    title: data.author.username,
-    message: data.content,
-    lifespan: 2000,
-  })
+	notificationStore.addNotification({
+		picture: data.author?.avatar,
+		title: data.author.username,
+		message: data.content,
+		lifespan: 2000,
+	})
 })
 </script>
 
 <style lang="scss">
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.5s ease;
+	transition: opacity 0.5s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-  opacity: 0;
+	opacity: 0;
 }
 
 #app {
@@ -84,12 +85,12 @@ chatStore.socket.on('msg', (data: IChatMessage) => {
     justify-items: center;
     align-items: center;
 
-    grid-template-areas:
+		grid-template-areas:
             "header1 header1 header2 header3"
             "left1 main1 main1 right1"
             "left1 main2 main2 right1"
             "left1 main3 main3 right1"
             "footer1 footer1 footer1 footer2";
-  }
+	}
 }
 </style>

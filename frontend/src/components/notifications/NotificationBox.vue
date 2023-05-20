@@ -4,7 +4,12 @@
 		<div v-if="props.notification.picture" class="icon">
 			<img :src="props.notification.picture" alt="icon" />
 		</div>
-		<p>{{ props.notification.message }}</p>
+		<p>
+			<span v-if="props.notification.title">
+				{{ props.notification.title }} :
+			</span>
+			{{ props.notification.message }}
+		</p>
 	</div>
 </template>
 
