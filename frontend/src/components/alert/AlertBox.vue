@@ -9,11 +9,13 @@
                     <p>{{ alertStore.message }}</p>
                 </div>
                 <form v-if="alertStore.passwordInput" @submit="handleSubmit">
-                    <input type="password" placeholder="Password" v-model="password"/>
+                    <input type="password" placeholder="Password" v-model="password" autofocus/>
                 </form>
                 <div class="alert_content_button">
                     <ButtonCustom @click="alertStore.passwordCallback ? handleSubmit() : handleClick()"
-                                  :style="'big danger'"
+                                  :style="'big' + (alertStore.error ? ' danger' : '')"
+                                  @keydown.enter="alertStore.passwordCallback ? handleSubmit() : handleClick()"
+                                  :autofocus="!alertStore.passwordCallback"
                     >
                         {{ !alertStore.callBack ? 'Ok' : 'Yes' }}
                     </ButtonCustom>
@@ -73,11 +75,12 @@ const handleClick = () => {
 const handleSubmit = (e?: Event) => {
     if (e)
         e.preventDefault()
-    let ret = false
-    if (alertStore.passwordCallback)
-        ret = alertStore.passwordCallback(password.value)
-    if (ret)
-        alertStore.resetState()
+    if (alertStore.passwordCallback) {
+        alertStore.passwordCallback(password.value).then((res: boolean) => {
+            if (res)
+                alertStore.resetState()
+        })
+    }
 }
 </script>
 

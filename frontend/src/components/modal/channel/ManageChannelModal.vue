@@ -68,8 +68,6 @@ const loading = ref(false)
 
 const handleClick = (action: string) => {
     switch (action) {
-        case 'edit':
-            break
         case 'delete':
             alertStore.setValidationAlert('You are about to delete a channel', 'Are you sure ?', deleteChannel)
             break

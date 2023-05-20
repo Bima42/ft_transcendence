@@ -14,7 +14,6 @@ export default interface IChatStore {
 	whisperChatList: Ref<IChat[]>;
 	subscribedChannelsList: Ref<IChat[]>;
 	notSubscribedChannelsList: Ref<IChat[]>;
-	isChannelPasswordProtected: Ref<boolean>;
 	sendMessage: (msg: any) => void;
 	refreshCurrentChat: () => Promise<boolean>;
 	setCurrentChat: (chatId: string) => Promise<boolean>;
@@ -26,12 +25,11 @@ export default interface IChatStore {
 	deleteChannel: (chatId: number) => Promise<boolean>;
 	createChannel: (name: string, type: string, password?: string) => Promise<IChat>;
 	createWhisper: (targetUser: string) => Promise<IChat>;
-	joinChannel: (chat: IChat, password?: string) => Promise<IChat>;
+	joinChannel: (chat: IChat, password?: string) => Promise<boolean>;
 	leaveChannel: (chatId: number) => Promise<boolean>;
 	subscribedChannels: () => Promise<boolean>;
 	getListOfNotSubscribedChannels: () => void;
 	updateChat: (newData: IUpdateChat) => Promise<IChat>;
-	currentChatPasswordProtected: () => Promise<void>;
 	inviteFriendToChat: (userName: string) => Promise<boolean>;
 	takeActionOnUser: (userName: string, actionToPerform: string, muteDuration?: number) => Promise<boolean>;
 	updateStore: () => Promise<void>;

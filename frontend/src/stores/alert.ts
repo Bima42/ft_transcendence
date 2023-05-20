@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type IChat from '@/interfaces/chat/IChat';
 
 export const useAlertStore = defineStore('alert', () => {
 	const message = ref<string | null>(null)
@@ -24,7 +25,7 @@ export const useAlertStore = defineStore('alert', () => {
 		show.value = true
 	}
 
-	const setPasswordAlert = function (newTitle: string, newMessage: string,  newPasswordCallback: (pass: string) => boolean) {
+	const setPasswordAlert = function (newTitle: string, newMessage: string,  newPasswordCallback: (pass: string) => Promise<boolean>) {
 		passwordInput.value = true
 		title.value = newTitle
 		message.value = newMessage

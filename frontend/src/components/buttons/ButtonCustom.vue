@@ -3,6 +3,8 @@
         :class="props.style"
         @click="props.click"
         :disabled="disabledTrack"
+        :id="props.autofocus ? 'autofocus' : ''"
+        ref="button"
     >
         <p v-if="!loadingTrack">
             <slot></slot>
@@ -20,23 +22,29 @@
  *
  * @comments - This button can be a loader display toom just pass him a ref of a boolean to track the loading state
  */
-import { defineProps, ref, watch } from 'vue'
+import {defineProps, onMounted, ref, watch} from 'vue'
 const props = defineProps<{
     style?: string
     loading?: boolean
     click?: () => void
     disabled?: boolean
+    autofocus?: boolean
 }>()
 
-const loadingTrack = ref(props.loading);
-const disabledTrack = ref(props.disabled);
+const loadingTrack = ref(props.loading)
+const disabledTrack = ref(props.disabled)
+const button = ref<HTMLButtonElement | null>(null)
 
 watch(() => props.loading, (loading) => {
-    loadingTrack.value = loading;
+    loadingTrack.value = loading
 })
 
 watch(() => props.disabled, (disabled) => {
-    disabledTrack.value = disabled;
+    disabledTrack.value = disabled
+})
+
+onMounted(() => {
+    if (props.autofocus && button.value) button.value.focus()
 })
 </script>
 

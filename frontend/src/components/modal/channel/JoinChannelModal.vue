@@ -16,32 +16,44 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted} from 'vue'
-import {useChatStore} from '@/stores/chat'
 import type IChat from '@/interfaces/chat/IChat'
-import {useModalStore} from '@/stores/modal'
-import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
+import { useModalStore } from '@/stores/modal'
+import { useChatStore } from '@/stores/chat'
+import { useAlertStore } from '@/stores/alert'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import { ref } from 'vue'
 
 const chatStore = useChatStore()
 const modalStore = useModalStore()
+const alertStore = useAlertStore()
+const selectedChat = ref<IChat>()
 
 chatStore.updateStore()
 
 const handleClick = (chat: IChat) => {
-    let password = undefined
-    if (chat.password) {
-        password = prompt('Password:')
-        if (!password)
-            return
+    selectedChat.value = chat
+    if (!chat.password) joinAChannel(undefined)
+    else {
+        alertStore.setPasswordAlert(
+            'This channel is protected by a password',
+            'Enter the password',
+            joinAChannel)
     }
-    chatStore.joinChannel(chat, password)
-        .then(() => {
+    return
+}
+
+const joinAChannel = async (password: string | undefined): Promise<boolean> =>{
+    chatStore.joinChannel(selectedChat.value!, password)
+        .then((res) => {
+            if (!res) return false
             modalStore.resetState()
             chatStore.updateStore()
-            chatStore.setCurrentChat(chat.id.toString())
+            chatStore.setCurrentChat(selectedChat.value!.id.toString())
+            return true
+        }).catch(() => {
+            return false
         })
-        .catch((e) => alert(e.message))
-    return
+    return true;
 }
 </script>
 
