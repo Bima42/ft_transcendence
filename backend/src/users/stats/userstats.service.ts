@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PlayerStatsDto } from '../dto/user.dto';
 
@@ -131,7 +131,7 @@ export class UserStatsService {
 	}
 
 	async getStatsByUserId(userId: number): Promise<PlayerStatsDto> {
-		const { username } = await this.prismaService.user.findUnique({
+		const user = await this.prismaService.user.findUnique({
 			where: {
 				id: userId
 			},
@@ -139,6 +139,8 @@ export class UserStatsService {
 				username: true
 			}
 		});
+		if (!user)
+			throw new NotFoundException("User not found")
 		const playedGames = await this.getPlayedGamesByUserId(userId);
 		const wonGames = await this.getWonGamesByUserId(userId);
 		const winRate = await this.getWinRateByUserId(userId);
@@ -146,7 +148,7 @@ export class UserStatsService {
 		const averageScore = await this.getAverageScoreByUserId(userId);
 		const rank = await this.getRankByUserId(userId);
 		return {
-			username: username,
+			username: user.username,
 			playedGames: playedGames,
 			wonGames: wonGames,
 			winRate: winRate,
