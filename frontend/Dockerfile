@@ -7,9 +7,6 @@ ARG GID=1000
 # install dependencies
 RUN apk add --no-cache --update yarn shadow
 
-# Use the already generated `node` user to run the app
-RUN groupmod -g "${GID}" node && usermod -u "${UID}" -g "${GID}" node
-
 USER node
 
 # set working directory
@@ -27,17 +24,29 @@ COPY --chown=node:node . .
 ################## DEV ###################
 # Dev target
 FROM base AS dev
+USER node
 
-EXPOSE 8000
+EXPOSE 80
 
 # start app
 CMD ["yarn", "dev"]
 
 ################## PROD ##################
 
-FROM base AS prod
-
+FROM base AS prod-builder
 USER node
-RUN mkdir dist
+
 # build app
-CMD ["yarn", "build-only"]
+RUN yarn build-only
+
+FROM nginx:1.23-alpine AS prod
+
+# Expose the port the Nginx server will be running on
+EXPOSE 80
+
+WORKDIR /app
+
+COPY --from=prod-builder /app/dist /usr/share/nginx/html
+
+# Start the Nginx server
+CMD ["nginx", "-g", "daemon off;"]
