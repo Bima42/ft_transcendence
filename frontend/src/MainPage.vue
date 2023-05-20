@@ -75,6 +75,20 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 	})
 })
 
+chatStore.socket.on('friendshipAccepted', (user: IUser) => {
+	friendStore.friends.push(user)
+	notificationStore.addNotification({
+		picture: user.avatar,
+		message: `${user.username} accepted your friend request`,
+		lifespan: 3000,
+		redirect: () => router.push(`/main/profile/${user.id}`),
+	})
+})
+
+chatStore.socket.on('friendshipRemoved', (user: IUser) => {
+	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id))
+})
+
 let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 	if (receivedInvite)

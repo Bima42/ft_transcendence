@@ -32,7 +32,10 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to add friend',
 				jsonHeaders,
 			)
-			return data.status === 'PENDING';
+			if (data.status === 'ACCEPTED') {
+				await updateStoreDatas();
+			}
+			return data.status === 'PENDING' || data.status === 'ACCEPTED';
 		}
 
 		const removeFriend = async (friendName: string): Promise<boolean> => {

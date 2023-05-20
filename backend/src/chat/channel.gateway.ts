@@ -178,6 +178,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const socket of friendSockets) {
 			socket.join("friend" + user.id.toString())
 		}
+		this.server.to("user" + targetUserId.toString()).emit("friendshipAccepted", user)
+
 	}
 
 	async onRemoveFriend(user: UserDto, targetUserId: number) {
@@ -189,5 +191,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const socket of friendSockets) {
 			socket.leave("friend" + user.id.toString())
 		}
+		this.server.to("user" + targetUserId.toString()).emit("friendshipRemoved", user)
 	}
 };

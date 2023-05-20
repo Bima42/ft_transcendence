@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { FriendshipStatus } from '@prisma/client';
@@ -18,17 +18,16 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	private async _isFriendshipCanceledOrDeclined(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	private async _getFriendshipStatus(userId: number, otherId: number) : Promise<FriendshipStatus | null> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
 					{
 						userId: userId,
-						friendId: friend.id,
+						friendId: otherId,
 					},
 					{
-						userId: friend.id,
+						userId: otherId,
 						friendId: userId,
 					}
 				]
@@ -38,8 +37,8 @@ export class FriendsService {
 			}
 		});
 		if (!friendship)
-			return false;
-		return friendship.status === FriendshipStatus.CANCELED || friendship.status === FriendshipStatus.DECLINED;
+			return null;
+		return friendship.status
 	}
 
 	async isFriend(userId: number, friendId: number) {
@@ -68,8 +67,26 @@ export class FriendsService {
 		if (await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is already a friend or has a pending request');
 
+		const friendshipStatus = await this._getFriendshipStatus(userId, friend.id)
+		if (!friendshipStatus) {
+			return this.prismaService.friendship.create({
+				data: {
+					user: {
+						connect: {
+							id: userId
+						}
+					},
+					friend: {
+						connect: {
+							id: friend.id
+						}
+					}
+				}
+			});
+		}
+
 		// If the friendship was canceled, we just update the status to pending
-		if (await this._isFriendshipCanceledOrDeclined(userId, friendName)) {
+		if (friendshipStatus == "DECLINED" || friendshipStatus == "CANCELED") {
 			await this.prismaService.friendship.updateMany({
 				where: {
 					OR: [
@@ -87,8 +104,9 @@ export class FriendsService {
 					status: FriendshipStatus.PENDING
 				}
 			});
-
-			return this.prismaService.friendship.findFirst({
+		}
+		else if (friendshipStatus == "PENDING") {
+			await this.prismaService.friendship.updateMany({
 				where: {
 					OR: [
 						{
@@ -100,24 +118,27 @@ export class FriendsService {
 							friendId: userId,
 						}
 					],
+				},
+				data: {
+					status: FriendshipStatus.ACCEPTED
 				}
 			});
 		}
-
-		return this.prismaService.friendship.create({
-			data: {
-				user: {
-					connect: {
-						id: userId
+		return this.prismaService.friendship.findFirst({
+			where: {
+				OR: [
+					{
+						userId: userId,
+						friendId: friend.id,
+					},
+					{
+						userId: friend.id,
+						friendId: userId,
 					}
-				},
-				friend: {
-					connect: {
-						id: friend.id
-					}
-				}
+				],
 			}
 		});
+
 	}
 
 	async removeFriend(userId: number, friend: UserDto) {
