@@ -50,7 +50,7 @@ friendStore.updateStoreDatas()
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
 	if (data.author.id === userStore.user?.id ||
-		chatStore.whisperChatList.some((chat) => chat.id !== data.chatId) ||
+		chatStore.subscribedChannelsList.some((chat) => chat.id === data.chatId) ||
 		chatStore.currentChat?.id == data.chatId)
 		return
 
