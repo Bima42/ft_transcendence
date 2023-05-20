@@ -11,6 +11,7 @@ import { UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { randomBytes} from 'crypto'
+import { toUserDto } from '../shared/mapper/user.mapper';
 
 @Controller('auth')
 export class AuthController {
@@ -62,9 +63,9 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: RequestWithUser, @Res() res: Response) {
-    const user = await this.usersService.updateData(req.user.id, { status: UserStatus.ONLINE });
+    const user = await this.usersService.findById(req.user.id);
 
-    res.status(200).send(user);
+    res.status(200).send(toUserDto(user));
   }
 
   @Get('logout')

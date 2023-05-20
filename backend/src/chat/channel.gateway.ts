@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 import { FriendsService } from 'src/users/friends/friends.service';
+import { UserStatus } from '@prisma/client';
 
 @WebSocketGateway({
 	path: "/api/socket.io",
@@ -122,7 +123,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const friend of friends) {
 			socket.join("friend" + friend.id.toString())
 		}
+
+		if (user.status !== UserStatus.OFFLINE)
+			return;
+
 		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
+		await this.usersService.updateData(user.id, { status: UserStatus.ONLINE });
 	}
 
 	handleDisconnect(socket: any): any {

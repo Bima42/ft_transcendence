@@ -35,7 +35,6 @@ chatStore.getMessages().then(() => {
 })
 
 onUnmounted(() => {
-	chatStore.socket.off('msg')
 	chatStore.resetState()
 })
 </script>
