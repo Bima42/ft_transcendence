@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CreditLink from '@/components/footers/CreditLink.vue'
 import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
