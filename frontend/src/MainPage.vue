@@ -39,15 +39,14 @@ const route = useRoute()
 const router = useRouter()
 
 const modalStore = useModalStore()
-const chatStore = useChatStore()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 const gameStore = useGameStore()
 const friendStore = useFriendStore()
 const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
 
 friendStore.updateStoreDatas()
-
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
 	if (data.author.id === userStore.user?.id ||
@@ -76,6 +75,7 @@ const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 	if (receivedInvite)
 		return
 	receivedInvite = true
+
 	// TODO: silent refuse if already in a game (already checked on server)
 	const gameType = gameSettings.game.type
 	setTimeout(() => {
