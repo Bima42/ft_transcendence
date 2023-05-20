@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  NotFoundException,
   Req,
   Res
 } from '@nestjs/common';
@@ -80,9 +81,9 @@ export class AuthController {
 
   @Get('bob')
   async signInAsBob(@Req() req: RequestWithUser, @Res() res: Response) {
-    // Available only on localhost
+    // Available only in development
     if ( process.env.NODE_ENV !== "development") {
-        res.status(403).send("Forbidden");
+		throw new NotFoundException("Cannot GET /api/auth/bob")
     }
     let bob: any;
     try {
