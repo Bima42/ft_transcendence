@@ -59,6 +59,10 @@ chatStore.socket.on('msg', (data: IChatMessage) => {
 		title: data.author.username,
 		message: data.content,
 		lifespan: 3000,
+		redirect: () => {
+			chatStore.setCurrentChat(data.chatId.toString())
+			router.push('/main/community/')
+		}
 	})
 })
 
