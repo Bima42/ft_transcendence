@@ -1,16 +1,19 @@
-import { get, jsonHeaders, mediaHeaders, patch, post } from '../../utils'
-import { defineStore } from 'pinia'
+import {get, jsonHeaders, mediaHeaders, patch, post} from '../../utils'
+import {defineStore} from 'pinia'
 import type IUser from '../interfaces/user/IUser'
-import { getCookie } from 'typescript-cookie'
-import { ref } from 'vue'
+import {getCookie} from 'typescript-cookie'
+import {ref} from 'vue'
 import type IUserUpdate from '../interfaces/user/IUserUpdate'
-import type IUserStats from '@/interfaces/user/IUserStats';
-import type IMatchHistory from '@/interfaces/user/IMatchHistory';
-import type { UserStatus } from '@/interfaces/user/IUser';
+import type IUserStats from '@/interfaces/user/IUserStats'
+import type IMatchHistory from '@/interfaces/user/IMatchHistory'
+import type {UserStatus} from '@/interfaces/user/IUser'
+import {useAlertStore} from '@/stores/alert'
+
 
 export const useUserStore = defineStore('user', () => {
 	const user = ref<IUser | null>(localStorage.getItem('localUser') ? JSON.parse(localStorage.getItem('localUser')!) as IUser : null)
 	const stats = ref<IUserStats | null>()
+	const alertStore = useAlertStore()
 
 	const resetState = () => {
 		user.value = null
@@ -37,7 +40,8 @@ export const useUserStore = defineStore('user', () => {
 			setState(json as IUser)
 			return true
 		}).catch(err => {
-			alert(err)
+			alertStore.setErrorAlert(err.message)
+			return false
 		})
 	}
 
@@ -65,7 +69,9 @@ export const useUserStore = defineStore('user', () => {
 			.then((newUser: IUser) => {
 				user.value = newUser
 				localStorage.setItem('localUser', JSON.stringify(user.value))
-			})
+			}).catch(err => {
+			alertStore.setErrorAlert(err.message)
+		})
 	}
 
 	const verifyTwoFaCode = async (code: string): Promise<boolean> => {
@@ -83,10 +89,13 @@ export const useUserStore = defineStore('user', () => {
 
 	const updateInfos = (infos: IUserUpdate): Promise<IUser | null> => {
 		// Yes, we have to use await and then, not sure why
-		return patch(`users/me`, "cannot update username", jsonHeaders, infos)
+		return patch(`users/me`, 'cannot update username', jsonHeaders, infos)
 			.then((newUser: IUser) => {
 				setState(newUser)
 				return user.value
+			}).catch(err => {
+				alertStore.setErrorAlert(err.message)
+				return null
 			})
 	}
 
@@ -104,7 +113,7 @@ export const useUserStore = defineStore('user', () => {
 				updateAvatar(avatar)
 			})
 			.catch(error => {
-				window.alert(error.message)
+				alertStore.setErrorAlert(error.message)
 			})
 	}
 
@@ -142,6 +151,9 @@ export const useUserStore = defineStore('user', () => {
 		).then((newUser: IUser) => {
 			setState(newUser)
 			return newUser.status
+		}).catch(err => {
+			alertStore.setErrorAlert('Failed to update status')
+			return user.value!.status
 		})
 	}
 

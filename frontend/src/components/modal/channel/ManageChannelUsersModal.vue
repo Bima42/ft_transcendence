@@ -48,6 +48,7 @@ import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
+import { useAlertStore } from '@/stores/alert'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
@@ -58,6 +59,7 @@ import { useRouter } from 'vue-router'
 const modalStore = useModalStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
+const alertStore = useAlertStore()
 const router = useRouter()
 
 const userRole = chatStore.getRoleFromUserId(userStore.user?.id || 0)
@@ -90,16 +92,13 @@ const handleBack = () => {
 const takeAction = () => {
     if (takeActionView.value && selectedAction.value && selectedUser.value) {
         if (selectedAction.value === 'mute' && (muteTime.value <= 0 || muteTime.value > 999)) {
-            //TODO: error !
+            alertStore.setErrorAlert('Mute time must be between 1 and 999 minutes')
             return
         }
         // do the action selected CARE IF MUTE ! USE MUTE TIME REF
         chatStore.takeActionOnUser(selectedUser.value.user.username, selectedAction.value, muteTime.value)
             .then(() => {
                 chatStore.updateStore()
-            })
-            .catch(err => {
-                alert(err.message)
             })
         // then we reset the values
         resetVariables()

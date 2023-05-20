@@ -88,6 +88,7 @@ export async function del(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+		.catch(() => { throw new Error(message) })
 	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
@@ -121,6 +122,7 @@ export async function put(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+		.catch(() => { throw new Error(message) })
 	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message
@@ -144,6 +146,7 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+		.catch(() => { throw new Error(message) })
 	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
 	if (!response.ok) {
 		jsonBody.message ??= message

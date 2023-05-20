@@ -14,12 +14,14 @@ export const useAlertStore = defineStore('alert', () => {
 		error.value = true
 		title.value = 'An error occurred'
 		message.value = newMessage
+		show.value = true
 	}
 
 	const setValidationAlert = function (newTitle: string, newMessage: string,  newCallBack: () => void) {
 		title.value = newTitle
 		message.value = newMessage
 		callBack.value = newCallBack
+		show.value = true
 	}
 
 	const setPasswordAlert = function (newTitle: string, newMessage: string,  newPasswordCallback: (pass: string) => boolean) {
@@ -27,6 +29,7 @@ export const useAlertStore = defineStore('alert', () => {
 		title.value = newTitle
 		message.value = newMessage
 		passwordCallback.value = newPasswordCallback
+		show.value = true
 	}
 	const resetState = function () {
 		message.value = null
