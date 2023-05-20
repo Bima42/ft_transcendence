@@ -118,8 +118,7 @@ export class FriendsService {
 		});
 	}
 
-	async removeFriend(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	async removeFriend(userId: number, friend: UserDto) {
 		if (!await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is not a friend or has a pending request');
 		const removed = await this.prismaService.friendship.deleteMany({
@@ -163,10 +162,9 @@ export class FriendsService {
 	 *   - friendId in the friendship table is the user who is accepting or declining the friend request
 	 *
 	 * @param userId: the user who is accepting or declining the friend request
-	 * @param friendName: the user who sent the friend request
+	 * @param friend: the user who sent the friend request
 	 */
-	async acceptFriend(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	async acceptFriend(userId: number, friend: UserDto) {
 		return this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {

@@ -163,5 +163,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	// OnNewFriend, OnRemoveFriend
+	async onNewFriend(user: UserDto, targetUserId: number) {
+		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of userSockets) {
+			socket.join("friend" + targetUserId.toString())
+		}
+		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
+		for (const socket of friendSockets) {
+			socket.join("friend" + user.id.toString())
+		}
+	}
+
+	async onRemoveFriend(user: UserDto, targetUserId: number) {
+		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of userSockets) {
+			socket.leave("friend" + targetUserId.toString())
+		}
+		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
+		for (const socket of friendSockets) {
+			socket.leave("friend" + user.id.toString())
+		}
+	}
 };

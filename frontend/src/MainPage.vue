@@ -58,7 +58,7 @@ chatStore.socket.on('msg', (data: IChatMessage) => {
 		picture: data.author?.avatar,
 		title: data.author.username,
 		message: data.content,
-		lifespan: 2000,
+		lifespan: 3000,
 	})
 })
 
@@ -66,7 +66,7 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} is online`,
-		lifespan: 2000,
+		lifespan: 3000,
 	})
 })
 
