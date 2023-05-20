@@ -13,7 +13,9 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 const modalStore = useModalStore()
 
@@ -29,7 +31,7 @@ const searchProfile = () => {
 			router.push(`/main/profile/${res.id}`)
 		modalStore.resetState()
 	}).catch((err) => {
-		alert(err.message)
+		alertStore.setErrorAlert(err)
 	})
 }
 </script>

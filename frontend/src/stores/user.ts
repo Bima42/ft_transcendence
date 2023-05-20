@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
 			setState(json as IUser)
 			return true
 		}).catch(err => {
-			alertStore.setErrorAlert(err.message)
+			alertStore.setErrorAlert(err)
 			return false
 		})
 	}
@@ -70,7 +70,7 @@ export const useUserStore = defineStore('user', () => {
 				user.value = newUser
 				localStorage.setItem('localUser', JSON.stringify(user.value))
 			}).catch(err => {
-			alertStore.setErrorAlert(err.message)
+			alertStore.setErrorAlert(err)
 		})
 	}
 
@@ -94,7 +94,7 @@ export const useUserStore = defineStore('user', () => {
 				setState(newUser)
 				return user.value
 			}).catch(err => {
-				alertStore.setErrorAlert(err.message)
+				alertStore.setErrorAlert(err)
 				return null
 			})
 	}
@@ -113,7 +113,7 @@ export const useUserStore = defineStore('user', () => {
 				updateAvatar(avatar)
 			})
 			.catch(error => {
-				alertStore.setErrorAlert(error.message)
+				alertStore.setErrorAlert(error)
 			})
 	}
 

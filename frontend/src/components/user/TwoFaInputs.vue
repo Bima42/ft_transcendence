@@ -23,9 +23,11 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
-import { post } from '../../../utils'
+import { post, BackendError } from '../../../utils'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 
 const enableTwoFa = ref(false)
@@ -34,8 +36,8 @@ const toggleTwoFaStatus = () => {
     enableTwoFa.value = !enableTwoFa.value
 	try {
 		userStore.updateTwoFaStatus(enableTwoFa.value)
-	} catch (err: any) {
-		alert(err.message)
+	} catch (err: BackendError) {
+		alertStore.setErrorAlert(err)
 	}
 }
 
@@ -44,7 +46,7 @@ const generateQrCode = () => {
         .then(data => {
             qrCodeImage.value = data.qrCodeImage
         })
-        .catch(err => alert(err.message))
+        .catch(err => alertStore.setErrorAlert(err))
 }
 </script>
 

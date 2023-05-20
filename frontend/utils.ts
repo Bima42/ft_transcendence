@@ -1,5 +1,16 @@
 import { getCookie } from 'typescript-cookie';
 
+export class BackendError extends Error {
+	public statusCode: number
+	public error: string
+
+	constructor(message: string, statusCode: number = 500, error: string = ""){
+		super(message)
+		this.statusCode = statusCode
+		this.error = error
+	}
+}
+
 export const jsonHeaders = new Headers({
 	'Content-Type': 'application/json',
 	'Accept': 'application/json',
@@ -29,11 +40,10 @@ export async function post(
 	else if (file)
 		request.body = file
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
+		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
+	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
-		jsonBody.message ??= message
-		jsonBody.statusCode ??= response.status
-		throw jsonBody
+		throw new BackendError(jsonBody.message ?? message, response.status, jsonBody.error ?? "")
 	}
 	return jsonBody
 }
@@ -54,12 +64,11 @@ export async function get(
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
 		headers: headers,
-	}).catch(() => { throw new Error(message) })
-
-	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message }})
+	})
+		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
+	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
-		jsonBody.message ??= message
-		throw jsonBody
+		throw new BackendError(jsonBody.message ?? message, response.status, jsonBody.error ?? "")
 	}
 	return jsonBody
 }
@@ -88,11 +97,10 @@ export async function del(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-		.catch(() => { throw new Error(message) })
-	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
+		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
+	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
-		jsonBody.message ??= message
-		throw jsonBody
+		throw new BackendError(jsonBody.message ?? message, response.status, jsonBody.error ?? "")
 	}
 	return jsonBody
 }
@@ -122,11 +130,10 @@ export async function put(
 	if (body)
 		request.body = JSON.stringify(body)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-		.catch(() => { throw new Error(message) })
-	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
+		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
+	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
-		jsonBody.message ??= message
-		throw jsonBody
+		throw new BackendError(jsonBody.message ?? message, response.status, jsonBody.error ?? "")
 	}
 	return jsonBody
 }
@@ -146,11 +153,10 @@ export async function patch(
 	if (json)
 		request.body = JSON.stringify(json)
 	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
-		.catch(() => { throw new Error(message) })
-	const jsonBody = await response.json().catch(() => { return { statusCode: 500, message: message } })
+		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
+	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
-		jsonBody.message ??= message
-		throw jsonBody
+		throw new BackendError(jsonBody.message ?? message, response.status, jsonBody.error ?? "")
 	}
 	return jsonBody
 }

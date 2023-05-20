@@ -31,9 +31,11 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import {useGameStore} from '@/stores/game'
 import {useRouter} from 'vue-router'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
+import { useAlertStore } from '@/stores/alert'
 
 const router = useRouter()
 
+const alertStore = useAlertStore()
 const gameStore = useGameStore();
 
 //const currentGame = ref<IGameSettings | null>(gameStore.currentGame)
@@ -52,7 +54,7 @@ function inviteToPlay() {
 	gameStore.socket.emit("invitePlayer", invite, ((res: string) => {
 		if (res !== "OK") {
 			cancelInvitation()
-			window.alert(res)
+			alertStore.setErrorAlert(res)
 		}
 	}))
 }
