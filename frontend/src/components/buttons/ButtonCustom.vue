@@ -3,7 +3,6 @@
         :class="props.style"
         @click="props.click"
         :disabled="disabledTrack"
-        :id="props.autofocus ? 'autofocus' : ''"
         ref="button"
     >
         <p v-if="!loadingTrack">
