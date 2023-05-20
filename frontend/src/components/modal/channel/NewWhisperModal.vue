@@ -30,7 +30,6 @@ const handleNewChannelSubmit = (e: Event) => {
 		chatStore.updateStore()
 		modalStore.resetState()
 	})
-	.catch(e => alert(e.message))
 }
 </script>
 
@@ -42,6 +41,7 @@ const handleNewChannelSubmit = (e: Event) => {
     justify-content: center;
     box-sizing: border-box;
     gap: 10px;
+    text-align: center;
 
     form {
         display: flex;
