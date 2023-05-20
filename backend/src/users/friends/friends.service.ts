@@ -63,6 +63,8 @@ export class FriendsService {
 
 	async addFriend(userId: number, friendName: string) {
 		const friend = await this.usersService.findByName(friendName);
+		if (userId === friend.id)
+			throw new BadRequestException('Bro, you are already friends with yourself');
 		if (await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is already a friend or has a pending request');
 
