@@ -22,16 +22,16 @@ import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
 import AlertBox from '@/components/alert/AlertBox.vue'
-import NotificationWrapper from '@/components/notifications/NotificationWrapper.vue';
+import NotificationWrapper from '@/components/notifications/NotificationWrapper.vue'
 import { useAlertStore } from '@/stores/alert'
-import {useChatStore} from '@/stores/chat';
-import {useUserStore} from '@/stores/user';
-import { useGameStore } from '@/stores/game';
-import { useFriendStore } from '@/stores/friend';
-import {useNotificationStore} from '@/stores/notification';
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
-import type IUser from '@/interfaces/user/IUser';
-import type IGameSettings from '@/interfaces/game/IGameSettings';
+import { useChatStore } from '@/stores/chat'
+import { useUserStore } from '@/stores/user'
+import { useGameStore } from '@/stores/game'
+import { useFriendStore } from '@/stores/friend'
+import { useNotificationStore } from '@/stores/notification'
+import type IChatMessage from '@/interfaces/chat/IChatMessage'
+import type IUser from '@/interfaces/user/IUser'
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,7 +44,13 @@ const friendStore = useFriendStore()
 const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
 
+friendStore.updateStoreDatas()
+
+/*************************************************************************
+ * 							NOTIFICATIONS								 *
+ *************************************************************************/
 chatStore.socket.on('msg', (data: IChatMessage) => {
+	chatStore.onNewMessage(data)
 	if (data.author.id === userStore.user?.id ||
 		chatStore.subscribedChannelsList.some((chat) => chat.id === data.chatId) ||
 		chatStore.currentChat?.id == data.chatId)
@@ -85,6 +91,10 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id))
 })
 
+
+/************************************************************************
+ * 								   GAME									*
+ ************************************************************************/
 let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 	if (receivedInvite)

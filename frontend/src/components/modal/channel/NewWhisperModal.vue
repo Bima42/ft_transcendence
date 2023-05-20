@@ -47,6 +47,10 @@ const handleNewChannelSubmit = (e: Event) => {
         display: flex;
         flex-direction: column;
         gap: 5px;
-    }
+
+		label, input {
+			font-family: 'Martian Mono', sans-serif;
+		}
+	}
 }
 </style>
