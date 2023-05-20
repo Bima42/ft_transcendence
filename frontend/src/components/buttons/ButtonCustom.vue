@@ -21,7 +21,7 @@
  *
  * @comments - This button can be a loader display toom just pass him a ref of a boolean to track the loading state
  */
-import {defineProps, onMounted, ref, watch} from 'vue'
+import { defineProps, onMounted, ref, watch } from 'vue'
 const props = defineProps<{
     style?: string
     loading?: boolean

@@ -12,7 +12,7 @@
                 {{ friend.username }}
             </li>
         </ul>
-        <section class="footer_buttons" ref="salut">
+        <section class="footer_buttons">
             <ButtonCustom :style="'big'" @click="handleBack">
                 Back
             </ButtonCustom>
