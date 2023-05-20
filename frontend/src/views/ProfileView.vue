@@ -54,7 +54,8 @@ const isSelf = ref(true)
 const rank = ref(0)
 
 async function loadUser() {
-    if (route.params.id) {
+    const routeId = route.params.id as string
+	if (routeId && +routeId !== userStore.user?.id) {
         isSelf.value = false
         user.value = await userStore.getUserInfos(route.params.id as string)
     } else {
@@ -67,6 +68,9 @@ async function loadUser() {
     })
 }
 
+watch(() => route.params.id, () => {
+    loadUser()
+})
 watch(() => route.params, () => {
     loadUser()
 })

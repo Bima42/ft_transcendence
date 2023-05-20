@@ -26,12 +26,6 @@ export const useUserStore = defineStore('user', () => {
 		localStorage.setItem('localUser', JSON.stringify(user.value))
 	}
 
-	const redirect = () => {
-		let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
-		redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
-		redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
-		window.open(redirect, '_self')
-	}
 	const login = () => {
 		return get(
 			'auth/login',
@@ -231,7 +225,6 @@ export const useUserStore = defineStore('user', () => {
 		user,
 		resetState,
 		setState,
-		redirect,
 		login,
 		logout,
 		isLoggedIn,

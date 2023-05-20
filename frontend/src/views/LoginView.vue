@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 
 async function loginAsBob() {
@@ -21,11 +20,16 @@ async function loginAsBob() {
 const loading = ref(false)
 const is_dev = ref(import.meta.env.DEV)
 
-const userStore = useUserStore()
+const loginRedirect = () => {
+	let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
+	redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
+	redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
+	window.open(redirect, '_self')
+}
 
 async function login() {
     loading.value = true;
-    userStore.redirect()
+	loginRedirect()
 }
 </script>
 

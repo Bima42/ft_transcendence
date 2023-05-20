@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { useNotificationStore } from '@/stores/notification';
-import NotificationBox from '@/components/NotificationBox.vue';
+import NotificationBox from '@/components/notifications/NotificationBox.vue'
+import { useNotificationStore } from '@/stores/notification'
 
 const notificationStore = useNotificationStore()
 </script>

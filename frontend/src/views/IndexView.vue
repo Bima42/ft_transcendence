@@ -22,46 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import type IGameSettings from '@/interfaces/game/IGameSettings'
-import { useChatStore } from '@/stores/chat'
-import { useGameStore } from '@/stores/game'
-import { useRouter } from 'vue-router'
-import { useFriendStore } from '@/stores/friend'
-
-const router = useRouter()
-
-const friendStore = useFriendStore()
-friendStore.updateStoreDatas()
-
-// DO NOT REMOVE: used to initialize the websocket
-const gameStore = useGameStore()
-
-let receivedInvite = false
-const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
-	if (receivedInvite)
-		return
-	receivedInvite = true
-	// TODO: silent refuse if already in a game (already checked on server)
-	const gameType = gameSettings.game.type
-	setTimeout(() => {
-		const accept = confirm(`Play a ${gameSettings.game.type.toLowerCase()} game with ${gameSettings.player1.username} ?`)
-		if (accept) {
-			gameStore.socket.emit("acceptInvitation", gameSettings)
-			router.push('game')
-		} else {
-			gameStore.socket.emit("declineInvitation", gameSettings)
-		}
-		receivedInvite = false
-
-	}, 100);
-	gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
-}
-
-gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
-
-// DO NOT REMOVE` used to initialize the websocket
-const chatStore = useChatStore()
-
 </script>
 
 <style scoped lang="scss">

@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import GitHubCard from '@/components/GitHubCard.vue'
+import GitHubCard from '@/components/footers/GitHubCard.vue'
 
 const creators = ref(
     [

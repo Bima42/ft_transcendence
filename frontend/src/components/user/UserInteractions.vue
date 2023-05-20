@@ -14,7 +14,7 @@
 import { useModalStore } from '@/stores/modal';
 import { useFriendStore } from '@/stores/friend';
 import { useGameStore } from '@/stores/game';
-import { ref } from 'vue';
+import { onMounted, onUpdated, ref } from 'vue';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 import type IUser from '@/interfaces/user/IUser';
 import { useRouter } from 'vue-router';
@@ -37,6 +37,10 @@ const isBlocked = ref(false)
 const isFriend = ref(false)
 const isRequestSent = ref(false)
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
+
+onUpdated(()=> {
+	user.value = props.targetUser ? props.targetUser : modalStore.data.user
+})
 
 isFriend.value = friendStore.isFriend(user.value.id)
 isBlocked.value = friendStore.isBlocked(user.value.id)

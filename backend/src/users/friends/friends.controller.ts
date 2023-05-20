@@ -30,7 +30,10 @@ export class FriendsController {
 	@Post('remove/:friendName')
 	@ApiProperty({ type: String })
 	async removeFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
-		return this.friendsService.removeFriend(req.user.id, friendName);
+		const friend = await this.usersService.findByName(friendName);
+		const removed = await this.friendsService.removeFriend(req.user.id, friend);
+		await this.channelGateway.onRemoveFriend(req.user, friend.id);
+		return removed
 	}
 
 	@Post('cancel/:friendName')
@@ -49,7 +52,10 @@ export class FriendsController {
 	@Patch('accept/:friendName')
 	@ApiProperty({ type: String })
 	async acceptFriend(@Param('friendName') friendName: string, @Req()  req: RequestWithUser) {
-		return this.friendsService.acceptFriend(req.user.id, friendName);
+		const friend = await this.usersService.findByName(friendName);
+		const friendship = await this.friendsService.acceptFriend(req.user.id, friend);
+		await this.channelGateway.onNewFriend(req.user, friend.id);
+		return friendship;
 	}
 
 	@Patch('decline/:friendName')

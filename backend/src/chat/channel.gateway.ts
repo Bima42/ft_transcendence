@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 import { FriendsService } from 'src/users/friends/friends.service';
+import { UserStatus } from '@prisma/client';
 
 @WebSocketGateway({
 	path: "/api/socket.io",
@@ -92,9 +93,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	async handleConnection(client: any, ...args: any[]) {
+	async handleConnection(socket: any, ...args: any[]) {
 
-		const user = await this.verifyUser(client.handshake.auth.token);
+		const user = await this.verifyUser(socket.handshake.auth.token);
 		if (!user) {
 			Logger.log("WS: client is not identified. dropped.");
 			return;
@@ -103,27 +104,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		Logger.log(`Chat: ${user.username}#${user.id} connected`);
 
 		// attach the user to the socket
-		client.data.user = user;
+		socket.data.user = user;
 
-		client.join("user" + user.id.toString())
+		socket.join("user" + user.id.toString())
 		const subscriptions = await this.channelService.getSubscribedChannels(user);
 		const whispers = await this.channelService.getWhisperChannels(user)
 		for (const chan of subscriptions) {
-			client.join("channel" + chan.id.toString())
+			socket.join("channel" + chan.id.toString())
 		}
 		for (const chan of whispers) {
-			client.join("channel" + chan.id.toString())
+			socket.join("channel" + chan.id.toString())
 		}
 		const blockedUsers = await this.friendService.getAllBlockedUsers(user.id)
 		for (const user of blockedUsers) {
-			client.join("block" + user.id.toString())
+			socket.join("block" + user.id.toString())
 		}
+		const friends = await this.friendService.getAllFriends(user.id)
+		for (const friend of friends) {
+			socket.join("friend" + friend.id.toString())
+		}
+
+		if (user.status !== UserStatus.OFFLINE)
+			return;
+
+		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
+		await this.usersService.updateData(user.id, { status: UserStatus.ONLINE });
 	}
 
-	handleDisconnect(client: any): any {
+	handleDisconnect(socket: any): any {
 
-		if (client.data.user) {
-			Logger.log(`Chat: ${client.data.user.username}#${client.data.user.id} disconnected`);
+		if (socket.data.user) {
+			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
 
 		//TODO: set user status offline
@@ -156,5 +167,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const socket of sockets) {
 			socket.leave("block" + targetUserId.toString())
 		}
+	}
+
+	async onNewFriend(user: UserDto, targetUserId: number) {
+		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of userSockets) {
+			socket.join("friend" + targetUserId.toString())
+		}
+		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
+		for (const socket of friendSockets) {
+			socket.join("friend" + user.id.toString())
+		}
+		this.server.to("user" + targetUserId.toString()).emit("friendshipAccepted", user)
+
+	}
+
+	async onRemoveFriend(user: UserDto, targetUserId: number) {
+		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
+		for (const socket of userSockets) {
+			socket.leave("friend" + targetUserId.toString())
+		}
+		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
+		for (const socket of friendSockets) {
+			socket.leave("friend" + user.id.toString())
+		}
+		this.server.to("user" + targetUserId.toString()).emit("friendshipRemoved", user)
 	}
 };
