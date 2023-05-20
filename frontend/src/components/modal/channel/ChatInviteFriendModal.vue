@@ -12,7 +12,7 @@
                 {{ friend.username }}
             </li>
         </ul>
-        <section class="footer_buttons" ref="salut">
+        <section class="footer_buttons">
             <ButtonCustom :style="'big'" @click="handleBack">
                 Back
             </ButtonCustom>
@@ -32,7 +32,9 @@ import { useFriendStore } from '@/stores/friend'
 import { useChatStore } from '@/stores/chat'
 import { ref, computed } from 'vue'
 import type IFriend from '@/interfaces/user/IFriend'
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 const chatStore = useChatStore()
@@ -74,7 +76,7 @@ const submitInvite = async () => {
         oldSelection.classList.remove('selected_friend')
     }
     await chatStore.inviteFriendToChat(selectedFriend.value.username)
-	.catch(e => alert(e.message))
+	.catch(e => alertStore.setErrorAlert(e))
 }
 </script>
 

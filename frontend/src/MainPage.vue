@@ -5,6 +5,7 @@
     <TheModal v-if="modalStore.show">
       <Component :is="modalStore.component"/>
     </TheModal>
+	<AlertBox v-if="alertStore.show"/>
     <NotificationWrapper v-show="notificationStore.show && notificationStore.notifications.length"/>
     <router-view v-slot="{ Component }">
       <Transition>
@@ -22,6 +23,8 @@ import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import {useModalStore} from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
+import AlertBox from '@/components/alert/AlertBox.vue'
+import { useAlertStore } from '@/stores/alert'
 import NotificationWrapper from '@/components/NotificationWrapper.vue';
 import {useChatStore} from '@/stores/chat';
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
@@ -33,6 +36,7 @@ const modalStore = useModalStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
+const alertStore = useAlertStore()
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
   if (data.author.id === userStore.user?.id ||
@@ -66,6 +70,10 @@ chatStore.socket.on('msg', (data: IChatMessage) => {
   font-weight: normal;
   overflow-x: hidden;
   overflow-y: auto;
+  background-image: url("@/assets/img/wave.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
 
   .UI-grid {
     display: grid;

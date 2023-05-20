@@ -35,13 +35,8 @@ const save = () => {
     // TODO: Check locally if the username is compliant
     const infos: IUserUpdate = { username: userValue.value }
 	userStore.updateInfos(infos).then((res) => {
-		if (res)
-			userValue.value = res.username
+		userValue.value = userStore.user?.username
 	})
-		.catch(e => {
-			alert(e.message)
-			userValue.value = userStore.user?.username
-		})
 };
 
 const cancel = () => {

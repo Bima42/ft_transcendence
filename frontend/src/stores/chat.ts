@@ -9,8 +9,9 @@ import type ISendMessage from '@/interfaces/chat/ISendMessage'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
 import type IUserChat from '@/interfaces/user/IUserChat'
-import type IUserChatAction from '@/interfaces/chat/IUserChatAction';
+import type IUserChatAction from '@/interfaces/chat/IUserChatAction'
 import type { IUpdateChat } from '@/interfaces/chat/IChat'
+import { useAlertStore } from '@/stores/alert'
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
 	const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
@@ -24,7 +25,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const whisperChatList = ref<IChat[]>([]);
 	const subscribedChannelsList = ref<IChat[]>([]);
 	const notSubscribedChannelsList = ref<IChat[]>([]);
-	const isChannelPasswordProtected = ref<boolean>(false); // TODO: Remove if unused
+	const alertStore = useAlertStore()
 
 	const sendMessage = function (this: IChatStore, msg: ISendMessage): void {
 		if (!currentChat.value) return
@@ -42,22 +43,25 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 
 	const refreshCurrentChat = async function (): Promise<boolean> {
 		if (!currentChat.value)
-			return false;
-		currentChat.value = await get(`chat/rooms/${currentChat.value.id}`, "Failed to refresh chat")
-		return true;
+			return false
+		currentChat.value = await get(`chat/rooms/${currentChat.value.id}`, 'Failed to refresh chat').catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
+		})
+		return true
 	}
 
 	const setCurrentChat = async function (chatId: string): Promise<boolean> {
-		if (!chatId) {
-			return false
-		}
+		if (!chatId) return false
 		const url = 'chat/rooms/' + chatId;
 		await get(url, 'Cannot load channel').then((newChannel) => {
 			currentChat.value = newChannel;
 			isChatOpen.value = true;
 			getMessages()
+		}).catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
 		})
-		await currentChatPasswordProtected()
 		return true
 	}
 
@@ -82,21 +86,24 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	// Get the message history
 	const getMessages = async function (): Promise<boolean> {
 		if (!currentChat.value) return false
-
 		isChatOpen.value = true;
-
 		const url = 'chat/rooms/' + currentChat.value.id + '/messages';
-		currentChat.value.messages = await get(url, 'Failed to get messages')
+		currentChat.value.messages = await get(url, 'Failed to get messages').catch((err) => {
+			alertStore.setErrorAlert(err)
+			return []
+		})
 		return true
 	}
 	const retrievePublicChats = async function (): Promise<boolean> {
 		await get('chat/rooms/public', 'Cannot load public channels')
 			.then((chatList: IChat[]) => {
 				publicChatList.value = chatList
-			})
-			.finally(() => {
+			}).catch((err) => {
+				alertStore.setErrorAlert(err)
+				return false
+			}).finally(() => {
 				return true
-			});
+			})
 		return false
 	}
 
@@ -104,8 +111,9 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		await get('chat/rooms/whispers', 'Failed to retrieve whispers list')
 			.then((chatList: IChat[]) => (
 				whisperChatList.value = chatList
-			))
-			.finally(() => {
+			)).catch((err) => {
+				alertStore.setErrorAlert(err)
+			}).finally(() => {
 				return true
 			});
 		return false
@@ -121,24 +129,40 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		if (password == '') {
 			password = undefined
 		}
-		const newChat = await post('chat/rooms', 'Failed to create channel', jsonHeaders, {name, type, password})
-		return newChat
+		const retChat = await post('chat/rooms', 'Failed to create channel', jsonHeaders, {name, type, password})
+			.catch((err) => {
+				alertStore.setErrorAlert(err)
+				return null
+			})
+		return retChat
 	}
 
 	const createWhisper = async function (targetUsername: string): Promise<IChat> {
 		const chat = await post('chat/rooms/whispers', 'Failed to create whisper', jsonHeaders, {targetUsername})
+			.catch((err) => {
+				alertStore.setErrorAlert(err)
+				return null
+			})
 		return chat
 	}
 
-	const joinChannel = async function (chat: IChat, password?: string): Promise<IChat> {
+	const joinChannel = async function (chat: IChat, password?: string): Promise<boolean> {
 		return await put('chat/rooms/join', 'Failed to join channel', jsonHeaders, {
 			chatId: chat.id,
 			password: password || undefined
+		}).then(() => {
+			return true
+		}).catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
 		})
 	}
 
 	const deleteChannel = async function (chatId: number): Promise<boolean> {
-		await del(`chat/rooms/${chatId}`, "Cannot delete channel")
+		await del(`chat/rooms/${chatId}`, 'Cannot delete channel').catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
+		})
 		subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
 		return true
 	}
@@ -147,7 +171,11 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		await put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, {chatId: chatId})
 			.then((_res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
+			}).catch((err) => {
+				alertStore.setErrorAlert(err)
+				return false
 			})
+		await subscribedChannels()
 		return true
 	}
 
@@ -155,8 +183,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		get('chat/rooms/subscribed', 'Failed to get subscribed channels')
 			.then((chatList: IChat[]) => {
 				subscribedChannelsList.value = chatList
-			})
-			.finally(() => {
+			}).catch((err) => {
+				alertStore.setErrorAlert(err)
+				return false
+			}).finally(() => {
 				return true
 			});
 		return false
@@ -178,19 +208,16 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 
 	const updateChat = async function (newData: IUpdateChat): Promise<IChat> {
 		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
+			.catch((err) => {
+				alertStore.setErrorAlert(err)
+				return null
+			})
 		if (newChat)
 			currentChat.value = newChat
 		updateStore()
 		return newChat
 	}
 
-	const currentChatPasswordProtected = async function (): Promise<void> {
-		isChannelPasswordProtected.value = await get(
-			'chat/rooms/' + currentChat.value?.id + '/isPasswordProtected',
-			'Failed to get password protection status',
-			jsonHeaders
-		)
-	}
 
 	const inviteFriendToChat = async function (userName: string): Promise<boolean> {
 		if (!currentChat.value) {
@@ -202,7 +229,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			type: 'add'
 		}
 		const url = `chat/rooms/${currentChat.value.id}/user`;
-		await put(url, `cannot add user`, jsonHeaders, action)
+		await put(url, `cannot add user`, jsonHeaders, action).catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
+		})
 		await updateStore()
 		return true
 	}
@@ -221,7 +251,10 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			muteDuration: muteDuration
 		}
 		const url = `chat/rooms/${currentChat.value.id}/user`;
-		await put(url, `cannot ${actionToPerform} user`, jsonHeaders, action)
+		await put(url, `cannot ${actionToPerform} user`, jsonHeaders, action).catch((err) => {
+			alertStore.setErrorAlert(err)
+			return false
+		})
 		await updateStore()
 		return true
 	}
@@ -245,7 +278,6 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		whisperChatList,
 		subscribedChannelsList,
 		notSubscribedChannelsList,
-		isChannelPasswordProtected,
 		onNewMessage,
 		sendMessage,
 		refreshCurrentChat,
@@ -263,7 +295,6 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		subscribedChannels,
 		getListOfNotSubscribedChannels,
 		updateChat,
-		currentChatPasswordProtected,
 		inviteFriendToChat,
 		takeActionOnUser,
 		updateStore

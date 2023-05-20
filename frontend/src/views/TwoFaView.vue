@@ -13,6 +13,9 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useRouter } from 'vue-router'
+import { useAlertStore } from '@/stores/alert'
+
+const alertStore = useAlertStore()
 
 const code = ref('')
 const userStore = useUserStore()
@@ -22,7 +25,7 @@ const toggleCode = () => {
     userStore.verifyTwoFaCode(code.value)
         .then(() => {
             router.push('/main/index')
-        }).catch(e => alert(e.message))
+        }).catch(e => alertStore.setErrorAlert(e))
 }
 
 </script>

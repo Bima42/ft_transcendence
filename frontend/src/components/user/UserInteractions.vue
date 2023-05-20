@@ -19,12 +19,14 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 import type IUser from '@/interfaces/user/IUser';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
+import { useAlertStore } from '@/stores/alert'
 
 const props = defineProps<{
 	invitePlay?: boolean,
 	targetUser?: IUser,
 }>()
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
@@ -52,7 +54,7 @@ const addOrRemoveFriend = async () => {
 			}
 		}
 	} catch (e: any) {
-		alert(e.message)
+		alertStore.setErrorAlert(e)
 	}
 }
 

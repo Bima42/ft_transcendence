@@ -12,8 +12,9 @@
 
 <script setup lang="ts">
 import { defineProps, ref, onUpdated } from 'vue'
-import { useUserStore } from '@/stores/user';
-import type { UserStatus } from '@/interfaces/user/IUser';
+import { useUserStore } from '@/stores/user'
+import type { UserStatus } from '@/interfaces/user/IUser'
+import { useAlertStore } from '@/stores/alert'
 
 /**
  * @typedef {Object} Props
@@ -28,6 +29,7 @@ const props = defineProps<{
 	pictureDotSize: string
 }>()
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 const defaultUrl = `https://${import.meta.env.VITE_BACKEND_URL}/uploads/default.png`
 const imgUrl = ref(props.url || defaultUrl)
@@ -53,7 +55,9 @@ const updateStatus = () => {
 				: status === 'AWAY' ? 'orange'
 				: 'red'
 			}
-		)
+		).catch((err) => {
+            alertStore.setErrorAlert(err.message)
+        })
 	}
 }
 

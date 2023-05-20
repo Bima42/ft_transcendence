@@ -35,31 +35,45 @@
                 {{ (selectedAction ?? 'Take action on') + ' ' + selectedUser.user.username }}
             </ButtonCustom>
         </section>
+        <ButtonCustom :style="'big'" v-if="selectedUser" @click="handleUserProfileClick">
+            View profile
+        </ButtonCustom>
     </section>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import TheModal from '@/components/modal/TheModal.vue'
 import EditChatModal from '@/components/modal/channel/EditChatModal.vue'
-import {useModalStore} from '@/stores/modal'
-import {useChatStore} from '@/stores/chat'
+import { useModalStore } from '@/stores/modal'
+import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
+import { useAlertStore } from '@/stores/alert'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import ChatUsersList from '@/components/chat/ChatUsersList.vue'
-import {ref} from 'vue'
 import TakeActionOnUser from '@/components/chat/TakeActionOnUser.vue'
 import type IUserChat from '@/interfaces/user/IUserChat'
 import { UserChatRoleEnum } from '@/interfaces/user/IUserChat'
+import { useRouter } from 'vue-router'
 
 const modalStore = useModalStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
+const alertStore = useAlertStore()
+const router = useRouter()
 
 const userRole = chatStore.getRoleFromUserId(userStore.user?.id || 0)
 const selectedUser = ref<IUserChat>()
 const takeActionView = ref(false)
 const selectedAction = ref<string | null>(null)
 const muteTime = ref(1)
+
+const handleUserProfileClick = () => {
+    if (selectedUser.value) {
+        router.push(`/main/profile/${selectedUser.value.user.id}`)
+        modalStore.resetState()
+    }
+}
 
 const resetVariables = () => {
     selectedUser.value = undefined
@@ -78,16 +92,13 @@ const handleBack = () => {
 const takeAction = () => {
     if (takeActionView.value && selectedAction.value && selectedUser.value) {
         if (selectedAction.value === 'mute' && (muteTime.value <= 0 || muteTime.value > 999)) {
-            //TODO: error !
+            alertStore.setErrorAlert('Mute time must be between 1 and 999 minutes')
             return
         }
         // do the action selected CARE IF MUTE ! USE MUTE TIME REF
         chatStore.takeActionOnUser(selectedUser.value.user.username, selectedAction.value, muteTime.value)
             .then(() => {
                 chatStore.updateStore()
-            })
-            .catch(err => {
-                alert(err.message)
             })
         // then we reset the values
         resetVariables()
@@ -114,6 +125,7 @@ const setAction = (action: string) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-family: 'Martian Mono', sans-serif;
     gap: 10px;
 
     .modal_header {

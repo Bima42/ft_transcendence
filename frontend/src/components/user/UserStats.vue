@@ -67,6 +67,7 @@ const tableHeaders = {
 	justify-content: center;
 	align-items: center;
 	gap: $small_gap;
+    background: $background;
 
 	h2 {
 		font-size: 20px;

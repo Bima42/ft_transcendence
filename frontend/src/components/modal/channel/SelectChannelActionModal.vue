@@ -14,7 +14,7 @@
         <NewChannelModal v-if="selectedOption === 1"/>
         <JoinChannelModal v-if="selectedOption === 2"/>
         <NewWhisperModal v-if="selectedOption === 3"/>
-        <ButtonCustom :style="'small adapt'" v-if="selectedOption !== 0" @click="selectedOption = 0">Back</ButtonCustom>
+        <ButtonCustom id="bima" :style="'small'" v-if="selectedOption !== 0" @click="selectedOption = 0">Back</ButtonCustom>
     </section>
 </template>
 
@@ -38,9 +38,9 @@ const handleClick = (option: string) => {
             selectedOption.value = 3;
             break
         default:
-            console.log('default')
-    }
-}
+            selectedOption.value = 0;
+            break
+}}
 </script>
 
 <style scoped lang="scss">
@@ -63,6 +63,10 @@ const handleClick = (option: string) => {
         &:hover {
             cursor: pointer;
         }
+    }
+
+    #bima {
+        width: 58%;
     }
 }
 </style>

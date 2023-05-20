@@ -49,5 +49,6 @@ onUnmounted(() => {
 	overflow-y: scroll;
 	gap: $small_gap;
 	padding: 15px;
+    max-width: 980px;
 }
 </style>

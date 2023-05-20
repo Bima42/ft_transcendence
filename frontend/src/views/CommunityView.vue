@@ -54,7 +54,9 @@ import EditChatModal from '@/components/modal/channel/EditChatModal.vue';
 import { get } from '../../utils';
 import UserInformations from '@/components/modal/UserInformationsModal.vue';
 import { useUserStore } from '@/stores/user';
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
 const selectedChatList = ref('public')
 const chatStore = useChatStore()
 const modalStore = useModalStore()
@@ -91,7 +93,7 @@ const toggleEditChatModal = () => {
 		get(`users/id/${author?.id}`, 'Cannot get user details').then((user) => {
 			modalStore.loadAndDisplay(TheModal, UserInformations, {user: user})
 		}).catch((err) => {
-			alert(err)
+			alertStore.setErrorAlert(err)
 		})
 	}
 }
@@ -150,6 +152,18 @@ const toggleEditChatModal = () => {
         bottom: 20px;
         right: 20px;
         z-index: 1;
+
+        svg {
+            height: 50px;
+            width: 50px;
+            padding-left: 3px;
+            @media (max-width: 980px) {
+                height: 30px;
+                width: 30px;
+                padding-left: 1px;
+            }
+        }
+
     }
 }
 
@@ -171,6 +185,7 @@ const toggleEditChatModal = () => {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    align-items: center;
 
     &.hidden {
         display: none;

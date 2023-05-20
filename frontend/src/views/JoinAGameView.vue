@@ -31,9 +31,11 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import {useGameStore} from '@/stores/game'
 import {useRouter} from 'vue-router'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
+import { useAlertStore } from '@/stores/alert'
 
 const router = useRouter()
 
+const alertStore = useAlertStore()
 const gameStore = useGameStore();
 
 //const currentGame = ref<IGameSettings | null>(gameStore.currentGame)
@@ -52,7 +54,7 @@ function inviteToPlay() {
 	gameStore.socket.emit("invitePlayer", invite, ((res: string) => {
 		if (res !== "OK") {
 			cancelInvitation()
-			window.alert(res)
+			alertStore.setErrorAlert(res)
 		}
 	}))
 }
@@ -82,7 +84,7 @@ function joinQueue() {
 		router.push('index')
 		// Go back to index to avoid spam to opponent
 		setTimeout(() => {
-			window.alert(`${gameSettings.player2.username} refused your invitation.`)
+			alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
 		}, 50);
 	})
 
@@ -140,8 +142,9 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 50%;
-    grid-area: $bigmain;
+    width: 100%;
+    height: 100%;
+    grid-area: $gigamain;
     gap: 20px;
     text-align: center;
 

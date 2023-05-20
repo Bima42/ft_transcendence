@@ -76,5 +76,7 @@ const tableHeaders = {
 </script>
 
 <style scoped lang="scss">
-
+.view_wrapper {
+    grid-area: $gigamain;
+}
 </style>

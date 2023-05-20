@@ -37,7 +37,7 @@ const creators = ref(
 
 <style scoped lang="scss">
 .credit-wrapper {
-    grid-area: $main;
+    grid-area: $gigamain;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

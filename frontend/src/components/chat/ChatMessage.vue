@@ -47,6 +47,8 @@ const toggleUserInformations = async (author: IAuthor) => {
     max-width: 85%;
     border-radius: 10px;
     gap: 5px;
+    font-family: 'Martian Mono', sans-serif;
+    min-width: 50px;
 
     &.left {
         align-self: flex-start;
@@ -55,7 +57,7 @@ const toggleUserInformations = async (author: IAuthor) => {
 
     &.right {
         align-self: flex-end;
-        background-color: $transparent-tertiary;
+        background-color: $tertiary;
     }
 
     .author {

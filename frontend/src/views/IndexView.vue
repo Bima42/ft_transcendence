@@ -75,11 +75,13 @@ a {
         text-decoration: none;
         scale: 120%;
         color: $tertiary;
+        -webkit-text-stroke-width: 0.5px;
+        -webkit-text-stroke-color: black;
     }
 }
 
 .index_wrapper {
-    grid-area: $bigmain;
+    grid-area: $gigamain;
     display: flex;
     gap: $medium_gap * 1.5;
     flex-direction: column;

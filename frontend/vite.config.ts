@@ -9,9 +9,13 @@ export default defineConfig({
     port: 8000,
     host: '0.0.0.0',
     strictPort: true,
+
     // hmr: false,
     hmr: {
       clientPort: 4443,
+    },
+    watch: {
+      usePolling: true
     },
   },
   plugins: [vue()],

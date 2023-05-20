@@ -12,6 +12,7 @@
 				<ButtonCustom :style="'small'" @click="goToDetailedProfile(modalStore.data.user.id)">
 					View Detailed Profile
 				</ButtonCustom>
+                <SendWhisperButton :user="modalStore.data.user" :callback="() => modalStore.resetState()" />
             </section>
         </section>
         <hr>
@@ -24,6 +25,7 @@ import UserPicture from '@/components/avatar/UserPicture.vue'
 import UserInteractions from '@/components/user/UserInteractions.vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useRouter } from 'vue-router'
+import SendWhisperButton from '@/components/buttons/SendWhisperButton.vue'
 
 const router = useRouter()
 const modalStore = useModalStore()

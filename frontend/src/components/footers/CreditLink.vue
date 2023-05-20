@@ -19,7 +19,7 @@
 
     a {
         text-shadow: none;
-        color: $secondary;
+        color: $transparent-tertiary;
     }
 }
 </style>
