@@ -84,7 +84,7 @@ function joinQueue() {
 		router.push('index')
 		// Go back to index to avoid spam to opponent
 		setTimeout(() => {
-			window.alert(`${gameSettings.player2.username} refused your invitation.`)
+			alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
 		}, 50);
 	})
 

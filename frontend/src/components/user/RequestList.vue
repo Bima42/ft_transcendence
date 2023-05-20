@@ -19,9 +19,11 @@ import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import UserPicture from '@/components/avatar/UserPicture.vue'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import type IUser from '@/interfaces/user/IUser'
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 
@@ -42,13 +44,13 @@ const showUserProfile = async (username: string) => {
 
 const acceptRequest = async (username: string) => {
 	await friendStore.acceptFriendRequest(username)
-		.catch(e => alert(e.message))
+		.catch(e => alertStore.setErrorAlert(e))
 	requests.value = await friendStore.getAllPendingRequests()
 }
 
 const declineRequest = async (username: string) => {
 	await friendStore.declineFriendRequest(username)
-		.catch(e => alert(e.message))
+		.catch(e => alert(e))
 	requests.value = await friendStore.getAllPendingRequests()
 }
 </script>
