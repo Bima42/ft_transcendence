@@ -79,16 +79,16 @@ export class AuthController {
 
   @Get('bob')
   async signInAsBob(@Req() req: RequestWithUser, @Res() res: Response) {
-    const username = randomBytes(3).toString('hex')
     // Available only on localhost
-    if ( ! process.env.FRONTEND_URL.startsWith("https://localhost")) {
+    if ( process.env.NODE_ENV !== "development") {
         res.status(403).send("Forbidden");
     }
     let bob: any;
     try {
-      bob = await this.usersService.findByName(username);
+      bob = await this.usersService.findByName("Bob42");
     }
     catch(e) {
+      const username = randomBytes(3).toString('hex')
       bob = {
         twoFA: false,
         twoFASecret:  null,
@@ -97,8 +97,8 @@ export class AuthController {
         username: username,
         email: username + "@example.com",
         avatar: `https://api.multiavatar.com/${username}.png`,
-        firstName: null,
-        lastName: null,
+        firstName: username,
+        lastName: "AkaBob42",
         phone: null,
         status: 'OFFLINE',
       }
@@ -106,7 +106,7 @@ export class AuthController {
     }
     // If a real user is using this pseudo, abort
     if (bob.fortyTwoId != null) {
-      res.status(403).send("Already a bob42");
+      res.status(403).send("Already a Bob42");
     }
 
     if (!req.cookies[process.env.JWT_COOKIE]) {
