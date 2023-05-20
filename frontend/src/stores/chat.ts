@@ -171,10 +171,11 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		await put('chat/rooms/leave', 'Failed to leave channel', jsonHeaders, {chatId: chatId})
 			.then((_res) => {
 				subscribedChannelsList.value.splice(subscribedChannelsList.value.findIndex(e => e.id === chatId))
-			}).catch((err: BackendError) => {
+			}).catch((err) => {
 				alertStore.setErrorAlert(err)
 				return false
 			})
+		await subscribedChannels()
 		return true
 	}
 
@@ -182,7 +183,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		get('chat/rooms/subscribed', 'Failed to get subscribed channels')
 			.then((chatList: IChat[]) => {
 				subscribedChannelsList.value = chatList
-			}).catch((err: BackendError) => {
+			}).catch((err) => {
 				alertStore.setErrorAlert(err)
 				return false
 			}).finally(() => {
@@ -207,7 +208,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 
 	const updateChat = async function (newData: IUpdateChat): Promise<IChat> {
 		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
-			.catch((err: BackendError) => {
+			.catch((err) => {
 				alertStore.setErrorAlert(err)
 				return null
 			})
