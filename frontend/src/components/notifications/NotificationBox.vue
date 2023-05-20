@@ -1,5 +1,5 @@
 <template>
-	<div class="notification_box slide-in-right slide-in-top">
+	<div class="notification_box slide-in-right slide-in-top" @click="redirect">
 		<XButton :size="'medium'" class="exit-button" @click="notificationStore.removeNotification(props.notification)"/>
 		<div v-if="props.notification.picture" class="icon">
 			<img :src="props.notification.picture" alt="icon" />
@@ -22,6 +22,11 @@ const props = defineProps<{
 	notification: INotification
 }>()
 const notificationStore = useNotificationStore()
+
+const redirect = () => {
+	if (!props.notification.redirect) return;
+	props.notification.redirect();
+}
 </script>
 
 <style scoped lang="scss">
@@ -30,6 +35,7 @@ const notificationStore = useNotificationStore()
 	border: 1px solid $tertiary;
 	border-radius: 5px;
 	background: $secondary;
+	cursor: pointer;
 
 	button {
 		width: 22px;

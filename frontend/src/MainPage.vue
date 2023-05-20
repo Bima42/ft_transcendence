@@ -67,6 +67,7 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 		picture: user.avatar,
 		message: `${user.username} is online`,
 		lifespan: 3000,
+		redirect: () => router.push(`/main/profile/${user.id}`),
 	})
 })
 
