@@ -18,7 +18,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	private async _getFriendshipStatus(userId: number, otherId: number) : Promise<FriendshipStatus | null> {
+	async getFriendshipStatus(userId: number, otherId: number) : Promise<FriendshipStatus | null> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
@@ -67,7 +67,7 @@ export class FriendsService {
 		if (await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is already a friend or has a pending request');
 
-		const friendshipStatus = await this._getFriendshipStatus(userId, friend.id)
+		const friendshipStatus = await this.getFriendshipStatus(userId, friend.id)
 		if (!friendshipStatus) {
 			return this.prismaService.friendship.create({
 				data: {

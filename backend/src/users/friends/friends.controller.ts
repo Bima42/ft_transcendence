@@ -24,7 +24,12 @@ export class FriendsController {
 	@Post('add/:friendName')
 	@ApiProperty({ type: String })
 	async addFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
-		return await this.friendsService.addFriend(req.user.id, friendName);
+		const friendship = await this.friendsService.addFriend(req.user.id, friendName);
+		if (friendship.status === 'ACCEPTED') {
+			const friendID = req.user.id === friendship.userId ? friendship.friendId : friendship.userId;
+			await this.channelGateway.onNewFriend(req.user, friendID);
+		}
+		return friendship
 	}
 
 	@Post('remove/:friendName')
@@ -91,7 +96,6 @@ export class FriendsController {
 	async isPending(@Param('username') username: string, @Req() req: RequestWithUser) {
 		return this.friendsService.isPendingRequest(req.user.id, username);
 	}
-
 
 	/*************************************************************************
 	 *                                                                       *

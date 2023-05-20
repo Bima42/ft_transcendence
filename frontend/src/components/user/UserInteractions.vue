@@ -11,14 +11,14 @@
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from '@/stores/modal';
-import { useFriendStore } from '@/stores/friend';
-import { useGameStore } from '@/stores/game';
-import { onMounted, onUpdated, ref } from 'vue';
-import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
-import type IUser from '@/interfaces/user/IUser';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { useModalStore } from '@/stores/modal'
+import { useFriendStore } from '@/stores/friend'
+import { useGameStore } from '@/stores/game'
+import { computed, onUpdated, ref } from 'vue'
+import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
+import type IUser from '@/interfaces/user/IUser'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import { useAlertStore } from '@/stores/alert'
 
 const props = defineProps<{
@@ -33,23 +33,20 @@ const friendStore = useFriendStore()
 const gameStore = useGameStore()
 const router = useRouter()
 
-const isBlocked = ref(false)
-const isFriend = ref(false)
+const isBlocked = computed(() => friendStore.isBlocked(user.value.id))
+const isFriend = computed(() => friendStore.isFriend(user.value.id))
 const isRequestSent = ref(false)
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
+friendStore.isWaitingRequest(user.value.username).then(res => isRequestSent.value = res)
 
 onUpdated(()=> {
 	user.value = props.targetUser ? props.targetUser : modalStore.data.user
 })
 
-isFriend.value = friendStore.isFriend(user.value.id)
-isBlocked.value = friendStore.isBlocked(user.value.id)
-friendStore.isWaitingRequest(user.value.username).then(res => isRequestSent.value = res)
-
 const addOrRemoveFriend = async () => {
 	try {
 		if (isFriend.value) {
-			isFriend.value = !(await friendStore.removeFriend(user.value.username))
+			await friendStore.removeFriend(user.value.username)
 		} else {
 			if (!isRequestSent.value)
 				isRequestSent.value = await friendStore.addFriend(user.value.username)
@@ -64,9 +61,9 @@ const addOrRemoveFriend = async () => {
 
 const blockOrUnblockUser = async () => {
 	if (isBlocked.value) {
-		isBlocked.value = !(await friendStore.unblockUser(user.value.username))
+		await friendStore.unblockUser(user.value.username)
 	} else {
-		isBlocked.value = await friendStore.blockUser(user.value.username)
+		await friendStore.blockUser(user.value.username)
 	}
 }
 

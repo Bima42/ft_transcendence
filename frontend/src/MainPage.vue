@@ -44,8 +44,6 @@ const friendStore = useFriendStore()
 const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
 
-friendStore.updateStoreDatas()
-
 /*************************************************************************
  * 							NOTIFICATIONS								 *
  *************************************************************************/

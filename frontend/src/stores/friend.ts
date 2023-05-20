@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { get, jsonHeaders, patch, post } from '../../utils';
 import type IFriendship from '@/interfaces/user/IFriendship';
+import type { FriendshipStatus } from '@/interfaces/user/IFriendship';
 import type IFriend from '@/interfaces/user/IFriend';
 import type IUser from '@/interfaces/user/IUser';
 import { ref } from 'vue';
@@ -9,6 +10,13 @@ import type IBlocked from '@/interfaces/user/IBlocked';
 export const useFriendStore = defineStore( 'friend', () => {
 	const friends = ref<IFriend[]>([]);
 	const blocked = ref<IBlocked[]>([]);
+	get('friends/all', 'Failed to get all friends', jsonHeaders).then((data) => {
+		friends.value = data;
+	});
+	get('friends/blocked', 'Failed to get all blocked', jsonHeaders).then((data) => {
+		blocked.value = data;
+	});
+	console.log('friends', friends.value);
 
 	const updateStoreDatas = async () => {
 		friends.value = await getAllFriends();

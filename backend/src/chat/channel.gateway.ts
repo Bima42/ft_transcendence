@@ -179,7 +179,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.join("friend" + user.id.toString())
 		}
 		this.server.to("user" + targetUserId.toString()).emit("friendshipAccepted", user)
-
 	}
 
 	async onRemoveFriend(user: UserDto, targetUserId: number) {
