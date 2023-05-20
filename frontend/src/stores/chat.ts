@@ -208,7 +208,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 	const updateChat = async function (newData: IUpdateChat): Promise<IChat> {
 		const newChat = await patch('chat/rooms/', 'Failed to update channel', jsonHeaders, newData)
 			.catch((err) => {
-				alertStore.setErrorAlert(err)
+				alertStore.setErrorAlert(err.message)
 				return null
 			})
 		if (newChat)
