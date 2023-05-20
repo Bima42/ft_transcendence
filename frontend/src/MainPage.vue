@@ -24,15 +24,15 @@ import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
 import AlertBox from '@/components/alert/AlertBox.vue'
+import NotificationWrapper from '@/components/notifications/NotificationWrapper.vue';
 import { useAlertStore } from '@/stores/alert'
-import NotificationWrapper from '@/components/NotificationWrapper.vue';
 import {useChatStore} from '@/stores/chat';
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import {useUserStore} from '@/stores/user';
-import {useNotificationStore} from '@/stores/notification';
-import type IUser from '@/interfaces/user/IUser';
 import { useGameStore } from '@/stores/game';
 import { useFriendStore } from '@/stores/friend';
+import {useNotificationStore} from '@/stores/notification';
+import type IChatMessage from '@/interfaces/chat/IChatMessage';
+import type IUser from '@/interfaces/user/IUser';
 import type IGameSettings from '@/interfaces/game/IGameSettings';
 
 const route = useRoute()
