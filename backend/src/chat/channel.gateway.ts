@@ -92,9 +92,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	async handleConnection(client: any, ...args: any[]) {
+	async handleConnection(socket: any, ...args: any[]) {
 
-		const user = await this.verifyUser(client.handshake.auth.token);
+		const user = await this.verifyUser(socket.handshake.auth.token);
 		if (!user) {
 			Logger.log("WS: client is not identified. dropped.");
 			return;
@@ -103,27 +103,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		Logger.log(`Chat: ${user.username}#${user.id} connected`);
 
 		// attach the user to the socket
-		client.data.user = user;
+		socket.data.user = user;
 
-		client.join("user" + user.id.toString())
+		socket.join("user" + user.id.toString())
 		const subscriptions = await this.channelService.getSubscribedChannels(user);
 		const whispers = await this.channelService.getWhisperChannels(user)
 		for (const chan of subscriptions) {
-			client.join("channel" + chan.id.toString())
+			socket.join("channel" + chan.id.toString())
 		}
 		for (const chan of whispers) {
-			client.join("channel" + chan.id.toString())
+			socket.join("channel" + chan.id.toString())
 		}
 		const blockedUsers = await this.friendService.getAllBlockedUsers(user.id)
 		for (const user of blockedUsers) {
-			client.join("block" + user.id.toString())
+			socket.join("block" + user.id.toString())
 		}
+		const friends = await this.friendService.getAllFriends(user.id)
+		for (const friend of friends) {
+			socket.join("friend" + friend.id.toString())
+		}
+		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
 	}
 
-	handleDisconnect(client: any): any {
+	handleDisconnect(socket: any): any {
 
-		if (client.data.user) {
-			Logger.log(`Chat: ${client.data.user.username}#${client.data.user.id} disconnected`);
+		if (socket.data.user) {
+			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
 
 		//TODO: set user status offline
@@ -157,4 +162,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.leave("block" + targetUserId.toString())
 		}
 	}
+
+	// OnNewFriend, OnRemoveFriend
 };

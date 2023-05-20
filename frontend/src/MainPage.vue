@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CreditLink from '@/components/footers/CreditLink.vue'
 import ElSidebar from '@/components/template/ElSidebar.vue'
 import TheModal from '@/components/modal/TheModal.vue'
@@ -30,13 +30,24 @@ import {useChatStore} from '@/stores/chat';
 import type IChatMessage from '@/interfaces/chat/IChatMessage';
 import {useUserStore} from '@/stores/user';
 import {useNotificationStore} from '@/stores/notification';
+import type IUser from '@/interfaces/user/IUser';
+import { useGameStore } from '@/stores/game';
+import { useFriendStore } from '@/stores/friend';
+import type IGameSettings from '@/interfaces/game/IGameSettings';
 
 const route = useRoute()
+const router = useRouter()
+
 const modalStore = useModalStore()
 const chatStore = useChatStore()
 const userStore = useUserStore()
+const gameStore = useGameStore()
+const friendStore = useFriendStore()
 const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
+
+friendStore.updateStoreDatas()
+
 
 chatStore.socket.on('msg', (data: IChatMessage) => {
 	if (data.author.id === userStore.user?.id ||
@@ -51,6 +62,37 @@ chatStore.socket.on('msg', (data: IChatMessage) => {
 		lifespan: 2000,
 	})
 })
+
+chatStore.socket.on('friendOnline', (user: IUser) => {
+	notificationStore.addNotification({
+		picture: user.avatar,
+		message: `${user.username} is online`,
+		lifespan: 2000,
+	})
+})
+
+let receivedInvite = false
+const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
+	if (receivedInvite)
+		return
+	receivedInvite = true
+	// TODO: silent refuse if already in a game (already checked on server)
+	const gameType = gameSettings.game.type
+	setTimeout(() => {
+		const accept = confirm(`Play a ${gameSettings.game.type.toLowerCase()} game with ${gameSettings.player1.username} ?`)
+		if (accept) {
+			gameStore.socket.emit("acceptInvitation", gameSettings)
+			router.push('game')
+		} else {
+			gameStore.socket.emit("declineInvitation", gameSettings)
+		}
+		receivedInvite = false
+
+	}, 100);
+	gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
+}
+
+gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
 </script>
 
 <style lang="scss">
