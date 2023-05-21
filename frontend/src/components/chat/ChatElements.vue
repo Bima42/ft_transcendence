@@ -4,6 +4,7 @@
 			v-for="message in chatStore.currentChat?.messages"
 			:key="message.id"
 			:author="message.author"
+			:sentAt="message.sentAt"
 			:userIs="currentUser"
 		>
 			{{ message.content }}

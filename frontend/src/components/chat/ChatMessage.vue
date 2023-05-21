@@ -7,7 +7,7 @@
             <slot></slot>
         </div>
         <div class="time">
-            12:23
+			{{ dateString }}
         </div>
     </div>
 </template>
@@ -22,6 +22,7 @@ import { get } from '../../../utils'
 
 const props = defineProps<{
     author: IAuthor
+    sentAt: string
     userIs: number | undefined
 }>()
 
@@ -34,13 +35,23 @@ const toggleUserInformations = async (author: IAuthor) => {
     const user = await get(`users/id/${author.id}`, 'Cannot get user details')
     modalStore.loadAndDisplay(TheModal, UserInformations, {user: user})
 }
+
+let dateString = ref(computed(() => {
+	const msgTimestamp = new Date(props.sentAt)
+	const now = new Date()
+	if (msgTimestamp.toDateString() === now.toDateString()) {
+		return msgTimestamp.toLocaleTimeString('fr-CH', {hour: '2-digit', minute:'2-digit'})
+	} else {
+		return msgTimestamp.toLocaleString('fr-CH', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})
+	}
+}))
 </script>
 
 <style scoped lang="scss">
 .message_wrap {
     position: relative;
     display: flex;
-    padding: 15px 10px;
+    padding: 15px 10px 20px;
     flex-direction: column;
     justify-content: center;
     text-align: start;
@@ -48,7 +59,7 @@ const toggleUserInformations = async (author: IAuthor) => {
     border-radius: 10px;
     gap: 5px;
     font-family: 'Martian Mono', sans-serif;
-    min-width: 50px;
+    min-width: 130px;
 
     &.left {
         align-self: flex-start;

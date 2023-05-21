@@ -2,14 +2,14 @@
 	<section class="search_profile_modal">
 		<h1>Search Profile</h1>
 		<div class="search_bar">
-			<input class="input" type="text" name="search_profile" placeholder="Find a profile" v-model="searchedProfile" @keydown.enter="searchProfile">
+			<input class="input" type="text" name="search_profile" placeholder="Find a profile" v-model="searchedProfile" @keydown.enter="searchProfile" ref="input">
 			<font-awesome-icon icon="fa-magnifying-glass" class="search_icon" @click="searchProfile"/>
 		</div>
 	</section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
@@ -21,8 +21,8 @@ const modalStore = useModalStore()
 
 const router = useRouter()
 const searchedProfile = ref('')
+const input = ref<HTMLInputElement | null>(null)
 
-//TODO: add error handling
 const searchProfile = () => {
 	userStore.getUserInfosByUsername(searchedProfile.value).then((res) => {
 		if (res.id === userStore.user?.id)
@@ -34,6 +34,10 @@ const searchProfile = () => {
 		alertStore.setErrorAlert(err)
 	})
 }
+
+onMounted(() => {
+    input.value?.focus()
+})
 </script>
 
 <style scoped lang="scss">

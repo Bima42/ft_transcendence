@@ -1,43 +1,43 @@
 <template>
-    <section class="community_wrapper">
-        <section class="community_header">
-            <font-awesome-icon v-if="chatStore.isChatOpen" icon="fa-chevron-left" @click="resetChat"/>
-            <h2
-                v-if="!chatStore.isChatOpen"
-                v-for="chat in chatListsSources"
-                :key="chat.id"
-                @click="selectChatList(chat.id)"
-                :class="[selectedChatList === chat.id ? '' : 'not_selected']"
-            >
-                {{ chat.name }}
-            </h2>
-            <h2 @click="toggleEditChatModal" v-else>
-                {{ chatStore.currentChat?.name || "Chat name"}}
-            </h2>
-        </section>
-        <div class="community_content">
-            <template :class="[chatStore.isChatOpen ? 'hidden' : 'shown mtl']">
-                <Suspense>
-                    <ChatList
-                        :selectedChatList="selectedChatList"
-                    />
-                </Suspense>
-            </template>
-            <template :class="['chat_wrap', chatStore.isChatOpen ? 'shown rtm' : 'hidden']">
-                <Suspense>
-                    <ChatElements/>
-                </Suspense>
-                <TypeBox/>
-            </template>
-        </div>
-        <ButtonCustom class="new_chat_button"
-                      :style="'big circular'"
-                      v-if="!chatStore.isChatOpen"
-                      :click="toggleAddChatModal"
-        >
-            <font-awesome-icon icon="fa-plus"/>
-        </ButtonCustom>
-    </section>
+	<section class="community_wrapper">
+		<section class="community_header">
+			<font-awesome-icon v-if="chatStore.isChatOpen" icon="fa-chevron-left" @click="resetChat"/>
+			<h2
+				v-if="!chatStore.isChatOpen"
+				v-for="chat in chatListsSources"
+				:key="chat.id"
+				@click="selectChatList(chat.id)"
+				:class="[selectedChatList === chat.id ? '' : 'not_selected']"
+			>
+				{{ chat.name }}
+			</h2>
+			<h2 @click="toggleEditChatModal" v-else>
+				{{ chatStore.currentChat?.name || "Chat name"}}
+			</h2>
+		</section>
+		<div class="community_content">
+			<template :class="[chatStore.isChatOpen ? 'hidden' : 'shown mtl']">
+				<Suspense>
+					<ChatList
+						:selectedChatList="selectedChatList"
+					/>
+				</Suspense>
+			</template>
+			<template :class="['chat_wrap', chatStore.isChatOpen ? 'shown rtm' : 'hidden']">
+				<Suspense>
+					<ChatElements/>
+				</Suspense>
+				<TypeBox/>
+			</template>
+		</div>
+		<ButtonCustom class="new_chat_button"
+					  :style="'big circular'"
+					  v-if="!chatStore.isChatOpen"
+					  :click="toggleAddChatModal"
+		>
+			<font-awesome-icon icon="fa-plus"/>
+		</ButtonCustom>
+	</section>
 </template>
 
 <script setup lang="ts">
@@ -63,26 +63,26 @@ const modalStore = useModalStore()
 const userStore = useUserStore()
 
 const chatListsSources = ref({
-    chat1: {
-        name: 'Chat Rooms',
-        id: 'public',
-    },
-    chat2: {
-        name: 'Whispers',
-        id: 'private',
-    },
+	chat1: {
+		name: 'Chat Rooms',
+		id: 'public',
+	},
+	chat2: {
+		name: 'Whispers',
+		id: 'private',
+	},
 })
 
 const selectChatList = (chatID: string) => {
 	chatStore.updateStore()
-    selectedChatList.value = chatID
+	selectedChatList.value = chatID
 }
 const resetChat = () => {
-    chatStore.resetState()
+	chatStore.resetState()
 }
 
 const toggleAddChatModal = () => {
-    modalStore.loadAndDisplay(TheModal, SelectChannelActionModal, {})
+	modalStore.loadAndDisplay(TheModal, SelectChannelActionModal, {})
 }
 
 const toggleEditChatModal = () => {
@@ -101,113 +101,117 @@ const toggleEditChatModal = () => {
 
 <style scoped lang="scss">
 .community_wrapper {
-    grid-area: $gigamain;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
+	grid-area: $gigamain;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	overflow: hidden;
 
-    .community_header {
-        border-bottom: 1px solid $tertiary;
-        border-top: 1px solid $tertiary;
-        padding: 10px;
-        width: 100%;
-        text-align: center;
-        position: sticky;
-        display: flex;
-        justify-content: center;
-        gap: $medium_gap;
-        color: $quaternary;
+	.community_header {
+		border-bottom: 1px solid $tertiary;
+		border-top: 1px solid $tertiary;
+		padding: 10px;
+		width: 100%;
+		text-align: center;
+		position: sticky;
+		display: flex;
+		justify-content: center;
+		gap: $medium_gap;
+		color: $quaternary;
 
-        h2:hover {
-            cursor: pointer;
-        }
+		h2:hover {
+			cursor: pointer;
+		}
 
-        .not_selected {
-            transition: color 0.2s ease-in-out;
-            color: $secondary;
-        }
+		.not_selected {
+			transition: color 0.2s ease-in-out;
+			color: $secondary;
+		}
 
-        svg {
-            height: 50%;
-            position: absolute;
-            left: 10px;
-            top: calc(50% - 10px);
-            cursor: pointer;
-        }
-    }
+		svg {
+			height: 50%;
+			position: absolute;
+			left: 10px;
+			top: calc(50% - 10px);
+			cursor: pointer;
+		}
+	}
 
-    .community_content {
-        height: 100%;
-        width: 100%;
-        overflow: auto;
-    }
+	.community_content {
+		height: 100%;
+		width: 100%;
+		overflow: auto;
+	}
 
-    .new_chat_button {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1;
+	.new_chat_button {
+		position: absolute;
+		bottom: 20px;
+		right: 20px;
+		z-index: 1;
 
-        svg {
-            height: 50px;
-            width: 50px;
-            padding-left: 3px;
-            @media (max-width: 980px) {
-                height: 30px;
-                width: 30px;
-                padding-left: 1px;
-            }
-        }
+		svg {
+			height: 50px;
+			width: 50px;
+			padding-left: 3px;
+			@media (max-width: 980px) {
+				height: 30px;
+				width: 30px;
+				padding-left: 1px;
+			}
+		}
 
-    }
+	}
 }
 
 .shown {
-    display: block;
+	display: block;
 
-    &.mtl {
-        animation: fadeInMTL 0.2s ease-in-out;
-    }
+	&.mtl {
+		animation: fadeInMTL 0.2s ease-in-out;
+	}
 
-    &.rtm {
-        animation: fadeInRTM 0.2s ease-in-out;
-    }
+	&.rtm {
+		animation: fadeInRTM 0.2s ease-in-out;
+	}
 }
 
 .chat_wrap {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
 
-    &.hidden {
-        display: none;
-    }
+	&.hidden {
+		display: none;
+	}
+
+	@media (min-width: 980px) {
+		padding-bottom: 10px;
+	}
 }
 
 // ANIMATION CORNER
 @keyframes fadeInMTL {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(0);
-    }
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(0);
+	}
 }
 
 @keyframes fadeInRTM {
-    0% {
-        transform: translateX(100%);
-    }
-    100% {
-        transform: translateX(0);
-    }
+	0% {
+		transform: translateX(100%);
+	}
+	100% {
+		transform: translateX(0);
+	}
 }
 </style>

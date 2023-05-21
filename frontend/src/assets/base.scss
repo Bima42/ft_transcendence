@@ -61,6 +61,25 @@
 	box-sizing: border-box;
 	margin: 0;
 	font-weight: normal;
+	// Standard version (Firefox only for now)
+	scrollbar-color: $tertiary $transparent-background;
+	scrollbar-width: thin;
+}
+
+// For Chrome & Safari
+::-webkit-scrollbar {
+	width: 7px;
+	height: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: $tertiary;
+	-webkit-border-radius: 1ex;
+}
+
+::-webkit-scrollbar-track {
+	background: $transparent-background;
+	-webkit-border-radius: 1ex;
 }
 
 html {
@@ -81,9 +100,10 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+
 h1, h2, h3, h4, h5, h6, p, a {
-  font-family: 'Martian Mono', sans-serif;
-  font-weight: 700;
+	font-family: 'Martian Mono', sans-serif;
+	font-weight: 700;
 }
 
 .picture_dot {
