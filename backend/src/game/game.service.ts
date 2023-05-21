@@ -41,11 +41,17 @@ export class GameService {
 	}
 
 	async checkCurrentGames() {
+		let nRunning = 0
 		this.gameServers.forEach(async (serv) => {
 			const servStatus = serv.getStatus()
-			if (["INVITING", "SEARCHING", "STARTED"].includes(servStatus)) {
+			if (["INVITING", "SEARCHING"].includes(servStatus)) {
 				return;
 			}
+			if (servStatus == "STARTED") {
+				nRunning++
+				return;
+			}
+
 			const players = serv.getEndPlayers()
 
 			await this.usersService.updateData(players[0].user.id, { status: "ONLINE" })
@@ -92,6 +98,9 @@ export class GameService {
 				this.gameServers.splice(this.gameServers.indexOf(serv));
 			}
 		})
+		if (nRunning) {
+			Logger.log(`${nRunning} game(s) are running`)
+		}
 	}
 
 	/**
@@ -220,10 +229,12 @@ export class GameService {
 					where: { id: match.id }
 				})
 			}
+			if (matches.length) {
+				Logger.log(`Game: ${user.username}#${user.id} quit the classic queue`);
+			}
 		} catch (e) {
 			// Logger.error(e)
 		}
-		Logger.log(`Game: ${user.username}#${user.id} quit the classic queue`);
 	}
 
 	async getGameDetails(gameId: number): Promise<Game> {

@@ -85,7 +85,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return;
 		}
 
-		Logger.log(`Chat: ${user.username}#${user.id} connected`);
+		Logger.log(`${user.username}#${user.id} connected`);
 
 		// attach the user to the socket
 		socket.data.user = user;
@@ -121,7 +121,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(socket: any): any {
 		if (socket.data.user) {
-			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
+			Logger.log(`${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
 	}
 

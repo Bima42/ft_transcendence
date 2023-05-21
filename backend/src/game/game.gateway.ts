@@ -73,8 +73,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 		}
 		this.userSockets[client.id] = user;
 
-		Logger.log(`Game: ${user.username}#${user.id} connected`);
-
 		// attach the user to the socket
 		client.data.user = user;
 
@@ -84,7 +82,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 	}
 
 	handleDisconnect(client: any): any {
-		Logger.log(`Game: ${client.data.user?.username}#${client.data.user?.id} left`);
 		this.gameService.onPlayerDisconnect(client);
 	}
 
