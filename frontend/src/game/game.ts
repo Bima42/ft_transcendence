@@ -29,7 +29,8 @@ async function launch(containerId: any, router: Router) {
 			},
 			debug: false,
 		},
-		scene: [BootScene]
+		scene: [BootScene],
+		backgroundColor: '#232423',
 	}
 	const game = new Phaser.Game(config);
 	game.scene.add('PongScene', PongScene, false, router);

@@ -109,6 +109,8 @@ export default class PongScene extends Phaser.Scene {
 	private isRunning: boolean = false;
 	private uiScene!: UiScene;
 	private vueRouter!: Router;
+	private middleLine!: Phaser.Geom.Line
+	private graphics!: any
 
 
 	constructor() {
@@ -162,6 +164,11 @@ export default class PongScene extends Phaser.Scene {
 
 		//  Enable world bounds, but disable the sides (left, right, up, down)
 		this.matter.world.setBounds(0, 0, pong.worldWidth, pong.worldHeight, 32, false, false, true, true);
+
+		// Middle lane
+		this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0x808080 } });
+		this.middleLine = new Phaser.Geom.Line(pong.worldWidth / 2, 0, pong.worldWidth / 2, pong.worldHeight);
+		this.graphics.strokeLineShape(this.middleLine);
 
 		this.ball = new Ball(this, pong.worldWidth / 2, pong.worldHeight / 2);
 		this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
@@ -263,11 +270,11 @@ export default class PongScene extends Phaser.Scene {
 	}
 
 	update() {
-
 		this.handleInput();
 
 		if (this.isRunning)
 			this.obstacles.forEach((o) => o.update());
+
 	}
 
 	private clearSocketGameListener() {
