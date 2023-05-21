@@ -62,7 +62,7 @@
     margin: 0;
     font-weight: normal;
     // Standard version (Firefox only for now)
-    scrollbar-color: $tertiary $background;
+    scrollbar-color: $tertiary $transparent-background;
 	scrollbar-width: thin;
 }
 
