@@ -31,7 +31,7 @@ const loadDatas = () => {
 watch(() => friendStore.friends, () => {
 	friendList.value = []
 	loadDatas()
-})
+}, { deep: true })
 loadDatas()
 
 const showUserProfile = async (username: string) => {

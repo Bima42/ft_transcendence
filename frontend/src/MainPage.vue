@@ -32,7 +32,6 @@ import { useNotificationStore } from '@/stores/notification'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IUser from '@/interfaces/user/IUser'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
-import { onMounted } from 'vue';
 
 const route = useRoute()
 const router = useRouter()

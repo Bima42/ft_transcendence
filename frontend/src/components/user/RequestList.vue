@@ -40,9 +40,10 @@ function loadDatas() {
 }
 loadDatas()
 watch(() => friendStore.receivedRequests, () => {
+	console.log(`watcher`)
 	requests.value = []
 	loadDatas()
-})
+}, { deep: true })
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)
