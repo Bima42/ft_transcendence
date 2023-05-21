@@ -39,7 +39,7 @@ function loadDatas() {
 	}
 }
 loadDatas()
-watch(friendStore.receivedRequests, () => {
+watch(() => friendStore.receivedRequests, () => {
 	requests.value = []
 	loadDatas()
 })

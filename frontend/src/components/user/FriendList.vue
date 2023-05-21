@@ -28,7 +28,7 @@ const loadDatas = () => {
 		})
 	}
 }
-watch(friendStore.friends, () => {
+watch(() => friendStore.friends, () => {
 	friendList.value = []
 	loadDatas()
 })
