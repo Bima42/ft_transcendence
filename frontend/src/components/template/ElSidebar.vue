@@ -170,6 +170,11 @@ const outsideClickHandle = () => {
             &[id='logout'] {
                 color: red;
             }
+
+			&:hover {
+				transition: transform 0.2s ease-in-out;
+				transform: scale(1.2);
+			}
         }
 
         &.active {
