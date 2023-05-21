@@ -72,9 +72,10 @@ function joinQueue() {
 		});
 	}
 
-	gameStore.socket.once('matchFound', () => {
+	gameStore.socket.once('matchFound', (gameSettings: IGameSettings) => {
 		isLoading.value = false;
 		gameStore.socket.off("invitationDeclined")
+		gameStore.currentGame = gameSettings
 		router.push(`game`);
 	});
 	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
