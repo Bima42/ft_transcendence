@@ -200,7 +200,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 			await retrievePublicChats()
 		}
 		notSubscribedChannelsList.value = publicChatList.value.filter((channel) => {
-			return !subscribedChannelsList.value.find((subscribedChaneeeeenel) => {
+			return !subscribedChannelsList.value.find((subscribedChannel) => {
 				return channel.id === subscribedChannel.id
 			})
 		})
