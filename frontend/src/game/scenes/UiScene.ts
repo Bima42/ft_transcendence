@@ -83,7 +83,10 @@ export default class UiScene extends Phaser.Scene {
 
 	onAbortGame(reason: string) {
 		this.startButton.setVisible(true)
-		this.startButton.setText(`Game aborted: ${reason}\nYou can leave this page`)
+					.off('pointerover')
+					.off('pointerout')
+					.off('pointerdown')
+					.setText(`Game aborted: ${reason}\nYou can leave this page`)
 	}
 
 	updateScoreWidgetContent(score1: number, score2: number) {
