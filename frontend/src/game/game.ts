@@ -4,6 +4,7 @@ import PongScene from '@/game/scenes/PongScene'
 import GameoverScene from '@/game/scenes/GameoverScene'
 import UiScene from './scenes/UiScene'
 import type { Router } from 'vue-router'
+import * as pong from "./GameConsts"
 
 async function launch(containerId: any, router: Router) {
 
@@ -12,8 +13,8 @@ async function launch(containerId: any, router: Router) {
 	const config = {
 		type: Phaser.AUTO,
 		scale: { // See doc here: https://newdocs.phaser.io/docs/3.55.2/Phaser.Scale.ScaleManager
-			width: 800,
-			height: 600,
+			width: pong.worldWidth,
+			height: pong.worldHeight,
 			parent: "gameContainer",
 			mode: Phaser.Scale.FIT,
 			autoCenter: Phaser.Scale.CENTER_BOTH,

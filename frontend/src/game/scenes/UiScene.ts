@@ -30,8 +30,8 @@ export default class UiScene extends Phaser.Scene {
 
 	create() {
 		// this.modal = new Modal("");
-		this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
 		this.gameSettings = gameStore.currentGame
+		this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
 
 		if (!this.gameSettings) {
 			// TODO: show error message
@@ -51,7 +51,7 @@ export default class UiScene extends Phaser.Scene {
 		}
 
 		this.updateScoreWidgetContent(0, 0);
-		this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !")
+		this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.02}px`, color: "#FFFFFF" })
 		this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
 
 		this.waitingRoom();
