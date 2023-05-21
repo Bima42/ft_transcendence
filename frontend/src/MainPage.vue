@@ -78,7 +78,7 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 
 chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 	friendStore.friends.push(user)
-	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friend === user.id))
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} accepted your friend request`,
@@ -94,8 +94,8 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 chatStore.socket.on('friendRequest', (user: IUser) => {
 	friendStore.receivedRequests.push({
 		status: 'PENDING',
-		user: userStore.user!.id,
-		friend: user.id,
+		userId: user.id,
+		friendId: userStore.user!.id,
 	})
 	notificationStore.addNotification({
 		picture: user.avatar,
@@ -106,17 +106,12 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 })
 
 chatStore.socket.on('friendRequestCanceled', (user: IUser) => {
-	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.user === user.id))
+	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.userId === user.id))
 })
 
 chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
-	console.log('friendRequestDeclined', user)
-	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friend === user.id))
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
 })
-
-watch(friendStore.friends, () => console.log('friends', friendStore.friends))
-watch(friendStore.receivedRequests, () => console.log('received', friendStore.receivedRequests))
-watch(friendStore.sentRequests, () => console.log('sent', friendStore.sentRequests))
 
 /************************************************************************
  * 								   GAME									*

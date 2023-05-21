@@ -33,8 +33,7 @@ const requests = ref<IUser[]>([])
 
 function loadDatas() {
 	for (const request of friendStore.receivedRequests) {
-		console.log(request)
-		userStore.getUserInfos(request.friend).then((res) => {
+		userStore.getUserInfos(request.userId).then((res) => {
 			requests.value.push(res)
 		})
 	}

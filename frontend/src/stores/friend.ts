@@ -53,8 +53,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 			if (data.status === 'ACCEPTED') {
 				const userStore = useUserStore();
-				const user = await userStore.getUserInfos(data.user)
-				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.user === user.id), 1);
+				const user = await userStore.getUserInfos(data.userId)
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === user.id), 1);
 
 				friends.value.push(user);
 				return data.status === 'ACCEPTED';
@@ -82,9 +82,9 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 			if (data.status === 'ACCEPTED') {
 				// The current user is the friend of the friendship
-				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.user === data.user), 1);
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === data.userId), 1);
 				const userStore = useUserStore();
-				friends.value.push(await userStore.getUserInfos(data.user));
+				friends.value.push(await userStore.getUserInfos(data.userId));
 			}
 			return data.status === 'ACCEPTED';
 		}
@@ -95,7 +95,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to decline friend request',
 				jsonHeaders,
 			)
-			await updateStoreDatas();
+			receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === data.userId), 1);
 			return data.status === 'DECLINED';
 		}
 
@@ -105,7 +105,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to cancel friend request',
 				jsonHeaders,
 			)
-			await updateStoreDatas();
+			sentRequests.value.splice(sentRequests.value.findIndex((friendship) => friendship.friendId === data.friendId), 1);
 			return data.status === 'CANCELED';
 		}
 
@@ -150,7 +150,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 		}
 
 		const isRequestSent = (id: number): boolean => {
-			return sentRequests.value.some((friend) => friend.friend === id);
+			return sentRequests.value.some((friend) => friend.friendId === id);
 		}
 
 	/*************************************************************************
