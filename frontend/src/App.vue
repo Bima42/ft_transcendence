@@ -1,5 +1,7 @@
 <template>
-  <router-view></router-view>
+	<section class="UI-grid">
+		<router-view></router-view>
+	</section>
 </template>
 
 <script setup lang="ts">
