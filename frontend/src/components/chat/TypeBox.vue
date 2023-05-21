@@ -38,7 +38,6 @@ async function sendMessage() {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: $small_gap;
     padding-left: 10px;
     position: relative;
     max-width: 980px;

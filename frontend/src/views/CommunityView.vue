@@ -190,6 +190,10 @@ const toggleEditChatModal = () => {
     &.hidden {
         display: none;
     }
+
+    @media (min-width: 980px) {
+        padding-bottom: 10px;
+    }
 }
 
 // ANIMATION CORNER
