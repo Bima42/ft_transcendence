@@ -57,6 +57,8 @@ services:
       - db
     env_file:
       - ./env/.backend.env
+    volumes:
+      - "./uploads:/server/uploads"
     expose:
       - '3080'
     networks:

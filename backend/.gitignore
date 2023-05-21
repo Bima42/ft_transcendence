@@ -1,3 +1,7 @@
 node_modules
 # Keep environment variables out of version control
 .env
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+!uploads/default.png
