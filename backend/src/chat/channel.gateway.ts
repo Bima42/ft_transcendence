@@ -139,6 +139,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	async onChannelBanned(user: UserDto, chatId: number) {
+		this.onChannelLeave(user, chatId)
+		this.server.to("user" + user.id).emit("channelBanned", chatId)
+	}
+
+	async onChannelKicked(user: UserDto, chatId: number) {
+		this.onChannelLeave(user, chatId)
+		this.server.to("user" + user.id).emit("channelKicked", chatId)
+	}
+
+	async onChannelMuted(user: UserDto, chatId: number, muteDuration: number) {
+		this.server.to("user" + user.id).emit("channelMuted", {chatId, muteDuration})
+	}
+
 	async onBlockUser(user: UserDto, targetUserId: number) {
 		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
 		for (const socket of sockets) {

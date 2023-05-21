@@ -84,7 +84,6 @@ const handleSubmit = (e?: Event) => {
 }
 
 const handleRefuse = (e?: Event) => {
-	console.log(`handle refuse`)
 	if (e)
 		e.preventDefault()
 	if( alertStore.callBackRefuse) {

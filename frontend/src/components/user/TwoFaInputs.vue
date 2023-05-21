@@ -36,7 +36,7 @@ const toggleTwoFaStatus = () => {
     enableTwoFa.value = !enableTwoFa.value
 	try {
 		userStore.updateTwoFaStatus(enableTwoFa.value)
-	} catch (err: BackendError) {
+	} catch (err: any) {
 		alertStore.setErrorAlert(err)
 	}
 }

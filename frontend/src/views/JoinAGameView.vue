@@ -79,7 +79,6 @@ function joinQueue() {
 		router.push(`game`);
 	});
 	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
-		console.log(`invitation declined :(`)
 		isLoading.value = false
 		gameStore.socket.off("matchFound")
 		router.push('index')
@@ -124,7 +123,8 @@ function onJoinCustom() {
 
 
 gameStore.socket.on('connect', () => {
-    console.log(`Connected to server with ID ${gameStore.socket.id}`);
+    //console.log(`Connected to server with ID ${gameStore.socket.id}`);
+	p
 });
 
 onUnmounted(() => {

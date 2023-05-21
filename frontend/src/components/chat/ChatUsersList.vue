@@ -48,6 +48,7 @@ const handleClick = (user: IUserChat) => {
     }
     props.setSelectedUser(user)
 }
+chatStore.updateStore()
 </script>
 
 <style scoped lang="scss">
