@@ -117,16 +117,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 		}
 
-		const isWaitingRequest = (friendName: string): boolean => {
-			let status = false;
-			get(
-				`friends/isWaiting/${friendName}`,
-				'Failed to check if waiting request',
-				jsonHeaders,
-			).then((data) => {
-				status = data;
-			});
-			return status;
+		const isRequestSent = (friendId: number): boolean => {
+			return sentRequests.value.some((friend) => friend.friendId === friendId);
 		}
 
 		const getAllWaitingRequests = (): Promise<IFriendship[]> => {
@@ -147,10 +139,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 
 		const isFriend = (id: number): boolean => {
 			return friends.value.some((friend) => friend.id === id);
-		}
-
-		const isRequestSent = (id: number): boolean => {
-			return sentRequests.value.some((friend) => friend.friendId === id);
 		}
 
 	/*************************************************************************
@@ -212,7 +200,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 			declineFriendRequest,
 			cancelFriendRequest,
 			getAllFriends,
-			isWaitingRequest,
 			getAllWaitingRequests,
 			getAllPendingRequests,
 			isFriend,

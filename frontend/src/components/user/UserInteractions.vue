@@ -36,27 +36,21 @@ const router = useRouter()
 const isBlocked = computed(() => friendStore.isBlocked(user.value.id))
 const isFriend = computed(() => friendStore.isFriend(user.value.id))
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
-const isRequestSent = ref(friendStore.isWaitingRequest(user.value.username))
+const isRequestSent = computed(() => friendStore.isRequestSent(user.value.id))
 
 onUpdated(() => {
 	user.value = props.targetUser ? props.targetUser : modalStore.data.user
 })
 
-watch(isFriend, (value) => {
-	if (value) {
-		isRequestSent.value = false
-	}
-})
-
 const addOrRemoveFriend = async () => {
 	try {
 		if (isFriend.value) {
-			isRequestSent.value = !(await friendStore.removeFriend(user.value.username))
+			await friendStore.removeFriend(user.value.username)
 		} else {
 			if (!isRequestSent.value)
-				isRequestSent.value = await friendStore.addFriend(user.value.username)
+				await friendStore.addFriend(user.value.username)
 			else {
-				isRequestSent.value = !(await friendStore.cancelFriendRequest(user.value.username))
+				await friendStore.cancelFriendRequest(user.value.username)
 			}
 		}
 	} catch (e: any) {
