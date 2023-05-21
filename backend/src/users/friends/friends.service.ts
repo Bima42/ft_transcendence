@@ -188,8 +188,8 @@ export class FriendsService {
 	 * @param userId: the user who is accepting or declining the friend request
 	 * @param friend: the user who sent the friend request
 	 */
-	async acceptFriend(userId: number, friend: UserDto) {
-		return this.prismaService.friendship.update({
+	async acceptFriend(userId: number, friend: UserDto): Promise<FriendshipDto> {
+		const friendship = await this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
 					userId: friend.id,
@@ -200,6 +200,11 @@ export class FriendsService {
 				status: FriendshipStatus.ACCEPTED
 			}
 		});
+
+		// Change the friendship friendId to friend.id and remove the userId key
+		friendship.friendId = friendship.userId;
+		delete friendship.userId;
+		return friendship;
 	}
 
 	async declineFriend(userId: number, friend: UserDto) {
@@ -253,7 +258,6 @@ export class FriendsService {
 				status: FriendshipStatus.PENDING
 			},
 			select: {
-				userId: true,
 				friendId: true,
 				status: true
 			}
@@ -272,17 +276,26 @@ export class FriendsService {
 	}
 
 	async getAllPendingRequests(userId: number): Promise<FriendshipDto[]> {
-		return this.prismaService.friendship.findMany({
+		const friendships = await this.prismaService.friendship.findMany({
 			where: {
 				friendId: userId,
 				status: FriendshipStatus.PENDING
 			},
 			select: {
 				userId: true,
-				friendId: true,
 				status: true
 			}
 		});
+
+		const response: FriendshipDto[] = [];
+		for (const friendship of friendships) {
+			response.push({
+				friendId: friendship.userId,
+				status: friendship.status
+			});
+		}
+
+		return response;
 	}
 
 	async isPendingRequest(userId: number, friendName: string) {

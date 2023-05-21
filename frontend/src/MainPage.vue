@@ -32,7 +32,7 @@ import { useNotificationStore } from '@/stores/notification'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IUser from '@/interfaces/user/IUser'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
-import { watch } from 'vue';
+import { onMounted } from 'vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -83,7 +83,7 @@ chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 		picture: user.avatar,
 		message: `${user.username} accepted your friend request`,
 		lifespan: 3000,
-		redirect: () => router.push(`/main/profile/${user.id}`),
+		redirect: () => router.replace(`/main/profile/${user.id}`),
 	})
 })
 
@@ -94,8 +94,7 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 chatStore.socket.on('friendRequest', (user: IUser) => {
 	friendStore.receivedRequests.push({
 		status: 'PENDING',
-		userId: user.id,
-		friendId: userStore.user!.id,
+		friendId: user.id,
 	})
 	if (route.name === 'requests')
 		return
@@ -108,7 +107,7 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 })
 
 chatStore.socket.on('friendRequestCanceled', (user: IUser) => {
-	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.userId === user.id))
+	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.friendId === user.id))
 })
 
 chatStore.socket.on('friendRequestDeclined', (user: IUser) => {

@@ -53,8 +53,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 			if (data.status === 'ACCEPTED') {
 				const userStore = useUserStore();
-				const user = await userStore.getUserInfos(data.userId)
-				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === user.id), 1);
+				const user = await userStore.getUserInfos(data.friendId)
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.friendId === user.id), 1);
 
 				friends.value.push(user);
 				return data.status === 'ACCEPTED';
@@ -81,9 +81,9 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 			if (data.status === 'ACCEPTED') {
 				// The current user is the friend of the friendship
-				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === data.userId), 1);
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.friendId === data.friendId), 1);
 				const userStore = useUserStore();
-				friends.value.push(await userStore.getUserInfos(data.userId));
+				friends.value.push(await userStore.getUserInfos(data.friendId));
 			}
 			return data.status === 'ACCEPTED';
 		}
@@ -94,7 +94,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to decline friend request',
 				jsonHeaders,
 			)
-			receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.userId === data.userId), 1);
+			receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.friendId === data.friendId), 1);
 			return data.status === 'DECLINED';
 		}
 

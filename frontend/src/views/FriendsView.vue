@@ -11,14 +11,14 @@
 			</h2>
 		</section>
 		<div class="friends_content">
-			<FriendList v-if="selectedList === 'Friends'"/>
+			<FriendList v-if="route.name === 'friends'"/>
 			<RequestList v-else/>
 		</div>
 	</section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import FriendList from '@/components/user/FriendList.vue'
 import RequestList from '@/components/user/RequestList.vue'
 import { useRoute, useRouter } from 'vue-router';
@@ -26,6 +26,9 @@ import { useRoute, useRouter } from 'vue-router';
 const router = useRouter()
 const route = useRoute()
 const selectedList = ref(route.name === 'friends' ? 'Friends' : 'Requests')
+watch(() => route.name, (newVal) => {
+	selectedList.value = newVal === 'friends' ? 'Friends' : 'Requests'
+})
 
 const friendListsSources = ref({
 	friendList: {

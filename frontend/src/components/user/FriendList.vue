@@ -28,11 +28,11 @@ const loadDatas = () => {
 		})
 	}
 }
-loadDatas()
 watch(friendStore.friends, () => {
 	friendList.value = []
 	loadDatas()
 })
+loadDatas()
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)
