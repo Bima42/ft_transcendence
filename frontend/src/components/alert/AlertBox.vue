@@ -19,7 +19,7 @@
                     >
                         {{ !alertStore.callBack ? 'Ok' : 'Yes' }}
                     </ButtonCustom>
-                    <ButtonCustom @click="alertStore.resetState()"
+                    <ButtonCustom @click="handleRefuse()"
                                   :style="'big'"
                                   v-if="!alertStore.error && alertStore.callBack"
                     >
@@ -81,6 +81,15 @@ const handleSubmit = (e?: Event) => {
                 alertStore.resetState()
         })
     }
+}
+
+const handleRefuse = (e?: Event) => {
+	if (e)
+		e.preventDefault()
+	if( alertStore.callBackRefuse) {
+		alertStore.callBackRefuse()
+	}
+	alertStore.resetState()
 }
 </script>
 

@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
 import type { IGameoverData, IPointWon } from '@/interfaces/game/IGameCommunication'
 import * as pong from "../GameConsts"
+import type { Router } from 'vue-router'
 
 
 const gameStore = useGameStore();
@@ -107,6 +108,9 @@ export default class PongScene extends Phaser.Scene {
 	private socket!: Socket;
 	private isRunning: boolean = false;
 	private uiScene!: UiScene;
+	private vueRouter!: Router;
+	private middleLine!: Phaser.Geom.Line
+	private graphics!: any
 
 
 	constructor() {
@@ -117,40 +121,38 @@ export default class PongScene extends Phaser.Scene {
 
 	}
 
-	private parseConfig(config: IGameSettings) {
-		this.config = config
-		if (!config.game)
-			return;
-
-		const gameNumber = config ? config.game.id : 0
-		if (this.config.game.type == 'CLASSIC') {
-			console.log(`Game #${gameNumber}: Classic game.`);
-		} else {
-			console.log(`Game #${gameNumber}: Custom game.`);
+	private updateEntityPosition(object: any, servRef: any, name: string, maxDiff: number = 10) {
+		const diff = {
+			x: object.x - servRef.x,
+			y: object.y - servRef.y,
+		}
+		const totalDiff = diff.x * diff.x + diff.y * diff.y
+		if (totalDiff > maxDiff * maxDiff) {
+			object.x = servRef.x
+			object.y = servRef.y
 		}
 	}
 
 	private updateWorld(state: WorldState) {
-		this.paddle1.x = state.paddle1.x;
-		this.paddle1.y = state.paddle1.y;
-		this.paddle2.x = state.paddle2.x;
-		this.paddle2.y = state.paddle2.y;
-		this.ball.x = state.ball.x;
-		this.ball.y = state.ball.y;
+		this.updateEntityPosition(this.paddle1, state.paddle1, "paddle1", 3)
+		this.updateEntityPosition(this.paddle2, state.paddle2, "paddle2", 3)
+		this.updateEntityPosition(this.ball, state.ball, "ball", 10)
 		this.ball.setVelocity(state.ball.vx, state.ball.vy);
 		let i = 0;
 		state.obstacles.forEach((o) => {
-			this.obstacles[i].x = o.x;
-			this.obstacles[i].y = o.y;
+			this.updateEntityPosition(this.obstacles[i], o, `obstacle${i}`, 3)
 			this.obstacles[i].speed.x = o.vx;
 			this.obstacles[i].speed.y = o.vy;
 			i++
 		})
 	}
 
-	create(config: IGameSettings) {
-		this.parseConfig(config)
-
+	create(router: Router) {
+		this.vueRouter = router
+		if (!gameStore.currentGame) {
+			return
+		}
+		this.config = gameStore.currentGame
 		this.socket = gameStore.socket as Socket;
 		this.resetSocketGameListener();
 
@@ -162,6 +164,11 @@ export default class PongScene extends Phaser.Scene {
 
 		//  Enable world bounds, but disable the sides (left, right, up, down)
 		this.matter.world.setBounds(0, 0, pong.worldWidth, pong.worldHeight, 32, false, false, true, true);
+
+		// Middle lane
+		this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0x808080 } });
+		this.middleLine = new Phaser.Geom.Line(pong.worldWidth / 2, 0, pong.worldWidth / 2, pong.worldHeight);
+		this.graphics.strokeLineShape(this.middleLine);
 
 		this.ball = new Ball(this, pong.worldWidth / 2, pong.worldHeight / 2);
 		this.ball.setOnCollide(() => this.sound.play('thud', { volume: 0.15 }))
@@ -263,11 +270,11 @@ export default class PongScene extends Phaser.Scene {
 	}
 
 	update() {
-
 		this.handleInput();
 
 		if (this.isRunning)
 			this.obstacles.forEach((o) => o.update());
+
 	}
 
 	private clearSocketGameListener() {
@@ -327,7 +334,7 @@ export default class PongScene extends Phaser.Scene {
 		this.socket.on("gameover", (gameoverData: IGameoverData) => {
 			this.uiScene.onGameover(gameoverData);
 			this.scene.stop('UiScene');
-			this.scene.start("GameoverScene", gameoverData);
+			this.scene.start("GameoverScene", { data: gameoverData, router: this.vueRouter });
 		});
 	}
 };

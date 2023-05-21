@@ -17,7 +17,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "chart.js": "^4.3.0",
     "cookie": "^0.5.0",
-    "phaser": "^3.55.2",
+    "phaser": "^3.60.0",
     "pinia": "^2.0.28",
     "socket.io-client": "^4.6.1",
     "typescript-cookie": "^1.0.4",

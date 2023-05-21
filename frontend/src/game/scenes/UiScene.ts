@@ -1,4 +1,3 @@
-import PongScene from './PongScene'
 import Phaser from 'phaser'
 import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useGameStore } from '@/stores/game'
@@ -10,35 +9,8 @@ import * as pong from "../GameConsts"
 const gameStore = useGameStore();
 const userStore = useUserStore();
 
-// class Modal {
-//   private background: Phaser.GameObjects.Rectangle;
-//   private textWidget: Phaser.GameObjects.Text;
-//
-//   constructor(private scene : Phaser.Scene,
-//               text: string,
-//               private type: "INFO" | "OK" = "INFO") {
-//     this.background = this.scene.add.rectangle(
-//     this.textWidget = this.scene.add.text(this.scene.cameras.main.centerX,
-//                                           this.scene.cameras.main.centerY - 50,
-//                                           text)
-//   }
-//
-//   setText(text: string) {
-//
-//   }
-//
-//   setVisible(visible: boolean) {
-//     this.textWidget.setVisible(visible);
-//     this.background.setVisible(visible);
-//     this.button.setVisible(visible);
-//   }
-//
-//   setType
-//
-// }
-
 export default class UiScene extends Phaser.Scene {
-	private gameSettings!: IGameSettings
+	private gameSettings!: IGameSettings | null
 	private scoreWidget: any;
 	private startButton!: Phaser.GameObjects.Text;
 	private countdown: number = 0;
@@ -46,7 +18,6 @@ export default class UiScene extends Phaser.Scene {
 	private myPlayer!: IUser
 	private otherPlayer!: IUser
 	private isPlayer1: boolean = false;
-	// private modal!: Modal;
 
 	constructor() {
 		super({ key: 'UiScene' })
@@ -56,19 +27,19 @@ export default class UiScene extends Phaser.Scene {
 
 	}
 
-	create(config: IGameSettings) {
+	create() {
 		// this.modal = new Modal("");
-		this.gameSettings = config;
-		this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
+		this.gameSettings = gameStore.currentGame
+		this.scoreWidget = this.add.text(0, 50, "Press W or S to move your paddle", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
 
-		if (!this.gameSettings.game) {
+		if (!this.gameSettings) {
 			// TODO: show error message
 			// this.scene.stop('UiScene');
 			this.scoreWidget.setText("No game. Invite someone or get in the queue !");
 			return;
 		}
 		// Are we player 1 or 2 ?
-		if (userStore.user?.id == this.gameSettings.player1?.id) {
+		if (userStore.user?.id == this.gameSettings.player1.id) {
 			this.isPlayer1 = true;
 			this.myPlayer = this.gameSettings.player1;
 			this.otherPlayer = this.gameSettings.player2;
@@ -78,8 +49,7 @@ export default class UiScene extends Phaser.Scene {
 			this.otherPlayer = this.gameSettings.player1;
 		}
 
-		this.updateScoreWidgetContent(0, 0);
-		this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !")
+		this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.02}px`, color: "#FFFFFF" })
 		this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
 
 		this.waitingRoom();
@@ -92,13 +62,19 @@ export default class UiScene extends Phaser.Scene {
 	}
 
 	onServerDisconnect() {
-		this.startButton.setVisible(true)
-		this.startButton.setText(`Server disconnected.`)
+		try {
+			this.startButton.setVisible(true)
+			this.startButton.setText(`Server disconnected.`)
+		}
+		catch(e) {}
 	}
 
 	onPlayerDisconnect() {
-		this.startButton.setVisible(true)
-		this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
+		try {
+			this.startButton.setVisible(true)
+			this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
+		}
+		catch(e) {}
 	}
 
 	onPlayerReconnect() {
@@ -111,7 +87,10 @@ export default class UiScene extends Phaser.Scene {
 
 	onAbortGame(reason: string) {
 		this.startButton.setVisible(true)
-		this.startButton.setText(`Game aborted: ${reason}\nYou can leave this page`)
+					.off('pointerover')
+					.off('pointerout')
+					.off('pointerdown')
+					.setText(`Game aborted: ${reason}\nYou can leave this page`)
 	}
 
 	updateScoreWidgetContent(score1: number, score2: number) {
@@ -160,6 +139,7 @@ export default class UiScene extends Phaser.Scene {
 			.on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
 			.on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
 			.on('pointerdown', () => {
+				this.updateScoreWidgetContent(0, 0);
 				this.startButton.setText("Waiting for opponent...")
 					.setStyle({ fill: '#FFF' })
 					.setInteractive({ useHandCursor: false })

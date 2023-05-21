@@ -123,7 +123,7 @@ export class ChannelController {
 		switch (action.type) {
 			case 'kick':
 				await this.channelService.deleteUserChatRole(user, chatId, targetUser);
-				await this.channelGateway.onChannelLeave(targetUser, chatId)
+				await this.channelGateway.onChannelKicked(targetUser, chatId)
 				break;
 			case 'add':
 			case 'demote':
@@ -134,11 +134,11 @@ export class ChannelController {
 				if (!action.muteDuration)
 					return;
 				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.MEMBER, action.muteDuration);
-				await this.channelGateway.onChannelJoin(targetUser, chatId)
+				await this.channelGateway.onChannelMuted(targetUser, chatId, action.muteDuration)
 				break;
 			case 'ban':
 				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.BANNED, null);
-				await this.channelGateway.onChannelLeave(targetUser, chatId)
+				await this.channelGateway.onChannelBanned(targetUser, chatId)
 				break;
 			case 'promote':
 				await this.channelService.UpsertUserChatRole(user, chatId, targetUser, UserChatRole.ADMIN, null);

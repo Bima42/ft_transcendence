@@ -85,7 +85,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return;
 		}
 
-		Logger.log(`Chat: ${user.username}#${user.id} connected`);
+		Logger.log(`${user.username}#${user.id} connected`);
 
 		// attach the user to the socket
 		socket.data.user = user;
@@ -121,7 +121,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(socket: any): any {
 		if (socket.data.user) {
-			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
+			Logger.log(`${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
 	}
 
@@ -137,6 +137,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const socket of sockets) {
 			socket.leave("channel" + chatId.toString())
 		}
+	}
+
+	async onChannelBanned(user: UserDto, chatId: number) {
+		this.onChannelLeave(user, chatId)
+		this.server.to("user" + user.id).emit("channelBanned", chatId)
+	}
+
+	async onChannelKicked(user: UserDto, chatId: number) {
+		this.onChannelLeave(user, chatId)
+		this.server.to("user" + user.id).emit("channelKicked", chatId)
+	}
+
+	async onChannelMuted(user: UserDto, chatId: number, muteDuration: number) {
+		this.server.to("user" + user.id).emit("channelMuted", {chatId, muteDuration})
 	}
 
 	async onBlockUser(user: UserDto, targetUserId: number) {

@@ -97,6 +97,27 @@ const toggleEditChatModal = () => {
 		})
 	}
 }
+
+chatStore.socket.on("channelMuted", ({chatId, muteDuration} : { chatId: number, muteDuration: number}) => {
+	if (chatId == chatStore.currentChat?.id) {
+		alertStore.setErrorAlert(`You have been muted from this chat for ${muteDuration} minutes`)
+	}
+})
+chatStore.socket.on("channelKicked", (chatId: number) => {
+	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId))
+	if (chatId == chatStore.currentChat?.id) {
+		alertStore.setErrorAlert("You have been kicked from this chat")
+		chatStore.resetState()
+	}
+})
+
+chatStore.socket.on("channelBanned", (chatId: number) => {
+	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId))
+	if (chatId == chatStore.currentChat?.id) {
+		alertStore.setErrorAlert("You have been banned from this chat")
+		chatStore.resetState()
+	}
+})
 </script>
 
 <style scoped lang="scss">

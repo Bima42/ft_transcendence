@@ -51,6 +51,13 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		return true
 	}
 
+	const iAmMutedUntil = function (userId: number): Date | null {
+		const userChat = currentChat.value?.users.find(el => { return el.user.id === userId })
+		if (userChat?.mutedUntil)
+			return userChat.mutedUntil
+		return null
+	}
+
 	const setCurrentChat = async function (chatId: string): Promise<boolean> {
 		if (!chatId) return false
 		const url = 'chat/rooms/' + chatId;
@@ -281,6 +288,7 @@ export const useChatStore = defineStore('chat', (): IChatStore => {
 		onNewMessage,
 		sendMessage,
 		refreshCurrentChat,
+		iAmMutedUntil,
 		setCurrentChat,
 		getRoleFromUserId,
 		getMessages,

@@ -13,6 +13,8 @@ const fps = 60;
 // At what frequency we send the state to the clients
 const syncPerSec = 5;
 
+const maxScore = 5
+
 const timeToStartBeforeAbort = 30000
 const disconnectTimeoutDuration = 10000
 // Duration of the countdown between the start (ms)
@@ -75,7 +77,7 @@ export class GameServer {
 	private readonly roomID: string;
 	private readonly players: Socket[] = [];
 	private scores: Array<number> = [0, 0];
-	private maxScore = 5
+	private maxScore = maxScore
 	private obstacles: Obstacle[] = [];
 	private status: GameStatus = "STARTED";
 	private hasStarted = false;
@@ -286,23 +288,53 @@ export class GameServer {
 	}
 
 	private onPause() {
-		clearInterval(this.IntervalUpdate);
+		this.isPaused = true
 		clearInterval(this.IntervalSync);
 	}
 
 	private onResume() {
+		this.isPaused = false
+		this.previousLoopTick = Date.now()
 		// Start simulation
-		this.updateWorld();
-		this.IntervalUpdate = setInterval(() => { this.updateWorld(); }, 1000 / fps);
+		this.updateWorld(1000 / fps);
+		this.gameLoop()
 
 		// start syncing with client
 		this.sendStateToClients();
 		this.IntervalSync = setInterval(() => { this.sendStateToClients(); }, 1000 / syncPerSec);
 	}
 
-	private updateWorld() {
+	/**
+	 * This is a hack to avoid the unconsistant behaviour of setInterval
+	 * */
+	private isPaused = false
+	private previousLoopTick: number
+	private gameLoop() {
+		if (this.isPaused) {
+			return
+		}
+		const now = Date.now()
 
-		Engine.update(this.engine, 1000 / fps);
+		if (this.previousLoopTick + (1000 / fps) <= now) {
+			const delta = (now - this.previousLoopTick)
+			this.previousLoopTick = now
+			// This takes time
+			this.updateWorld(delta)
+		}
+
+		if (Date.now() - this.previousLoopTick < (1000 / fps) - 16) {
+			setTimeout(() => this.gameLoop())
+		} else {
+			setImmediate(() => this.gameLoop())
+		}
+
+
+	}
+
+	private updateWorld(delta: number) {
+		// Logger.log(`updateWorld: delta = ${delta}`)
+
+		Engine.update(this.engine, delta);
 		this.obstacles.forEach((o) => o.update())
 
 		// Just a fix for some crazy stuff happening

@@ -16,21 +16,30 @@
  */
 import { defineProps } from 'vue'
 import { useChatStore } from '@/stores/chat'
+import { useUserStore } from '@/stores/user';
+import { useAlertStore } from '@/stores/alert';
 
 const chatStore = useChatStore();
+const userStore = useUserStore();
+const alertStore = useAlertStore();
 chatStore.updateStore();
 
 const props = defineProps<{
     selectedChatList: string
 }>()
 
-const toggleChat = (id: number) => {
+const toggleChat = async (id: number) => {
     const castedId = id.toString()
-    const response = chatStore.setCurrentChat(castedId)
+    const response = await chatStore.setCurrentChat(castedId)
     if (!response) {
-        console.error('Chat not found') //TODO: set variable and display error message
+        alertStore.setErrorAlert('Chat not found')
         return
     }
+	const mutedUntil = chatStore.iAmMutedUntil(userStore.user?.id || 0)
+	if (mutedUntil) {
+		const dateString = mutedUntil.toLocaleString('fr-CH', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})
+		alertStore.setErrorAlert(`You are muted until ${dateString}`)
+	}
 }
 </script>
 

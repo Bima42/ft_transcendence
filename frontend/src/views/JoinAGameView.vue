@@ -72,20 +72,18 @@ function joinQueue() {
 		});
 	}
 
-	gameStore.socket.once('matchFound', () => {
+	gameStore.socket.once('matchFound', (gameSettings: IGameSettings) => {
 		isLoading.value = false;
 		gameStore.socket.off("invitationDeclined")
+		gameStore.currentGame = gameSettings
 		router.push(`game`);
 	});
 	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
 		isLoading.value = false
-		gameStore.socket.off("invitationDeclined")
 		gameStore.socket.off("matchFound")
 		router.push('index')
 		// Go back to index to avoid spam to opponent
-		setTimeout(() => {
-			alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
-		}, 50);
+		alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
 	})
 
 	// This is ubercrade
@@ -125,7 +123,8 @@ function onJoinCustom() {
 
 
 gameStore.socket.on('connect', () => {
-    console.log(`Connected to server with ID ${gameStore.socket.id}`);
+    //console.log(`Connected to server with ID ${gameStore.socket.id}`);
+	p
 });
 
 onUnmounted(() => {

@@ -2,6 +2,7 @@ import type { IGameoverData } from '@/interfaces/game/IGameCommunication';
 import { Scene } from 'phaser'
 import { useUserStore } from '@/stores/user'
 import * as pong from "../GameConsts"
+import type { Router } from 'vue-router';
 
 export default class GameoverScene extends Scene {
 
@@ -13,7 +14,7 @@ export default class GameoverScene extends Scene {
 
 	}
 
-	create(data: IGameoverData) {
+	create({data, router} : {data: IGameoverData, router: Router}) {
 
 		const userStore = useUserStore()
 		let text = "You won ! :D"
@@ -33,8 +34,7 @@ export default class GameoverScene extends Scene {
 
 		this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 			.on('up', (_key: any, _event: any) => {
-				console.log("EXIT GAME")
-				// TODO: event to leave page to 'joinQueue'
+				router.push('/main/joinGame')
 			}, this);
 
 	}

@@ -19,7 +19,6 @@
  *
  * @param {number} chatId - This is the chat ID that is received from the parent
  */
-import { onUnmounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import ChatMessage from '@/components/chat/ChatMessage.vue'
@@ -28,10 +27,6 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 
 const currentUser = userStore.user?.id
-
-onUnmounted(() => {
-	chatStore.resetState()
-})
 </script>
 
 <style scoped lang="scss">

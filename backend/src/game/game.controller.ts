@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { Response } from 'express'
@@ -17,7 +17,7 @@ export class GameController {
 	getCurrentGame(@Req() req: RequestWithUser, @Res() res: Response) {
 		const gameSettings = this.gameService.getCurrentGame(req.user);
 		if (!gameSettings)
-			return res.status(404).send("Game not Found");
+			throw new NotFoundException("No current game")
 		else
 			return res.status(200).json(gameSettings);
 	}
