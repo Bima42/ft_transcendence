@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { get, jsonHeaders, patch, post } from '../../utils';
 import type IFriendship from '@/interfaces/user/IFriendship';
-import type { FriendshipStatus } from '@/interfaces/user/IFriendship';
 import type IFriend from '@/interfaces/user/IFriend';
 import type IUser from '@/interfaces/user/IUser';
 import { ref } from 'vue';
@@ -16,7 +15,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 	get('friends/blocked', 'Failed to get all blocked', jsonHeaders).then((data) => {
 		blocked.value = data;
 	});
-	console.log('friends', friends.value);
 
 	const updateStoreDatas = async () => {
 		friends.value = await getAllFriends();
@@ -43,7 +41,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 			if (data.status === 'ACCEPTED') {
 				await updateStoreDatas();
 			}
-			return data.status === 'PENDING' || data.status === 'ACCEPTED';
+			return data.status === 'PENDING';
 		}
 
 		const removeFriend = async (friendName: string): Promise<boolean> => {
@@ -82,6 +80,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				jsonHeaders,
 			)
 			return data.status === 'CANCELED';
+			// return data.status;
 		}
 
 		const getAllFriends = async (): Promise<IFriend[]> => {
@@ -92,12 +91,16 @@ export const useFriendStore = defineStore( 'friend', () => {
 			)
 		}
 
-		const isWaitingRequest = async (friendName: string): Promise<boolean> => {
-			return get(
+		const isWaitingRequest = (friendName: string): boolean => {
+			let status = false;
+			get(
 				`friends/isWaiting/${friendName}`,
 				'Failed to check if waiting request',
 				jsonHeaders,
-			)
+			).then((data) => {
+				status = data;
+			});
+			return status;
 		}
 
 		const getAllPendingRequests = (): Promise<IUser[]> => {

@@ -68,9 +68,6 @@ async function loadUser() {
     })
 }
 
-watch(() => route.params.id, () => {
-    loadUser()
-})
 watch(() => route.params, () => {
     loadUser()
 })

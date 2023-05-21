@@ -7,4 +7,4 @@ export default interface IFriendship {
 	friend: IUser
 }
 
-export type FriendshipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELED'
+export type FriendshipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELED' | 'NONE'

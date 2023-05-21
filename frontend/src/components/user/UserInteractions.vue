@@ -14,7 +14,7 @@
 import { useModalStore } from '@/stores/modal'
 import { useFriendStore } from '@/stores/friend'
 import { useGameStore } from '@/stores/game'
-import { computed, onUpdated, ref } from 'vue'
+import { computed, onUpdated, ref, watch } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import type IUser from '@/interfaces/user/IUser'
 import { useRouter } from 'vue-router'
@@ -35,18 +35,23 @@ const router = useRouter()
 
 const isBlocked = computed(() => friendStore.isBlocked(user.value.id))
 const isFriend = computed(() => friendStore.isFriend(user.value.id))
-const isRequestSent = ref(false)
 const user = ref(props.targetUser ? props.targetUser : modalStore.data.user)
-friendStore.isWaitingRequest(user.value.username).then(res => isRequestSent.value = res)
+const isRequestSent = ref(friendStore.isWaitingRequest(user.value.username))
 
-onUpdated(()=> {
+onUpdated(() => {
 	user.value = props.targetUser ? props.targetUser : modalStore.data.user
+})
+
+watch(isFriend, (value) => {
+	if (value) {
+		isRequestSent.value = false
+	}
 })
 
 const addOrRemoveFriend = async () => {
 	try {
 		if (isFriend.value) {
-			await friendStore.removeFriend(user.value.username)
+			isRequestSent.value = !(await friendStore.removeFriend(user.value.username))
 		} else {
 			if (!isRequestSent.value)
 				isRequestSent.value = await friendStore.addFriend(user.value.username)

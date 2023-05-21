@@ -268,7 +268,7 @@ export class FriendsService {
 		return waitingRequests;
 	}
 
-	async isWaitingRequest(userId: number, friend: UserDto) {
+	async isWaitingRequest(userId: number, friend: UserDto): Promise<boolean> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				userId: userId,
