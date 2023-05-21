@@ -94,7 +94,7 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 		picture: user.avatar,
 		message: `${user.username} sent you a friend request`,
 		lifespan: 3000,
-		redirect: () => router.push(`/main/profile/${user.id}`),
+		redirect: () => router.push(`/main/friends/requests`),
 	})
 })
 

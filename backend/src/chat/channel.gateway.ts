@@ -56,30 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return msg;
 	}
 
-	@SubscribeMessage('whisper')
-	async handleWhisperMessage(@MessageBody() data: NewWhisperMessageDto,
-		@ConnectedSocket() socket: Socket) {
-		const msg = this.channelService.postMessageInWhisperChat(socket.data.user, data)
-			.then(msg => {
-				// The server also send back to the sender, as acknowledgement and validation
-				this.server
-					.to("channel" + msg.chatId.toString())
-					.except("block" + msg.author.id.toString())
-					.emit("msg", msg);
-				return msg
-			})
-			.catch(err => {
-				Logger.log(err);
-				return err;
-			});
-		// send error back to the client
-		if (typeof msg === "string")
-			return msg;
-
-		Logger.log(`New whisper from ${socket.data.user.username}#${socket.data.user.id} to ${data.receiverId}`);
-
-	}
-
 	private async verifyUser(token: string): Promise<UserDto> {
 		if (!token)
 			return null;

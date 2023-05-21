@@ -487,36 +487,6 @@ export class ChannelService {
 		return msgs.map((msg: any) => toMessageDto(msg, msg.user))
 	}
 
-	async postMessageInWhisperChat(user: User, data: NewWhisperMessageDto): Promise<ChatMessageDto> {
-		try {
-			const chat = await this.prismaService.chat.findFirst({
-				where: {
-					type: 'WHISPER',
-					users: {
-						none: {
-							userId: { notIn: [user.id, data.receiverId] },
-						},
-					},
-				},
-			})
-			if (!chat) {
-				throw new BadRequestException("Cannot find chat")
-			}
-			const msg: ChatMessage = await this.prismaService.chatMessage.create({
-				data: {
-					content: data.content,
-					user: { connect: { id: user.id } },
-					chat: { connect: { id: chat.id } }
-				}
-			});
-			return toMessageDto(msg, user);
-		}
-		catch (error) {
-			Logger.error(error)
-			return Promise.reject("cannot post message")
-		}
-	}
-
 	async postMessage(user: UserDto, chatId: number, data: NewChatMessageDto): Promise<ChatMessageDto> {
 		const chat = await this.findChannelById(chatId);
 		if (!chat) {
