@@ -119,21 +119,26 @@ export default class PongScene extends Phaser.Scene {
 
 	}
 
+	private updateEntityPosition(object: any, servRef: any, name: string, maxDiff: number = 10) {
+		const diff = {
+			x: object.x - servRef.x,
+			y: object.y - servRef.y,
+		}
+		const totalDiff = diff.x * diff.x + diff.y * diff.y
+		if (totalDiff > maxDiff * maxDiff) {
+			object.x = servRef.x
+			object.y = servRef.y
 		}
 	}
 
 	private updateWorld(state: WorldState) {
-		this.paddle1.x = state.paddle1.x;
-		this.paddle1.y = state.paddle1.y;
-		this.paddle2.x = state.paddle2.x;
-		this.paddle2.y = state.paddle2.y;
-		this.ball.x = state.ball.x;
-		this.ball.y = state.ball.y;
+		this.updateEntityPosition(this.paddle1, state.paddle1, "paddle1", 3)
+		this.updateEntityPosition(this.paddle2, state.paddle2, "paddle2", 3)
+		this.updateEntityPosition(this.ball, state.ball, "ball", 10)
 		this.ball.setVelocity(state.ball.vx, state.ball.vy);
 		let i = 0;
 		state.obstacles.forEach((o) => {
-			this.obstacles[i].x = o.x;
-			this.obstacles[i].y = o.y;
+			this.updateEntityPosition(this.obstacles[i], o, `obstacle${i}`, 3)
 			this.obstacles[i].speed.x = o.vx;
 			this.obstacles[i].speed.y = o.vy;
 			i++
