@@ -62,13 +62,19 @@ export default class UiScene extends Phaser.Scene {
 	}
 
 	onServerDisconnect() {
-		this.startButton.setVisible(true)
-		this.startButton.setText(`Server disconnected.`)
+		try {
+			this.startButton.setVisible(true)
+			this.startButton.setText(`Server disconnected.`)
+		}
+		catch(e) {}
 	}
 
 	onPlayerDisconnect() {
-		this.startButton.setVisible(true)
-		this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
+		try {
+			this.startButton.setVisible(true)
+			this.startButton.setText(`${this.otherPlayer.username} disconnected.`)
+		}
+		catch(e) {}
 	}
 
 	onPlayerReconnect() {
@@ -121,7 +127,6 @@ export default class UiScene extends Phaser.Scene {
 		this.startButton.setText("3")
 		this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
 		this.time.addEvent(this.countdownEvent);
-		this.updateScoreWidgetContent(0, 0);
 	}
 
 	waitingRoom() {
@@ -134,6 +139,7 @@ export default class UiScene extends Phaser.Scene {
 			.on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
 			.on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
 			.on('pointerdown', () => {
+				this.updateScoreWidgetContent(0, 0);
 				this.startButton.setText("Waiting for opponent...")
 					.setStyle({ fill: '#FFF' })
 					.setInteractive({ useHandCursor: false })
