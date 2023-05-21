@@ -6,6 +6,7 @@ import { User, UserGame } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
 import { UsersService } from '../users/users.service';
+import { FriendsService } from '../users/friends/friends.service';
 import { EndGamePlayer, InvitePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
 
@@ -21,6 +22,7 @@ export class GameService {
 	constructor(
 		private readonly prismaService: PrismaService,
 		private readonly usersService: UsersService,
+		private readonly friendsService: FriendsService,
 	) { }
 
 	async init(server: Server) {
@@ -360,7 +362,6 @@ export class GameService {
 	}
 
 	async inviteSomebodyToPlay(client: Socket, inviteSettings: InviteSettings) {
-		Logger.log(`Invited to play: ${JSON.stringify(inviteSettings)}`)
 
 		const user: User = client.data.user;
 		if (!user)
@@ -381,7 +382,9 @@ export class GameService {
 		if (otherUser.status === "OFFLINE") {
 			return `${otherUser.username} is currently offline`
 		} else if (otherUser.status === "BUSY") {
-			return `${otherUser.username} is currently playing`
+			return `${otherUser.username} is currently busy`
+		} else if (await this.friendsService.isBlocked(otherUser.id, user.username)) {
+			return `${otherUser.username} declined your invitation`
 		}
 
 		if (this.isInQueue(user))
@@ -421,7 +424,7 @@ export class GameService {
 			})
 		} catch (error) {
 		}
-		// TODO: send a message to target user (unless we still use alert in frontend)
+		client.to("user" + settings.player2.id.toString()).emit("invitationCanceled", settings)
 	}
 
 	async acceptInvitation(client: Socket, settings: GameSettingsDto) {
@@ -457,7 +460,7 @@ export class GameService {
 			return;
 		Logger.log(`${user.username} declined the invitation of ${settings.player1.username}`)
 
-		client.to("game" + settings.game.id.toString()).emit("invitationDeclined", settings)
+		client.to("user" + settings.player1.id.toString()).emit("invitationDeclined", settings)
 		try {
 			await this.prismaService.userGame.deleteMany({
 				where: {

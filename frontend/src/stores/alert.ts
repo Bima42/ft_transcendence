@@ -8,6 +8,7 @@ export const useAlertStore = defineStore('alert', () => {
 	const title = ref<string | null>(null)
 	const error = ref<boolean>(false)
 	const callBack = ref<Function | null>(null)
+	const callBackRefuse = ref<Function | null>(null)
 	const passwordInput = ref<boolean>(false)
 	const passwordCallback = ref<Function | null>(null)
 
@@ -20,10 +21,13 @@ export const useAlertStore = defineStore('alert', () => {
 		show.value = true
 	}
 
-	const setValidationAlert = function (newTitle: string, newMessage: string,  newCallBack: () => void) {
+	const setValidationAlert = function (newTitle: string, newMessage: string,  newAcceptCallBack?: () => void, newRefuseCallBack?: () => void) {
 		title.value = newTitle
 		message.value = newMessage
-		callBack.value = newCallBack
+		if (newAcceptCallBack)
+			callBack.value = newAcceptCallBack
+		if (newRefuseCallBack)
+			callBackRefuse.value = newRefuseCallBack
 		show.value = true
 	}
 
@@ -40,6 +44,7 @@ export const useAlertStore = defineStore('alert', () => {
 		title.value = null
 		error.value = false
 		callBack.value = null
+		callBackRefuse.value = null
 		passwordInput.value = false
 		passwordCallback.value = null
 	}
@@ -50,6 +55,7 @@ export const useAlertStore = defineStore('alert', () => {
 		title,
 		error,
 		callBack,
+		callBackRefuse,
 		passwordInput,
 		passwordCallback,
 		setErrorAlert,

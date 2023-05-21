@@ -116,27 +116,33 @@ chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
 /************************************************************************
  * 								   GAME									*
  ************************************************************************/
+const onGameInvitationCanceled = () => {
+	alertStore.resetState()
+}
+
 let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
-	if (receivedInvite)
+	if (receivedInvite) {
+		gameStore.socket.emit("declineInvitation", gameSettings)
 		return
+	}
+
 	receivedInvite = true
-
-	// TODO: silent refuse if already in a game (already checked on server)
-	const gameType = gameSettings.game.type
-	setTimeout(() => {
-		const accept = confirm(`Play a ${gameSettings.game.type.toLowerCase()} game with ${gameSettings.player1.username} ?`)
-		if (accept) {
-			gameStore.socket.emit("acceptInvitation", gameSettings)
-			router.push('game')
-		} else {
-			gameStore.socket.emit("declineInvitation", gameSettings)
-		}
+	gameStore.socket.once("invitationCanceled", onGameInvitationCanceled)
+	alertStore.setValidationAlert(`Game invitation from ${gameSettings.player1.username}`, `Play a ${gameSettings.game.type.toLowerCase()} game ?`, () => {
+		gameStore.socket.off("invitationCanceled")
+		gameStore.socket.emit("acceptInvitation", gameSettings)
+		gameStore.currentGame = gameSettings
+		router.push('game')
 		receivedInvite = false
+	}, () => {
+		gameStore.socket.off("invitationCanceled")
+		gameStore.socket.emit("declineInvitation", gameSettings)
+		receivedInvite = false
+	})
 
-	}, 100);
-	gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
 }
+
 
 gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
 </script>

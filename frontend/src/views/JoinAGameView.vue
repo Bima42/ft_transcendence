@@ -79,14 +79,12 @@ function joinQueue() {
 		router.push(`game`);
 	});
 	gameStore.socket.once("invitationDeclined", (gameSettings: IGameSettings) => {
+		console.log(`invitation declined :(`)
 		isLoading.value = false
-		gameStore.socket.off("invitationDeclined")
 		gameStore.socket.off("matchFound")
 		router.push('index')
 		// Go back to index to avoid spam to opponent
-		setTimeout(() => {
-			alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
-		}, 50);
+		alertStore.setErrorAlert(`${gameSettings.player2.username} refused your invitation.`)
 	})
 
 	// This is ubercrade
