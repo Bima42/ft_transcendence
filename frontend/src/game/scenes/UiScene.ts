@@ -18,7 +18,6 @@ export default class UiScene extends Phaser.Scene {
 	private myPlayer!: IUser
 	private otherPlayer!: IUser
 	private isPlayer1: boolean = false;
-	// private modal!: Modal;
 
 	constructor() {
 		super({ key: 'UiScene' })
@@ -31,7 +30,7 @@ export default class UiScene extends Phaser.Scene {
 	create() {
 		// this.modal = new Modal("");
 		this.gameSettings = gameStore.currentGame
-		this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
+		this.scoreWidget = this.add.text(0, 50, "Press W or S to move your paddle", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
 
 		if (!this.gameSettings) {
 			// TODO: show error message
@@ -50,7 +49,6 @@ export default class UiScene extends Phaser.Scene {
 			this.otherPlayer = this.gameSettings.player1;
 		}
 
-		this.updateScoreWidgetContent(0, 0);
 		this.startButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "I am ready !", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.02}px`, color: "#FFFFFF" })
 		this.countdownEvent = new Phaser.Time.TimerEvent({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
 
@@ -123,6 +121,7 @@ export default class UiScene extends Phaser.Scene {
 		this.startButton.setText("3")
 		this.countdownEvent.reset({ delay: 1000, callback: () => this.onCountdown(), repeat: this.countdown - 1 });
 		this.time.addEvent(this.countdownEvent);
+		this.updateScoreWidgetContent(0, 0);
 	}
 
 	waitingRoom() {
