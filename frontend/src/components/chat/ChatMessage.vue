@@ -51,7 +51,7 @@ let dateString = ref(computed(() => {
 .message_wrap {
     position: relative;
     display: flex;
-    padding: 15px 10px;
+    padding: 15px 10px 20px;
     flex-direction: column;
     justify-content: center;
     text-align: start;
@@ -59,7 +59,7 @@ let dateString = ref(computed(() => {
     border-radius: 10px;
     gap: 5px;
     font-family: 'Martian Mono', sans-serif;
-    min-width: 50px;
+    min-width: 130px;
 
     &.left {
         align-self: flex-start;
