@@ -116,11 +116,6 @@ export class ChannelController {
 		return this.channelService.postMessage(req.user, id, data);
 	}
 
-	@Post('whisper/messages')
-	async PostWhisperMessage(@Req() req: RequestWithUser, @Body() data: NewWhisperMessageDto): Promise<ChatMessageDto> {
-		return this.channelService.postMessageInWhisperChat(req.user, data)
-	}
-
 	@Put('rooms/:id/user')
 	async UpsertUserChat(@Req() req: RequestWithUser, @Body() action: UserchatAction, @Param('id', new ParseIntPipe()) chatId: number) {
 		const user = req.user;

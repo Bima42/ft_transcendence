@@ -2,7 +2,7 @@
 	<div class="element_line" v-for="(user, index) in requests" :key="index">
 		<div class="user_infos" @click="showUserProfile(user.username)">
 			<UserPicture :type="'small'" :url="user.avatar" :isSelf="false" :status="user.status"
-				:pictureDotSize="'medium'"/>
+				:pictureDotSize="'large'"/>
 			<h3>{{ user.username }}</h3>
 		</div>
 		<div class="user_decisions">
@@ -19,23 +19,31 @@ import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import UserPicture from '@/components/avatar/UserPicture.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type IUser from '@/interfaces/user/IUser'
 import { useAlertStore } from '@/stores/alert'
+import { useUserStore } from '@/stores/user';
 
 const alertStore = useAlertStore()
+const userStore = useUserStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 
 const requests = ref<IUser[]>([])
 
 function loadDatas() {
-	friendStore.updateStoreDatas()
-	friendStore.getAllPendingRequests().then((res) => {
-		requests.value = res
-	})
+	for (const request of friendStore.receivedRequests) {
+		userStore.getUserInfos(request.friendId).then((res) => {
+			requests.value.push(res)
+		})
+	}
 }
 loadDatas()
+watch(() => friendStore.receivedRequests, () => {
+	console.log(`watcher`)
+	requests.value = []
+	loadDatas()
+}, { deep: true })
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)
@@ -45,13 +53,11 @@ const showUserProfile = async (username: string) => {
 const acceptRequest = async (username: string) => {
 	await friendStore.acceptFriendRequest(username)
 		.catch(e => alertStore.setErrorAlert(e))
-	requests.value = await friendStore.getAllPendingRequests()
 }
 
 const declineRequest = async (username: string) => {
 	await friendStore.declineFriendRequest(username)
 		.catch(e => alert(e))
-	requests.value = await friendStore.getAllPendingRequests()
 }
 </script>
 

@@ -2,7 +2,7 @@ import { Engine, Bodies, Common, Collision, Body, Composite } from "matter-js";
 // import Matter from 'matter-js';
 import { Socket, Server } from "socket.io";
 import { Logger } from "@nestjs/common";
-import { Game, GameStatus, User, UserGame } from '@prisma/client';
+import { Game, GameStatus } from '@prisma/client';
 import { EndGamePlayer, GameoverDto, PlayerMoveDto, PointWonDto, WorldStateDto } from "./dto/game.dto";
 import { GameSettingsDto } from "./dto/joinQueueData.dto";
 import { toUserDto } from '../shared/mapper/user.mapper';

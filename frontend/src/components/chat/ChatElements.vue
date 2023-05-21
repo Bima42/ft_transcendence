@@ -23,17 +23,11 @@ import { onUnmounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useUserStore } from '@/stores/user'
 import ChatMessage from '@/components/chat/ChatMessage.vue'
-import type IChatMessage from '@/interfaces/chat/IChatMessage'
 
 const userStore = useUserStore()
 const chatStore = useChatStore()
 
 const currentUser = userStore.user?.id
-chatStore.getMessages().then(() => {
-	chatStore.socket.on('msg', (data: IChatMessage) => {
-		chatStore.onNewMessage(data)
-	})
-})
 
 onUnmounted(() => {
 	chatStore.resetState()

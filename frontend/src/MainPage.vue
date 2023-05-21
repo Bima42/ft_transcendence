@@ -22,16 +22,16 @@ import TheModal from '@/components/modal/TheModal.vue'
 import { useModalStore } from '@/stores/modal'
 import HeaderLogo from '@/components/template/HeaderLogo.vue'
 import AlertBox from '@/components/alert/AlertBox.vue'
-import NotificationWrapper from '@/components/notifications/NotificationWrapper.vue';
+import NotificationWrapper from '@/components/notifications/NotificationWrapper.vue'
 import { useAlertStore } from '@/stores/alert'
-import {useChatStore} from '@/stores/chat';
-import {useUserStore} from '@/stores/user';
-import { useGameStore } from '@/stores/game';
-import { useFriendStore } from '@/stores/friend';
-import {useNotificationStore} from '@/stores/notification';
-import type IChatMessage from '@/interfaces/chat/IChatMessage';
-import type IUser from '@/interfaces/user/IUser';
-import type IGameSettings from '@/interfaces/game/IGameSettings';
+import { useChatStore } from '@/stores/chat'
+import { useUserStore } from '@/stores/user'
+import { useGameStore } from '@/stores/game'
+import { useFriendStore } from '@/stores/friend'
+import { useNotificationStore } from '@/stores/notification'
+import type IChatMessage from '@/interfaces/chat/IChatMessage'
+import type IUser from '@/interfaces/user/IUser'
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,9 +44,11 @@ const friendStore = useFriendStore()
 const notificationStore = useNotificationStore()
 const alertStore = useAlertStore()
 
-friendStore.updateStoreDatas()
-
+/*************************************************************************
+ * 							NOTIFICATIONS								 *
+ *************************************************************************/
 chatStore.socket.on('msg', (data: IChatMessage) => {
+	chatStore.onNewMessage(data)
 	if (data.author.id === userStore.user?.id ||
 		chatStore.subscribedChannelsList.some((chat) => chat.id === data.chatId) ||
 		chatStore.currentChat?.id == data.chatId)
@@ -75,11 +77,12 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 
 chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 	friendStore.friends.push(user)
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} accepted your friend request`,
 		lifespan: 3000,
-		redirect: () => router.push(`/main/profile/${user.id}`),
+		redirect: () => router.replace(`/main/profile/${user.id}`),
 	})
 })
 
@@ -87,6 +90,32 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id))
 })
 
+chatStore.socket.on('friendRequest', (user: IUser) => {
+	friendStore.receivedRequests.push({
+		status: 'PENDING',
+		friendId: user.id,
+	})
+	if (route.name === 'requests')
+		return
+	notificationStore.addNotification({
+		picture: user.avatar,
+		message: `${user.username} sent you a friend request`,
+		lifespan: 3000,
+		redirect: () => router.push(`/main/friends/requests`),
+	})
+})
+
+chatStore.socket.on('friendRequestCanceled', (user: IUser) => {
+	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.friendId === user.id))
+})
+
+chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
+})
+
+/************************************************************************
+ * 								   GAME									*
+ ************************************************************************/
 let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 	if (receivedInvite)

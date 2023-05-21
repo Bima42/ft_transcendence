@@ -1,6 +1,6 @@
 <template>
 	<div class="element_line" v-for="(data, index) in friendList" @click="showUserProfile(data.friend.username)" :key="index">
-		<UserPicture :type="'small'" :url="data.friend.avatar" :isSelf="false" :status="data.friend.status" :pictureDotSize="'medium'"/>
+		<UserPicture :type="'small'" :url="data.friend.avatar" :isSelf="false" :status="data.friend.status" :pictureDotSize="'large'"/>
 		<h3>{{ data.friend.username }}</h3>
 		<h3>Rank {{ data.rank }}</h3>
 	</div>
@@ -14,7 +14,7 @@ import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal'
 import type IFriend from '@/interfaces/user/IFriend'
 import { useUserStore } from '@/stores/user'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
@@ -22,14 +22,16 @@ const userStore = useUserStore()
 
 const friendList = ref<{friend: IFriend, rank: number}[]>([])
 const loadDatas = () => {
-	friendStore.updateStoreDatas().then(() =>
-		friendStore.friends.forEach((friend) => {
-			userStore.getRank(friend.id).then((res) => {
-				friendList.value.push({friend: friend, rank: res})
-			})
+	for (const friend of friendStore.friends) {
+		userStore.getRank(friend.id).then((res) => {
+			friendList.value.push({friend: friend, rank: res})
 		})
-	)
+	}
 }
+watch(() => friendStore.friends, () => {
+	friendList.value = []
+	loadDatas()
+}, { deep: true })
 loadDatas()
 
 const showUserProfile = async (username: string) => {

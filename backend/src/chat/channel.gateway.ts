@@ -56,30 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return msg;
 	}
 
-	@SubscribeMessage('whisper')
-	async handleWhisperMessage(@MessageBody() data: NewWhisperMessageDto,
-		@ConnectedSocket() socket: Socket) {
-		const msg = this.channelService.postMessageInWhisperChat(socket.data.user, data)
-			.then(msg => {
-				// The server also send back to the sender, as acknowledgement and validation
-				this.server
-					.to("channel" + msg.chatId.toString())
-					.except("block" + msg.author.id.toString())
-					.emit("msg", msg);
-				return msg
-			})
-			.catch(err => {
-				Logger.log(err);
-				return err;
-			});
-		// send error back to the client
-		if (typeof msg === "string")
-			return msg;
-
-		Logger.log(`New whisper from ${socket.data.user.username}#${socket.data.user.id} to ${data.receiverId}`);
-
-	}
-
 	private async verifyUser(token: string): Promise<UserDto> {
 		if (!token)
 			return null;
@@ -93,6 +69,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	/**
+	 * When a client connects to the server, this method is called to
+	 * verify the user and attach it to the socket
+	 * Then, the user is added to the rooms he is subscribed to
+	 *
+	 * @param socket
+	 * @param args
+	 */
 	async handleConnection(socket: any, ...args: any[]) {
 
 		const user = await this.verifyUser(socket.handshake.auth.token);
@@ -107,6 +91,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.data.user = user;
 
 		socket.join("user" + user.id.toString())
+		socket.join("friendRequest" + user.id.toString())
+
 		const subscriptions = await this.channelService.getSubscribedChannels(user);
 		const whispers = await this.channelService.getWhisperChannels(user)
 		for (const chan of subscriptions) {
@@ -124,21 +110,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.join("friend" + friend.id.toString())
 		}
 
+		/*******************************************
+		 * 			NOTIFICATIONS ON CONNECT	   *
+		 *******************************************/
 		if (user.status !== UserStatus.OFFLINE)
 			return;
-
 		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
 		await this.usersService.updateData(user.id, { status: UserStatus.ONLINE });
 	}
 
 	handleDisconnect(socket: any): any {
-
 		if (socket.data.user) {
 			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
-
-		//TODO: set user status offline
-		//TODO: send notifications to all users to change his status to offline
 	}
 
 	async onChannelJoin(user: UserDto, chatId: number) {
@@ -179,7 +163,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.join("friend" + user.id.toString())
 		}
 		this.server.to("user" + targetUserId.toString()).emit("friendshipAccepted", user)
-
 	}
 
 	async onRemoveFriend(user: UserDto, targetUserId: number) {
@@ -192,5 +175,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.leave("friend" + user.id.toString())
 		}
 		this.server.to("user" + targetUserId.toString()).emit("friendshipRemoved", user)
+	}
+
+	async onNewFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequest", user)
+	}
+
+	async onCancelFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequestCanceled", user)
+	}
+
+	async onDeclineFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequestDeclined", user)
 	}
 };

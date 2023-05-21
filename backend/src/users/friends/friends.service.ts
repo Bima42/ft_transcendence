@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
-import { FriendshipStatus } from '@prisma/client';
+import { Friendship, FriendshipStatus } from '@prisma/client';
 import { toBlockedDto, toFriendDto, toUserDto } from '../../shared/mapper/user.mapper';
 import { FriendDto, UserDto } from '../dto/user.dto';
+import { FriendshipDto } from '../dto/friend.dto';
 
 @Injectable()
 export class FriendsService {
@@ -18,7 +19,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	private async _getFriendshipStatus(userId: number, otherId: number) : Promise<FriendshipStatus | null> {
+	async getFriendshipStatus(userId: number, otherId: number) : Promise<FriendshipStatus | null> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
@@ -67,7 +68,7 @@ export class FriendsService {
 		if (await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is already a friend or has a pending request');
 
-		const friendshipStatus = await this._getFriendshipStatus(userId, friend.id)
+		const friendshipStatus = await this.getFriendshipStatus(userId, friend.id)
 		if (!friendshipStatus) {
 			return this.prismaService.friendship.create({
 				data: {
@@ -187,8 +188,8 @@ export class FriendsService {
 	 * @param userId: the user who is accepting or declining the friend request
 	 * @param friend: the user who sent the friend request
 	 */
-	async acceptFriend(userId: number, friend: UserDto) {
-		return this.prismaService.friendship.update({
+	async acceptFriend(userId: number, friend: UserDto): Promise<FriendshipDto> {
+		const friendship = await this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
 					userId: friend.id,
@@ -199,10 +200,14 @@ export class FriendsService {
 				status: FriendshipStatus.ACCEPTED
 			}
 		});
+
+		// Change the friendship friendId to friend.id and remove the userId key
+		friendship.friendId = friendship.userId;
+		delete friendship.userId;
+		return friendship;
 	}
 
-	async declineFriend(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	async declineFriend(userId: number, friend: UserDto) {
 		return this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
@@ -246,29 +251,20 @@ export class FriendsService {
 		return friends;
 	}
 
-	async getAllWaitingRequests(userId: number) {
-		const requests = await this.prismaService.friendship.findMany({
+	async getAllWaitingRequests(userId: number): Promise<FriendshipDto[]>  {
+		return this.prismaService.friendship.findMany({
 			where: {
 				userId: userId,
 				status: FriendshipStatus.PENDING
 			},
 			select: {
-				userId: true,
-				friendId: true
+				friendId: true,
+				status: true
 			}
 		});
-
-		const waitingRequests: UserDto[] = [];
-		for (const request of requests) {
-			const id = request.userId === userId ? request.friendId : request.userId;
-			const user = await this.usersService.findById(id);
-			waitingRequests.push(toUserDto(user));
-		}
-
-		return waitingRequests;
 	}
 
-	async isWaitingRequest(userId: number, friend: UserDto) {
+	async isWaitingRequest(userId: number, friend: UserDto): Promise<boolean> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				userId: userId,
@@ -279,26 +275,27 @@ export class FriendsService {
 		return !!friendship;
 	}
 
-	async getAllPendingRequests(userId: number) {
-		const requests = await this.prismaService.friendship.findMany({
+	async getAllPendingRequests(userId: number): Promise<FriendshipDto[]> {
+		const friendships = await this.prismaService.friendship.findMany({
 			where: {
 				friendId: userId,
 				status: FriendshipStatus.PENDING
 			},
 			select: {
 				userId: true,
-				friendId: true
+				status: true
 			}
 		});
 
-		const pendingRequests: UserDto[] = [];
-		for (const request of requests) {
-			const id = request.userId === userId ? request.friendId : request.userId;
-			const user = await this.usersService.findById(id);
-			pendingRequests.push(toUserDto(user));
+		const response: FriendshipDto[] = [];
+		for (const friendship of friendships) {
+			response.push({
+				friendId: friendship.userId,
+				status: friendship.status
+			});
 		}
 
-		return pendingRequests;
+		return response;
 	}
 
 	async isPendingRequest(userId: number, friendName: string) {
