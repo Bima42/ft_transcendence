@@ -1,6 +1,6 @@
 <template>
 	<div class="element_line" v-for="(data, index) in friendList" @click="showUserProfile(data.friend.username)" :key="index">
-		<UserPicture :type="'small'" :url="data.friend.avatar" :isSelf="false" :status="data.friend.status" :pictureDotSize="'medium'"/>
+		<UserPicture :type="'small'" :url="data.friend.avatar" :isSelf="false" :status="data.friend.status" :pictureDotSize="'large'"/>
 		<h3>{{ data.friend.username }}</h3>
 		<h3>Rank {{ data.rank }}</h3>
 	</div>

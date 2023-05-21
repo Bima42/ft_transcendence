@@ -4,7 +4,7 @@
             <div class="user_infos">
                 <div class="user_overview">
                     <UserPicture :url="user?.avatar" :type="'big'" :status="user.status" :isSelf="isSelf"
-                                 :pictureDotSize="'large'"/>
+                                 :pictureDotSize="'medium'"/>
                     <h3>Rank #{{ rank }}
                         <font-awesome-icon color="gold" icon="fa-ranking-star"/>
                     </h3>

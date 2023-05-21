@@ -109,23 +109,23 @@ h1, h2, h3, h4, h5, h6, p, a {
 .picture_dot {
 	border-radius: 50%;
 	position: absolute;
-	bottom: 9%;
-	right: 9%;
+	bottom: 7%;
+	right: 7%;
 	cursor: pointer;
 
 	&.small {
-		width: 13px;
-		height: 13px;
+		width: 8%;
+		height: 8%;
 	}
 
 	&.medium {
-		width: 18px;
-		height: 18px;
+		width: 12%;
+		height: 12%;
 	}
 
 	&.large {
-		width: 23px;
-		height: 23px;
+		width: 16%;
+		height: 16%;
 	}
 }
 

@@ -2,7 +2,7 @@
 	<div class="element_line" v-for="(user, index) in requests" :key="index">
 		<div class="user_infos" @click="showUserProfile(user.username)">
 			<UserPicture :type="'small'" :url="user.avatar" :isSelf="false" :status="user.status"
-				:pictureDotSize="'medium'"/>
+				:pictureDotSize="'large'"/>
 			<h3>{{ user.username }}</h3>
 		</div>
 		<div class="user_decisions">
