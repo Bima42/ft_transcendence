@@ -14,7 +14,7 @@
 import { useModalStore } from '@/stores/modal'
 import { useFriendStore } from '@/stores/friend'
 import { useGameStore } from '@/stores/game'
-import { computed, onUpdated, ref, watch } from 'vue'
+import { computed, onUpdated, ref } from 'vue'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import type IUser from '@/interfaces/user/IUser'
 import { useRouter } from 'vue-router'

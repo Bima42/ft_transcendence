@@ -59,7 +59,6 @@ export const useFriendStore = defineStore( 'friend', () => {
 				friends.value.push(user);
 				return data.status === 'ACCEPTED';
 			}
-			console.log(data)
 			sentRequests.value.push(data);
 			return data.status === 'PENDING';
 		}

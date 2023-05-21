@@ -14,7 +14,7 @@ import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal'
 import type IFriend from '@/interfaces/user/IFriend'
 import { useUserStore } from '@/stores/user'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
@@ -22,15 +22,17 @@ const userStore = useUserStore()
 
 const friendList = ref<{friend: IFriend, rank: number}[]>([])
 const loadDatas = () => {
-	friendStore.updateStoreDatas().then(() =>
-		friendStore.friends.forEach((friend) => {
-			userStore.getRank(friend.id).then((res) => {
-				friendList.value.push({friend: friend, rank: res})
-			})
+	for (const friend of friendStore.friends) {
+		userStore.getRank(friend.id).then((res) => {
+			friendList.value.push({friend: friend, rank: res})
 		})
-	)
+	}
 }
 loadDatas()
+watch(friendStore.friends, () => {
+	friendList.value = []
+	loadDatas()
+})
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)

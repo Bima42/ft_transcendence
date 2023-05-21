@@ -63,7 +63,7 @@ const router = createRouter({
                     children: [
                         {
                             path: 'requests',
-                            name: 'friendsRequests',
+                            name: 'requests',
                             component: FriendsView
                         }
                     ]

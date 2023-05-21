@@ -39,6 +39,10 @@ function loadDatas() {
 	}
 }
 loadDatas()
+watch(friendStore.receivedRequests, () => {
+	requests.value = []
+	loadDatas()
+})
 
 const showUserProfile = async (username: string) => {
 	const user = await friendStore.getUserInfos(username)

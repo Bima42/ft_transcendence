@@ -97,6 +97,8 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 		userId: user.id,
 		friendId: userStore.user!.id,
 	})
+	if (route.name === 'requests')
+		return
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} sent you a friend request`,
