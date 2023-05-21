@@ -13,6 +13,8 @@ const fps = 60;
 // At what frequency we send the state to the clients
 const syncPerSec = 5;
 
+const maxScore = 5
+
 const timeToStartBeforeAbort = 30000
 const disconnectTimeoutDuration = 10000
 // Duration of the countdown between the start (ms)
@@ -75,7 +77,7 @@ export class GameServer {
 	private readonly roomID: string;
 	private readonly players: Socket[] = [];
 	private scores: Array<number> = [0, 0];
-	private maxScore = 5
+	private maxScore = maxScore
 	private obstacles: Obstacle[] = [];
 	private status: GameStatus = "STARTED";
 	private hasStarted = false;
