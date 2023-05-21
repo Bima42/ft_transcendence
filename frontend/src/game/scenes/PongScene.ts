@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user'
 import type UiScene from './UiScene'
 import type { IGameoverData, IPointWon } from '@/interfaces/game/IGameCommunication'
 import * as pong from "../GameConsts"
+import type { Router } from 'vue-router'
 
 
 const gameStore = useGameStore();
@@ -107,6 +108,7 @@ export default class PongScene extends Phaser.Scene {
 	private socket!: Socket;
 	private isRunning: boolean = false;
 	private uiScene!: UiScene;
+	private vueRouter!: Router;
 
 
 	constructor() {
@@ -117,16 +119,6 @@ export default class PongScene extends Phaser.Scene {
 
 	}
 
-	private parseConfig(config: IGameSettings) {
-		this.config = config
-		if (!config.game)
-			return;
-
-		const gameNumber = config ? config.game.id : 0
-		if (this.config.game.type == 'CLASSIC') {
-			console.log(`Game #${gameNumber}: Classic game.`);
-		} else {
-			console.log(`Game #${gameNumber}: Custom game.`);
 		}
 	}
 
@@ -148,9 +140,12 @@ export default class PongScene extends Phaser.Scene {
 		})
 	}
 
-	create(config: IGameSettings) {
-		this.parseConfig(config)
-
+	create(router: Router) {
+		this.vueRouter = router
+		if (!gameStore.currentGame) {
+			return
+		}
+		this.config = gameStore.currentGame
 		this.socket = gameStore.socket as Socket;
 		this.resetSocketGameListener();
 
@@ -327,7 +322,7 @@ export default class PongScene extends Phaser.Scene {
 		this.socket.on("gameover", (gameoverData: IGameoverData) => {
 			this.uiScene.onGameover(gameoverData);
 			this.scene.stop('UiScene');
-			this.scene.start("GameoverScene", gameoverData);
+			this.scene.start("GameoverScene", { data: gameoverData, router: this.vueRouter });
 		});
 	}
 };

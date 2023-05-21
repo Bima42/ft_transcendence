@@ -1,4 +1,3 @@
-import PongScene from './PongScene'
 import Phaser from 'phaser'
 import type IGameSettings from '@/interfaces/game/IGameSettings';
 import { useGameStore } from '@/stores/game'
@@ -10,35 +9,8 @@ import * as pong from "../GameConsts"
 const gameStore = useGameStore();
 const userStore = useUserStore();
 
-// class Modal {
-//   private background: Phaser.GameObjects.Rectangle;
-//   private textWidget: Phaser.GameObjects.Text;
-//
-//   constructor(private scene : Phaser.Scene,
-//               text: string,
-//               private type: "INFO" | "OK" = "INFO") {
-//     this.background = this.scene.add.rectangle(
-//     this.textWidget = this.scene.add.text(this.scene.cameras.main.centerX,
-//                                           this.scene.cameras.main.centerY - 50,
-//                                           text)
-//   }
-//
-//   setText(text: string) {
-//
-//   }
-//
-//   setVisible(visible: boolean) {
-//     this.textWidget.setVisible(visible);
-//     this.background.setVisible(visible);
-//     this.button.setVisible(visible);
-//   }
-//
-//   setType
-//
-// }
-
 export default class UiScene extends Phaser.Scene {
-	private gameSettings!: IGameSettings
+	private gameSettings!: IGameSettings | null
 	private scoreWidget: any;
 	private startButton!: Phaser.GameObjects.Text;
 	private countdown: number = 0;
@@ -56,19 +28,19 @@ export default class UiScene extends Phaser.Scene {
 
 	}
 
-	create(config: IGameSettings) {
+	create() {
 		// this.modal = new Modal("");
-		this.gameSettings = config;
 		this.scoreWidget = this.add.text(0, 50, "0 - 0", { fontFamily: 'Arial', fontSize: "25px", color: "#00FF00" });
+		this.gameSettings = gameStore.currentGame
 
-		if (!this.gameSettings.game) {
+		if (!this.gameSettings) {
 			// TODO: show error message
 			// this.scene.stop('UiScene');
 			this.scoreWidget.setText("No game. Invite someone or get in the queue !");
 			return;
 		}
 		// Are we player 1 or 2 ?
-		if (userStore.user?.id == this.gameSettings.player1?.id) {
+		if (userStore.user?.id == this.gameSettings.player1.id) {
 			this.isPlayer1 = true;
 			this.myPlayer = this.gameSettings.player1;
 			this.otherPlayer = this.gameSettings.player2;

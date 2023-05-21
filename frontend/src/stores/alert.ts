@@ -11,10 +11,12 @@ export const useAlertStore = defineStore('alert', () => {
 	const passwordInput = ref<boolean>(false)
 	const passwordCallback = ref<Function | null>(null)
 
-	const setErrorAlert = function (newMessage: string) {
+	const setErrorAlert = function (newMessage: string, newCallBack?: () => void) {
 		error.value = true
 		title.value = 'An error occurred'
 		message.value = newMessage
+		if (newCallBack)
+			callBack.value = newCallBack
 		show.value = true
 	}
 
