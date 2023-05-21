@@ -44,7 +44,6 @@ export class GameService {
 		this.gameServers.forEach(async (serv) => {
 			const servStatus = serv.getStatus()
 			if (["INVITING", "SEARCHING", "STARTED"].includes(servStatus)) {
-				console.log(`game is ${servStatus}, skipped}`)
 				return;
 			}
 			const players = serv.getEndPlayers()
