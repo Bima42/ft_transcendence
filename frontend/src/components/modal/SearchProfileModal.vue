@@ -6,6 +6,7 @@
 			<font-awesome-icon icon="fa-magnifying-glass" class="search_icon" @click="searchProfile"/>
 		</div>
 	</section>
+	<YButton v-if="meow"></YButton>
 </template>
 
 <script setup lang="ts">
@@ -14,6 +15,7 @@ import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { useAlertStore } from '@/stores/alert'
+import YButton from '@/components/buttons/YButton.vue'
 
 const alertStore = useAlertStore()
 const userStore = useUserStore()
@@ -22,8 +24,13 @@ const modalStore = useModalStore()
 const router = useRouter()
 const searchedProfile = ref('')
 const input = ref<HTMLInputElement | null>(null)
+const meow = ref(false)
 
 const searchProfile = () => {
+	if (searchedProfile.value === 'I LOVE CATS UWU') {
+		meow.value = true
+		return
+	}
 	userStore.getUserInfosByUsername(searchedProfile.value).then((res) => {
 		if (res.id === userStore.user?.id)
 			router.push('/main/profile')

@@ -1,5 +1,4 @@
 <template>
-  <section class="UI-grid">
     <ElSidebar/>
     <HeaderLogo/>
     <TheModal v-if="modalStore.show">
@@ -13,7 +12,6 @@
       </Transition>
     </router-view>
     <CreditLink v-if="route.name !== 'community' && route.name !== 'profile'"></CreditLink>
-  </section>
 </template>
 
 <script setup lang="ts">
@@ -123,35 +121,5 @@ gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
 .v-enter-from,
 .v-leave-to {
 	opacity: 0;
-}
-
-#app {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  font-weight: normal;
-  overflow-x: hidden;
-  overflow-y: auto;
-  background-image: url("@/assets/img/wave.svg");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: bottom;
-
-  .UI-grid {
-    display: grid;
-    width: 100%;
-    height: 100%;
-    grid-template-columns: 20% 30% 30% 20%;
-    grid-template-rows: 10% 30% 30% 20% 10%;
-    justify-items: center;
-    align-items: center;
-
-		grid-template-areas:
-            "header1 header1 header2 header3"
-            "left1 main1 main1 right1"
-            "left1 main2 main2 right1"
-            "left1 main3 main3 right1"
-            "footer1 footer1 footer1 footer2";
-	}
 }
 </style>

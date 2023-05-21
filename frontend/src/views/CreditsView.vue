@@ -8,7 +8,7 @@
 		</section>
 		<section class="back_button">
 			<ButtonCustom :style="'big'" :click="() => $router.push('/')">
-				Back to home
+				Back
 			</ButtonCustom>
 		</section>
 	</section>
@@ -45,6 +45,7 @@ const creators = ref(
 
 <style scoped lang="scss">
 .credit_wrapper {
+	grid-area: $gigamain;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;
@@ -58,8 +59,6 @@ const creators = ref(
 		flex-wrap: wrap;
 		justify-content: space-around;
 		align-items: center;
-		width: 100%;
-		height: 100%;
 		gap: 50px;
 	}
 
@@ -67,8 +66,6 @@ const creators = ref(
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		width: 100%;
-		height: 20%;
 	}
 }
 </style>
