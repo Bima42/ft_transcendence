@@ -25,9 +25,12 @@ export class FriendsController {
 	@ApiProperty({ type: String })
 	async addFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
 		const friendship = await this.friendsService.addFriend(req.user.id, friendName);
+		const friendID = req.user.id === friendship.userId ? friendship.friendId : friendship.userId;
 		if (friendship.status === 'ACCEPTED') {
-			const friendID = req.user.id === friendship.userId ? friendship.friendId : friendship.userId;
 			await this.channelGateway.onNewFriend(req.user, friendID);
+		}
+		else if ( friendship.status === 'PENDING' ) {
+			await this.channelGateway.onNewFriendRequest(req.user, friendID);
 		}
 		return friendship
 	}

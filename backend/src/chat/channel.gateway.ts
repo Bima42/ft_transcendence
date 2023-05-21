@@ -107,6 +107,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.data.user = user;
 
 		socket.join("user" + user.id.toString())
+		socket.join("friendRequest" + user.id.toString())
+
 		const subscriptions = await this.channelService.getSubscribedChannels(user);
 		const whispers = await this.channelService.getWhisperChannels(user)
 		for (const chan of subscriptions) {
@@ -126,7 +128,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		if (user.status !== UserStatus.OFFLINE)
 			return;
-
 		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
 		await this.usersService.updateData(user.id, { status: UserStatus.ONLINE });
 	}
@@ -191,5 +192,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.leave("friend" + user.id.toString())
 		}
 		this.server.to("user" + targetUserId.toString()).emit("friendshipRemoved", user)
+	}
+
+	async onNewFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequest", user)
 	}
 };

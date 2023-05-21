@@ -89,6 +89,15 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id))
 })
 
+chatStore.socket.on('friendRequest', (user: IUser) => {
+	notificationStore.addNotification({
+		picture: user.avatar,
+		message: `${user.username} sent you a friend request`,
+		lifespan: 3000,
+		redirect: () => router.push(`/main/profile/${user.id}`),
+	})
+})
+
 
 /************************************************************************
  * 								   GAME									*
