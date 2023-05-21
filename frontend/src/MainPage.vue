@@ -32,6 +32,7 @@ import { useNotificationStore } from '@/stores/notification'
 import type IChatMessage from '@/interfaces/chat/IChatMessage'
 import type IUser from '@/interfaces/user/IUser'
 import type IGameSettings from '@/interfaces/game/IGameSettings'
+import { watch } from 'vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -77,6 +78,7 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 
 chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 	friendStore.friends.push(user)
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friend === user.id))
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} accepted your friend request`,
@@ -90,6 +92,11 @@ chatStore.socket.on('friendshipRemoved', (user: IUser) => {
 })
 
 chatStore.socket.on('friendRequest', (user: IUser) => {
+	friendStore.receivedRequests.push({
+		status: 'PENDING',
+		user: userStore.user!.id,
+		friend: user.id,
+	})
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} sent you a friend request`,
@@ -98,6 +105,18 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 	})
 })
 
+chatStore.socket.on('friendRequestCanceled', (user: IUser) => {
+	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.user === user.id))
+})
+
+chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
+	console.log('friendRequestDeclined', user)
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friend === user.id))
+})
+
+watch(friendStore.friends, () => console.log('friends', friendStore.friends))
+watch(friendStore.receivedRequests, () => console.log('received', friendStore.receivedRequests))
+watch(friendStore.sentRequests, () => console.log('sent', friendStore.sentRequests))
 
 /************************************************************************
  * 								   GAME									*

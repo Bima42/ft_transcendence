@@ -19,21 +19,25 @@ import UserInformations from '@/components/modal/UserInformationsModal.vue'
 import { useModalStore } from '@/stores/modal'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import UserPicture from '@/components/avatar/UserPicture.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type IUser from '@/interfaces/user/IUser'
 import { useAlertStore } from '@/stores/alert'
+import { useUserStore } from '@/stores/user';
 
 const alertStore = useAlertStore()
+const userStore = useUserStore()
 const modalStore = useModalStore()
 const friendStore = useFriendStore()
 
 const requests = ref<IUser[]>([])
 
 function loadDatas() {
-	friendStore.updateStoreDatas()
-	friendStore.getAllPendingRequests().then((res) => {
-		requests.value = res
-	})
+	for (const request of friendStore.receivedRequests) {
+		console.log(request)
+		userStore.getUserInfos(request.friend).then((res) => {
+			requests.value.push(res)
+		})
+	}
 }
 loadDatas()
 
@@ -45,13 +49,11 @@ const showUserProfile = async (username: string) => {
 const acceptRequest = async (username: string) => {
 	await friendStore.acceptFriendRequest(username)
 		.catch(e => alertStore.setErrorAlert(e))
-	requests.value = await friendStore.getAllPendingRequests()
 }
 
 const declineRequest = async (username: string) => {
 	await friendStore.declineFriendRequest(username)
 		.catch(e => alert(e))
-	requests.value = await friendStore.getAllPendingRequests()
 }
 </script>
 

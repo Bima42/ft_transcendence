@@ -29,7 +29,7 @@ export class FriendsController {
 		if (friendship.status === 'ACCEPTED') {
 			await this.channelGateway.onNewFriend(req.user, friendID);
 		}
-		else if ( friendship.status === 'PENDING' ) {
+		else if (friendship.status === 'PENDING') {
 			await this.channelGateway.onNewFriendRequest(req.user, friendID);
 		}
 		return friendship
@@ -47,7 +47,9 @@ export class FriendsController {
 	@Post('cancel/:friendName')
 	@ApiProperty({ type: String })
 	async cancelFriendRequest(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
-		return this.friendsService.cancelFriendRequest(req.user.id, friendName);
+		const response = await this.friendsService.cancelFriendRequest(req.user.id, friendName);
+		await this.channelGateway.onCancelFriendRequest(req.user, response.friendId);
+		return response
 	}
 
 	@Get('is/:friendName')
@@ -69,7 +71,10 @@ export class FriendsController {
 	@Patch('decline/:friendName')
 	@ApiProperty({ type: String })
 	async declineFriend(@Param('friendName') friendName: string, @Req() req: RequestWithUser) {
-		return this.friendsService.declineFriend(req.user.id, friendName);
+		const friend = await this.usersService.findByName(friendName);
+		const friendship = await this.friendsService.declineFriend(req.user.id, friend);
+		await this.channelGateway.onDeclineFriendRequest(req.user, friend.id);
+		return friendship;
 	}
 
 	@Get('all')

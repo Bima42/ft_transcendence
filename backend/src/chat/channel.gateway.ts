@@ -69,6 +69,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	/**
+	 * When a client connects to the server, this method is called to
+	 * verify the user and attach it to the socket
+	 * Then, the user is added to the rooms he is subscribed to
+	 *
+	 * @param socket
+	 * @param args
+	 */
 	async handleConnection(socket: any, ...args: any[]) {
 
 		const user = await this.verifyUser(socket.handshake.auth.token);
@@ -102,6 +110,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket.join("friend" + friend.id.toString())
 		}
 
+		/*******************************************
+		 * 			NOTIFICATIONS ON CONNECT	   *
+		 *******************************************/
 		if (user.status !== UserStatus.OFFLINE)
 			return;
 		socket.to("friend" + user.id.toString()).emit("friendOnline", user)
@@ -109,13 +120,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	handleDisconnect(socket: any): any {
-
 		if (socket.data.user) {
 			Logger.log(`Chat: ${socket.data.user.username}#${socket.data.user.id} disconnected`);
 		}
-
-		//TODO: set user status offline
-		//TODO: send notifications to all users to change his status to offline
 	}
 
 	async onChannelJoin(user: UserDto, chatId: number) {
@@ -172,5 +179,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async onNewFriendRequest(user: UserDto, targetUserId: number) {
 		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequest", user)
+	}
+
+	async onCancelFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequestCanceled", user)
+	}
+
+	async onDeclineFriendRequest(user: UserDto, targetUserId: number) {
+		this.server.to("friendRequest" + targetUserId.toString()).emit("friendRequestDeclined", user)
 	}
 };

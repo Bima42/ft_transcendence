@@ -201,8 +201,7 @@ export class FriendsService {
 		});
 	}
 
-	async declineFriend(userId: number, friendName: string) {
-		const friend = await this.usersService.findByName(friendName);
+	async declineFriend(userId: number, friend: UserDto) {
 		return this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
@@ -246,7 +245,7 @@ export class FriendsService {
 		return friends;
 	}
 
-	async getAllWaitingRequests(userId: number) {
+	async getAllWaitingRequests(userId: number): Promise<{status: FriendshipStatus, friend: UserDto}[]>  {
 		const requests = await this.prismaService.friendship.findMany({
 			where: {
 				userId: userId,
@@ -254,15 +253,20 @@ export class FriendsService {
 			},
 			select: {
 				userId: true,
-				friendId: true
+				friendId: true,
+				status: true
 			}
 		});
 
-		const waitingRequests: UserDto[] = [];
+		const waitingRequests = [];
 		for (const request of requests) {
 			const id = request.userId === userId ? request.friendId : request.userId;
 			const user = await this.usersService.findById(id);
-			waitingRequests.push(toUserDto(user));
+			const item = {
+				status: request.status,
+				friend: toUserDto(user)
+			}
+			waitingRequests.push(item);
 		}
 
 		return waitingRequests;
@@ -279,7 +283,7 @@ export class FriendsService {
 		return !!friendship;
 	}
 
-	async getAllPendingRequests(userId: number) {
+	async getAllPendingRequests(userId: number): Promise<{status: FriendshipStatus, friend: UserDto}[]> {
 		const requests = await this.prismaService.friendship.findMany({
 			where: {
 				friendId: userId,
@@ -287,15 +291,20 @@ export class FriendsService {
 			},
 			select: {
 				userId: true,
-				friendId: true
+				friendId: true,
+				status: true
 			}
 		});
 
-		const pendingRequests: UserDto[] = [];
+		const pendingRequests = [];
 		for (const request of requests) {
 			const id = request.userId === userId ? request.friendId : request.userId;
 			const user = await this.usersService.findById(id);
-			pendingRequests.push(toUserDto(user));
+			const item = {
+				status: request.status,
+				friend: toUserDto(user)
+			}
+			pendingRequests.push(item);
 		}
 
 		return pendingRequests;

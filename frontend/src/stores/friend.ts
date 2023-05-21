@@ -5,25 +5,38 @@ import type IFriend from '@/interfaces/user/IFriend';
 import type IUser from '@/interfaces/user/IUser';
 import { ref } from 'vue';
 import type IBlocked from '@/interfaces/user/IBlocked';
+import { useUserStore } from '@/stores/user';
 
 export const useFriendStore = defineStore( 'friend', () => {
 	const friends = ref<IFriend[]>([]);
 	const blocked = ref<IBlocked[]>([]);
+	const sentRequests = ref<IFriendship[]>([]);
+	const receivedRequests = ref<IFriendship[]>([]);
 	get('friends/all', 'Failed to get all friends', jsonHeaders).then((data) => {
 		friends.value = data;
 	});
 	get('friends/blocked', 'Failed to get all blocked', jsonHeaders).then((data) => {
 		blocked.value = data;
 	});
+	get('friends/waiting', 'Failed to get all sent requests', jsonHeaders).then((data) => {
+		sentRequests.value = data;
+	});
+	get('friends/pending', 'Failed to get all pending requests', jsonHeaders).then((data) => {
+		receivedRequests.value = data;
+	});
 
 	const updateStoreDatas = async () => {
 		friends.value = await getAllFriends();
 		blocked.value = await getAllBlocked();
+		sentRequests.value = await getAllWaitingRequests();
+		receivedRequests.value = await getAllPendingRequests();
 	}
 
 	const resetState = () => {
 		friends.value = [];
 		blocked.value = [];
+		sentRequests.value = [];
+		receivedRequests.value = [];
 	}
 
 	/*************************************************************************
@@ -39,8 +52,15 @@ export const useFriendStore = defineStore( 'friend', () => {
 				jsonHeaders,
 			)
 			if (data.status === 'ACCEPTED') {
-				await updateStoreDatas();
+				const userStore = useUserStore();
+				const user = await userStore.getUserInfos(data.user)
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.user === user.id), 1);
+
+				friends.value.push(user);
+				return data.status === 'ACCEPTED';
 			}
+			console.log(data)
+			sentRequests.value.push(data);
 			return data.status === 'PENDING';
 		}
 
@@ -50,7 +70,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to remove friend',
 				jsonHeaders,
 			)
-			await updateStoreDatas();
+			friends.value.splice(friends.value.findIndex((friend) => friend.username === friendName), 1);
 			return true;
 		}
 
@@ -60,7 +80,12 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to accept friend request',
 				jsonHeaders,
 			)
-			await updateStoreDatas();
+			if (data.status === 'ACCEPTED') {
+				// The current user is the friend of the friendship
+				receivedRequests.value.splice(receivedRequests.value.findIndex((friendship) => friendship.user === data.user), 1);
+				const userStore = useUserStore();
+				friends.value.push(await userStore.getUserInfos(data.user));
+			}
 			return data.status === 'ACCEPTED';
 		}
 
@@ -70,6 +95,7 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to decline friend request',
 				jsonHeaders,
 			)
+			await updateStoreDatas();
 			return data.status === 'DECLINED';
 		}
 
@@ -79,8 +105,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 				'Failed to cancel friend request',
 				jsonHeaders,
 			)
+			await updateStoreDatas();
 			return data.status === 'CANCELED';
-			// return data.status;
 		}
 
 		const getAllFriends = async (): Promise<IFriend[]> => {
@@ -103,7 +129,15 @@ export const useFriendStore = defineStore( 'friend', () => {
 			return status;
 		}
 
-		const getAllPendingRequests = (): Promise<IUser[]> => {
+		const getAllWaitingRequests = (): Promise<IFriendship[]> => {
+			return get(
+				'friends/waiting',
+				'Failed to get all sent requests',
+				jsonHeaders,
+			)
+		}
+
+		const getAllPendingRequests = (): Promise<IFriendship[]> => {
 			return get(
 				'friends/pending',
 				'Failed to get all pending requests',
@@ -113,6 +147,10 @@ export const useFriendStore = defineStore( 'friend', () => {
 
 		const isFriend = (id: number): boolean => {
 			return friends.value.some((friend) => friend.id === id);
+		}
+
+		const isRequestSent = (id: number): boolean => {
+			return sentRequests.value.some((friend) => friend.friend === id);
 		}
 
 	/*************************************************************************
@@ -164,6 +202,8 @@ export const useFriendStore = defineStore( 'friend', () => {
 		return {
 			friends,
 			blocked,
+			sentRequests,
+			receivedRequests,
 			updateStoreDatas,
 			resetState,
 			addFriend,
@@ -173,8 +213,10 @@ export const useFriendStore = defineStore( 'friend', () => {
 			cancelFriendRequest,
 			getAllFriends,
 			isWaitingRequest,
+			getAllWaitingRequests,
 			getAllPendingRequests,
 			isFriend,
+			isRequestSent,
 			blockUser,
 			unblockUser,
 			getAllBlocked,
