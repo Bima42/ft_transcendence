@@ -5,18 +5,18 @@ import breakoutJson from '@/game/assets/breakout.json'
 import breakoutPng from '@/game/assets/breakout.png'
 
 export default class BootScene extends Scene {
-  constructor () {
-    super({ key: 'BootScene' })
-  }
+	constructor() {
+		super({ key: 'BootScene' })
+	}
 
-  preload () {
-    this.load.audio('thud', [thudMp3, thudOgg])
+	preload() {
+		this.load.audio('thud', [thudMp3, thudOgg])
 
-    this.load.atlas('assets', breakoutPng, breakoutJson);
-  }
+		this.load.atlas('assets', breakoutPng, breakoutJson);
+	}
 
-  create () {
-    this.scene.launch('UiScene')
-    this.scene.start('PongScene')
-  }
+	create() {
+		this.scene.launch('UiScene')
+		this.scene.start('PongScene')
+	}
 }

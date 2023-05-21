@@ -9,14 +9,14 @@ import { UsersMiddleware } from 'src/users/middlewares/users.middleware';
 
 
 @Module({
-  imports: [UsersModule, AuthModule],
-  providers: [PrismaService, GameService, GameGateway],
-  controllers: [GameController],
-  exports: [GameService],
+	imports: [UsersModule, AuthModule],
+	providers: [PrismaService, GameService, GameGateway],
+	controllers: [GameController],
+	exports: [GameService],
 })
 
 export class GameModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UsersMiddleware).forRoutes(GameController);
-  }
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(UsersMiddleware).forRoutes(GameController);
+	}
 }
