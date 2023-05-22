@@ -89,7 +89,7 @@ export class AuthService {
 		let newUser: User | null = null;
 		if (!user) {
 			// Verify if username is already taken
-			let { username: newUsername } = await this.prismaService.user.findUnique({
+			const existingUser = await this.prismaService.user.findUnique({
 				where: {
 					username: username
 				},
@@ -97,15 +97,16 @@ export class AuthService {
 					username: true
 				}
 			});
-			while (newUsername) {
-				newUsername = generateUsername();
+
+			while (existingUser?.username) {
+				existingUser.username = generateUsername();
 				const isUsernameTaken = await this.prismaService.user.findUnique({
 					where: {
-						username: newUsername
+						username: existingUser.username
 					}
 				});
 				if (!isUsernameTaken) {
-					username = newUsername;
+					username = existingUser.username;
 					break;
 				}
 			}

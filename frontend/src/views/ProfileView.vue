@@ -65,14 +65,19 @@ async function loadUser() {
     userStore.getRank(user.value?.id).then((res) => {
         rank.value = res
         return
-    })
+    }).catch(() => {
+		rank.value = 0
+		return
+	})
 }
 
 watch(() => route.params, () => {
     loadUser()
 })
 watch(() => userStore.user, () => {
-    loadUser()
+	if (!userStore.user)
+		return
+	loadUser()
 })
 
 loadUser()
