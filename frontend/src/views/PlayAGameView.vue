@@ -14,12 +14,12 @@
 <script setup lang="ts">
 import PhaserContainer from '@/components/PhaserContainer.vue'
 import { get } from '../../utils'
-import { useNotificationStore } from '@/stores/notification';
-import { onMounted, onUnmounted } from 'vue';
+import { useNotificationStore } from '@/stores/notification'
+import { onMounted, onUnmounted } from 'vue'
 import { useAlertStore } from '@/stores/alert'
 import { useGameStore } from '@/stores/game'
 import { useRouter } from 'vue-router'
-import type IGameSettings from '@/interfaces/game/IGameSettings';
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 
 const gameStore = useGameStore()
 const alertStore = useAlertStore()
