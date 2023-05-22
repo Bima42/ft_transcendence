@@ -199,9 +199,6 @@ export class GameService {
 			}
 		})
 		if (playersUserGames.length >= 2) {
-			const players = await this.server.in("game" + match.id.toString()).fetchSockets()
-			Logger.log(`n sockets = ${players.length}`)
-
 			await this.startGame(match);
 		}
 
@@ -291,12 +288,13 @@ export class GameService {
 		// Find and update user informations
 		const players: EndGamePlayer[] = []
 		try {
-			const userGame1 = await this.prismaService.userGame.findFirstOrThrow({ where: { gameId: game.id} })
-			const userGame2 = await this.prismaService.userGame.findFirstOrThrow({ where: { gameId: game.id} })
-			const user1 = await this.usersService.updateData(userGame1.userId, { status: "BUSY" })
-			const user2 = await this.usersService.updateData(userGame2.userId, { status: "BUSY" })
-			players.push({ user: user1, userGame: userGame1})
-			players.push({ user: user2, userGame: userGame2})
+			const userGames = await this.prismaService.userGame.findMany({ where: { gameId: game.id} })
+			if (userGames.length < 2)
+				throw new Error("Not enough userGame");
+			const user1 = await this.usersService.updateData(userGames[0].userId, { status: "BUSY" })
+			const user2 = await this.usersService.updateData(userGames[1].userId, { status: "BUSY" })
+			players.push({ user: user1, userGame: userGames[0]})
+			players.push({ user: user2, userGame: userGames[1]})
 		} catch(e) {
 			Logger.error(`$Game#{settings.game.id}: cannot find users for game, abort`)
 			return
