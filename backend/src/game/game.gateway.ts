@@ -23,8 +23,6 @@ import { InvitePlayer } from './dto/game.dto';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
-	private userSockets: { [key: string]: UserDto } = {};
-
 	@WebSocketServer()
 	server: Server
 
@@ -71,7 +69,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 			Logger.log("WS: client is not verified. dropped.");
 			return;
 		}
-		this.userSockets[client.id] = user;
 
 		// attach the user to the socket
 		client.data.user = user;
