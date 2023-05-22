@@ -12,7 +12,7 @@
 				<ButtonCustom :style="'small'" @click="goToDetailedProfile(modalStore.data.user.id)">
 					View Detailed Profile
 				</ButtonCustom>
-                <SendWhisperButton :user="modalStore.data.user" :callback="() => modalStore.resetState()" />
+                <SendWhisperButton :user="modalStore.data.user" :callback="modalStore.resetState" />
             </section>
         </section>
         <hr>
