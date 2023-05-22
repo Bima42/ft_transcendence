@@ -116,11 +116,13 @@ chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
 /************************************************************************
  * 								   GAME									*
  ************************************************************************/
+let receivedInvite = false
+
 const onGameInvitationCanceled = () => {
+	receivedInvite = false
 	alertStore.resetState()
 }
 
-let receivedInvite = false
 const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 	if (receivedInvite) {
 		gameStore.socket.emit("declineInvitation", gameSettings)
@@ -144,7 +146,7 @@ const onReceiveGameInvitation = (gameSettings: IGameSettings) => {
 }
 
 
-gameStore.socket.once("gameInvitation", onReceiveGameInvitation)
+gameStore.socket.on("gameInvitation", onReceiveGameInvitation)
 </script>
 
 <style lang="scss">
