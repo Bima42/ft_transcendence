@@ -99,10 +99,8 @@ export class ChannelController {
 
 	@Delete('rooms/:id')
 	async DeleteChannel(@Req() req: RequestWithUser, @Param('id', new ParseIntPipe()) id: number) {
-		const deletedChan = await this.channelService.deleteChannel(req.user, id);
-		for (const member of deletedChan.users) {
-			this.channelGateway.onChannelLeave(member.user, id)
-		}
+		await this.channelService.deleteChannel(req.user, id);
+		this.channelGateway.onChannelDelete(id)
 		return
 	}
 

@@ -126,17 +126,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async onChannelJoin(user: UserDto, chatId: number) {
-		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of sockets) {
-			socket.join("channel" + chatId.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsJoin("channel" + chatId.toString())
+	}
+
+	async onChannelDelete(chatId: number) {
+		this.server.socketsLeave("channel" + chatId.toString())
 	}
 
 	async onChannelLeave(user: UserDto, chatId: number) {
-		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of sockets) {
-			socket.leave("channel" + chatId.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsLeave("channel" + chatId.toString())
 	}
 
 	async onChannelBanned(user: UserDto, chatId: number) {
@@ -154,40 +152,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async onBlockUser(user: UserDto, targetUserId: number) {
-		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of sockets) {
-			socket.join("block" + targetUserId.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsJoin("block" + targetUserId.toString())
 	}
 
 	async onUnblockUser(user: UserDto, targetUserId: number) {
-		const sockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of sockets) {
-			socket.leave("block" + targetUserId.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsLeave("block" + targetUserId.toString())
 	}
 
 	async onNewFriend(user: UserDto, targetUserId: number) {
-		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of userSockets) {
-			socket.join("friend" + targetUserId.toString())
-		}
-		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
-		for (const socket of friendSockets) {
-			socket.join("friend" + user.id.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsJoin("friend" + targetUserId.toString())
+		this.server.in("user" + targetUserId.toString()).socketsJoin("friend" + user.id.toString())
 		this.server.to("user" + targetUserId.toString()).emit("friendshipAccepted", user)
 	}
 
 	async onRemoveFriend(user: UserDto, targetUserId: number) {
-		const userSockets = await this.server.in("user" + user.id.toString()).fetchSockets()
-		for (const socket of userSockets) {
-			socket.leave("friend" + targetUserId.toString())
-		}
-		const friendSockets = await this.server.in("user" + targetUserId.toString()).fetchSockets()
-		for (const socket of friendSockets) {
-			socket.leave("friend" + user.id.toString())
-		}
+		this.server.in("user" + user.id.toString()).socketsLeave("friend" + targetUserId.toString())
+		this.server.in("user" + targetUserId.toString()).socketsLeave("friend" + user.id.toString())
 		this.server.to("user" + targetUserId.toString()).emit("friendshipRemoved", user)
 	}
 
