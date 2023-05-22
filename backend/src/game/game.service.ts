@@ -202,7 +202,7 @@ export class GameService {
 			const players = await this.server.in("game" + match.id.toString()).fetchSockets()
 			Logger.log(`n sockets = ${players.length}`)
 
-			await this.startGame(match, players as unknown as Socket[]);
+			await this.startGame(match);
 		}
 
 		return `OK`;
@@ -286,41 +286,56 @@ export class GameService {
 		});
 	}
 
-	private async startGame(match: Game, players: Socket[]): Promise<void> {
-		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+	private async startGame(game: Game): Promise<void> {
 
-		// Update user informations
-		players[0].data.user = await this.usersService.updateData(players[0].data.user.id, { status: "BUSY" })
-		players[1].data.user = await this.usersService.updateData(players[1].data.user.id, { status: "BUSY" })
-
+		// Find and update user informations
+		const players: EndGamePlayer[] = []
+		try {
+			const userGame1 = await this.prismaService.userGame.findFirstOrThrow({ where: { gameId: game.id} })
+			const userGame2 = await this.prismaService.userGame.findFirstOrThrow({ where: { gameId: game.id} })
+			const user1 = await this.usersService.updateData(userGame1.userId, { status: "BUSY" })
+			const user2 = await this.usersService.updateData(userGame2.userId, { status: "BUSY" })
+			players.push({ user: user1, userGame: userGame1})
+			players.push({ user: user2, userGame: userGame2})
+		} catch(e) {
+			Logger.error(`$Game#{settings.game.id}: cannot find users for game, abort`)
+			return
+		}
+		Logger.log(`Game#${game.id}: ${game.type} match found between ${players[0].user.username} and ${players[1].user.username} !`);
 
 		// Update the game status to 'STARTED'
-		await this.prismaService.game.update({
-			where: { id: match.id },
-			data: { status: 'STARTED' }
+		const match = await this.prismaService.game.update({
+			where: { id: game.id },
+			data: { status: 'STARTED' },
+			include: {
+				users: true
+			}
 		});
 
 		// Create the game server
-		const gameServer = new GameServer(this.server, match, players);
+		const gameServer = new GameServer(this.server, game, players);
 		this.gameServers.push(gameServer);
 
 		// Link all infos to socket
-		players.forEach((player) => {
-			player.data.gameServer = gameServer;
-			player.data.game = match;
-			player.data.isReady = false;
-			player.join("game" + String(match.id))
+		players.forEach(async (player) => {
+			const sockets = await this.server.in("user" + player.user.id.toString()).fetchSockets()
+			sockets.forEach(el => {
+				el.join("game" + match.id.toString())
+				el.data.gameServer = gameServer;
+				el.data.game = match;
+			})
 		})
 
 		// Emit an event to the clients to indicate that a match has been found
-		const gameSettings: GameSettingsDto = {
-			game: match,
-			player1: players[0].data.user,
-			player2: players[1].data.user,
+		const settings: GameSettingsDto = {
+			game: game,
+			player1: players[0].user,
+			player2: players[1].user,
 		}
-		this.server.to(players[0].data.user.username)
-			.to("game" + match.id.toString())
-			.emit("matchFound", gameSettings);
+		this.server
+			.to("user" + players[0].user.id.toString())
+			.to("user" + players[1].user.id.toString())
+			.emit("matchFound", settings);
 	}
 
 	async onPlayerDisconnect(client: Socket) {
@@ -448,10 +463,7 @@ export class GameService {
 		client.data.userGame = await this.createUserGame(match, user);
 		await client.join("game" + match.id.toString())
 
-		// Get all sockets in game room:
-		const players = await this.server.in("game" + match.id.toString()).fetchSockets()
-
-		await this.startGame(match, players as unknown as Socket[])
+		await this.startGame(match)
 	}
 
 	async declineInvitation(client: Socket, settings: GameSettingsDto) {
@@ -473,7 +485,7 @@ export class GameService {
 				}
 			})
 		} catch {
-			console.log("Game already deleted")
+			Logger.log(`Game#${settings.game.id} already deleted`)
 		}
 	}
 }

@@ -310,9 +310,9 @@ export default class PongScene extends Phaser.Scene {
 			this.resetLevel();
 		});
 
-		this.socket.on("playerReconnect", () => {
+		this.socket.on("playerReconnect", (username: string) => {
 			this.resetSocketGameListener()
-			this.uiScene.onPlayerReconnect()
+			this.uiScene.onPlayerReconnect(username)
 			this.isRunning = false;
 			this.scene.pause(this)
 			setTimeout(() => {

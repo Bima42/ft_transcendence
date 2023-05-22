@@ -77,9 +77,9 @@ export default class UiScene extends Phaser.Scene {
 		catch(e) {}
 	}
 
-	onPlayerReconnect() {
+	onPlayerReconnect(username: string) {
 		this.startButton.setVisible(true)
-		this.startButton.setText(`${this.otherPlayer.username} reconnected!`)
+		this.startButton.setText(`${username} reconnected!`)
 		setTimeout(() => {
 			this.startButton.setVisible(false);
 		}, pong.ReconnectBreakMs);

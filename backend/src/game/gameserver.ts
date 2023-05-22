@@ -75,8 +75,8 @@ export class GameServer {
 	private readonly startTimeout: NodeJS.Timeout;
 	private readonly engine!: any;
 	private readonly roomID: string;
-	private readonly players: Socket[] = [];
-	private scores: Array<number> = [0, 0];
+	private readonly players: EndGamePlayer[] = [];
+	private isReady: boolean[] = [false, false]
 	private maxScore = maxScore
 	private obstacles: Obstacle[] = [];
 	private status: GameStatus = "STARTED";
@@ -84,11 +84,11 @@ export class GameServer {
 
 	constructor(private server: Server,
 		public game: Game,
-		sockets: Socket[]) {
+		players: EndGamePlayer[]) {
 		this.roomID = "game" + this.game.id.toString();
 		this.players = [];
-		this.players.push(sockets[0])
-		this.players.push(sockets[1])
+		this.players.push(players[0])
+		this.players.push(players[1])
 
 		// Init MatterJS
 		this.engine = Engine.create();
@@ -135,14 +135,7 @@ export class GameServer {
 	}
 
 	onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
-		const idx = this.players.indexOf(socket);
-		let paddle: any;
-		if (idx == 0)
-			paddle = this.paddle1;
-		else if (idx == 1)
-			paddle = this.paddle2;
-		else
-			return;
+		let paddle = (socket.data.user.id === this.players[0].user.id) ? this.paddle1 : this.paddle2
 
 		// Refuse too big movements
 		if (playerMove.y - paddle.y > cheaterDetectionLimit) {
@@ -151,24 +144,28 @@ export class GameServer {
 		}
 
 		Body.setPosition(paddle, { x: paddle.position.x, y: playerMove.y })
-		socket.to(this.roomID).emit("enemyMove", playerMove);
+		socket.to(this.roomID).except("user" + socket.data.user.id.toString()).emit("enemyMove", playerMove);
 	}
 
-	onPlayerDisconnect(client: Socket) {
+	onPlayerDisconnect(socket: Socket) {
 		if (!this.hasStarted)
 			return;
-		Logger.log(`Game#${this.game.id}: ${client.data.user.username} disconnected`);
+		Logger.log(`Game#${this.game.id}: ${socket.data.user.username} disconnected`);
+		const userIdx = this.players.findIndex(el => socket.data.user.id === el.user.id)
+		if (userIdx < 0)
+			return
 
 		// check if already disconnected
-		if (client.data.isReady) {
-			client.data.isReady = false;
+		if (this.isReady[userIdx]) {
+			this.isReady[userIdx] = false;
 			this.onPause();
-			client.to(this.roomID).emit("playerDisconnect")
+			socket.to(this.roomID).emit("playerDisconnect")
 			this.resetLevel();
 			if (!this.disconnectTimeout)
 				this.disconnectTimeout = setTimeout(() => { this.onAbortGame("player timeout") }, disconnectTimeoutDuration);
 		}
-		if (!this.players[0].data.isReady && !this.players[1].data.isReady && this.status != 'ENDED')
+
+		if (!this.isReady[0] && !this.isReady[1] && this.status != 'ENDED')
 			this.onAbortGame("both players disconnected");
 	}
 
@@ -187,14 +184,9 @@ export class GameServer {
 		newClient.data.isReady = true;
 		newClient.data.game = this.game;
 		newClient.data.gameServer = this;
-		this.players.forEach((el, idx) => {
-			if (el.data.user.id == newClient.data.user.id && el.disconnected) {
-				this.players[idx] = newClient;
-			}
-		});
 		this.sendStateToClients();
 
-		this.server.to(this.roomID).emit("playerReconnect")
+		this.server.to(this.roomID).emit("playerReconnect", newClient.data.username)
 
 		this.onPause();
 		// lauch ball after countdown
@@ -204,13 +196,16 @@ export class GameServer {
 		}, 2000);
 	}
 
-	onPlayerIsReady(client: Socket) {
-		Logger.log(`Game#${this.game.id}: ${client.data.user.username} is ready to play`);
+	onPlayerIsReady(socket: Socket) {
+		Logger.log(`Game#${this.game.id}: ${socket.data.user.username} is ready to play`);
 
-		client.data.isReady = true;
+		const userIdx = this.players.findIndex(el => socket.data.user.id === el.user.id)
+		if (userIdx < 0)
+			return
+		this.isReady[userIdx] = true;
 
 		// Check if everybody is ready
-		if (!this.hasStarted && this.players[0].data.isReady && this.players[1].data.isReady) {
+		if (!this.hasStarted && this.isReady[0] && this.isReady[1]) {
 			clearTimeout(this.startTimeout);
 			Logger.log(`Game#${this.game.id}: Starting game !`);
 			this.onStartGame();
@@ -226,14 +221,12 @@ export class GameServer {
 
 	private onGameOver() {
 		Logger.log(`Game#${this.game.id}: Gameover`);
-		this.players[0].data.userGame.score = this.scores[0]
-		this.players[1].data.userGame.score = this.scores[1]
-		this.players[0].data.userGame.win = this.scores[0] > this.scores[1] ? 1 : 0
-		this.players[1].data.userGame.win = this.scores[1] > this.scores[0] ? 1 : 0
+		this.players[0].userGame.win = this.players[0].userGame.score > this.players[1].userGame.score ? 1 : 0
+		this.players[1].userGame.win = this.players[0].userGame.win ? 0 : 1
 		const gameoverData: GameoverDto = {
-			winnerId: this.players[0].data.userGame.win ? this.players[0].data.user.id : this.players[1].data.user.id,
-			score1: this.scores[0],
-			score2: this.scores[1],
+			winnerId: this.players[0].userGame.win ? this.players[0].user.id : this.players[1].user.id,
+			score1: this.players[0].userGame.score,
+			score2: this.players[1].userGame.score,
 		}
 		this.server.to(this.roomID).emit("gameover", gameoverData);
 		this.status = "ENDED"
@@ -257,17 +250,18 @@ export class GameServer {
 	private updateScore() {
 		// Update score
 		if (this.ball.position.x < 0) {
-			this.scores[1] += 1;
+			this.players[1].userGame.score += 1;
 		} else {
-			this.scores[0] += 1;
+			this.players[0].userGame.score += 1;
 		}
-		Logger.log(`Game#${this.game.id}: ${this.scores[0]} - ${this.scores[1]}`);
+		Logger.log(`Game#${this.game.id}: ${this.players[0].userGame.score} - ${this.players[1].userGame.score}`);
 
 		const pointWon: PointWonDto = {
-			score1: this.scores[0],
-			score2: this.scores[1],
+			score1: this.players[0].userGame.score,
+			score2: this.players[1].userGame.score,
 		}
-		if (this.scores[0] >= this.maxScore || this.scores[1] >= this.maxScore) {
+		if (this.players[0].userGame.score >= this.maxScore ||
+			this.players[1].userGame.score >= this.maxScore) {
 			this.onGameOver();
 		} else {
 			this.server.to(this.roomID).emit("pointEnd", pointWon)
@@ -402,8 +396,9 @@ export class GameServer {
 		});
 	}
 
-	cleanupGameDataOnSockets() {
-		this.players.forEach((s) => {
+	async cleanupGameDataOnSockets() {
+		const sockets = await this.server.in("game" + this.roomID).fetchSockets()
+		sockets.forEach((s) => {
 			s.data.game = null;
 			s.data.gameServer = null;
 		})
@@ -414,25 +409,15 @@ export class GameServer {
 	}
 
 	getUsers(): UserDto[] {
-		return [toUserDto(this.players[0].data.user), toUserDto(this.players[1].data.user)]
+		return [this.players[0].user, this.players[1].user]
 	}
 
 	getEndPlayers(): EndGamePlayer[] {
-		const users = this.getUsers();
-		return [
-			{
-				user: users[0],
-				userGame: this.players[0].data.userGame,
-			},
-			{
-				user: users[1],
-				userGame: this.players[1].data.userGame,
-			},
-		]
+		return this.players
 	}
 
 	getScore(): Array<number> {
-		return this.scores;
+		return [this.players[0].userGame.score, this.players[1].userGame.score];
 	}
 
 	toGameSettingsDto(): GameSettingsDto {
