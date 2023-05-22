@@ -44,14 +44,15 @@ export class GameService {
 
 	async checkCurrentGames() {
 		let nRunning = 0
-		this.gameServers = this.gameServers.filter(async (serv) => {
+		for(let i = this.gameServers.length - 1; i >= 0; i--) {
+			const serv = this.gameServers[i]
 			const servStatus = serv.getStatus()
 			if (["INVITING", "SEARCHING"].includes(servStatus)) {
-				return true;
+				continue
 			}
 			if (servStatus == "STARTED") {
 				nRunning++
-				return true;
+				continue
 			}
 
 			const players = serv.getEndPlayers()
@@ -76,7 +77,8 @@ export class GameService {
 				}
 
 				serv.cleanupGameDataOnSockets();
-				return false
+				this.gameServers.splice(i, 1)
+				continue
 			} else if (serv.getStatus() == "ENDED") {
 				Logger.log(`Game #${serv.game.id} written as ended in DB`);
 
@@ -96,9 +98,10 @@ export class GameService {
 				}
 
 				serv.cleanupGameDataOnSockets();
-				return false
+				this.gameServers.splice(i, 1)
+				continue
 			}
-		})
+		}
 		if (nRunning) {
 			Logger.log(`${nRunning} game(s) are running`)
 		}
