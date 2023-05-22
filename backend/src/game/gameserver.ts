@@ -135,7 +135,11 @@ export class GameServer {
 	}
 
 	onPlayerMove(socket: Socket, playerMove: PlayerMoveDto) {
-		let paddle = (socket.data.user.id === this.players[0].user.id) ? this.paddle1 : this.paddle2
+		const user = this.players.find(el => socket.data.user.id === el.user.id)
+		if (!user)
+			return
+
+		const paddle = (user === this.players[0]) ? this.paddle1 : this.paddle2
 
 		// Refuse too big movements
 		if (playerMove.y - paddle.y > cheaterDetectionLimit) {
