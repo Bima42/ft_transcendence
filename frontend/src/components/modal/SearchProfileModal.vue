@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import {onMounted, onUpdated, ref} from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
@@ -31,6 +31,8 @@ const searchProfile = () => {
 		meow.value = true
 		return
 	}
+	if (searchedProfile.value === '')
+		return
 	userStore.getUserInfosByUsername(searchedProfile.value).then((res) => {
 		if (res.id === userStore.user?.id)
 			router.push('/main/profile')
@@ -38,7 +40,7 @@ const searchProfile = () => {
 			router.push(`/main/profile/${res.id}`)
 		modalStore.resetState()
 	}).catch((err) => {
-		alertStore.setErrorAlert(err)
+		alertStore.setErrorAlert(err, () => input.value?.focus())
 	})
 }
 
