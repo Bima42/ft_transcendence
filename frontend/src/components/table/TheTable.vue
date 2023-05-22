@@ -10,7 +10,13 @@
 			</thead>
 			<tbody>
 			<tr v-for="(row, index) in tableDataPaginated" :key="index">
-				<td v-for="(data, index) in row" :key="index">{{ data }}</td>
+				<td v-for="(data, name, index) in row"
+					:key="index"
+					@click="name === 'username' || 'opponent' ? callback(data) : ''"
+					:class="name === 'username' || 'opponent' ? 'clickable' : ''"
+				>
+					{{ data }}
+				</td>
 			</tr>
 			</tbody>
 		</table>
@@ -31,6 +37,7 @@ const props = defineProps<{
 	headers: any,
 	rowsPerPage?: number,
 	sortDatas?: (header: string) => void
+	callback?: (username: string) => void
 }>()
 
 const sortDatas = props.sortDatas ? props.sortDatas : function () {
@@ -112,6 +119,10 @@ const tableDataPaginated = computed(() => {
 		th,
 		td {
 			padding: 12px 5px 12px 5px;
+
+			&.clickable {
+				cursor: pointer;
+			}
 		}
 
 		tbody tr {

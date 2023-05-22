@@ -14,12 +14,12 @@
 <script setup lang="ts">
 import PhaserContainer from '@/components/PhaserContainer.vue'
 import { get } from '../../utils'
-import { useNotificationStore } from '@/stores/notification';
-import { onMounted, onUnmounted } from 'vue';
+import { useNotificationStore } from '@/stores/notification'
+import { onMounted, onUnmounted } from 'vue'
 import { useAlertStore } from '@/stores/alert'
 import { useGameStore } from '@/stores/game'
 import { useRouter } from 'vue-router'
-import type IGameSettings from '@/interfaces/game/IGameSettings';
+import type IGameSettings from '@/interfaces/game/IGameSettings'
 
 const gameStore = useGameStore()
 const alertStore = useAlertStore()
@@ -31,7 +31,7 @@ notificationStore.show = false
 if (!gameStore.currentGame) {
 	get('game/current', "Cannot get game config")
 		.then((gameSettings: IGameSettings) => {
-			gameStore.currentGame = gameSettings;
+			gameStore.currentGame = gameSettings
 		})
 		.catch((e) => {
 			alertStore.setErrorAlert(e, () => router.push('joinGame'))
@@ -81,8 +81,12 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .gamePong {
-	grid-area: $gigamain;
-	width: 100%;
+	grid-area: $bigmain;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 80%;
 	height: 100%;
 }
 </style>

@@ -13,7 +13,7 @@ import {useModalStore} from '@/stores/modal'
 
 const modalStore = useModalStore()
 
-function exitClick(e: Event) {
+function exitClick() {
     modalStore.resetState()
 }
 </script>

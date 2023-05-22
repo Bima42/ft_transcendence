@@ -11,7 +11,7 @@
         <component :is="Component"/>
       </Transition>
     </router-view>
-    <CreditLink v-if="route.name !== 'community' && route.name !== 'profile'"></CreditLink>
+    <CreditLink v-if="route.name !== 'community' && route.name !== 'profile' && route.name !== 'game'"></CreditLink>
 </template>
 
 <script setup lang="ts">

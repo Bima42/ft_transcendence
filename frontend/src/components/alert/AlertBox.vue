@@ -17,7 +17,7 @@
                                   @keydown.enter="alertStore.passwordCallback ? handleSubmit() : handleClick()"
                                   :autofocus="!alertStore.passwordCallback"
                     >
-                        {{ !alertStore.callBack ? 'Ok' : 'Yes' }}
+                        {{ alertStore.error ? 'Ok' : 'Yes' }}
                     </ButtonCustom>
                     <ButtonCustom @click="handleRefuse()"
                                   :style="'big'"

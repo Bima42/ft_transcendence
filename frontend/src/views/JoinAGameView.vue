@@ -22,6 +22,7 @@
             <img src="@/assets/img/loading.svg" alt="loading">
 			<ButtonCustom @click="leaveQueue" :style="'big'">{{gameStore.currentGame ? "Cancel invite" : "Leave Queue" }} </ButtonCustom>
         </div>
+		<blockquote>Please note that the game is not supported without a keyboard</blockquote>
     </section>
 </template>
 
@@ -146,6 +147,10 @@ onUnmounted(() => {
     grid-area: $gigamain;
     gap: 20px;
     text-align: center;
+
+	blockquote {
+		font-family: 'Martian Mono', sans-serif;
+	}
 
     .buttons_wrap {
         display: flex;
