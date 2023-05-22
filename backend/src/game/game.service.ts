@@ -44,14 +44,15 @@ export class GameService {
 
 	async checkCurrentGames() {
 		let nRunning = 0
-		this.gameServers.forEach(async (serv) => {
+		for(let i = this.gameServers.length - 1; i >= 0; i--) {
+			const serv = this.gameServers[i]
 			const servStatus = serv.getStatus()
 			if (["INVITING", "SEARCHING"].includes(servStatus)) {
-				return;
+				continue
 			}
 			if (servStatus == "STARTED") {
 				nRunning++
-				return;
+				continue
 			}
 
 			const players = serv.getEndPlayers()
@@ -76,8 +77,8 @@ export class GameService {
 				}
 
 				serv.cleanupGameDataOnSockets();
-				this.gameServers.splice(this.gameServers.indexOf(serv));
-
+				this.gameServers.splice(i, 1)
+				continue
 			} else if (serv.getStatus() == "ENDED") {
 				Logger.log(`Game #${serv.game.id} written as ended in DB`);
 
@@ -97,9 +98,10 @@ export class GameService {
 				}
 
 				serv.cleanupGameDataOnSockets();
-				this.gameServers.splice(this.gameServers.indexOf(serv));
+				this.gameServers.splice(i, 1)
+				continue
 			}
-		})
+		}
 		if (nRunning) {
 			Logger.log(`${nRunning} game(s) are running`)
 		}
@@ -199,10 +201,7 @@ export class GameService {
 			}
 		})
 		if (playersUserGames.length >= 2) {
-			const players = await this.server.in("game" + match.id.toString()).fetchSockets()
-			Logger.log(`n sockets = ${players.length}`)
-
-			await this.startGame(match, players as unknown as Socket[]);
+			await this.startGame(match);
 		}
 
 		return `OK`;
@@ -286,18 +285,31 @@ export class GameService {
 		});
 	}
 
-	private async startGame(match: Game, players: Socket[]): Promise<void> {
-		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].data.user.username} and ${players[1].data.user.username} !`);
+	private async startGame(match: Game): Promise<void> {
 
-		// Update user informations
-		players[0].data.user = await this.usersService.updateData(players[0].data.user.id, { status: "BUSY" })
-		players[1].data.user = await this.usersService.updateData(players[1].data.user.id, { status: "BUSY" })
-
+		// Find and update user informations
+		const players: EndGamePlayer[] = []
+		try {
+			const userGames = await this.prismaService.userGame.findMany({ where: { gameId: match.id} })
+			if (userGames.length < 2)
+				throw new Error("Not enough userGame");
+			const user1 = await this.usersService.updateData(userGames[0].userId, { status: "BUSY" })
+			const user2 = await this.usersService.updateData(userGames[1].userId, { status: "BUSY" })
+			players.push({ user: user1, userGame: userGames[0]})
+			players.push({ user: user2, userGame: userGames[1]})
+		} catch(e) {
+			Logger.error(`$Game#{settings.game.id}: cannot find users for game, abort`)
+			return
+		}
+		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].user.username} and ${players[1].user.username} !`);
 
 		// Update the game status to 'STARTED'
-		await this.prismaService.game.update({
+		match = await this.prismaService.game.update({
 			where: { id: match.id },
-			data: { status: 'STARTED' }
+			data: { status: 'STARTED' },
+			include: {
+				users: true
+			}
 		});
 
 		// Create the game server
@@ -305,22 +317,24 @@ export class GameService {
 		this.gameServers.push(gameServer);
 
 		// Link all infos to socket
-		players.forEach((player) => {
-			player.data.gameServer = gameServer;
-			player.data.game = match;
-			player.data.isReady = false;
-			player.join("game" + String(match.id))
+		players.forEach(async (player) => {
+			const sockets = await this.server.in("user" + player.user.id.toString()).fetchSockets()
+			sockets.forEach(el => {
+				el.join("game" + match.id.toString())
+				el.data.gameServer = gameServer;
+			})
 		})
 
 		// Emit an event to the clients to indicate that a match has been found
-		const gameSettings: GameSettingsDto = {
+		const settings: GameSettingsDto = {
 			game: match,
-			player1: players[0].data.user,
-			player2: players[1].data.user,
+			player1: players[0].user,
+			player2: players[1].user,
 		}
-		this.server.to(players[0].data.user.username)
-			.to("game" + match.id.toString())
-			.emit("matchFound", gameSettings);
+		this.server
+			.to("user" + players[0].user.id.toString())
+			.to("user" + players[1].user.id.toString())
+			.emit("matchFound", settings);
 	}
 
 	async onPlayerDisconnect(client: Socket) {
@@ -333,7 +347,7 @@ export class GameService {
 
 	playerIsReady(client: Socket) {
 		if (client.data.gameServer)
-			client.data.gameServer.onPlayerIsReady(client);
+			return client.data.gameServer.onPlayerIsReady(client);
 	}
 
 	tryToReconnect(client: Socket) {
@@ -448,10 +462,7 @@ export class GameService {
 		client.data.userGame = await this.createUserGame(match, user);
 		await client.join("game" + match.id.toString())
 
-		// Get all sockets in game room:
-		const players = await this.server.in("game" + match.id.toString()).fetchSockets()
-
-		await this.startGame(match, players as unknown as Socket[])
+		await this.startGame(match)
 	}
 
 	async declineInvitation(client: Socket, settings: GameSettingsDto) {
@@ -473,7 +484,7 @@ export class GameService {
 				}
 			})
 		} catch {
-			console.log("Game already deleted")
+			Logger.log(`Game#${settings.game.id} already deleted`)
 		}
 	}
 }

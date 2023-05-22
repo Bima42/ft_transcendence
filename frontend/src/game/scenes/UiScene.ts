@@ -33,8 +33,6 @@ export default class UiScene extends Phaser.Scene {
 		this.scoreWidget = this.add.text(0, 50, "Press W or S to move your paddle", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
 
 		if (!this.gameSettings) {
-			// TODO: show error message
-			// this.scene.stop('UiScene');
 			this.scoreWidget.setText("No game. Invite someone or get in the queue !");
 			return;
 		}
@@ -77,9 +75,9 @@ export default class UiScene extends Phaser.Scene {
 		catch(e) {}
 	}
 
-	onPlayerReconnect() {
+	onPlayerReconnect(username: string) {
 		this.startButton.setVisible(true)
-		this.startButton.setText(`${this.otherPlayer.username} reconnected!`)
+		this.startButton.setText(`${username} reconnected!`)
 		setTimeout(() => {
 			this.startButton.setVisible(false);
 		}, pong.ReconnectBreakMs);
@@ -139,14 +137,15 @@ export default class UiScene extends Phaser.Scene {
 			.on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
 			.on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
 			.on('pointerdown', () => {
-				this.updateScoreWidgetContent(0, 0);
-				this.startButton.setText("Waiting for opponent...")
-					.setStyle({ fill: '#FFF' })
-					.setInteractive({ useHandCursor: false })
-					.off('pointerover')
-					.off('pointerout')
-					.off('pointerdown')
-				gameStore.socket.emit("playerReady");
+				gameStore.socket.emit("playerReady", () => {
+					this.updateScoreWidgetContent(0, 0);
+					this.startButton.setText("Waiting for opponent...")
+						.setStyle({ fill: '#FFF' })
+						.setInteractive({ useHandCursor: false })
+						.off('pointerover')
+						.off('pointerout')
+						.off('pointerdown')
+				});
 			})
 	}
 
