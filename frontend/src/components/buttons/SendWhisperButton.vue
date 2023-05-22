@@ -41,6 +41,9 @@ const goToWhisper = (name: string) => {
         console.log(err)
     })
     if (props.callback) {
+		if (route.name !== 'community') {
+			router.push('/main/community/')
+		}
         props.callback()
     }
     return
