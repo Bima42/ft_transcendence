@@ -283,12 +283,12 @@ export class GameService {
 		});
 	}
 
-	private async startGame(game: Game): Promise<void> {
+	private async startGame(match: Game): Promise<void> {
 
 		// Find and update user informations
 		const players: EndGamePlayer[] = []
 		try {
-			const userGames = await this.prismaService.userGame.findMany({ where: { gameId: game.id} })
+			const userGames = await this.prismaService.userGame.findMany({ where: { gameId: match.id} })
 			if (userGames.length < 2)
 				throw new Error("Not enough userGame");
 			const user1 = await this.usersService.updateData(userGames[0].userId, { status: "BUSY" })
@@ -299,11 +299,11 @@ export class GameService {
 			Logger.error(`$Game#{settings.game.id}: cannot find users for game, abort`)
 			return
 		}
-		Logger.log(`Game#${game.id}: ${game.type} match found between ${players[0].user.username} and ${players[1].user.username} !`);
+		Logger.log(`Game#${match.id}: ${match.type} match found between ${players[0].user.username} and ${players[1].user.username} !`);
 
 		// Update the game status to 'STARTED'
-		const match = await this.prismaService.game.update({
-			where: { id: game.id },
+		match = await this.prismaService.game.update({
+			where: { id: match.id },
 			data: { status: 'STARTED' },
 			include: {
 				users: true
@@ -311,7 +311,7 @@ export class GameService {
 		});
 
 		// Create the game server
-		const gameServer = new GameServer(this.server, game, players);
+		const gameServer = new GameServer(this.server, match, players);
 		this.gameServers.push(gameServer);
 
 		// Link all infos to socket
@@ -320,13 +320,12 @@ export class GameService {
 			sockets.forEach(el => {
 				el.join("game" + match.id.toString())
 				el.data.gameServer = gameServer;
-				el.data.game = match;
 			})
 		})
 
 		// Emit an event to the clients to indicate that a match has been found
 		const settings: GameSettingsDto = {
-			game: game,
+			game: match,
 			player1: players[0].user,
 			player2: players[1].user,
 		}

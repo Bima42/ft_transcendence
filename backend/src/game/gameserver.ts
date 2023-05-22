@@ -182,7 +182,6 @@ export class GameServer {
 		// Socket shenanigans
 		newClient.join(this.roomID);
 		newClient.data.isReady = true;
-		newClient.data.game = this.game;
 		newClient.data.gameServer = this;
 		this.sendStateToClients();
 
@@ -399,7 +398,7 @@ export class GameServer {
 	async cleanupGameDataOnSockets() {
 		const sockets = await this.server.in("game" + this.roomID).fetchSockets()
 		sockets.forEach((s) => {
-			s.data.game = null;
+			// TODO: TEST
 			s.data.gameServer = null;
 		})
 	}
