@@ -322,6 +322,7 @@ export default class PongScene extends Phaser.Scene {
 		});
 
 		this.socket.on("abortGame", (reason: string) => {
+			this.clearSocketGameListener()
 			this.uiScene.onAbortGame(reason)
 			this.scene.pause(this)
 		});
@@ -333,6 +334,7 @@ export default class PongScene extends Phaser.Scene {
 
 		this.socket.on("gameover", (gameoverData: IGameoverData) => {
 			this.uiScene.onGameover(gameoverData);
+			this.clearSocketGameListener()
 			this.scene.stop('UiScene');
 			this.scene.start("GameoverScene", { data: gameoverData, router: this.vueRouter });
 		});
