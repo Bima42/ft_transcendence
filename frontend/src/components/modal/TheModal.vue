@@ -57,7 +57,7 @@ function exitClick(e: Event) {
         top: 20px;
         right: 20px;
         @media (max-width: 768px) {
-            display: none; //TODO: not sure :/
+            display: none;
         }
     }
 }
