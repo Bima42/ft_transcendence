@@ -31,7 +31,7 @@ notificationStore.show = false
 if (!gameStore.currentGame) {
 	get('game/current', "Cannot get game config")
 		.then((gameSettings: IGameSettings) => {
-			gameStore.currentGame = gameSettings;
+			gameStore.currentGame = gameSettings
 		})
 		.catch((e) => {
 			alertStore.setErrorAlert(e, () => router.push('joinGame'))
