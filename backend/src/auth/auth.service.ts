@@ -86,65 +86,25 @@ export class AuthService {
 			}
 		});
 
-		let newUser: User | null = null;
 		if (!user) {
-			// Verify if username is already taken
-			const existingUser = await this.prismaService.user.findUnique({
-				where: {
-					username: username
-				},
-				select: {
-					username: true
-				}
-			});
-
-			while (existingUser?.username) {
-				existingUser.username = generateUsername();
-				const isUsernameTaken = await this.prismaService.user.findUnique({
-					where: {
-						username: existingUser.username
-					}
-				});
-				if (!isUsernameTaken) {
-					username = existingUser.username;
-					break;
-				}
+			const data = {
+				username: username,
+				email: email,
+				firstName: firstName,
+				lastName: lastName,
+				phone: phone,
+				fortyTwoId: fortyTwoId,
+				avatar: avatar
 			}
-
-			try {
-				newUser = await this.prismaService.user.create({
-					data: {
-						username,
-						email,
-						firstName,
-						lastName,
-						phone,
-						fortyTwoId,
-						avatar
-					}
-				});
-				return {
-					user: newUser,
-					firstLogin: true
-				}
-			}
-			catch (e) {
-				throw new BadRequestException('Error while creating user');
+			const newUser = await this.usersService.create(data, username);
+			return {
+				user: newUser,
+				firstLogin: true
 			}
 		}
 		else {
-			newUser = await this.prismaService.user.update({
-				where: {
-					id: user.id
-				},
-				data: {
-					firstName,
-					lastName,
-					fortyTwoId
-				}
-			});
 			return {
-				user: newUser,
+				user: user,
 				firstLogin: false
 			}
 		}

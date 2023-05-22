@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UpdateUserDto, UserDto } from './dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
+import { generateUsername } from 'unique-username-generator';
 
 @Injectable()
 export class UsersService {
@@ -10,16 +11,49 @@ export class UsersService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async create(data: User): Promise<UserDto> {
-    const user = await this.prismaService.user.create({
-      data: data
-    });
+  async create(data: any, username: string): Promise<User> {
+	  // Verify if username is already taken
+	  const existingUser = await this.prismaService.user.findUnique({
+		  where: {
+			  username: username
+		  },
+		  select: {
+			  username: true
+		  }
+	  });
 
-    if (!user) {
-      throw new BadRequestException('User not created');
-    }
+	  while (existingUser?.username) {
+		  existingUser.username = generateUsername();
+		  const isUsernameTaken = await this.prismaService.user.findUnique({
+			  where: {
+				  username: existingUser.username
+			  }
+		  });
+		  if (!isUsernameTaken) {
+			  data.username = existingUser.username;
+			  break;
+		  }
+	  }
 
-    return user;
+	  let newUser: User | null = null;
+	  try {
+		  newUser = await this.prismaService.user.create({
+			  data: data
+		  });
+		  return newUser;
+	  }
+	  catch (e) {
+		  throw new BadRequestException('Error while creating user');
+	  }
+    // const user = await this.prismaService.user.create({
+    //   data: data
+    // });
+    //
+    // if (!user) {
+    //   throw new BadRequestException('User not created');
+    // }
+    //
+    // return user;
   }
 
   async findById(userId: number): Promise<User> {
