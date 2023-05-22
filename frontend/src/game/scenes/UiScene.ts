@@ -33,8 +33,6 @@ export default class UiScene extends Phaser.Scene {
 		this.scoreWidget = this.add.text(0, 50, "Press W or S to move your paddle", { fontFamily: 'Arial', fontSize: `${pong.worldWidth * 0.03}px`, color: "#00FF00" });
 
 		if (!this.gameSettings) {
-			// TODO: show error message
-			// this.scene.stop('UiScene');
 			this.scoreWidget.setText("No game. Invite someone or get in the queue !");
 			return;
 		}

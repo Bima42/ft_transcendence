@@ -19,7 +19,9 @@ import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue';
 import type IUserUpdate from '@/interfaces/user/IUserUpdate'
+import { useAlertStore } from '@/stores/alert';
 
+const alertStore = useAlertStore()
 const userStore = useUserStore()
 const editing = ref(true);
 
@@ -32,7 +34,11 @@ const save = () => {
     editing.value = !editing.value;
     if (!userValue.value)
       return
-    // TODO: Check locally if the username is compliant
+	const newValue = userValue.value.trim()
+	if (newValue.length < 2 || newValue.length > 20 || !newValue.match("^[a-zA-Z0-9_-]+$")) {
+		alertStore.setErrorAlert("username constraints: between 2 and 20 characters and contains only alphanumericals characters and/or -_")
+		return
+	}
     const infos: IUserUpdate = { username: userValue.value }
 	userStore.updateInfos(infos).then((res) => {
 		userValue.value = userStore.user?.username
