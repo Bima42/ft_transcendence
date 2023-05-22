@@ -5,7 +5,7 @@
 				Leaderboard
 			</h2>
 		</section>
-		<TheTable :headers="tableHeaders" :data="datas" :sortDatas="sortDatas" :rowsPerPage="11"/>
+		<TheTable :headers="tableHeaders" :data="datas" :sortDatas="sortDatas" :rowsPerPage="11" :callback="handleProfileClick"/>
 	</section>
 </template>
 
@@ -15,8 +15,14 @@ import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
 import type IUserStats from '@/interfaces/user/IUserStats'
 import { roundValue } from '../../utils'
+import { useRouter } from 'vue-router'
+import { useModalStore } from '@/stores/modal'
+import { useAlertStore } from '@/stores/alert'
 
+const alertStore = useAlertStore()
+const modalStore = useModalStore()
 const userStore = useUserStore()
+const router = useRouter()
 
 const datas = ref<IUserStats[]>([])
 
@@ -31,6 +37,19 @@ function loadDatas() {
 }
 
 loadDatas()
+
+const handleProfileClick = (userName: string) => {
+	if (userName === '') return
+	userStore.getUserInfosByUsername(userName).then((res) => {
+		if (res.id === userStore.user?.id)
+			router.push('/main/profile')
+		else
+			router.push(`/main/profile/${res.id}`)
+		modalStore.resetState()
+	}).catch((err) => {
+		alertStore.setErrorAlert(err)
+	})
+}
 
 const sortDatas = (header: string) => {
 	if (header == 'Username') {
