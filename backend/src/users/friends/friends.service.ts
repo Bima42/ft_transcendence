@@ -61,7 +61,7 @@ export class FriendsService {
 		return !!friendship;
 	}
 
-	async addFriend(userId: number, friendName: string) {
+	async addFriend(userId: number, friendName: string): Promise<Friendship> {
 		const friend = await this.usersService.findByName(friendName);
 		if (userId === friend.id)
 			throw new BadRequestException('Bro, you are already friends with yourself');
@@ -124,8 +124,9 @@ export class FriendsService {
 					status: FriendshipStatus.ACCEPTED
 				}
 			});
+
 		}
-		return this.prismaService.friendship.findFirst({
+		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
 					{
@@ -140,6 +141,11 @@ export class FriendsService {
 			}
 		});
 
+		if (userId == friendship.friendId) {
+			friendship.friendId = friendship.userId;
+			friendship.userId = userId;
+		}
+		return friendship;
 	}
 
 	async removeFriend(userId: number, friend: UserDto) {
