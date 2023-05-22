@@ -22,7 +22,7 @@
             <img src="@/assets/img/loading.svg" alt="loading">
 			<ButtonCustom @click="leaveQueue" :style="'big'">{{gameStore.currentGame ? "Cancel invite" : "Leave Queue" }} </ButtonCustom>
         </div>
-		<blockquote>Please note that the game is not supported on mobile</blockquote>
+		<blockquote>Please note that the game is not supported without a keyboard</blockquote>
     </section>
 </template>
 
