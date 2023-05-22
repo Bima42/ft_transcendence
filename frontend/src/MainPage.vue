@@ -77,7 +77,7 @@ chatStore.socket.on('friendOnline', (user: IUser) => {
 
 chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 	friendStore.friends.push(user)
-	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id), 1)
 	notificationStore.addNotification({
 		picture: user.avatar,
 		message: `${user.username} accepted your friend request`,
@@ -87,7 +87,7 @@ chatStore.socket.on('friendshipAccepted', (user: IUser) => {
 })
 
 chatStore.socket.on('friendshipRemoved', (user: IUser) => {
-	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id))
+	friendStore.friends.splice(friendStore.friends.findIndex(e => e.id === user.id), 1)
 })
 
 chatStore.socket.on('friendRequest', (user: IUser) => {
@@ -106,11 +106,11 @@ chatStore.socket.on('friendRequest', (user: IUser) => {
 })
 
 chatStore.socket.on('friendRequestCanceled', (user: IUser) => {
-	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.friendId === user.id))
+	friendStore.receivedRequests.splice(friendStore.receivedRequests.findIndex(e => e.friendId === user.id), 1)
 })
 
 chatStore.socket.on('friendRequestDeclined', (user: IUser) => {
-	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id))
+	friendStore.sentRequests.splice(friendStore.sentRequests.findIndex(e => e.friendId === user.id), 1)
 })
 
 /************************************************************************

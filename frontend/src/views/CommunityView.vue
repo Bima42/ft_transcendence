@@ -104,7 +104,7 @@ chatStore.socket.on("channelMuted", ({chatId, muteDuration} : { chatId: number, 
 	}
 })
 chatStore.socket.on("channelKicked", (chatId: number) => {
-	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId))
+	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId), 1)
 	if (chatId == chatStore.currentChat?.id) {
 		alertStore.setErrorAlert("You have been kicked from this chat")
 		chatStore.resetState()
@@ -112,7 +112,7 @@ chatStore.socket.on("channelKicked", (chatId: number) => {
 })
 
 chatStore.socket.on("channelBanned", (chatId: number) => {
-	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId))
+	chatStore.subscribedChannelsList.splice(chatStore.subscribedChannelsList.findIndex(el => el.id === chatId), 1)
 	if (chatId == chatStore.currentChat?.id) {
 		alertStore.setErrorAlert("You have been banned from this chat")
 		chatStore.resetState()
