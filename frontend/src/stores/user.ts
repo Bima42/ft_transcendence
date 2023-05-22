@@ -196,13 +196,15 @@ export const useUserStore = defineStore('user', () => {
 	}
 
 	const getRank = (user_id: number | undefined = user.value?.id): Promise<number> => {
+		if (!user_id)
+			return Promise.reject('No user id provided')
 		return get(
 			`users/stats/rank/${user_id}`,
 			'Failed to get rank',
 			jsonHeaders,
 		).then((rank: number) => {
 			return rank
-		})
+		}).catch()
 	}
 
 	const getUserInfos = async (user_id: number | string | undefined = user.value?.id): Promise<IUser> => {

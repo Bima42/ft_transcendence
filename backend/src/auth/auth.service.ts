@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { User } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
+import { generateUsername } from 'unique-username-generator';
 
 @Injectable()
 export class AuthService {
@@ -87,20 +88,48 @@ export class AuthService {
 
 		let newUser: User | null = null;
 		if (!user) {
-			newUser = await this.prismaService.user.create({
-				data: {
-					username,
-					email,
-					firstName,
-					lastName,
-					phone,
-					fortyTwoId,
-					avatar
+			// Verify if username is already taken
+			const existingUser = await this.prismaService.user.findUnique({
+				where: {
+					username: username
+				},
+				select: {
+					username: true
 				}
 			});
-			return {
-				user: newUser,
-				firstLogin: true
+
+			while (existingUser?.username) {
+				existingUser.username = generateUsername();
+				const isUsernameTaken = await this.prismaService.user.findUnique({
+					where: {
+						username: existingUser.username
+					}
+				});
+				if (!isUsernameTaken) {
+					username = existingUser.username;
+					break;
+				}
+			}
+
+			try {
+				newUser = await this.prismaService.user.create({
+					data: {
+						username,
+						email,
+						firstName,
+						lastName,
+						phone,
+						fortyTwoId,
+						avatar
+					}
+				});
+				return {
+					user: newUser,
+					firstLogin: true
+				}
+			}
+			catch (e) {
+				throw new BadRequestException('Error while creating user');
 			}
 		}
 		else {

@@ -40,7 +40,6 @@ function loadDatas() {
 }
 loadDatas()
 watch(() => friendStore.receivedRequests, () => {
-	console.log(`watcher`)
 	requests.value = []
 	loadDatas()
 }, { deep: true })

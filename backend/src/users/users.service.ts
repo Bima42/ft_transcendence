@@ -1,6 +1,6 @@
-import { BadRequestException, NotFoundException, Injectable, Logger, HttpException, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, UserStatus } from '@prisma/client';
+import { User } from '@prisma/client';
 import { UpdateUserDto, UserDto } from './dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 
@@ -11,7 +11,6 @@ export class UsersService {
   ) { }
 
   async create(data: User): Promise<UserDto> {
-    // FIXME: verify that the username is not already taken
     const user = await this.prismaService.user.create({
       data: data
     });
@@ -38,7 +37,7 @@ export class UsersService {
   }
 
   async findByName(username: string): Promise<UserDto> {
-    const user = await this.prismaService.user.findUnique({
+      const user = await this.prismaService.user.findUnique({
       where: {
         username: username,
       }

@@ -16,7 +16,7 @@ export default interface IChatStore {
 	notSubscribedChannelsList: Ref<IChat[]>;
 	sendMessage: (msg: any) => void;
 	refreshCurrentChat: () => Promise<boolean>;
-	iAmMutedUntil: (userId: number) => Date;
+	iAmMutedUntil: (userId: number) => Date | null;
 	setCurrentChat: (chatId: string) => Promise<boolean>;
 	retrievePublicChats: () => Promise<boolean>;
 	retrieveWhispers: () => Promise<boolean>;
