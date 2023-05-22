@@ -81,8 +81,12 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .gamePong {
-	grid-area: $gigamain;
-	width: 100%;
+	grid-area: $bigmain;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 80%;
 	height: 100%;
 }
 </style>
