@@ -137,14 +137,15 @@ export default class UiScene extends Phaser.Scene {
 			.on('pointerover', () => this.startButton.setStyle({ fill: '#f39c12' }))
 			.on('pointerout', () => this.startButton.setStyle({ fill: '#FFF' }))
 			.on('pointerdown', () => {
-				this.updateScoreWidgetContent(0, 0);
-				this.startButton.setText("Waiting for opponent...")
-					.setStyle({ fill: '#FFF' })
-					.setInteractive({ useHandCursor: false })
-					.off('pointerover')
-					.off('pointerout')
-					.off('pointerdown')
-				gameStore.socket.emit("playerReady");
+				gameStore.socket.emit("playerReady", () => {
+					this.updateScoreWidgetContent(0, 0);
+					this.startButton.setText("Waiting for opponent...")
+						.setStyle({ fill: '#FFF' })
+						.setInteractive({ useHandCursor: false })
+						.off('pointerover')
+						.off('pointerout')
+						.off('pointerdown')
+				});
 			})
 	}
 

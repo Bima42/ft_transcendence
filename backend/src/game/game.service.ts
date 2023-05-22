@@ -347,7 +347,7 @@ export class GameService {
 
 	playerIsReady(client: Socket) {
 		if (client.data.gameServer)
-			client.data.gameServer.onPlayerIsReady(client);
+			return client.data.gameServer.onPlayerIsReady(client);
 	}
 
 	tryToReconnect(client: Socket) {

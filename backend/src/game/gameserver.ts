@@ -213,6 +213,7 @@ export class GameServer {
 			Logger.log(`Game#${this.game.id}: Starting game !`);
 			this.onStartGame();
 		}
+		return "OK"
 	}
 
 	private onAbortGame(reason: string) {
