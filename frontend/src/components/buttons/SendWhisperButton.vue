@@ -8,6 +8,7 @@
 import type IUser from '@/interfaces/user/IUser'
 import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import { useChatStore } from '@/stores/chat'
+import { useRouter, useRoute } from 'vue-router'
 
 const props = defineProps<{
     user: IUser
@@ -15,6 +16,8 @@ const props = defineProps<{
 }>()
 
 const chatStore = useChatStore()
+const router = useRouter()
+const route = useRoute()
 
 const goToWhisper = (name: string) => {
     chatStore.whisperChatList.map((chat) => {
@@ -23,7 +26,10 @@ const goToWhisper = (name: string) => {
                 console.log(err)
             })
             if (props.callback) {
-                props.callback()
+				if (route.name !== 'community') {
+					router.push('/main/community/')
+				}
+				props.callback()
             }
             return
         }
@@ -35,6 +41,9 @@ const goToWhisper = (name: string) => {
         console.log(err)
     })
     if (props.callback) {
+		if (route.name !== 'community') {
+			router.push('/main/community/')
+		}
         props.callback()
     }
     return
