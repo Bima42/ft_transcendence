@@ -173,22 +173,26 @@ export class GameServer {
 			this.onAbortGame("both players disconnected");
 	}
 
-	onPlayerReconnect(newClient: Socket) {
+	onPlayerReconnect(socket: Socket) {
+
+		clearTimeout(this.disconnectTimeout)
+		this.disconnectTimeout = null
+		const userIdx = this.players.findIndex(el => socket.data.user.id === el.user.id)
+		if (userIdx < 0)
+			return
+
+
+		Logger.log(`Game#${this.game.id}: ${socket.data.user.username} reconnected`);
+		// Socket shenanigans
+		socket.join(this.roomID);
+		socket.data.gameServer = this;
+		this.sendStateToClients();
+
 		if (!this.hasStarted) {
 			this.sendStateToClients()
 			return;
 		}
-
-		Logger.log(`Game#${this.game.id}: ${newClient.data.user.username} reconnected`);
-		clearTimeout(this.disconnectTimeout)
-		this.disconnectTimeout = null
-
-		// Socket shenanigans
-		newClient.join(this.roomID);
-		newClient.data.isReady = true;
-		newClient.data.gameServer = this;
-		this.sendStateToClients();
-
+		this.isReady[userIdx] = true
 		this.server.to(this.roomID).emit("playerReconnect",
 			{
 				username: socket.data.user.username,
