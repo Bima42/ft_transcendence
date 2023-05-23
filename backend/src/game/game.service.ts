@@ -7,8 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GameServer } from './gameserver';
 import { UsersService } from '../users/users.service';
 import { FriendsService } from '../users/friends/friends.service';
-import { EndGamePlayer, InvitePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
-import { toUserDto } from 'src/shared/mapper/user.mapper';
+import { EndGamePlayer, InvitePlayer as InviteSettings } from './dto/game.dto';
 
 
 @Injectable()
@@ -76,7 +75,6 @@ export class GameService {
 					Logger.error(`Game #${serv.game.id} was already deleted`)
 				}
 
-				serv.cleanupGameDataOnSockets();
 				this.gameServers.splice(i, 1)
 				continue
 			} else if (serv.getStatus() == "ENDED") {
@@ -97,7 +95,6 @@ export class GameService {
 					Logger.error(`Game #${serv.game.id} was already deleted`)
 				}
 
-				serv.cleanupGameDataOnSockets();
 				this.gameServers.splice(i, 1)
 				continue
 			}

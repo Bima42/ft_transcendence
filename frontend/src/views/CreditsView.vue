@@ -35,7 +35,7 @@ const creators = ref(
 		},
 		{
 			name: 'Tyrossel',
-			title: 'GeniusMan',
+			title: 'DevopsMan',
 			githubLink: 'https://github.com/Tyrossel',
 			website: ''
 		},

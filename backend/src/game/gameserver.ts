@@ -173,28 +173,38 @@ export class GameServer {
 			this.onAbortGame("both players disconnected");
 	}
 
-	onPlayerReconnect(newClient: Socket) {
+	onPlayerReconnect(socket: Socket) {
+
+		clearTimeout(this.disconnectTimeout)
+		this.disconnectTimeout = null
+		const userIdx = this.players.findIndex(el => socket.data.user.id === el.user.id)
+		if (userIdx < 0)
+			return
+
+
+		Logger.log(`Game#${this.game.id}: ${socket.data.user.username} reconnected`);
+		// Socket shenanigans
+		socket.join(this.roomID);
+		socket.data.gameServer = this;
+		this.sendStateToClients();
+
 		if (!this.hasStarted) {
 			this.sendStateToClients()
 			return;
 		}
-
-		Logger.log(`Game#${this.game.id}: ${newClient.data.user.username} reconnected`);
-		clearTimeout(this.disconnectTimeout)
-		this.disconnectTimeout = null
-
-		// Socket shenanigans
-		newClient.join(this.roomID);
-		newClient.data.isReady = true;
-		newClient.data.gameServer = this;
-		this.sendStateToClients();
-
-		this.server.to(this.roomID).emit("playerReconnect", newClient.data.user.username)
+		this.isReady[userIdx] = true
+		this.server.to(this.roomID).emit("playerReconnect",
+			{
+				username: socket.data.user.username,
+				score1: this.players[0].userGame.score,
+				score2: this.players[1].userGame.score,
+			})
 
 		this.onPause();
 		// lauch ball after countdown
 		setTimeout(() => {
-			Body.setVelocity(this.ball, { x: -ballMaxSpeed, y: 0 });
+			const direction = (this.players[0].userGame.score + this.players[1].userGame.score) % 2 ? 1 : -1
+			Body.setVelocity(this.ball, { x: direction * ballMaxSpeed, y: 0 });
 			this.onResume();
 		}, 2000);
 	}
@@ -221,6 +231,7 @@ export class GameServer {
 		this.status = "ABORTED"
 
 		this.server.to(this.roomID).emit("abortGame", reason)
+		this.onTerminate()
 	}
 
 	private onGameOver() {
@@ -234,6 +245,8 @@ export class GameServer {
 		}
 		this.server.to(this.roomID).emit("gameover", gameoverData);
 		this.status = "ENDED"
+
+		this.onTerminate()
 	}
 
 	onStartGame() {
@@ -246,7 +259,8 @@ export class GameServer {
 
 		// lauch ball after countdown
 		setTimeout(() => {
-			Body.setVelocity(this.ball, { x: -ballMaxSpeed, y: 0 });
+			const direction = (this.players[0].userGame.score + this.players[1].userGame.score) % 2 ? 1 : -1
+			Body.setVelocity(this.ball, { x: direction * ballMaxSpeed, y: 0 });
 		}, countdownDuration);
 
 	}
@@ -398,14 +412,20 @@ export class GameServer {
 			x: ballMaxSpeed * Math.sin(newAngle),
 			y: ballMaxSpeed * Math.cos(newAngle)
 		});
+		setImmediate(() => this.sendStateToClients())
 	}
 
-	async cleanupGameDataOnSockets() {
-		const sockets = await this.server.in("game" + this.roomID).fetchSockets()
+	async onTerminate() {
+		clearTimeout(this.disconnectTimeout)
+		clearTimeout(this.startTimeout)
+		clearInterval(this.IntervalSync)
+		clearInterval(this.IntervalUpdate)
+
+		const sockets = await this.server.in(this.roomID).fetchSockets()
 		sockets.forEach((s) => {
-			// TODO: TEST
 			s.data.gameServer = null;
 		})
+		this.server.socketsLeave(this.roomID)
 	}
 
 	getStatus(): GameStatus {

@@ -51,26 +51,28 @@ const handleProfileClick = (userName: string) => {
 	})
 }
 
+let ascendSort = 1
 const sortDatas = (header: string) => {
+	ascendSort *= -1
 	if (header == 'Username') {
 		datas.value.sort((a, b) => {
-			return a.username.localeCompare(b.username)
+			return ascendSort * a.username.localeCompare(b.username)
 		})
 	} else if (header == 'Winrate') {
 		datas.value.sort((a, b) => {
-			return b.winRate - a.winRate
+			return ascendSort * ( b.winRate - a.winRate)
 		})
 	} else if (header == 'Games') {
 		datas.value.sort((a, b) => {
-			return b.playedGames - a.playedGames
+			return ascendSort * (b.playedGames - a.playedGames)
 		})
 	} else if (header == 'Average Score') {
 		datas.value.sort((a, b) => {
-			return b.averageScore - a.averageScore
+			return ascendSort * (b.averageScore - a.averageScore)
 		})
 	} else if (header == 'Elo') {
 		datas.value.sort((a, b) => {
-			return b.elo - a.elo
+			return ascendSort * (b.elo - a.elo)
 		})
 	}
 }
