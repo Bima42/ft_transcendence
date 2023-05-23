@@ -15,7 +15,7 @@ import ButtonCustom from '@/components/buttons/ButtonCustom.vue'
 import CreditLink from '@/components/footers/CreditLink.vue'
 
 async function loginAsBob() {
-	const redirect = 'https://localhost:4443/api/auth/bob'
+	const redirect = `${import.meta.env.VITE_BACKEND_URL}/auth/bob`
 	window.open(redirect, '_self')
 }
 
