@@ -12,8 +12,8 @@
 			<tr v-for="(row, index) in tableDataPaginated" :key="index">
 				<td v-for="(data, name, index) in row"
 					:key="index"
-					@click="name === 'username' || 'opponent' ? callback(data) : ''"
-					:class="name === 'username' || 'opponent' ? 'clickable' : ''"
+					@click="name === 'username' || name === 'opponent' ? callback(data) : ''"
+					:class="name === 'username' || name === 'opponent' ? 'clickable' : ''"
 				>
 					{{ data }}
 				</td>
@@ -114,6 +114,7 @@ const tableDataPaginated = computed(() => {
 			border-top: 1px solid $tertiary;
 			color: white;
 			vertical-align: middle;
+			cursor: pointer;
 		}
 
 		th,
