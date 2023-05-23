@@ -203,7 +203,8 @@ export class GameServer {
 		this.onPause();
 		// lauch ball after countdown
 		setTimeout(() => {
-			Body.setVelocity(this.ball, { x: -ballMaxSpeed, y: 0 });
+			const direction = (this.players[0].userGame.score + this.players[1].userGame.score) % 2 ? 1 : -1
+			Body.setVelocity(this.ball, { x: direction * ballMaxSpeed, y: 0 });
 			this.onResume();
 		}, 2000);
 	}
@@ -258,7 +259,8 @@ export class GameServer {
 
 		// lauch ball after countdown
 		setTimeout(() => {
-			Body.setVelocity(this.ball, { x: -ballMaxSpeed, y: 0 });
+			const direction = (this.players[0].userGame.score + this.players[1].userGame.score) % 2 ? 1 : -1
+			Body.setVelocity(this.ball, { x: direction * ballMaxSpeed, y: 0 });
 		}, countdownDuration);
 
 	}
