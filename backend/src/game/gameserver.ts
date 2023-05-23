@@ -189,7 +189,12 @@ export class GameServer {
 		newClient.data.gameServer = this;
 		this.sendStateToClients();
 
-		this.server.to(this.roomID).emit("playerReconnect", newClient.data.user.username)
+		this.server.to(this.roomID).emit("playerReconnect",
+			{
+				username: socket.data.user.username,
+				score1: this.players[0].userGame.score,
+				score2: this.players[1].userGame.score,
+			})
 
 		this.onPause();
 		// lauch ball after countdown
