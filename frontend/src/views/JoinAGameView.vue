@@ -122,12 +122,6 @@ function onJoinCustom() {
     useClassicMode.value = false;
 }
 
-
-gameStore.socket.on('connect', () => {
-    //console.log(`Connected to server with ID ${gameStore.socket.id}`);
-	p
-});
-
 onUnmounted(() => {
 	if (gameStore.currentGame) {
 		//cancelInvitation();
