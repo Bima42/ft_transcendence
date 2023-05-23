@@ -89,7 +89,7 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 		lastName: "Petruzzi",
 		phone: "hidden",
 		status: 'OFFLINE',
-		elo: 69420,
+		elo: 1001,
 	}
 ]
 

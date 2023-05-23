@@ -26,9 +26,11 @@ const userStore = useUserStore()
 const editing = ref(true);
 
 const userValue = ref(userStore.user?.username)
+const initialValue = ref(userValue.value)
+
 const startEditing = () => {
 	editing.value = !editing.value;
-};
+}
 
 const save = () => {
 	editing.value = !editing.value;
@@ -37,11 +39,13 @@ const save = () => {
 	const newValue = userValue.value.trim()
 	if (newValue.length < 2 || newValue.length > 20 || !newValue.match("^[a-zA-Z0-9_-]+$")) {
 		alertStore.setErrorAlert("username constraints: between 2 and 20 characters and contains only alphanumericals characters and/or -_")
+		userValue.value = initialValue.value
 		return
 	}
 	const infos: IUserUpdate = { username: userValue.value }
 	userStore.updateInfos(infos).then(() => {
 		userValue.value = userStore.user?.username
+		initialValue.value = userValue.value
 	})
 };
 
