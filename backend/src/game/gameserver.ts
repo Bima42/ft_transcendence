@@ -401,6 +401,7 @@ export class GameServer {
 			x: ballMaxSpeed * Math.sin(newAngle),
 			y: ballMaxSpeed * Math.cos(newAngle)
 		});
+		setImmediate(() => this.sendStateToClients())
 	}
 
 	async onTerminate() {
