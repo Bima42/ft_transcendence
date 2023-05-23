@@ -221,6 +221,7 @@ export class GameServer {
 		this.status = "ABORTED"
 
 		this.server.to(this.roomID).emit("abortGame", reason)
+		this.onTerminate()
 	}
 
 	private onGameOver() {
@@ -234,6 +235,8 @@ export class GameServer {
 		}
 		this.server.to(this.roomID).emit("gameover", gameoverData);
 		this.status = "ENDED"
+
+		this.onTerminate()
 	}
 
 	onStartGame() {
@@ -400,12 +403,17 @@ export class GameServer {
 		});
 	}
 
-	async cleanupGameDataOnSockets() {
-		const sockets = await this.server.in("game" + this.roomID).fetchSockets()
+	async onTerminate() {
+		clearTimeout(this.disconnectTimeout)
+		clearTimeout(this.startTimeout)
+		clearInterval(this.IntervalSync)
+		clearInterval(this.IntervalUpdate)
+
+		const sockets = await this.server.in(this.roomID).fetchSockets()
 		sockets.forEach((s) => {
-			// TODO: TEST
 			s.data.gameServer = null;
 		})
+		this.server.socketsLeave(this.roomID)
 	}
 
 	getStatus(): GameStatus {
