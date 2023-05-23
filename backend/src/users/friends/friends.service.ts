@@ -289,6 +289,11 @@ export class FriendsService {
 		return !!friendship;
 	}
 
+	/**
+	 * We return a FriendshipDto here in order to always serve front with
+	 * the id of the other user as the friendId of the friendship
+	 * @param userId
+	 */
 	async getAllPendingRequests(userId: number): Promise<FriendshipDto[]> {
 		const friendships = await this.prismaService.friendship.findMany({
 			where: {
