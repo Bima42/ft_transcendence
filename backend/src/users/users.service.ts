@@ -45,15 +45,6 @@ export class UsersService {
 	  catch (e) {
 		  throw new BadRequestException('Error while creating user');
 	  }
-    // const user = await this.prismaService.user.create({
-    //   data: data
-    // });
-    //
-    // if (!user) {
-    //   throw new BadRequestException('User not created');
-    // }
-    //
-    // return user;
   }
 
   async findById(userId: number): Promise<User> {

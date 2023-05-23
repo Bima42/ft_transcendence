@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users.service';
 import { Friendship, FriendshipStatus } from '@prisma/client';
-import { toBlockedDto, toFriendDto, toUserDto } from '../../shared/mapper/user.mapper';
-import { FriendDto, UserDto } from '../dto/user.dto';
+import { toBlockedDto, toFriendDto } from '../../shared/mapper/user.mapper';
+import { BlockedDto, FriendDto, UserDto } from '../dto/user.dto';
 import { FriendshipDto } from '../dto/friend.dto';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class FriendsService {
 		return friendship.status
 	}
 
-	async isFriend(userId: number, friendId: number) {
+	async isFriend(userId: number, friendId: number): Promise<boolean> {
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
 				OR: [
@@ -61,6 +61,14 @@ export class FriendsService {
 		return !!friendship;
 	}
 
+	/**
+	 * This function had to check if there is already a pending request for the current user
+	 * Also, in frontend, we want to always return the current user as user of the friendship
+	 * And the other user as the friend of the friendship, even if it's not the case in db
+	 *
+	 * @param userId
+	 * @param friendName
+	 */
 	async addFriend(userId: number, friendName: string): Promise<Friendship> {
 		const friend = await this.usersService.findByName(friendName);
 		if (userId === friend.id)
@@ -148,7 +156,7 @@ export class FriendsService {
 		return friendship;
 	}
 
-	async removeFriend(userId: number, friend: UserDto) {
+	async removeFriend(userId: number, friend: UserDto): Promise<boolean> {
 		if (!await this.isFriend(userId, friend.id))
 			throw new BadRequestException('User is not a friend or has a pending request');
 		const removed = await this.prismaService.friendship.deleteMany({
@@ -169,7 +177,7 @@ export class FriendsService {
 		return removed.count > 0;
 	}
 
-	async cancelFriendRequest(userId: number, friendName: string) {
+	async cancelFriendRequest(userId: number, friendName: string): Promise<Friendship> {
 		const friend = await this.usersService.findByName(friendName);
 		if (!await this.isWaitingRequest(userId, friend))
 			throw new BadRequestException('There is no request to cancel');
@@ -213,7 +221,7 @@ export class FriendsService {
 		return friendship;
 	}
 
-	async declineFriend(userId: number, friend: UserDto) {
+	async declineFriend(userId: number, friend: UserDto): Promise<Friendship> {
 		return this.prismaService.friendship.update({
 			where: {
 				userId_friendId: {
@@ -227,7 +235,7 @@ export class FriendsService {
 		});
 	}
 
-	async getAllFriends(userId: number) {
+	async getAllFriends(userId: number): Promise<FriendDto[]> {
 		const friendships = await this.prismaService.friendship.findMany({
 			where: {
 				OR: [
@@ -281,6 +289,11 @@ export class FriendsService {
 		return !!friendship;
 	}
 
+	/**
+	 * We return a FriendshipDto here in order to always serve front with
+	 * the id of the other user as the friendId of the friendship
+	 * @param userId
+	 */
 	async getAllPendingRequests(userId: number): Promise<FriendshipDto[]> {
 		const friendships = await this.prismaService.friendship.findMany({
 			where: {
@@ -304,7 +317,7 @@ export class FriendsService {
 		return response;
 	}
 
-	async isPendingRequest(userId: number, friendName: string) {
+	async isPendingRequest(userId: number, friendName: string): Promise<boolean> {
 		const friend = await this.usersService.findByName(friendName);
 		const friendship = await this.prismaService.friendship.findFirst({
 			where: {
@@ -323,7 +336,7 @@ export class FriendsService {
 	 *                                                                       *
 	 *************************************************************************/
 
-	async isBlocked(userId: number, blockedUsername: string) {
+	async isBlocked(userId: number, blockedUsername: string): Promise<boolean> {
 		const blockedUser = await this.usersService.findByName(blockedUsername);
 
 		// Find the blockedUser in the blocked list of the user
@@ -339,13 +352,11 @@ export class FriendsService {
 		return blocked.blocked.length > 0;
 	}
 
-	async blockUser(userId: number, blockedUser: UserDto) {
+	async blockUser(userId: number, blockedUser: UserDto): Promise<boolean> {
 
-		// Check if the user is already blocked
 		if (await this.isBlocked(userId, blockedUser.username))
 			throw new BadRequestException('User is already blocked');
 
-		// Update the user blocked list
 		await this.prismaService.user.update({
 			where: { id: userId },
 			data: {
@@ -360,13 +371,11 @@ export class FriendsService {
 		return true;
 	}
 
-	async unblockUser(userId: number, blockedUser: UserDto) {
+	async unblockUser(userId: number, blockedUser: UserDto): Promise<boolean> {
 
-		// Check if the user is not blocked
 		if (!await this.isBlocked(userId, blockedUser.username))
 			throw new BadRequestException('User is not blocked');
 
-		// Update the user blocked list
 		await this.prismaService.user.update({
 			where: { id: userId },
 			data: {
@@ -381,7 +390,7 @@ export class FriendsService {
 		return true;
 	}
 
-	async getAllBlockedUsers(userId: number) {
+	async getAllBlockedUsers(userId: number): Promise<BlockedDto[]> {
 		const users = await this.prismaService.user.findUnique({
 			where: { id: userId },
 			select: { blocked: true }

@@ -119,3 +119,15 @@ export class PlayerStatsDto {
 	averageScore: number;
 	rank: number;
 }
+
+export class EloHistoryDto {
+	eloHistory: number[];
+	dateHistory: string[];
+}
+
+export class MatchHistoryDto {
+	opponent: number | string;
+	result: string;
+	score: string;
+	date: Date | string;
+}
