@@ -68,6 +68,28 @@ const users: Prisma.UserUncheckedCreateInput[] = [
 		phone: "hidden",
 		status: 'OFFLINE',
 		elo: 666,
+	},
+	{
+		username: "tpauvret",
+		fortyTwoId: 91874,
+		email: "tpauvret@student.42lausanne.ch",
+		avatar: `https://cdn.intra.42.fr/users/4ee4d9e553504c561a378314c28d595f/medium_tpauvret.jpg`,
+		firstName: "Tanguy",
+		lastName: "Pauvret",
+		phone: "hidden",
+		status: 'OFFLINE',
+		elo: 1000,
+	},
+	{
+		username: "ypetruzz",
+		fortyTwoId: 91877,
+		email: "ypetruzz@student.42lausanne.ch",
+		avatar: `https://cdn.intra.42.fr/users/4f1108e6402e04bde3b444eee22a2dcd/medium_ypetruzz.jpg`,
+		firstName: "Yvan",
+		lastName: "Petruzzi",
+		phone: "hidden",
+		status: 'OFFLINE',
+		elo: 69420,
 	}
 ]
 
