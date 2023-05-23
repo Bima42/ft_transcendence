@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { PlayerStatsDto } from '../dto/user.dto';
+import { EloHistoryDto, MatchHistoryDto, PlayerStatsDto } from '../dto/user.dto';
 
 @Injectable()
 export class UserStatsService {
@@ -8,7 +8,7 @@ export class UserStatsService {
 		private readonly prismaService: PrismaService
 	) {}
 
-	private _formatDate(dateToFormat: Date) {
+	private _formatDate(dateToFormat: Date): string {
 		const date = new Date(dateToFormat);
 		const day = date.getDate().toString().padStart(2, '0');
 		const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
@@ -16,7 +16,7 @@ export class UserStatsService {
 		return `${day} ${month} ${year}`;
 	}
 
-	async getPlayedGamesByUserId(userId: number) {
+	async getPlayedGamesByUserId(userId: number): Promise<number> {
 		return this.prismaService.userGame.count({
 			where: {
 				userId: userId,
@@ -25,7 +25,7 @@ export class UserStatsService {
 		});
 	}
 
-	async getWonGamesByUserId(userId: number) {
+	async getWonGamesByUserId(userId: number): Promise<number> {
 		return this.prismaService.userGame.count({
 			where: {
 				userId: userId,
@@ -35,7 +35,7 @@ export class UserStatsService {
 		});
 	}
 
-	async getWinRateByUserId(userId: number) {
+	async getWinRateByUserId(userId: number): Promise<number> {
 		const playedGames = await this.getPlayedGamesByUserId(userId);
 		const winGames = await this.getWonGamesByUserId(userId);
 		if (playedGames === 0 || winGames === 0)
@@ -43,7 +43,7 @@ export class UserStatsService {
 		return winGames / playedGames * 100;
 	}
 
-	async getEloByUserId(userId: number) {
+	async getEloByUserId(userId: number): Promise<number> {
 		const { elo } = await this.prismaService.user.findUnique({
 			where: {
 				id: userId
@@ -55,7 +55,7 @@ export class UserStatsService {
 		return elo;
 	}
 
-	async getAverageScoreByUserId(userId: number) {
+	async getAverageScoreByUserId(userId: number): Promise<number> {
 		const scores = await this.prismaService.userGame.findMany({
 			where: {
 				userId: userId,
@@ -75,7 +75,7 @@ export class UserStatsService {
 		return totalScore / playedGames;
 	}
 
-	async getEloHistoryByUserId(userId: number) {
+	async getEloHistoryByUserId(userId: number): Promise<EloHistoryDto> {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
 				userId: userId,
@@ -115,7 +115,7 @@ export class UserStatsService {
 		}
 	}
 
-	async getRankByUserId(userId: number) {
+	async getRankByUserId(userId: number): Promise<number> {
 		const users = await this.prismaService.user.findMany({
 			select: {
 				id: true,
@@ -182,7 +182,7 @@ export class UserStatsService {
 		return highestElo;
 	}
 
-	async getMatchHistoryByUserId(userId: number) {
+	async getMatchHistoryByUserId(userId: number): Promise<MatchHistoryDto[]> {
 		const games = await this.prismaService.userGame.findMany({
 			where: {
 				userId: userId,
