@@ -4,6 +4,7 @@ import {
 	IsEmail,
 	IsEnum,
 	IsNotEmpty,
+	IsNumber,
 	IsOptional,
 	IsPhoneNumber,
 	IsString,
@@ -12,6 +13,42 @@ import {
 	MaxLength,
 	MinLength
 } from 'class-validator';
+
+export class CreateUserDto {
+
+	@MinLength(2)
+	@MaxLength(20)
+	@Matches(/^[a-zA-Z0-9_-]+$/, {message: "Username must contains only letters, numbers or -_"})
+	username: string
+
+	@IsEmail()
+	email: string
+
+	@IsOptional()
+	@IsString()
+	@IsNotEmpty()
+	@ApiProperty({required: false})
+	avatar?: string;
+
+	@IsOptional()
+	@IsNumber()
+	@IsNotEmpty()
+	@ApiProperty({required: false})
+	fortyTwoId?: number;
+
+	@MinLength(1)
+	@MaxLength(60)
+	firstName: string
+
+	@MinLength(1)
+	@MaxLength(60)
+	lastName: string
+
+	@IsOptional()
+	@IsPhoneNumber()
+	@ApiProperty({required: false})
+	phone?: string
+}
 
 export class UpdateUserDto {
 

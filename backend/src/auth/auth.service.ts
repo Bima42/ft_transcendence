@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { generateUsername } from 'unique-username-generator';
+import { CreateUserDto } from 'src/users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -87,7 +88,7 @@ export class AuthService {
 		});
 
 		if (!user) {
-			const data = {
+			const data: CreateUserDto = {
 				username: username,
 				email: email,
 				firstName: firstName,
@@ -96,7 +97,7 @@ export class AuthService {
 				fortyTwoId: fortyTwoId,
 				avatar: avatar
 			}
-			const newUser = await this.usersService.create(data, username);
+			const newUser = await this.usersService.create(data, true);
 			return {
 				user: newUser,
 				firstLogin: true
