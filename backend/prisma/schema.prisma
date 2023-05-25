@@ -18,7 +18,7 @@ model User {
   fortyTwoId         Int?
   username           String     @unique @db.VarChar(255)
   email              String     @unique
-  avatar             String     @default("https://localhost:4443/api/uploads/default.png")
+  avatar             String
   firstName          String?
   lastName           String?
   phone              String?
