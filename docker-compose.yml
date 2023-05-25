@@ -71,8 +71,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    env_file:
-      - ./env/.backend.env
     volumes:
       - './backend:/server'
       - 'backend_modules:/server/node_modules'
