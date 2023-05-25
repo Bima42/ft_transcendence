@@ -33,7 +33,7 @@ export class AuthService {
 				client_id: process.env.FORTYTWO_API_UID,
 				client_secret: process.env.FORTYTWO_API_SECRET,
 				code: code,
-				redirect_uri: process.env.FORTYTWO_API_CALLBACK,
+				redirect_uri: process.env.BACKEND_URL + "/auth/42/callback",
 			}),
 		});
 		const tokenData = await tokenResponse.json();
