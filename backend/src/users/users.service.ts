@@ -1,7 +1,7 @@
-import { BadRequestException, NotFoundException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
-import { UpdateUserDto, UserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, UserDto } from './dto/user.dto';
 import { toUserDto } from '../shared/mapper/user.mapper';
 import { generateUsername } from 'unique-username-generator';
 
@@ -11,16 +11,18 @@ export class UsersService {
     private readonly prismaService: PrismaService
   ) { }
 
-  async create(data: any, username: string): Promise<User> {
+  async create(data: CreateUserDto, generateNewUsername: boolean): Promise<User> {
 	  // Verify if username is already taken
 	  const existingUser = await this.prismaService.user.findUnique({
 		  where: {
-			  username: username
+			  username: data.username
 		  },
 		  select: {
 			  username: true
 		  }
 	  });
+    if (existingUser && !generateNewUsername)
+      throw new ConflictException("Username already exists")
 
 	  while (existingUser?.username) {
 		  existingUser.username = generateUsername();
@@ -35,6 +37,8 @@ export class UsersService {
 		  }
 	  }
 
+    if (!data.avatar)
+      data.avatar = process.env.BACKEND_URL + "/uploads/default.png"
 	  let newUser: User | null = null;
 	  try {
 		  newUser = await this.prismaService.user.create({

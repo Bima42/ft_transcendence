@@ -45,6 +45,7 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UsersMiddleware)
+      .exclude('users/signup')
       .forRoutes(UsersController, UserStatsController, FriendsController);
   }
 }

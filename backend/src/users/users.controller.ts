@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  UseInterceptors, UploadedFile, ParseFilePipeBuilder, Req, Logger
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -16,7 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { toUserDto } from 'src/shared/mapper/user.mapper';
-import { UpdateUserDto, UserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, UserDto } from './dto/user.dto';
 
 
 const storage = {
@@ -38,6 +41,11 @@ export class UsersController {
   constructor(
       private readonly usersService: UsersService
   ) {}
+
+  @Post('signup')
+  async signup(@Body() newUser: CreateUserDto) : Promise<UserDto> {
+    return toUserDto(await this.usersService.create(newUser, false))
+  }
 
   @Get('all')
   async getAllUsers(): Promise<UserDto[]> {

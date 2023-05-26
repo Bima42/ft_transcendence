@@ -39,7 +39,7 @@ export async function post(
 		request.body = JSON.stringify(body)
 	else if (file)
 		request.body = file
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
 	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
@@ -61,7 +61,7 @@ export async function get(
 	message: string,
 	headers: Headers = jsonHeaders
 ) {
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, {
+	const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${route}`, {
 		method: 'GET',
 		headers: headers,
 	})
@@ -96,7 +96,7 @@ export async function del(
 	}
 	if (body)
 		request.body = JSON.stringify(body)
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
 	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
@@ -129,7 +129,7 @@ export async function put(
 	}
 	if (body)
 		request.body = JSON.stringify(body)
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
 	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
@@ -152,7 +152,7 @@ export async function patch(
 	}
 	if (json)
 		request.body = JSON.stringify(json)
-	const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
+	const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${route}`, request)
 		.catch(() => { throw new BackendError("Cannot connect to server", 500) })
 	const jsonBody = await response.json().catch(() => {})
 	if (!response.ok) {
