@@ -7,8 +7,8 @@ import type IGameSettings from '@/interfaces/game/IGameSettings';
 export const useGameStore = defineStore('game', () => {
   const app_url = import.meta.env.VITE_APP_URL as string
   const protocol = app_url.startsWith("https://") ? "wss" : "ws"
-  const url = protocol === "wss" ? app_url.replace("https://", "wss") : app_url.replace("http://","")
-	const socket = ref<Socket>(io(`${protocol}://${url}/chat`, {
+  const url = protocol === "wss" ? app_url.replace("https://", "") : app_url.replace("http://","")
+	const socket = ref<Socket>(io(`${protocol}://${url}/game`, {
 		auth: {token: getCookie('access_token')},
 		path: '/api/socket.io/',
 	}));
