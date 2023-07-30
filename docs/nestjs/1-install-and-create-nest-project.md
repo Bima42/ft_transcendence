@@ -32,7 +32,6 @@
 - ### [3. Launch project](#launch-project)
 - ### [4. Reach my project](#reach-my-project)
 - ### [Previous Docs : What is NestJS](0-what-is-nestjs.md)
-- ### [Next Docs : Dockerize NestJS Postgres and PGAdmin](2-dockerize-nest-postgres-and-pgadmin.md)
 ### [Back to summary](../Summary.md)
 
 ***
