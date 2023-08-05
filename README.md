@@ -36,49 +36,49 @@ docker compose up -d
 ## Website overview
 ### Login
 
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/login_page.png" alt="Computer Image" style="max-height: 200px">
-    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 ### Home
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/home_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 ### Profile
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/profile_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 ### Chat
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/chat_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 #### Chat with a friend
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 ### Game
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/game_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 #### In game
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/in_game_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
 
 ### Leaderboard
-<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
-    <img src="docs/images/leaderboard_page.png" alt="Computer Image" style="max-height: 200px;">
-    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
-</div>
+<p align="center">
+    <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+</p>
