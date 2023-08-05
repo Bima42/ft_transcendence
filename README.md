@@ -36,49 +36,49 @@ docker compose up -d
 ## Website overview
 ### Login
 
-<p align="center">
-    <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 ### Home
-<p align="center">
-    <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 ### Profile
-<p align="center">
-    <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 ### Chat
-<p align="center">
-    <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 #### Chat with a friend
-<p align="center">
-    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 ### Game
-<p align="center">
-    <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 #### In game
-<p align="center">
-    <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
 
 ### Leaderboard
-<p align="center">
-    <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
-    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="display: inline-block; vertical-align: middle">
+<p style="vertical-align: center">
+    <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto">
+    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </p>
