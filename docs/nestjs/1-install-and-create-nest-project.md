@@ -32,6 +32,7 @@
 - ### [3. Launch project](#launch-project)
 - ### [4. Reach my project](#reach-my-project)
 - ### [Previous Docs : What is NestJS](0-what-is-nestjs.md)
+- ### [Next Docs: Configure Database](2-configure-database.md)
 ### [Back to summary](../Summary.md)
 
 ***

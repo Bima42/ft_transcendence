@@ -13,6 +13,7 @@ cd ft_transcendence
 ### Setting up environment variables
 - Rename `.env.example` to `.env`
 - Change the values of the variables `FORTYTWO_API_UID` and `FORTYTWO_API_SECRET` in `.env` to match your environment
+- You should also configure `JWT_KEY` 
 
 ### Run containers
 - Use `--build` to rebuild images
