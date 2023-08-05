@@ -47,7 +47,7 @@ $ npm run start:prod
 
 ## Backend Structure
 <p align="center">
-  <img src="../docs/nestjs/database_structure.png">
+  <img src="../docs/backend/database_structure.png">
 </p>
 
 ## License
