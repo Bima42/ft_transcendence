@@ -38,79 +38,79 @@ docker compose up -d
 
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/login_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/login_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 ### Home
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/home_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/home_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 ### Profile
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/profile_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/profile_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 ### Chat
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/chat_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/chat_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 #### Chat with a friend
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 ### Game
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/game_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/game_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 #### In game
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/in_game_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/in_game_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
 
 ### Leaderboard
 <div style="display: flex; align-items: center; gap: 20px">
   <div style="flex: 1;">
-    <img src="docs/images/leaderboard_page.png" alt="Computer Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/leaderboard_page.png" alt="Computer Image" style="width: 100%; max-width: 200px;">
   </div>
   <div style="flex: 1;">
-    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 400px;">
+    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" style="width: 100%; max-width: 200px;">
   </div>
 </div>
