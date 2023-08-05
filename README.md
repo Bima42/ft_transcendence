@@ -36,49 +36,49 @@ docker compose up -d
 ## Website overview
 ### Login
 
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 ### Home
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 ### Profile
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 ### Chat
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 #### Chat with a friend
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 ### Game
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 #### In game
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
 
 ### Leaderboard
-<div style="text-align:center">
+<div style="display: flex; align-items: center">
     <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto">
     <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto">
 </div>
