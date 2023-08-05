@@ -36,49 +36,49 @@ docker compose up -d
 ## Website overview
 ### Login
 
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/login_page.png" alt="Computer Image" style="max-height: 200px">
     <img src="docs/images/login_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 ### Home
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/home_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/home_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 ### Profile
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/profile_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 ### Chat
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/chat_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 #### Chat with a friend
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 ### Game
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/game_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/game_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 #### In game
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/in_game_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
 
 ### Leaderboard
-<div style="display: flex; align-items: center; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: center; gap: 20px">
     <img src="docs/images/leaderboard_page.png" alt="Computer Image" style="max-height: 200px;">
     <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" style="max-height: 200px;">
 </div>
