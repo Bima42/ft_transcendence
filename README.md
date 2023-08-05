@@ -37,48 +37,48 @@ docker compose up -d
 ### Login
 
 <p align="center">
-    <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/login_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/login_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 ### Home
 <p align="center">
-    <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/home_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/home_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 ### Profile
 <p align="center">
-    <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/profile_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/profile_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 ### Chat
 <p align="center">
-    <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/chat_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/chat_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 #### Chat with a friend
 <p align="center">
-    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/chat_with_a_friend.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/chat_with_a_friend_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 ### Game
 <p align="center">
-    <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/game_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/game_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 #### In game
 <p align="center">
-    <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/in_game_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/in_game_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
 
 ### Leaderboard
 <p align="center">
-    <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto">
-    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto">
+    <img src="docs/images/leaderboard_page.png" alt="Computer Image" width="400" height="auto" style="vertical-align: middle">
+    <img src="docs/images/leaderboard_page_mobile.png" alt="Mobile Image" width="400" height="auto" style="vertical-align: middle">
 </p>
