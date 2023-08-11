@@ -1,5 +1,5 @@
 # Index
-- ### [Previous Docs : Dockerize Nest with Database](2-dockerize-nest-postgres-and-pgadmin.md)
+- ### [Previous Docs : Configure Database](2-configure-database.md)
 ### [Back to summary](../Summary.md)
 
 # Backend Structure

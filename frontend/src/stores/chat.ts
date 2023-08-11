@@ -14,7 +14,10 @@ import type { IUpdateChat } from '@/interfaces/chat/IChat'
 import { useAlertStore } from '@/stores/alert'
 
 export const useChatStore = defineStore('chat', (): IChatStore => {
-	const socket = ref<Socket>(io(`wss://${import.meta.env.VITE_APP_URL}/chat`, {
+  const app_url = import.meta.env.VITE_APP_URL as string
+  const protocol = app_url.startsWith("https://") ? "wss" : "ws"
+  const url = protocol === "wss" ? app_url.replace("https://", "") : app_url.replace("http://","")
+	const socket = ref<Socket>(io(`${protocol}://${url}/chat`, {
 		auth: {token: getCookie('access_token')},
 		path: '/api/socket.io/',
 	}));

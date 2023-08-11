@@ -33,8 +33,11 @@ services:
         - "GID=${GID:-1000}"
     depends_on:
       - backend
-    env_file:
-      - ./env/.frontend.env
+    environment:
+      - VITE_APP_URL=${FRONTEND_URL}
+      - VITE_BACKEND_URL=${BACKEND_URL}
+      - VITE_JWT_COOKIE=${JWT_COOKIE}
+      - VITE_FORTYTWO_API_UID=${FORTYTWO_API_UID}
     volumes:
       - './frontend:/app'
       - 'frontend_modules:/app/node_modules'
@@ -55,8 +58,18 @@ services:
         - "GID=${GID:-1000}"
     depends_on:
       - db
-    env_file:
-      - ./env/.backend.env
+    environment:
+      - BACKEND_URL=${BACKEND_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - JWT_COOKIE=${JWT_COOKIE}
+      - JWT_KEY=${JWT_KEY}
+      - FORTYTWO_API_UID=${FORTYTWO_API_UID}
+      - FORTYTWO_API_SECRET=${FORTYTWO_API_SECRET}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - './backend:/server'
       - 'backend_modules:/server/node_modules'
@@ -80,8 +93,12 @@ services:
     image: postgres:15.1-alpine
     container_name: transcendence-db
     restart: always
-    env_file:
-      - ./env/.postgres.env
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - 'data:/var/lib/postgresql/data'
     expose:

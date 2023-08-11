@@ -104,7 +104,7 @@ export class AuthController {
         phone: null,
         status: 'OFFLINE',
       }
-      bob = await this.usersService.create(bob, username);
+      bob = await this.usersService.create(bob, true);
     }
     // If a real user is using this pseudo, abort
     if (bob.fortyTwoId != null) {

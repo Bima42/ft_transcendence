@@ -25,7 +25,7 @@ const is_dev = ref(import.meta.env.DEV)
 const loginRedirect = () => {
 	let redirect = 'https://api.intra.42.fr/oauth/authorize?client_id='
 	redirect += import.meta.env.VITE_FORTYTWO_API_UID + '&redirect_uri=';
-	redirect += encodeURIComponent(import.meta.env.VITE_FORTYTWO_API_CALLBACK) + '&response_type=code';
+	redirect += encodeURIComponent(import.meta.env.VITE_BACKEND_URL) + '/auth/42/callback&response_type=code';
 	window.open(redirect, '_self')
 }
 
