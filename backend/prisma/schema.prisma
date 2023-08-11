@@ -18,7 +18,7 @@ model User {
   fortyTwoId         Int?
   username           String     @unique @db.VarChar(255)
   email              String     @unique
-  avatar             String
+  avatar             String     @default("")
   firstName          String?
   lastName           String?
   phone              String?
