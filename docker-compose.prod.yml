@@ -4,51 +4,13 @@ networks:
   transcendence: {}
 
 services:
-  server:
-    image: nginx
-    container_name: transcendence-nginx-prod
-    restart: always
-    depends_on:
-      - frontend
-    volumes:
-      - './nginx/conf.d/production.conf:/etc/nginx/conf.d/default.conf'
-      - './frontend/dist:/var/www/html'
-    env_file:
-      - ./env/.frontend.env
-    ports:
-      - '4443:443'
-      - '8880:80'
-    networks:
-      - transcendence
 
-  frontend:
-    image: trans-frontend-prod
-    container_name: transcendence-frontend-prod
-    restart: "no"
-    build:
-      context: ./frontend
-      target: prod
-      args:
-        - "UID=${UID:-1000}"
-        - "GID=${GID:-1000}"
-    depends_on:
-      - backend
-    env_file:
-      - ./env/.frontend.env
-    volumes:
-      - './frontend/dist:/app/dist'
-      - 'frontend_modules:/app/node_modules'
-    expose:
-      - '8000'
-    networks:
-      - transcendence
-
-  backend:
-    image: trans-backend-prod
-    container_name: transcendence-backend-prod
+  transcendence:
+    image: transcendence-full
+    container_name: transcendence
     restart: always
     build:
-      context: ./backend
+      context: .
       target: prod
       args:
         - "UID=${UID:-1000}"
@@ -56,22 +18,11 @@ services:
     depends_on:
       - db
     env_file:
-      - ./env/.backend.env
+      - .env
     volumes:
       - "./uploads:/server/uploads"
-    expose:
-      - '3080'
-    networks:
-      - transcendence
-
-  adminer:
-    image: adminer
-    container_name: transcendence-adminer
-    restart: always
-    environment:
-      - ADMINER_DEFAULT_SERVER=db
     ports:
-      - '8080:8080'
+      - '3080:3080'
     networks:
       - transcendence
 
@@ -79,8 +30,10 @@ services:
     image: postgres:15.1-alpine
     container_name: transcendence-db
     restart: always
-    env_file:
-      - ./env/.postgres.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - 'data:/var/lib/postgresql/data'
     expose:
